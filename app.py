@@ -3,14 +3,17 @@ import sqlite3
 import json
 import base64
 from datetime import datetime
-from flask import Flask, request, jsonify, send_file, render_template_string
+from uuid import uuid4
+from flask import Flask, request, jsonify, send_file, send_from_directory, render_template_string
+from werkzeug.utils import secure_filename
 
 print("CWD AT STARTUP:", os.getcwd())
 
 app = Flask(__name__)
 BASE_DIR        = os.path.dirname(os.path.abspath(__file__))
-DB_PATH         = 'songs.db'
+DB_PATH         = os.path.join(BASE_DIR, 'songs.db')
 LOCAL_IMAGE_DIR = 'chart_images'
+FILE_UPLOAD_DIR = 'song_files'
 SETTINGS_PATH   = 'app_settings.json'
 INDEX_PATH      = os.path.join(BASE_DIR, "index.html")
 
@@ -46,6 +49,7 @@ def init_db():
             date_performed   TEXT,
             performed_dates_json TEXT,
             reference_media_json TEXT,
+            file_metadata_json TEXT,
             instruments      TEXT,
             chart_json       TEXT,
             row_lead_json    TEXT,
@@ -68,6 +72,7 @@ def init_db():
         ('next_performance_date', 'TEXT'),
         ('performed_dates_json', 'TEXT'),
         ('reference_media_json', 'TEXT'),
+        ('file_metadata_json', 'TEXT'),
     )
     for col_name, col_type in migrations:
         try:
@@ -88,7 +93,8 @@ def init_db():
                 THEN '["' || REPLACE(date_performed, '"', '\"') || '"]'
                 ELSE COALESCE(performed_dates_json, '[]')
             END,
-            reference_media_json = COALESCE(NULLIF(reference_media_json, ''), '{}')
+            reference_media_json = COALESCE(NULLIF(reference_media_json, ''), '{}'),
+            file_metadata_json = COALESCE(NULLIF(file_metadata_json, ''), '[]')
     ''')
     conn.commit()
     conn.close()
@@ -150,6 +156,50 @@ def save_app_settings(data):
     return payload
 
 
+def normalize_file_metadata_value(value):
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except Exception:
+            value = []
+    if not isinstance(value, list):
+        value = []
+
+    files = []
+    for item in value:
+        if isinstance(item, str):
+            item = {"path": item}
+        if not isinstance(item, dict):
+            continue
+
+        name = str(item.get("name") or item.get("title") or item.get("original_filename") or "").strip()
+        path = str(item.get("path") or "").strip()
+        url = str(item.get("url") or "").strip()
+        notes = str(item.get("notes") or item.get("description") or "").strip()
+        kind = str(item.get("kind") or item.get("type") or "Reference").strip() or "Reference"
+        stored_filename = str(item.get("stored_filename") or "").strip()
+        original_filename = str(item.get("original_filename") or "").strip()
+        file_id = str(item.get("id") or uuid4().hex).strip()
+
+        if not (name or path or url or notes or stored_filename or original_filename):
+            continue
+
+        files.append({
+            "id": file_id,
+            "name": name or original_filename or os.path.basename(path) or url or "File",
+            "kind": kind,
+            "path": path,
+            "url": url,
+            "notes": notes,
+            "stored_filename": stored_filename,
+            "original_filename": original_filename,
+            "uploaded": bool(item.get("uploaded") or stored_filename),
+            "size": item.get("size") or None,
+            "added_at": str(item.get("added_at") or datetime.now().isoformat(timespec="seconds"))
+        })
+    return files
+
+
 def normalize_song_payload(data):
     if not isinstance(data, dict):
         data = {}
@@ -192,6 +242,9 @@ def normalize_song_payload(data):
             "info": str(value.get("info") or "").strip()
         }
 
+    def _normalize_file_metadata(value):
+        return normalize_file_metadata_value(value)
+
     current_key = (data.get("current_key") or data.get("key") or "").strip()
     original_key = (data.get("original_key") or current_key).strip()
     performed_dates = _normalize_list(data.get("performed_dates", data.get("performed_dates_json")))
@@ -203,6 +256,9 @@ def normalize_song_payload(data):
 
     reference_media = _normalize_ref_media(
         data.get("reference_media", data.get("reference_media_json"))
+    )
+    file_metadata = _normalize_file_metadata(
+        data.get("file_metadata", data.get("file_metadata_json"))
     )
 
     return {
@@ -219,6 +275,7 @@ def normalize_song_payload(data):
         "date_performed": date_performed,
         "performed_dates": performed_dates,
         "reference_media": reference_media,
+        "file_metadata": file_metadata,
         "instruments": data.get("instruments"),
         "chart_json": data.get("chart_json", data.get("chartjson")),
         "row_lead_json": data.get("row_lead_json", data.get("rowleadjson")),
@@ -292,6 +349,7 @@ def song_row_to_dict(row, full=False):
         "images": [str(v).strip() for v in (ref_media.get("images") or []) if str(v).strip()],
         "info": str(ref_media.get("info") or "").strip()
     }
+    d["file_metadata"] = normalize_file_metadata_value(d.get("file_metadata_json"))
 
     if full:
         if d.get("chart_json"):
@@ -379,7 +437,7 @@ def get_songs():
     Optional query params:
       ?category=Choir
       ?key=G
-      ?q=amazing+grace      (title search)
+      ?q=amazing+grace      (searches title, lyrics/notes, dates, files, and metadata)
     """
     category = request.args.get('category', '').strip()
     key      = request.args.get('key', '').strip()
@@ -387,7 +445,7 @@ def get_songs():
 
     sql    = '''SELECT id, title_karen, title, category, key, current_key, original_key, style, tempo,
                        created_date, next_performance_date, date_performed, performed_dates_json,
-                       reference_media_json, instruments, created_at, updated_at
+                       reference_media_json, file_metadata_json, instruments, notes, created_at, updated_at
                 FROM songs WHERE 1=1'''
     params = []
 
@@ -398,8 +456,26 @@ def get_songs():
         sql    += ' AND COALESCE(NULLIF(current_key, ""), key) = ?'
         params.append(key)
     if q:
-        sql    += ' AND title LIKE ?'
-        params.append(f'%{q}%')
+        like = f'%{q}%'
+        sql += ''' AND (
+            COALESCE(title, '') LIKE ?
+            OR COALESCE(title_karen, '') LIKE ?
+            OR COALESCE(category, '') LIKE ?
+            OR COALESCE(key, '') LIKE ?
+            OR COALESCE(current_key, '') LIKE ?
+            OR COALESCE(original_key, '') LIKE ?
+            OR COALESCE(style, '') LIKE ?
+            OR COALESCE(tempo, '') LIKE ?
+            OR COALESCE(created_date, '') LIKE ?
+            OR COALESCE(next_performance_date, '') LIKE ?
+            OR COALESCE(date_performed, '') LIKE ?
+            OR COALESCE(performed_dates_json, '') LIKE ?
+            OR COALESCE(reference_media_json, '') LIKE ?
+            OR COALESCE(file_metadata_json, '') LIKE ?
+            OR COALESCE(instruments, '') LIKE ?
+            OR COALESCE(notes, '') LIKE ?
+        )'''
+        params.extend([like] * 16)
 
     sql += ' ORDER BY updated_at DESC'
 
@@ -429,9 +505,9 @@ def create_song():
         INSERT INTO songs
             (title_karen, title, category, key, current_key, original_key, style, tempo,
              created_date, next_performance_date, date_performed, performed_dates_json,
-             reference_media_json, instruments, chart_json, row_lead_json, raw_editor_text,
+             reference_media_json, file_metadata_json, instruments, chart_json, row_lead_json, raw_editor_text,
              chart_image_path, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('title_karen'),
         data.get('title'),
@@ -446,6 +522,7 @@ def create_song():
         data.get('date_performed'),
         json.dumps(data.get('performed_dates', []), ensure_ascii=False),
         json.dumps(data.get('reference_media', {}), ensure_ascii=False),
+        json.dumps(data.get('file_metadata', []), ensure_ascii=False),
         data.get('instruments'),
         json.dumps(data.get('chart_json')),
         json.dumps(data.get('row_lead_json')),
@@ -471,7 +548,7 @@ def update_song(song_id):
         UPDATE songs
         SET title_karen=?, title=?, category=?, key=?, current_key=?, original_key=?, style=?, tempo=?,
             created_date=?, next_performance_date=?, date_performed=?, performed_dates_json=?, reference_media_json=?,
-            instruments=?, chart_json=?, row_lead_json=?, raw_editor_text=?,
+            file_metadata_json=?, instruments=?, chart_json=?, row_lead_json=?, raw_editor_text=?,
             chart_image_path=?, notes=?, updated_at=CURRENT_TIMESTAMP
         WHERE id=?
     ''', (
@@ -488,6 +565,7 @@ def update_song(song_id):
         data.get('date_performed'),
         json.dumps(data.get('performed_dates', []), ensure_ascii=False),
         json.dumps(data.get('reference_media', {}), ensure_ascii=False),
+        json.dumps(data.get('file_metadata', []), ensure_ascii=False),
         data.get('instruments'),
         json.dumps(data.get('chart_json')),
         json.dumps(data.get('row_lead_json')),
@@ -509,6 +587,91 @@ def delete_song(song_id):
     conn.commit()
     conn.close()
     return jsonify({'success': True})
+
+
+@app.route('/api/songs/<int:song_id>/files', methods=['POST'])
+def upload_song_file(song_id):
+    upload = request.files.get('file')
+    if not upload or not upload.filename:
+        return jsonify({'error': 'No file selected'}), 400
+
+    conn = get_db()
+    row = conn.execute('SELECT file_metadata_json FROM songs WHERE id = ?', (song_id,)).fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'error': 'Song not found'}), 404
+
+    safe_original = secure_filename(upload.filename) or 'attachment'
+    stored_filename = f"{uuid4().hex}_{safe_original}"
+    song_dir = os.path.join(BASE_DIR, FILE_UPLOAD_DIR, f"song_{song_id}")
+    os.makedirs(song_dir, exist_ok=True)
+    stored_path = os.path.join(song_dir, stored_filename)
+    upload.save(stored_path)
+
+    files = normalize_file_metadata_value(row['file_metadata_json'])
+    display_name = str(request.form.get('name') or upload.filename).strip()
+    item = {
+        "id": uuid4().hex,
+        "name": display_name or upload.filename,
+        "kind": str(request.form.get('kind') or "Reference").strip() or "Reference",
+        "path": os.path.join(FILE_UPLOAD_DIR, f"song_{song_id}", stored_filename).replace("\\", "/"),
+        "url": f"/api/songs/{song_id}/files/{stored_filename}/download",
+        "notes": str(request.form.get('notes') or "").strip(),
+        "stored_filename": stored_filename,
+        "original_filename": upload.filename,
+        "uploaded": True,
+        "size": os.path.getsize(stored_path),
+        "added_at": datetime.now().isoformat(timespec="seconds")
+    }
+    files.append(item)
+
+    conn.execute(
+        'UPDATE songs SET file_metadata_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+        (json.dumps(files, ensure_ascii=False), song_id)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'file': item, 'files': files})
+
+
+@app.route('/api/songs/<int:song_id>/files/<file_id>', methods=['DELETE'])
+def delete_song_file(song_id, file_id):
+    conn = get_db()
+    row = conn.execute('SELECT file_metadata_json FROM songs WHERE id = ?', (song_id,)).fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'error': 'Song not found'}), 404
+
+    files = normalize_file_metadata_value(row['file_metadata_json'])
+    removed = None
+    kept = []
+    for item in files:
+        if str(item.get("id")) == str(file_id):
+            removed = item
+        else:
+            kept.append(item)
+
+    if removed and removed.get("stored_filename"):
+        stored_path = os.path.join(BASE_DIR, FILE_UPLOAD_DIR, f"song_{song_id}", removed["stored_filename"])
+        try:
+            if os.path.isfile(stored_path):
+                os.remove(stored_path)
+        except Exception as e:
+            print(f"[files] failed deleting {stored_path}: {e}")
+
+    conn.execute(
+        'UPDATE songs SET file_metadata_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+        (json.dumps(kept, ensure_ascii=False), song_id)
+    )
+    conn.commit()
+    conn.close()
+    return jsonify({'success': True, 'files': kept})
+
+
+@app.route('/api/songs/<int:song_id>/files/<path:filename>/download', methods=['GET'])
+def download_song_file(song_id, filename):
+    song_dir = os.path.join(BASE_DIR, FILE_UPLOAD_DIR, f"song_{song_id}")
+    return send_from_directory(song_dir, filename, as_attachment=False)
 
 
 # ============================================================

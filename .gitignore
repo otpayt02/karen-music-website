@@ -10,6 +10,8 @@ __pycache__/
 .env
 .env.*
 api_keys.txt
+app_settings.json
+song_files/
 
 .idx/
 .vscode/
@@ -21,6 +23,7 @@ Church_Music_Archive/
 *.pdf
 *.mp3
 *.m4a
+chart_images/song_*.json
 
 app.txt
 app_v*.py

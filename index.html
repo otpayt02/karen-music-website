@@ -10,7 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..800&family=IBM+Plex+Mono:wght@400;600;700&family=Instrument+Sans:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
       /* ============================================================
@@ -36,8 +36,8 @@
         --font-xmarks: 0.6em;
         --font-lead: 10px;
         --row-height-base: 26px;
-        --font-ui: "Manrope", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        --font-display: "Sora", "Avenir Next", "Segoe UI", sans-serif;
+        --font-ui: "Instrument Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        --font-display: "Fraunces", "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
         --font-mono: "IBM Plex Mono", "Courier New", Courier, monospace;
         --font-karen: "Noto Sans Myanmar", "Myanmar Text", sans-serif;
         --sidebar-width: 320px;
@@ -4512,7 +4512,8 @@
 
       @media print {
         .paper-flaps,
-        .lyrics-container {
+        .lyrics-container,
+        .database-container {
           display: none !important;
         }
 
@@ -4525,6 +4526,1600 @@
           opacity: 1 !important;
           filter: none !important;
           box-shadow: none !important;
+        }
+      }
+
+      /* ============================================================
+        NEXT-LEVEL INTERFACE SYSTEM
+        Final layer: theme modes, palette presets, softer controls,
+        polished overlays, and compact motion.
+      ============================================================ */
+      :root {
+        --motion-flow: cubic-bezier(0.16, 1, 0.3, 1);
+        --motion-soft: 420ms;
+        --motion-quick: 170ms;
+        --motion-slow: 680ms;
+        --panel-radius: 18px;
+        --control-radius: 13px;
+        --pill-radius: 999px;
+        --field-pad-y: 8px;
+        --field-pad-x: 11px;
+        --panel-gap: 9px;
+        --ambient-1: rgba(24, 79, 95, 0.15);
+        --ambient-2: rgba(212, 93, 69, 0.12);
+        --ambient-3: rgba(43, 49, 94, 0.1);
+      }
+
+      html[data-theme-effective="light"] {
+        color-scheme: light;
+        --bg-dark: #f7f2ea;
+        --sidebar-bg: rgba(255, 250, 242, 0.86);
+        --surface: rgba(255, 252, 246, 0.78);
+        --surface-2: rgba(232, 240, 238, 0.72);
+        --surface-3: rgba(241, 223, 213, 0.72);
+        --text: #1f2424;
+        --text-muted: #66706d;
+        --border: rgba(31, 36, 36, 0.08);
+        --app-bg: #f7f2ea;
+        --app-bg-soft: rgba(255, 250, 242, 0.78);
+        --panel-bg: rgba(255, 253, 248, 0.72);
+        --panel-bg-strong: rgba(255, 253, 248, 0.92);
+        --field-bg: rgba(255, 255, 255, 0.74);
+        --field-shadow: 0 11px 24px rgba(58, 46, 31, 0.075), inset 0 1px 0 rgba(255,255,255,0.9);
+        --floating-shadow: 0 26px 66px rgba(58, 46, 31, 0.2), inset 0 1px 0 rgba(255,255,255,0.75);
+        --deep-shadow: 0 36px 90px rgba(58, 46, 31, 0.22), inset 0 1px 0 rgba(255,255,255,0.74);
+        --glass-line: rgba(255, 255, 255, 0.42);
+        --chart-bg: #fffef9;
+        --chart-ink: #171717;
+        --measure-border: #161616;
+        --beat-active-bg: rgba(223, 242, 241, 0.95);
+        --beat-active-outline: var(--accent);
+        --lead-row-bg: color-mix(in srgb, var(--accent-2) 13%, transparent);
+      }
+
+      html[data-theme-effective="dark"] {
+        color-scheme: dark;
+        --bg-dark: #070a0f;
+        --sidebar-bg: rgba(13, 17, 24, 0.8);
+        --surface: rgba(18, 24, 33, 0.76);
+        --surface-2: rgba(27, 35, 48, 0.74);
+        --surface-3: rgba(39, 42, 55, 0.72);
+        --text: #eef3f2;
+        --text-muted: #9aa9ad;
+        --border: rgba(255, 255, 255, 0.08);
+        --app-bg: #070a0f;
+        --app-bg-soft: rgba(11, 15, 22, 0.8);
+        --panel-bg: rgba(15, 20, 28, 0.72);
+        --panel-bg-strong: rgba(17, 23, 32, 0.92);
+        --field-bg: rgba(255, 255, 255, 0.075);
+        --field-shadow: 0 12px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+        --floating-shadow: 0 28px 74px rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255,255,255,0.1);
+        --deep-shadow: 0 42px 100px rgba(0, 0, 0, 0.62), inset 0 1px 0 rgba(255,255,255,0.1);
+        --glass-line: rgba(255, 255, 255, 0.12);
+        --chart-bg: #fffdf7;
+        --chart-ink: #161616;
+        --measure-border: #161616;
+        --beat-active-bg: #eaf7f6;
+        --beat-active-outline: var(--accent);
+        --lead-row-bg: color-mix(in srgb, var(--accent-2) 16%, transparent);
+      }
+
+      html[data-palette="ivory"] {
+        --accent: #184f5f;
+        --accent-2: #d45d45;
+        --accent-3: #2b315e;
+        --accent-dim: rgba(24, 79, 95, 0.14);
+        --ambient-1: rgba(24, 79, 95, 0.15);
+        --ambient-2: rgba(212, 93, 69, 0.12);
+        --ambient-3: rgba(43, 49, 94, 0.1);
+      }
+
+      html[data-palette="velvet"] {
+        --accent: #8f6cff;
+        --accent-2: #25d0b5;
+        --accent-3: #ff7188;
+        --accent-dim: rgba(143, 108, 255, 0.16);
+        --ambient-1: rgba(143, 108, 255, 0.19);
+        --ambient-2: rgba(37, 208, 181, 0.14);
+        --ambient-3: rgba(255, 113, 136, 0.12);
+      }
+
+      html[data-palette="aurora"] {
+        --accent: #0f766e;
+        --accent-2: #7c3aed;
+        --accent-3: #f59e0b;
+        --accent-dim: rgba(15, 118, 110, 0.16);
+        --ambient-1: rgba(15, 118, 110, 0.18);
+        --ambient-2: rgba(124, 58, 237, 0.13);
+        --ambient-3: rgba(245, 158, 11, 0.12);
+      }
+
+      html[data-palette="graphite"] {
+        --accent: #2f6f88;
+        --accent-2: #d8a657;
+        --accent-3: #b94a48;
+        --accent-dim: rgba(47, 111, 136, 0.14);
+        --ambient-1: rgba(47, 111, 136, 0.17);
+        --ambient-2: rgba(216, 166, 87, 0.12);
+        --ambient-3: rgba(185, 74, 72, 0.11);
+      }
+
+      html[data-palette="bloom"] {
+        --accent: #ad3b72;
+        --accent-2: #0e9f9a;
+        --accent-3: #3c2b6f;
+        --accent-dim: rgba(173, 59, 114, 0.14);
+        --ambient-1: rgba(173, 59, 114, 0.17);
+        --ambient-2: rgba(14, 159, 154, 0.13);
+        --ambient-3: rgba(60, 43, 111, 0.11);
+      }
+
+      html[data-motion="calm"] {
+        --motion-soft: 260ms;
+        --motion-quick: 130ms;
+        --motion-slow: 420ms;
+      }
+
+      html[data-density="compact"] {
+        --field-pad-y: 7px;
+        --field-pad-x: 10px;
+        --panel-gap: 8px;
+      }
+
+      html[data-density="comfy"] {
+        --field-pad-y: 10px;
+        --field-pad-x: 13px;
+        --panel-gap: 12px;
+      }
+
+      html {
+        background: var(--app-bg);
+        scroll-behavior: smooth;
+      }
+
+      body {
+        position: relative;
+        isolation: isolate;
+        background:
+          radial-gradient(900px 600px at 8% 10%, var(--ambient-1), transparent 68%),
+          radial-gradient(760px 520px at 92% 14%, var(--ambient-2), transparent 70%),
+          radial-gradient(900px 660px at 54% 100%, var(--ambient-3), transparent 72%),
+          linear-gradient(140deg, var(--app-bg-soft), var(--app-bg)) !important;
+        color: var(--text);
+        transition:
+          background var(--motion-slow) var(--motion-flow),
+          color var(--motion-soft) ease;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          repeating-linear-gradient(90deg, color-mix(in srgb, var(--text) 5%, transparent) 0 1px, transparent 1px 92px),
+          repeating-linear-gradient(0deg, color-mix(in srgb, var(--text) 3%, transparent) 0 1px, transparent 1px 92px);
+        opacity: 0.44;
+        transform: translateZ(0);
+      }
+
+      #main-editor {
+        background:
+          radial-gradient(740px 480px at 72% 6%, var(--ambient-2), transparent 72%),
+          linear-gradient(180deg, color-mix(in srgb, var(--panel-bg) 68%, transparent), var(--app-bg-soft)),
+          var(--app-bg) !important;
+        scroll-behavior: smooth;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+        transition:
+          background var(--motion-slow) var(--motion-flow),
+          padding var(--motion-soft) var(--motion-flow);
+      }
+
+      #sidebar {
+        background:
+          linear-gradient(160deg, color-mix(in srgb, var(--panel-bg-strong) 92%, transparent), color-mix(in srgb, var(--surface-2) 64%, transparent)),
+          var(--panel-bg-strong) !important;
+        border-right-color: transparent !important;
+        box-shadow:
+          26px 0 70px color-mix(in srgb, var(--accent) 16%, transparent),
+          inset -1px 0 0 var(--glass-line) !important;
+        backdrop-filter: blur(28px) saturate(1.18);
+        scrollbar-color: color-mix(in srgb, var(--accent) 48%, transparent) transparent;
+      }
+
+      #sidebar.collapsed {
+        box-shadow: none !important;
+      }
+
+      #sidebar-toggle,
+      #lang-toggle,
+      #settings-toggle,
+      #theme-toggle,
+      #shortcut-toggle {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        border: 0 !important;
+        border-radius: var(--pill-radius) !important;
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--panel-bg-strong) 92%, white 8%), color-mix(in srgb, var(--surface-2) 72%, transparent)),
+          var(--panel-bg-strong) !important;
+        color: var(--text) !important;
+        box-shadow:
+          0 14px 34px color-mix(in srgb, var(--accent) 16%, transparent),
+          inset 0 1px 0 var(--glass-line) !important;
+        backdrop-filter: blur(18px) saturate(1.15);
+        transition:
+          transform var(--motion-quick) var(--motion-flow),
+          box-shadow var(--motion-soft) var(--motion-flow),
+          background var(--motion-soft) ease,
+          color var(--motion-soft) ease;
+      }
+
+      #theme-toggle {
+        position: fixed;
+        top: 12px;
+        left: 138px;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-family: var(--font-display);
+        font-size: 15px;
+        line-height: 1;
+      }
+
+      #sidebar-toggle:hover,
+      #lang-toggle:hover,
+      #settings-toggle:hover,
+      #theme-toggle:hover,
+      #shortcut-toggle:hover {
+        transform: translateY(-2px) scale(1.03);
+        color: #fff !important;
+        background:
+          linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+        box-shadow:
+          0 18px 42px color-mix(in srgb, var(--accent) 28%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.22) !important;
+      }
+
+      #settings-panel,
+      #shortcut-panel {
+        border: 0 !important;
+        border-radius: var(--panel-radius) !important;
+        background:
+          linear-gradient(160deg, color-mix(in srgb, var(--panel-bg-strong) 96%, white 4%), color-mix(in srgb, var(--surface-2) 72%, transparent)),
+          var(--panel-bg-strong) !important;
+        color: var(--text) !important;
+        box-shadow: var(--floating-shadow) !important;
+        backdrop-filter: blur(30px) saturate(1.18);
+      }
+
+      #settings-panel {
+        display: block;
+        width: min(360px, calc(100vw - 24px));
+        max-height: min(720px, calc(100vh - 72px));
+        overflow-y: auto;
+        padding: 14px;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-10px) scale(0.97);
+        transition:
+          opacity var(--motion-soft) var(--motion-flow),
+          transform var(--motion-soft) var(--motion-flow),
+          visibility 0s linear var(--motion-soft);
+      }
+
+      #settings-panel.open {
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+        transition-delay: 0s;
+      }
+
+      #shortcut-panel {
+        width: min(620px, calc(100vw - 32px)) !important;
+        max-height: min(760px, calc(100vh - 76px)) !important;
+        right: 18px !important;
+      }
+
+      .shortcut-panel-header {
+        gap: 12px;
+        padding: 14px 16px !important;
+      }
+
+      .shortcut-panel-title {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .shortcut-panel-title strong {
+        font-family: var(--font-display);
+        font-size: 1.02rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--text) 78%, var(--accent) 22%);
+      }
+
+      .shortcut-panel-title span {
+        font-size: 0.72rem;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        color: var(--text-muted);
+      }
+
+      .shortcut-panel-body {
+        padding: 12px !important;
+        display: grid;
+        gap: 10px;
+      }
+
+      .guide-section {
+        border-radius: 15px;
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--field-bg) 88%, transparent), color-mix(in srgb, var(--surface-2) 54%, transparent));
+        box-shadow: inset 0 1px 0 var(--glass-line);
+        overflow: hidden;
+      }
+
+      .guide-section[open] {
+        box-shadow:
+          inset 0 1px 0 var(--glass-line),
+          0 14px 34px color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+
+      .guide-section summary {
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        color: color-mix(in srgb, var(--text) 84%, var(--accent) 16%);
+        font-size: 0.8rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .guide-section summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .guide-section summary::after {
+        content: "+";
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: color-mix(in srgb, var(--accent) 12%, transparent);
+        color: var(--accent);
+        flex: 0 0 auto;
+      }
+
+      .guide-section[open] summary::after {
+        content: "-";
+      }
+
+      .guide-section-body {
+        padding: 0 14px 14px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .guide-section-body p {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 0.86rem;
+        line-height: 1.55;
+      }
+
+      .guide-grid {
+        display: grid;
+        grid-template-columns: minmax(122px, 0.42fr) minmax(0, 1fr);
+        gap: 6px 12px;
+        align-items: start;
+      }
+
+      .guide-grid dt,
+      .guide-kbd {
+        font-family: var(--font-mono);
+        font-size: 0.76rem;
+        font-weight: 800;
+        color: var(--accent);
+      }
+
+      .guide-grid dd {
+        margin: 0;
+        color: var(--text);
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+
+      .guide-sequence {
+        margin: 0;
+        padding-left: 18px;
+        display: grid;
+        gap: 6px;
+        color: var(--text);
+        font-size: 0.82rem;
+        line-height: 1.45;
+      }
+
+      .guide-note {
+        border-left: 3px solid var(--accent-2);
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--accent-2) 9%, transparent);
+        color: var(--text);
+      }
+
+      .settings-row {
+        gap: 12px;
+        margin-bottom: var(--panel-gap);
+      }
+
+      .settings-row-block {
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        padding: 10px;
+        border-radius: 16px;
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--field-bg) 86%, transparent), color-mix(in srgb, var(--surface-2) 54%, transparent));
+        box-shadow: inset 0 1px 0 var(--glass-line);
+      }
+
+      .settings-row-split {
+        grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.25fr);
+        align-items: center;
+      }
+
+      .settings-label,
+      label,
+      .sub-label,
+      .wizard-label {
+        color: var(--text-muted) !important;
+        font-weight: 800;
+      }
+
+      .segmented-control,
+      .palette-grid {
+        display: grid;
+        gap: 6px;
+      }
+
+      .segmented-control {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        padding: 4px;
+        border-radius: var(--pill-radius);
+        background: color-mix(in srgb, var(--text) 8%, transparent);
+        box-shadow: inset 0 1px 2px color-mix(in srgb, #000 18%, transparent);
+      }
+
+      .compact-segment {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .segmented-control button,
+      .palette-option {
+        min-height: 28px;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        color: var(--text-muted) !important;
+        border-radius: var(--pill-radius);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .segmented-control button.is-selected,
+      .segmented-control button[aria-pressed="true"] {
+        background:
+          linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+        color: #fff !important;
+        box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 22%, transparent) !important;
+      }
+
+      .palette-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .palette-option {
+        display: grid;
+        justify-items: center;
+        gap: 5px;
+        padding: 7px 4px;
+        border-radius: 14px;
+      }
+
+      .palette-option.is-selected,
+      .palette-option[aria-pressed="true"] {
+        background: color-mix(in srgb, var(--accent) 12%, transparent) !important;
+        color: var(--text) !important;
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent) !important;
+      }
+
+      .palette-swatch {
+        display: block;
+        width: 28px;
+        height: 18px;
+        border-radius: 999px;
+        box-shadow:
+          0 8px 16px rgba(0,0,0,0.14),
+          inset 0 1px 0 rgba(255,255,255,0.4);
+      }
+
+      .swatch-ivory { background: linear-gradient(120deg, #184f5f, #d45d45, #fffaf2); }
+      .swatch-velvet { background: linear-gradient(120deg, #8f6cff, #25d0b5, #ff7188); }
+      .swatch-aurora { background: linear-gradient(120deg, #0f766e, #7c3aed, #f59e0b); }
+      .swatch-graphite { background: linear-gradient(120deg, #2f6f88, #d8a657, #23272d); }
+      .swatch-bloom { background: linear-gradient(120deg, #ad3b72, #0e9f9a, #3c2b6f); }
+
+      input,
+      select,
+      textarea,
+      #settings-alt-folder,
+      .wizard-input {
+        border-color: transparent !important;
+        border-radius: var(--control-radius) !important;
+        background:
+          linear-gradient(180deg, color-mix(in srgb, var(--field-bg) 94%, white 6%), color-mix(in srgb, var(--field-bg) 72%, transparent)),
+          var(--field-bg) !important;
+        color: var(--text) !important;
+        padding: var(--field-pad-y) var(--field-pad-x);
+        box-shadow: var(--field-shadow) !important;
+        transition:
+          transform var(--motion-quick) var(--motion-flow),
+          box-shadow var(--motion-soft) var(--motion-flow),
+          background var(--motion-soft) ease,
+          color var(--motion-soft) ease;
+      }
+
+      input:hover,
+      select:hover,
+      textarea:hover,
+      .wizard-input:hover {
+        transform: translateY(-1px);
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus,
+      .wizard-input:focus,
+      #wizard-overlay select:focus {
+        border-color: transparent !important;
+        box-shadow:
+          0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent),
+          0 14px 32px color-mix(in srgb, var(--accent) 12%, transparent),
+          inset 0 1px 0 var(--glass-line) !important;
+        outline: 0 !important;
+      }
+
+      button {
+        border-color: transparent !important;
+        transition:
+          transform var(--motion-quick) var(--motion-flow),
+          box-shadow var(--motion-soft) var(--motion-flow),
+          background var(--motion-soft) ease,
+          color var(--motion-soft) ease,
+          opacity var(--motion-quick) ease;
+      }
+
+      button:active {
+        transform: translateY(0) scale(0.985);
+      }
+
+      #btn-new,
+      #btn-save,
+      #btn-print,
+      #btn-export,
+      .wizard-btn-primary {
+        border: 0 !important;
+        color: #fff !important;
+        box-shadow:
+          0 14px 32px color-mix(in srgb, var(--accent) 22%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.24) !important;
+      }
+
+      #btn-new { background: linear-gradient(135deg, var(--accent-2), var(--accent)) !important; }
+      #btn-save { background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important; }
+      #btn-print { background: linear-gradient(135deg, var(--accent-3), var(--accent-2)) !important; }
+      #btn-export { background: linear-gradient(135deg, color-mix(in srgb, var(--accent-3) 84%, #111 16%), var(--accent)) !important; }
+
+      #btn-save.is-saved {
+        background: linear-gradient(135deg, #14b87a, #0f766e) !important;
+        box-shadow:
+          0 16px 36px rgba(20, 184, 122, 0.28),
+          inset 0 1px 0 rgba(255,255,255,0.28) !important;
+      }
+
+      #main-editor > div[style*="text-align:center"] {
+        border: 0 !important;
+        border-radius: 20px !important;
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--panel-bg-strong) 88%, white 6%), color-mix(in srgb, var(--surface-2) 56%, transparent)) !important;
+        box-shadow: var(--floating-shadow) !important;
+        backdrop-filter: blur(24px) saturate(1.14);
+      }
+
+      #view-title {
+        color: color-mix(in srgb, var(--text) 82%, var(--accent) 18%) !important;
+      }
+
+      #view-title::after,
+      .sidebar-title::after {
+        border-radius: 999px !important;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3)) !important;
+        box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 32%, transparent);
+      }
+
+      .song-item,
+      .instr-choice,
+      .instr-tag,
+      .paper-flap,
+      .k-key {
+        border-color: transparent !important;
+      }
+
+      .song-item {
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--field-bg) 94%, white 5%), color-mix(in srgb, var(--surface-2) 52%, transparent)) !important;
+        color: var(--text) !important;
+        box-shadow: var(--field-shadow) !important;
+        transition:
+          transform var(--motion-soft) var(--motion-flow),
+          box-shadow var(--motion-soft) var(--motion-flow),
+          background var(--motion-soft) ease;
+      }
+
+      .song-item:hover {
+        transform: translateX(5px) scale(1.01);
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--accent) 14%, var(--field-bg)), color-mix(in srgb, var(--accent-2) 11%, var(--field-bg))) !important;
+        box-shadow:
+          0 18px 34px color-mix(in srgb, var(--accent) 14%, transparent),
+          inset 0 1px 0 var(--glass-line) !important;
+      }
+
+      .chart-container {
+        border-color: transparent !important;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.99), var(--chart-bg)),
+          var(--chart-bg) !important;
+        box-shadow:
+          0 38px 82px color-mix(in srgb, var(--accent) 13%, rgba(0,0,0,0.18)),
+          0 9px 0 color-mix(in srgb, var(--accent) 9%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.9) !important;
+      }
+
+      .paper-flap {
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--panel-bg-strong) 88%, white 10%), color-mix(in srgb, var(--surface-2) 68%, transparent)) !important;
+        color: var(--text-muted) !important;
+        box-shadow:
+          0 -8px 24px color-mix(in srgb, var(--accent) 8%, transparent),
+          inset 0 1px 0 var(--glass-line) !important;
+      }
+
+      .paper-flap.is-active {
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--accent) 13%, var(--panel-bg-strong)), color-mix(in srgb, var(--panel-bg-strong) 92%, white 8%)) !important;
+        color: color-mix(in srgb, var(--text) 82%, var(--accent) 18%) !important;
+      }
+
+      .modal-overlay,
+      .wizard-overlay,
+      .lang-picker-overlay {
+        background:
+          radial-gradient(900px 620px at 16% 12%, var(--ambient-1), transparent 70%),
+          radial-gradient(820px 560px at 88% 18%, var(--ambient-2), transparent 72%),
+          linear-gradient(145deg, color-mix(in srgb, var(--app-bg) 90%, transparent), var(--app-bg)) !important;
+        transition:
+          opacity var(--motion-soft) var(--motion-flow),
+          background var(--motion-slow) ease;
+      }
+
+      .modal-overlay::before,
+      .wizard-overlay::before,
+      .lang-picker-overlay::before {
+        background:
+          repeating-linear-gradient(90deg, color-mix(in srgb, var(--text) 5%, transparent) 0 1px, transparent 1px 88px),
+          repeating-linear-gradient(0deg, color-mix(in srgb, var(--text) 3%, transparent) 0 1px, transparent 1px 88px) !important;
+        opacity: 0.5;
+      }
+
+      .modal,
+      .wizard-card,
+      .lang-picker-card,
+      .lead-modal-card {
+        position: relative;
+        overflow: hidden;
+        border: 0 !important;
+        border-radius: 24px !important;
+        background:
+          linear-gradient(150deg, color-mix(in srgb, var(--panel-bg-strong) 96%, white 4%), color-mix(in srgb, var(--surface-2) 70%, transparent)),
+          var(--panel-bg-strong) !important;
+        color: var(--text) !important;
+        box-shadow: var(--deep-shadow) !important;
+        backdrop-filter: blur(34px) saturate(1.2);
+      }
+
+      .modal::before,
+      .wizard-card::before,
+      .lang-picker-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(420px 200px at 18% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 70%),
+          radial-gradient(360px 220px at 100% 8%, color-mix(in srgb, var(--accent-2) 16%, transparent), transparent 72%),
+          linear-gradient(180deg, var(--glass-line), transparent 38%);
+        opacity: 0.9;
+      }
+
+      .modal > *,
+      .wizard-card > *,
+      .lang-picker-card > * {
+        position: relative;
+        z-index: 1;
+      }
+
+      .modal h2,
+      .wizard-title,
+      .wizard-step-question,
+      .lang-title-karen,
+      .lang-title-english {
+        color: color-mix(in srgb, var(--text) 84%, var(--accent) 16%) !important;
+        text-shadow: none !important;
+      }
+
+      .lang-btn {
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--field-bg) 92%, white 8%), color-mix(in srgb, var(--surface-2) 58%, transparent)) !important;
+        color: var(--text) !important;
+        box-shadow: var(--field-shadow) !important;
+      }
+
+      .lang-btn .lang-btn-label,
+      .lang-btn .lang-btn-arrow,
+      .lang-btn .lang-btn-script {
+        color: inherit !important;
+      }
+
+      .lang-btn:hover,
+      .lang-btn.selected {
+        background:
+          linear-gradient(135deg, var(--accent), var(--accent-3)) !important;
+        color: #fff !important;
+        box-shadow:
+          0 20px 42px color-mix(in srgb, var(--accent) 24%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.22) !important;
+      }
+
+      .wizard-card {
+        width: min(640px, calc(100vw - 28px));
+        max-height: calc(100vh - 28px);
+        overflow-y: auto;
+        gap: 14px;
+        padding: 24px;
+        animation: wizardInPro var(--motion-soft) var(--motion-flow) both;
+        scrollbar-width: thin;
+      }
+
+      @keyframes wizardInPro {
+        from { opacity: 0; transform: translateY(22px) scale(0.96); filter: blur(8px); }
+        to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+      }
+
+      .wizard-logo {
+        width: 38px;
+        height: 38px;
+        border: 0 !important;
+        border-radius: 14px !important;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+        color: #fff !important;
+        box-shadow:
+          0 14px 30px color-mix(in srgb, var(--accent) 32%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.24);
+      }
+
+      .wizard-title {
+        font-size: 1.08em;
+        letter-spacing: 0.12em;
+      }
+
+      .wizard-fields {
+        gap: 10px;
+      }
+
+      #wizard-quick .wizard-fields {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+
+      #wizard-quick .wizard-field-group:nth-child(1),
+      #wizard-quick .wizard-field-group:nth-child(3),
+      #wizard-quick .wizard-field-group:nth-child(4),
+      #wizard-quick .wizard-field-group:nth-child(5) {
+        grid-column: 1 / -1;
+      }
+
+      #wizard-quick .wizard-fields > div:nth-child(2) {
+        grid-column: 1 / -1;
+      }
+
+      #wizard-step-panels {
+        min-height: 220px;
+        display: grid;
+        align-items: center;
+      }
+
+      .wizard-step-panel {
+        animation: stepFloatIn var(--motion-soft) var(--motion-flow) both;
+      }
+
+      @keyframes stepFloatIn {
+        from { opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(4px); }
+        to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+      }
+
+      .wizard-step-emoji {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        border-radius: 16px;
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent-2) 12%, transparent));
+        box-shadow: inset 0 1px 0 var(--glass-line);
+        font-size: 1.5em;
+      }
+
+      .wizard-step {
+        width: 22px;
+        height: 5px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--text) 18%, transparent);
+        transition:
+          width var(--motion-soft) var(--motion-flow),
+          background var(--motion-soft) ease,
+          transform var(--motion-soft) var(--motion-flow),
+          box-shadow var(--motion-soft) ease;
+      }
+
+      .wizard-step.active {
+        width: 38px;
+        transform: none;
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 13%, transparent);
+      }
+
+      .wizard-step.done {
+        background: color-mix(in srgb, var(--accent) 54%, var(--accent-2) 18%);
+      }
+
+      .wizard-actions {
+        position: sticky;
+        bottom: -1px;
+        gap: 8px;
+        padding-top: 12px;
+        background:
+          linear-gradient(180deg, transparent, color-mix(in srgb, var(--panel-bg-strong) 94%, transparent) 36%, var(--panel-bg-strong));
+      }
+
+      #wizard-quick .wizard-actions,
+      #wizard-guided-actions {
+        background:
+          linear-gradient(180deg, transparent, color-mix(in srgb, var(--panel-bg-strong) 94%, transparent) 36%, var(--panel-bg-strong)) !important;
+      }
+
+      .wizard-btn-primary,
+      .wizard-btn-secondary,
+      .wizard-btn-skip {
+        min-height: 38px;
+        border-radius: var(--pill-radius) !important;
+      }
+
+      .wizard-btn-primary {
+        padding-inline: 24px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+      }
+
+      .wizard-btn-secondary,
+      .wizard-btn-skip {
+        background: color-mix(in srgb, var(--text) 7%, transparent) !important;
+        color: var(--text-muted) !important;
+        box-shadow: inset 0 1px 0 var(--glass-line) !important;
+      }
+
+      .wizard-btn-secondary:hover,
+      .wizard-btn-secondary.selected,
+      .wizard-btn-skip:hover {
+        background: color-mix(in srgb, var(--accent) 16%, transparent) !important;
+        color: var(--text) !important;
+      }
+
+      .wizard-mode-hint,
+      .wizard-mode-link {
+        color: var(--text-muted) !important;
+      }
+
+      .wizard-mode-link {
+        color: var(--accent) !important;
+      }
+
+      #wizard-overlay .instr-checklist,
+      .instr-checklist {
+        background:
+          linear-gradient(180deg, transparent, color-mix(in srgb, var(--field-bg) 78%, transparent) 40%, color-mix(in srgb, var(--field-bg) 78%, transparent) 60%, transparent) !important;
+      }
+
+      .instr-choice,
+      #wizard-overlay .instr-choice {
+        color: var(--text-muted);
+      }
+
+      .instr-choice.is-wheel-focus,
+      .instr-choice:hover,
+      #wizard-overlay .instr-choice.is-wheel-focus,
+      #wizard-overlay .instr-choice:hover {
+        color: var(--text) !important;
+        background:
+          linear-gradient(90deg, color-mix(in srgb, var(--field-bg) 92%, white 6%), color-mix(in srgb, var(--surface-2) 72%, transparent)) !important;
+      }
+
+      .instr-choice.selected,
+      #wizard-overlay .instr-choice.selected {
+        color: var(--text) !important;
+        background:
+          linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, transparent), color-mix(in srgb, var(--accent-2) 12%, transparent)) !important;
+        box-shadow:
+          0 14px 30px color-mix(in srgb, var(--accent) 10%, transparent),
+          inset 3px 0 0 var(--accent-2) !important;
+      }
+
+      .instr-choice.selected::before {
+        border-color: var(--accent) !important;
+        background: var(--accent) !important;
+      }
+
+      .instr-tag {
+        background: color-mix(in srgb, var(--accent) 11%, transparent) !important;
+        color: color-mix(in srgb, var(--text) 74%, var(--accent) 26%) !important;
+      }
+
+      #modal-overlay .modal {
+        width: min(480px, calc(100vw - 28px));
+        padding: 24px;
+      }
+
+      #modal-overlay .modal > div[style*="grid"] {
+        gap: 10px !important;
+      }
+
+      #modal-overlay button[data-section] {
+        min-height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--field-bg) 86%, white 8%), color-mix(in srgb, var(--surface-2) 64%, transparent)) !important;
+        color: var(--text) !important;
+        box-shadow: var(--field-shadow) !important;
+        text-align: left;
+      }
+
+      #modal-overlay button[data-section]:hover {
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--accent) 16%, var(--field-bg)), color-mix(in srgb, var(--accent-2) 12%, var(--field-bg))) !important;
+        transform: translateY(-2px) scale(1.01);
+      }
+
+      .shortcut-hint {
+        color: var(--accent);
+        opacity: 0.76;
+      }
+
+      #section-modal-exit-btn {
+        background: color-mix(in srgb, var(--text) 9%, transparent) !important;
+        color: var(--text-muted) !important;
+        box-shadow: inset 0 1px 0 var(--glass-line) !important;
+      }
+
+      .toast-stack {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 1100;
+        display: grid;
+        gap: 8px;
+        pointer-events: none;
+      }
+
+      .app-toast {
+        min-width: min(300px, calc(100vw - 44px));
+        padding: 11px 14px;
+        border-radius: 16px;
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--panel-bg-strong) 92%, white 8%), color-mix(in srgb, var(--surface-2) 72%, transparent));
+        color: var(--text);
+        box-shadow: var(--floating-shadow);
+        backdrop-filter: blur(24px) saturate(1.12);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+        transition:
+          opacity var(--motion-soft) var(--motion-flow),
+          transform var(--motion-soft) var(--motion-flow);
+      }
+
+      .app-toast.show {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+
+      .app-toast.success {
+        box-shadow:
+          0 18px 44px rgba(20, 184, 122, 0.18),
+          inset 0 1px 0 var(--glass-line);
+      }
+
+      @media (max-width: 720px) {
+        #theme-toggle {
+          left: 12px;
+          top: 54px;
+        }
+
+        #settings-panel {
+          left: 12px;
+          top: 96px;
+        }
+
+        #shortcut-panel {
+          right: 12px !important;
+          top: 54px;
+          width: calc(100vw - 24px) !important;
+        }
+
+        .guide-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .settings-row-split {
+          grid-template-columns: 1fr;
+        }
+
+        .palette-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .wizard-card {
+          width: min(430px, calc(100vw - 22px));
+          padding: 18px;
+          border-radius: 20px !important;
+        }
+
+        #wizard-quick .wizard-fields {
+          grid-template-columns: 1fr;
+        }
+
+        #wizard-quick .wizard-field-group,
+        #wizard-quick .wizard-fields > div:nth-child(2) {
+          grid-column: 1 / -1 !important;
+        }
+
+        #wizard-step-panels {
+          min-height: 190px;
+        }
+
+        .wizard-actions {
+          flex-wrap: wrap;
+        }
+
+        .wizard-btn-primary {
+          flex: 1;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        body::before {
+          animation: none !important;
+        }
+      }
+
+      /* ============================================================
+        TYPOGRAPHIC ATELIER PASS
+        Final visual layer only: sharper hierarchy, calmer controls,
+        and smoother object feel without changing data behavior.
+      ============================================================ */
+      :root {
+        --font-ui: "Instrument Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        --font-display: "Fraunces", "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
+        --headline-balance: 1.03;
+      }
+
+      html[data-palette="velvet"] {
+        --accent: #9b315f;
+        --accent-2: #0f9f9a;
+        --accent-3: #dfb15b;
+        --accent-dim: rgba(155, 49, 95, 0.15);
+        --ambient-1: rgba(155, 49, 95, 0.16);
+        --ambient-2: rgba(15, 159, 154, 0.13);
+        --ambient-3: rgba(223, 177, 91, 0.11);
+      }
+
+      *, *::before, *::after {
+        letter-spacing: 0 !important;
+      }
+
+      body {
+        font-optical-sizing: auto;
+        text-rendering: optimizeLegibility;
+      }
+
+      h2,
+      h3,
+      .sidebar-title,
+      #view-title,
+      .wizard-title,
+      .wizard-step-question,
+      .lang-title-english,
+      .lyrics-english-title {
+        font-family: var(--font-display) !important;
+        font-weight: 760 !important;
+        line-height: var(--headline-balance);
+        text-wrap: balance;
+      }
+
+      .lang-title-english,
+      .wizard-step-question,
+      #view-title {
+        font-size-adjust: 0.52;
+      }
+
+      button,
+      input,
+      select,
+      textarea,
+      .paper-flap,
+      .segmented-control button,
+      .palette-option,
+      .song-item,
+      .settings-label,
+      .sub-label,
+      .wizard-label,
+      .lyrics-meta,
+      .lyrics-empty,
+      .lyrics-footer {
+        font-family: var(--font-ui) !important;
+      }
+
+      .sidebar-title,
+      #view-title {
+        color: color-mix(in srgb, var(--text) 78%, var(--accent) 22%) !important;
+      }
+
+      .settings-row-block,
+      .guide-section,
+      .song-item,
+      input,
+      select,
+      textarea {
+        border: 1px solid color-mix(in srgb, var(--text) 7%, transparent) !important;
+      }
+
+      #settings-panel,
+      #shortcut-panel,
+      .modal,
+      .wizard-card,
+      .lang-picker-card,
+      .lead-modal-card {
+        border: 1px solid color-mix(in srgb, var(--text) 8%, transparent) !important;
+      }
+
+      .paper-stage {
+        perspective: 1200px;
+      }
+
+      .paper-card {
+        transform-origin: 50% 18%;
+      }
+
+      .paper-card.is-active {
+        animation: paperArrive var(--motion-soft) var(--motion-flow) both;
+      }
+
+      @keyframes paperArrive {
+        from {
+          opacity: 0.86;
+          transform: translate3d(0, 12px, 0) rotateX(1.5deg) scale(0.993);
+          filter: blur(3px) saturate(0.92);
+        }
+        to {
+          opacity: 1;
+          transform: translate3d(0, 0, 0) rotateX(0) scale(1);
+          filter: blur(0) saturate(1);
+        }
+      }
+
+      .section,
+      .measure,
+      .beat {
+        transition:
+          transform var(--motion-soft) var(--motion-flow),
+          opacity var(--motion-soft) ease,
+          background var(--motion-soft) ease,
+          border-color var(--motion-soft) ease,
+          box-shadow var(--motion-soft) var(--motion-flow);
+      }
+
+      .section:hover {
+        transform: translateY(-1px);
+      }
+
+      .measure:hover {
+        box-shadow:
+          0 10px 18px color-mix(in srgb, var(--accent) 8%, transparent),
+          inset 0 0 0 1px color-mix(in srgb, var(--accent) 14%, transparent);
+      }
+
+      .beat.active {
+        transform: translateY(-1px) scale(1.015);
+      }
+
+      .wizard-card,
+      .modal,
+      .lang-picker-card {
+        max-width: min(680px, calc(100vw - 28px));
+      }
+
+      .wizard-input,
+      #wizard-overlay select,
+      #wizard-overlay textarea {
+        min-height: 44px;
+      }
+
+      .app-toast {
+        border: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
+      }
+
+      /* ============================================================
+        DATABASE PAPER
+      ============================================================ */
+      .paper-flaps {
+        gap: 7px;
+      }
+
+      .paper-flap-database {
+        min-width: 104px;
+      }
+
+      .database-container {
+        min-height: 1056px;
+        padding: 30px 34px 38px;
+        border-radius: 14px 14px 6px 6px;
+        color: #112827;
+        background:
+          radial-gradient(520px 340px at 14% 0%, rgba(255, 255, 255, 0.58), transparent 70%),
+          radial-gradient(540px 360px at 100% 12%, rgba(223, 177, 91, 0.22), transparent 72%),
+          linear-gradient(145deg, rgba(226, 248, 244, 0.98), rgba(249, 240, 221, 0.98) 54%, rgba(246, 226, 232, 0.98)),
+          #e8f5f0;
+        box-shadow:
+          0 38px 78px color-mix(in srgb, var(--accent-2) 17%, rgba(0,0,0,0.18)),
+          0 9px 0 rgba(15, 159, 154, 0.1),
+          inset 0 1px 0 rgba(255,255,255,0.88);
+        overflow: hidden;
+      }
+
+      .database-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: end;
+        padding-bottom: 18px;
+        border-bottom: 2px solid rgba(17, 40, 39, 0.72);
+      }
+
+      .database-eyebrow {
+        margin-bottom: 5px;
+        color: rgba(17, 40, 39, 0.66);
+        font-size: 0.72rem;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .database-title {
+        margin: 0;
+        color: #112827;
+        font-family: var(--font-display);
+        font-size: clamp(1.6rem, 4vw, 2.35rem);
+        font-weight: 780;
+        line-height: 1.02;
+      }
+
+      .database-meta-line {
+        margin-top: 8px;
+        color: rgba(17, 40, 39, 0.7);
+        font-size: 0.92rem;
+        font-weight: 750;
+      }
+
+      .database-count {
+        min-width: 92px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.54);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+        color: #0f766e;
+        font-weight: 900;
+        text-align: center;
+      }
+
+      .database-search-band {
+        margin: 20px 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .database-search-band label,
+      .database-section-title {
+        color: rgba(17, 40, 39, 0.72) !important;
+        font-size: 0.78rem;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .database-search-row,
+      .database-file-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .database-search-row input,
+      .database-file-grid input,
+      .database-file-grid select,
+      .database-file-grid textarea {
+        min-height: 42px;
+        color: #112827 !important;
+        background: rgba(255,255,255,0.66) !important;
+      }
+
+      .database-clear-btn,
+      .database-add-btn,
+      .database-file-remove {
+        min-height: 42px;
+        border-radius: 999px !important;
+        color: #fff !important;
+        background: linear-gradient(135deg, #0f766e, #9b315f) !important;
+        box-shadow:
+          0 14px 28px rgba(15, 118, 110, 0.2),
+          inset 0 1px 0 rgba(255,255,255,0.24) !important;
+      }
+
+      .database-layout {
+        display: grid;
+        grid-template-columns: minmax(230px, 0.92fr) minmax(0, 1.25fr);
+        gap: 18px;
+        align-items: start;
+      }
+
+      .database-column {
+        min-width: 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .database-results,
+      .database-details,
+      .database-file-area {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.42);
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,0.72),
+          0 18px 36px rgba(17, 40, 39, 0.08);
+      }
+
+      #database-results,
+      #database-file-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      #database-results {
+        max-height: 540px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+
+      .database-song-row {
+        width: 100%;
+        min-height: 72px;
+        padding: 11px 12px;
+        display: grid;
+        gap: 4px;
+        border-radius: 14px !important;
+        text-align: left;
+        color: #112827 !important;
+        background: rgba(255,255,255,0.58) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.72) !important;
+      }
+
+      .database-song-row:hover,
+      .database-song-row.is-active {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, rgba(15,118,110,0.14), rgba(155,49,95,0.1)) !important;
+      }
+
+      .database-song-title {
+        font-weight: 900;
+        color: #112827;
+      }
+
+      .database-song-meta,
+      .database-song-snippet {
+        color: rgba(17, 40, 39, 0.68);
+        font-size: 0.8rem;
+        line-height: 1.35;
+      }
+
+      .database-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .database-meta-pill {
+        min-height: 54px;
+        padding: 9px 10px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.48);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+      }
+
+      .database-meta-pill span {
+        display: block;
+        color: rgba(17, 40, 39, 0.58);
+        font-size: 0.68rem;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .database-meta-pill strong {
+        display: block;
+        margin-top: 3px;
+        overflow-wrap: anywhere;
+        color: #112827;
+        font-size: 0.96rem;
+      }
+
+      .database-notes-preview {
+        min-height: 96px;
+        padding: 12px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.42);
+        color: rgba(17, 40, 39, 0.75);
+        white-space: pre-wrap;
+        line-height: 1.5;
+      }
+
+      .database-file-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .database-file-grid .wide {
+        grid-column: 1 / -1;
+      }
+
+      .database-file-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .database-file-picker {
+        min-width: min(100%, 260px);
+        color: #112827 !important;
+      }
+
+      .database-file-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: start;
+        padding: 11px 12px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.54);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+      }
+
+      .database-file-name {
+        color: #112827;
+        font-weight: 900;
+      }
+
+      .database-file-meta {
+        margin-top: 3px;
+        color: rgba(17, 40, 39, 0.66);
+        font-size: 0.8rem;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+      }
+
+      .database-file-link {
+        color: #0f766e;
+        font-weight: 850;
+        text-decoration: none;
+      }
+
+      .database-empty {
+        padding: 18px;
+        border-radius: 14px;
+        color: rgba(17, 40, 39, 0.62);
+        background: rgba(255,255,255,0.34);
+        text-align: center;
+        font-weight: 850;
+      }
+
+      @media (max-width: 900px) {
+        .database-layout {
+          grid-template-columns: 1fr;
+        }
+
+        #database-results {
+          max-height: 360px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .database-container {
+          padding: 24px 18px 34px;
+        }
+
+        .database-header,
+        .database-search-row,
+        .database-file-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .database-count {
+          justify-self: start;
+        }
+
+        .database-meta-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media print {
+        body::before,
+        .toast-stack,
+        #theme-toggle,
+        .database-container {
+          display: none !important;
         }
       }
     </style>
@@ -4655,8 +6250,6 @@
 
       <!-- MODE 2: Guided multi-step -->
       <div id="wizard-guided" class="wizard-card" style="display:none;">
-        <div class="wizard-logo">✦</div>
-
         <!-- Step indicator -->
         <div class="wizard-steps">
           <div class="wizard-step" id="ws-dot-0"></div>
@@ -5004,6 +6597,7 @@
         <div class="paper-flaps" aria-label="Paper view tabs">
           <button type="button" class="paper-flap paper-flap-chart is-active" onclick="setPaperView('chart')" aria-pressed="true">Chart</button>
           <button type="button" class="paper-flap paper-flap-lyrics" onclick="setPaperView('lyrics')" aria-pressed="false">Lyrics</button>
+          <button type="button" class="paper-flap paper-flap-database" onclick="setPaperView('database')" aria-pressed="false">Database</button>
         </div>
 
         <div class="paper-stage">
@@ -5045,6 +6639,62 @@
               <span id="lyrics-footer-right">Lyrics Sheet</span>
             </div>
           </div>
+
+          <div class="database-container paper-card paper-card-database is-behind" id="database-container" tabindex="0" aria-label="Database sheet">
+            <div class="database-header">
+              <div>
+                <div class="database-eyebrow">Archive Workspace</div>
+                <h2 class="database-title" id="database-active-title">New Song</h2>
+                <div class="database-meta-line" id="database-active-meta">Search, files, and song metadata</div>
+              </div>
+              <div class="database-count" id="database-result-count">0 songs</div>
+            </div>
+
+            <div class="database-search-band">
+              <label for="database-search">Search Any Metadata</label>
+              <div class="database-search-row">
+                <input id="database-search" type="search" placeholder="Title, key, style, dates, notes, file names...">
+                <button type="button" class="database-clear-btn" id="database-clear-search">Clear</button>
+              </div>
+            </div>
+
+            <div class="database-layout">
+              <section class="database-column database-results" aria-label="Database results">
+                <div class="database-section-title">Songs</div>
+                <div id="database-results"></div>
+              </section>
+
+              <section class="database-column" aria-label="Selected song metadata">
+                <div class="database-details">
+                  <div class="database-section-title">Selected Song</div>
+                  <div class="database-meta-grid" id="database-meta-grid"></div>
+                  <div class="database-notes-preview" id="database-notes-preview">Notes and lyrics will appear here.</div>
+                </div>
+
+                <div class="database-file-area">
+                  <div class="database-section-title">Files and References</div>
+                  <div class="database-file-grid">
+                    <input id="db-file-name" type="text" placeholder="File title">
+                    <select id="db-file-kind" aria-label="File type">
+                      <option value="Lead Sheet">Lead Sheet</option>
+                      <option value="Audio">Audio</option>
+                      <option value="Video">Video</option>
+                      <option value="PDF">PDF</option>
+                      <option value="Image">Image</option>
+                      <option value="Reference">Reference</option>
+                    </select>
+                    <input id="db-file-path" class="wide" type="text" placeholder="URL or local file path">
+                    <textarea id="db-file-notes" class="wide" rows="2" placeholder="Notes, source, arrangement details, permissions..."></textarea>
+                  </div>
+                  <div class="database-file-actions">
+                    <input id="db-file-input" class="database-file-picker" type="file">
+                    <button type="button" class="database-add-btn" id="db-add-file">Add File</button>
+                  </div>
+                  <div id="database-file-list"></div>
+                </div>
+              </section>
+            </div>
+          </div>
         </div>
       </div>
       <div id="print-batch"></div>
@@ -5057,34 +6707,161 @@
 
     <div id="shortcut-panel">
       <div class="shortcut-panel-header">
-        Keyboard Shortcuts
-        <button class="shortcut-close" id="shortcut-close">×</button>
+        <div class="shortcut-panel-title">
+          <strong>App Guide</strong>
+          <span>Shortcuts, workflows, rules, and sequences</span>
+        </div>
+        <button class="shortcut-close" id="shortcut-close" aria-label="Close guide">×</button>
       </div>
       <div class="shortcut-panel-body">
-        <ul>
-          <li><strong>Enter</strong> Section modal</li>
-          <li><strong>Arrow keys</strong> Move focus</li>
-          <li><strong>Space / Tab</strong> Advance beat</li>
-          <li><strong>Backspace</strong> Clear beat (or prev)</li>
-          <li><strong>L</strong> Toggle lead row</li>
-          <li><strong>3 / 4</strong> Lead slots (in modal)</li>
-          <li><strong>A – G</strong> Set chord root</li>
-          <li><strong>B</strong> Flat (♭)</li>
-          <li><strong>M</strong> Minor</li>
-          <li><strong>T then 7</strong> Δ7 superscript</li>
-          <li><strong>7</strong> Plain 7 (subscript)</li>
-          <li><strong>/ then A–G</strong> Bass note</li>
-          <li><strong>.</strong> Push (dot + underline + x)</li>
-          <li><strong>X</strong> Add x mark (max 4)</li>
-          <li><strong>R</strong> Roll</li>
-          <li><strong>O</strong> Circle</li>
-          <li><strong>S</strong> Start / end slur</li>
-          <li><strong>,</strong> Only / All In span</li>
-          <li><strong>Ctrl + Z / Y</strong> Undo / Redo</li>
-          <li><strong>Ctrl + ↑</strong> Print</li>
-          <li><strong>Esc</strong> Clear pending / panic</li>
-          <li><strong>?</strong> Toggle this panel</li>
-        </ul>
+        <details class="guide-section" open>
+          <summary>Start Here</summary>
+          <div class="guide-section-body">
+            <p>The editor listens for chart shortcuts only when focus is on the invisible editor target. When you close the sidebar, exit the wizard, or return from the Chart tab, focus is routed there automatically.</p>
+            <dl class="guide-grid">
+              <dt>?</dt><dd>Open or close this guide.</dd>
+              <dt>☰ / ×</dt><dd>Open or close the sidebar. Closing the sidebar returns focus to the chart editor.</dd>
+              <dt>Gear</dt><dd>Open settings for language, theme, palette, motion, density, time signature, default measures per row, and alternate song folder.</dd>
+              <dt>Chart / Lyrics</dt><dd>Use the paper flaps above the sheet to bring either the chord chart or the lyrics sheet to the front.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section" open>
+          <summary>Core Chart Navigation</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>Arrow keys</dt><dd>Move the active beat left, right, up, or down through the chart.</dd>
+              <dt>Space</dt><dd>Advance to the next beat. If you are at the end, the app creates the next measure.</dd>
+              <dt>Tab</dt><dd>Advance to the next measure and land on beat 1.</dd>
+              <dt>Ctrl + Space</dt><dd>Insert a new measure after the current one using the current beat number as the new measure length.</dd>
+              <dt>Ctrl + Tab</dt><dd>Split the current measure after the active beat, then move into a new measure.</dd>
+              <dt>Backspace</dt><dd>Smart delete: remove the latest visible change from the beat, or move backward/delete empty trailing structures when the current beat is empty.</dd>
+              <dt>Delete</dt><dd>Delete the current measure. If the section has only one empty measure, delete the section and jump back.</dd>
+              <dt>Esc</dt><dd>Clear pending states such as bass-entry or triangle/superscript mode.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Chord Entry Rules</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>A-G</dt><dd>Set the chord root on the active beat. B creates a B root when the beat is empty.</dd>
+              <dt>B</dt><dd>When a root already exists, toggle flat on that chord.</dd>
+              <dt>M</dt><dd>Toggle minor on the active chord.</dd>
+              <dt>7</dt><dd>Add or toggle a plain seventh.</dd>
+              <dt>T then 7</dt><dd>Enter the triangle/superscript seventh sequence.</dd>
+              <dt>/ then A-G</dt><dd>Arm bass mode, then press a note letter to set the bass note. Press / again on a beat with bass to clear it.</dd>
+            </dl>
+            <p class="guide-note">Most chord-mark commands require a root chord first. The app ignores rhythm marks that would not make sense on an empty beat.</p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Rhythm Marks And Spans</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>.</dt><dd>Toggle push: dot plus underline behavior on the active rooted beat.</dd>
+              <dt>X</dt><dd>Add x marks for rhythmic hits. It cycles up to four manual x marks.</dd>
+              <dt>O</dt><dd>Toggle a circle. Turning on a circle clears dot/x marks for that beat.</dd>
+              <dt>R</dt><dd>Toggle a roll for the current measure. Measure-level roll clears beat-level roll marks.</dd>
+              <dt>S</dt><dd>Start, finish, or delete a beat-spanning slur.</dd>
+              <dt>,</dt><dd>Start or finish an Only / All In cue span.</dd>
+              <dt>Ctrl + 1-4</dt><dd>Toggle manual underline on beat 1, 2, 3, or 4 of the current measure when the target beat has no structural underline.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Sections And Measures</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>Enter</dt><dd>Open the Add Section modal from the editor.</dd>
+              <dt>I / V / P / C / B / S / E</dt><dd>Inside the section modal, add Intro, Verse, Pre-Chorus, Chorus, Bridge, Solo, or Ending.</dd>
+              <dt>Esc</dt><dd>Close the section modal without adding a section.</dd>
+              <dt>+ between sections</dt><dd>Click an insert line to add a new section at that location.</dd>
+              <dt>Left section rail</dt><dd>Toggle a 2-beat pre-measure for that section.</dd>
+              <dt>Row +/-</dt><dd>Use the section controls to change how many measures fit on each row.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Lead Melody Modal</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>L</dt><dd>Open the lead melody modal for the current measure.</dd>
+              <dt>Tab 1: 1-8</dt><dd>Choose the base octave.</dd>
+              <dt>Tab 2: 3 / 4</dt><dd>Choose lead spaces per beat.</dd>
+              <dt>Tab 2: ← / →</dt><dd>Switch between 3-slot and 4-slot lead spacing.</dd>
+              <dt>Tab 2/3: ↑ / ↓</dt><dd>Shift the working octave wheel up or down.</dd>
+              <dt>Tab 3: 1-7</dt><dd>Place a scale-degree note in the active lead cell.</dd>
+              <dt>Tab 3: 0 / Backspace / Delete</dt><dd>Clear the active lead cell.</dd>
+              <dt>Tab 3: ← / → / Space</dt><dd>Move across the lead grid.</dd>
+              <dt>Enter</dt><dd>Advance to the next lead step, or save when the modal is complete.</dd>
+              <dt>Ctrl + Z / Y</dt><dd>Undo or redo edits inside the lead modal.</dd>
+              <dt>Esc</dt><dd>Cancel and close the lead modal.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Lyrics Sheet</summary>
+          <div class="guide-section-body">
+            <ol class="guide-sequence">
+              <li>Open the sidebar and type lyrics or notes in the Notes field.</li>
+              <li>Close the sidebar or click the Lyrics flap above the paper stack.</li>
+              <li>The Lyrics paper comes forward and formats blank-line-separated text as stanzas.</li>
+              <li>Click Chart to return to chord editing; focus returns to the editor target.</li>
+            </ol>
+            <p class="guide-note">The lyrics sheet uses the existing Notes field, so it saves with the song without adding a new data field.</p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Sidebar Workflows</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>New</dt><dd>Clear the current form and open the new-song wizard.</dd>
+              <dt>Save</dt><dd>Save the song metadata, chart JSON, lead rows, dates, notes, and reference media.</dd>
+              <dt>Print</dt><dd>Create one print packet for each selected instrument plus a Reference copy.</dd>
+              <dt>Export</dt><dd>Download the local song database.</dd>
+              <dt>Instruments</dt><dd>Select instruments in the wheel/list. Selected instruments control print packets and footer labels.</dd>
+              <dt>Dates</dt><dd>Date Created, Next Performance, and performed-date log flow into the sheet footer and saved song metadata.</dd>
+              <dt>Reference / Media</dt><dd>Store YouTube links, handwritten/photo links, and notes for the song.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Settings And Appearance</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>Wizard mode</dt><dd>Choose quick song setup or guided step-by-step setup.</dd>
+              <dt>Language</dt><dd>Switch between English and Karen UI labels.</dd>
+              <dt>Theme</dt><dd>Use Auto, Light, or Dark modes when available.</dd>
+              <dt>Palette</dt><dd>Change the interface color set without changing chart data.</dd>
+              <dt>Motion</dt><dd>Choose silky or calmer motion.</dd>
+              <dt>Density</dt><dd>Choose compact or comfy control spacing.</dd>
+              <dt>Time Signature</dt><dd>Switch between 4/4 and 3/4. Existing measures normalize unless specifically preserved by saved data.</dd>
+              <dt>Measures / row</dt><dd>Set the default row density for new/auto sections.</dd>
+              <dt>Alternate folder</dt><dd>Choose or save a different song folder path for the backend settings.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Undo, Print, And Safety</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>Ctrl + Z</dt><dd>Undo the latest chart edit.</dd>
+              <dt>Ctrl + Y</dt><dd>Redo the latest undone chart edit.</dd>
+              <dt>Ctrl + P</dt><dd>Print instrument packets.</dd>
+              <dt>Browser focus</dt><dd>If shortcuts stop responding, close text fields/sidebar or click the chart paper; the editor target will receive shortcut focus again.</dd>
+            </dl>
+          </div>
+        </details>
       </div>
     </div>
 
@@ -5204,6 +6981,7 @@
           images: [],
           info: ""
         },
+        fileMetadata: [],
         sections: [],
         currentSectionIdx: 0,
         pendingSectionInsertIndex: null,
@@ -5243,6 +7021,9 @@
         },
         karenInputTargetId: null,
       };
+
+      let songsCache = [];
+      let databaseSearchTimer = 0;
 
       function initializeInstrumentChoiceButtons() {
         ["instr-sidebar","instr-wq","instr-wg"].forEach(id => {
@@ -7681,37 +9462,59 @@
         }
       }
 
-      function setPaperView(view) {
-        activePaperView = view === "lyrics" ? "lyrics" : "chart";
+      function setPaperView(view, opts = {}) {
+        activePaperView = ["chart", "lyrics", "database"].includes(view) ? view : "chart";
+        const shouldFocus = opts.focus !== false;
         const stack = document.getElementById("paper-stack");
         const chart = document.getElementById("chart-container");
         const lyrics = document.getElementById("lyrics-container");
+        const database = document.getElementById("database-container");
         const chartFlap = document.querySelector(".paper-flap-chart");
         const lyricsFlap = document.querySelector(".paper-flap-lyrics");
+        const databaseFlap = document.querySelector(".paper-flap-database");
+        const showChart = activePaperView === "chart";
         const showLyrics = activePaperView === "lyrics";
+        const showDatabase = activePaperView === "database";
 
         if (stack) stack.dataset.activePaper = activePaperView;
         if (chart) {
-          chart.classList.toggle("is-active", !showLyrics);
-          chart.classList.toggle("is-behind", showLyrics);
-          chart.setAttribute("aria-hidden", showLyrics ? "true" : "false");
+          chart.classList.toggle("is-active", showChart);
+          chart.classList.toggle("is-behind", !showChart);
+          chart.setAttribute("aria-hidden", showChart ? "false" : "true");
         }
         if (lyrics) {
           lyrics.classList.toggle("is-active", showLyrics);
           lyrics.classList.toggle("is-behind", !showLyrics);
           lyrics.setAttribute("aria-hidden", showLyrics ? "false" : "true");
         }
+        if (database) {
+          database.classList.toggle("is-active", showDatabase);
+          database.classList.toggle("is-behind", !showDatabase);
+          database.setAttribute("aria-hidden", showDatabase ? "false" : "true");
+        }
         if (chartFlap) {
-          chartFlap.classList.toggle("is-active", !showLyrics);
-          chartFlap.setAttribute("aria-pressed", showLyrics ? "false" : "true");
+          chartFlap.classList.toggle("is-active", showChart);
+          chartFlap.setAttribute("aria-pressed", showChart ? "true" : "false");
         }
         if (lyricsFlap) {
           lyricsFlap.classList.toggle("is-active", showLyrics);
           lyricsFlap.setAttribute("aria-pressed", showLyrics ? "true" : "false");
         }
+        if (databaseFlap) {
+          databaseFlap.classList.toggle("is-active", showDatabase);
+          databaseFlap.setAttribute("aria-pressed", showDatabase ? "true" : "false");
+        }
+
+        if (!shouldFocus) {
+          if (showDatabase) renderDatabaseSheet(songsCache);
+          return;
+        }
 
         if (showLyrics) {
           lyrics?.focus({ preventScroll: true });
+        } else if (showDatabase) {
+          database?.focus({ preventScroll: true });
+          renderDatabaseSheet(songsCache);
         } else {
           focusEditor();
         }
@@ -7766,6 +9569,358 @@
           stanza.textContent = clean;
           body.appendChild(stanza);
         });
+      }
+
+      function normalizeFileMetadataList(value) {
+        if (!Array.isArray(value)) return [];
+        return value
+          .filter(Boolean)
+          .map(item => {
+            const file = typeof item === "string" ? { path: item } : item;
+            if (!file || typeof file !== "object") return null;
+            const name = String(file.name || file.title || file.original_filename || file.path || file.url || "File").trim();
+            return {
+              id: String(file.id || `local-${Date.now()}-${Math.random().toString(16).slice(2)}`),
+              name: name || "File",
+              kind: String(file.kind || file.type || "Reference").trim() || "Reference",
+              path: String(file.path || "").trim(),
+              url: String(file.url || "").trim(),
+              notes: String(file.notes || file.description || "").trim(),
+              original_filename: String(file.original_filename || "").trim(),
+              stored_filename: String(file.stored_filename || "").trim(),
+              uploaded: !!(file.uploaded || file.stored_filename),
+              size: file.size || null,
+              added_at: String(file.added_at || new Date().toISOString())
+            };
+          })
+          .filter(Boolean);
+      }
+
+      function readableFileSize(size) {
+        const n = Number(size);
+        if (!Number.isFinite(n) || n <= 0) return "";
+        if (n < 1024) return `${n} B`;
+        if (n < 1024 * 1024) return `${Math.round(n / 102.4) / 10} KB`;
+        return `${Math.round(n / 1024 / 102.4) / 10} MB`;
+      }
+
+      function activeSongDatabaseMeta() {
+        const titleEnglish = String(document.getElementById("songTitle")?.value || "").trim();
+        const titleKaren = String(document.getElementById("songTitleKaren")?.value || "").trim();
+        const key = normalizeKeyToFlat(document.getElementById("songKey")?.value || state.currentKey || "");
+        const tempo = String(document.getElementById("songTempo")?.value || "").trim();
+        const category = String(document.getElementById("songCategory")?.value || "").trim();
+        const style = String(document.getElementById("songStyle")?.value || "").trim();
+        const instruments = String(document.getElementById("songInstruments")?.value || "").trim();
+        const notes = String(document.getElementById("karenText")?.value || "").trim();
+        return {
+          title: titleEnglish || titleKaren || "New Song",
+          titleKaren,
+          key,
+          tempo,
+          category,
+          style,
+          instruments,
+          notes,
+          created: state.createdDate || "",
+          nextPerformance: state.nextPerformanceDate || "",
+          performed: Array.isArray(state.performedDates) ? state.performedDates.join(", ") : "",
+          files: normalizeFileMetadataList(state.fileMetadata)
+        };
+      }
+
+      function renderDatabaseSheet(songs = songsCache) {
+        const database = document.getElementById("database-container");
+        if (!database) return;
+
+        const meta = activeSongDatabaseMeta();
+        const title = document.getElementById("database-active-title");
+        const metaLine = document.getElementById("database-active-meta");
+        const count = document.getElementById("database-result-count");
+        const grid = document.getElementById("database-meta-grid");
+        const notesPreview = document.getElementById("database-notes-preview");
+        const results = document.getElementById("database-results");
+        const filesList = document.getElementById("database-file-list");
+
+        if (title) title.textContent = meta.title;
+        if (metaLine) {
+          metaLine.textContent = [
+            meta.key ? `Key ${meta.key}` : "",
+            meta.tempo ? `${meta.tempo} BPM` : "",
+            meta.category,
+            meta.style,
+            meta.instruments
+          ].filter(Boolean).join(" / ") || "Search, files, and song metadata";
+        }
+        if (count) count.textContent = `${Array.isArray(songs) ? songs.length : 0} song${Array.isArray(songs) && songs.length === 1 ? "" : "s"}`;
+
+        if (grid) {
+          grid.innerHTML = "";
+          [
+            ["Karen Title", meta.titleKaren || "—"],
+            ["Category", meta.category || "—"],
+            ["Key", meta.key || "—"],
+            ["Style", meta.style || "—"],
+            ["Tempo", meta.tempo ? `${meta.tempo} BPM` : "—"],
+            ["Instruments", meta.instruments || "—"],
+            ["Created", meta.created || "—"],
+            ["Next", meta.nextPerformance || "—"],
+            ["Performed", meta.performed || "—"],
+            ["Files", `${meta.files.length}`]
+          ].forEach(([label, value]) => {
+            const pill = document.createElement("div");
+            pill.className = "database-meta-pill";
+            const labelEl = document.createElement("span");
+            labelEl.textContent = label;
+            const valueEl = document.createElement("strong");
+            valueEl.textContent = value;
+            pill.append(labelEl, valueEl);
+            grid.appendChild(pill);
+          });
+        }
+
+        if (notesPreview) {
+          notesPreview.textContent = meta.notes || "Notes and lyrics will appear here.";
+        }
+
+        if (filesList) {
+          filesList.innerHTML = "";
+          if (!meta.files.length) {
+            const empty = document.createElement("div");
+            empty.className = "database-empty";
+            empty.textContent = "No files added yet.";
+            filesList.appendChild(empty);
+          } else {
+            meta.files.forEach(file => {
+              const item = document.createElement("div");
+              item.className = "database-file-item";
+
+              const content = document.createElement("div");
+              const name = document.createElement("div");
+              name.className = "database-file-name";
+              name.textContent = file.name;
+              const details = document.createElement("div");
+              details.className = "database-file-meta";
+              details.textContent = [
+                file.kind,
+                readableFileSize(file.size),
+                file.added_at ? file.added_at.slice(0, 10) : ""
+              ].filter(Boolean).join(" / ");
+              content.append(name, details);
+
+              const target = file.url || file.path;
+              if (target) {
+                const link = document.createElement("a");
+                link.className = "database-file-link";
+                link.href = target;
+                link.target = "_blank";
+                link.rel = "noopener";
+                link.textContent = target;
+                content.appendChild(link);
+              }
+              if (file.notes) {
+                const notes = document.createElement("div");
+                notes.className = "database-file-meta";
+                notes.textContent = file.notes;
+                content.appendChild(notes);
+              }
+
+              const remove = document.createElement("button");
+              remove.type = "button";
+              remove.className = "database-file-remove";
+              remove.textContent = "Remove";
+              remove.addEventListener("click", () => removeDatabaseFile(file.id));
+
+              item.append(content, remove);
+              filesList.appendChild(item);
+            });
+          }
+        }
+
+        if (results) {
+          results.innerHTML = "";
+          const rows = Array.isArray(songs) ? songs : [];
+          if (!rows.length) {
+            const empty = document.createElement("div");
+            empty.className = "database-empty";
+            empty.textContent = "No songs match that search.";
+            results.appendChild(empty);
+          } else {
+            rows.forEach(song => {
+              const row = document.createElement("button");
+              row.type = "button";
+              row.className = "database-song-row";
+              if (String(song.id || "") === String(state.id || "")) row.classList.add("is-active");
+              row.addEventListener("click", () => loadSong(song.id));
+
+              const rowTitle = document.createElement("div");
+              rowTitle.className = "database-song-title";
+              rowTitle.textContent = song.title || song.title_karen || "Untitled";
+
+              const rowMeta = document.createElement("div");
+              rowMeta.className = "database-song-meta";
+              rowMeta.textContent = [
+                song.title_karen,
+                song.category,
+                song.current_key || song.key,
+                song.style,
+                song.tempo ? `${song.tempo} BPM` : "",
+                song.instruments
+              ].filter(Boolean).join(" / ");
+
+              const firstFile = normalizeFileMetadataList(song.file_metadata)[0];
+              const snippet = document.createElement("div");
+              snippet.className = "database-song-snippet";
+              snippet.textContent = firstFile
+                ? `File: ${firstFile.name}${firstFile.notes ? ` - ${firstFile.notes}` : ""}`
+                : String(song.notes || "").slice(0, 120);
+
+              row.append(rowTitle, rowMeta, snippet);
+              results.appendChild(row);
+            });
+          }
+        }
+      }
+
+      function setupDatabaseControls() {
+        const search = document.getElementById("database-search");
+        const clear = document.getElementById("database-clear-search");
+        const add = document.getElementById("db-add-file");
+        const fileInput = document.getElementById("db-file-input");
+        const nameInput = document.getElementById("db-file-name");
+        if (search && !search.dataset.bound) {
+          search.addEventListener("input", () => {
+            clearTimeout(databaseSearchTimer);
+            databaseSearchTimer = setTimeout(() => loadSongs(search.value.trim()), 180);
+          });
+          search.dataset.bound = "1";
+        }
+        if (clear && !clear.dataset.bound) {
+          clear.addEventListener("click", () => {
+            if (search) search.value = "";
+            loadSongs("");
+          });
+          clear.dataset.bound = "1";
+        }
+        if (add && !add.dataset.bound) {
+          add.addEventListener("click", addDatabaseFile);
+          add.dataset.bound = "1";
+        }
+        if (fileInput && !fileInput.dataset.bound) {
+          fileInput.addEventListener("change", () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (file && nameInput && !nameInput.value.trim()) {
+              nameInput.value = file.name;
+            }
+          });
+          fileInput.dataset.bound = "1";
+        }
+      }
+
+      function clearDatabaseFileInputs() {
+        ["db-file-name", "db-file-path", "db-file-notes"].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        });
+        const kind = document.getElementById("db-file-kind");
+        if (kind) kind.value = "Lead Sheet";
+        const input = document.getElementById("db-file-input");
+        if (input) input.value = "";
+      }
+
+      async function addDatabaseFile() {
+        const nameInput = document.getElementById("db-file-name");
+        const kindInput = document.getElementById("db-file-kind");
+        const pathInput = document.getElementById("db-file-path");
+        const notesInput = document.getElementById("db-file-notes");
+        const fileInput = document.getElementById("db-file-input");
+        const upload = fileInput?.files?.[0] || null;
+        const name = String(nameInput?.value || "").trim();
+        const kind = String(kindInput?.value || "Reference").trim() || "Reference";
+        const path = String(pathInput?.value || "").trim();
+        const notes = String(notesInput?.value || "").trim();
+
+        if (!upload && !name && !path && !notes) {
+          showToast("Add a file, link, path, or note first", "info");
+          return;
+        }
+
+        state.fileMetadata = normalizeFileMetadataList(state.fileMetadata);
+
+        if (upload) {
+          if (!state.id) {
+            await saveSong({ quiet: true, skipCapture: true });
+          }
+          if (!state.id) {
+            showToast("Save the song before uploading a file", "info");
+            return;
+          }
+
+          const form = new FormData();
+          form.append("file", upload);
+          form.append("name", name || upload.name);
+          form.append("kind", kind);
+          form.append("notes", notes);
+
+          const res = await fetch(`/api/songs/${state.id}/files`, {
+            method: "POST",
+            body: form
+          });
+          const result = await res.json();
+          if (!res.ok) {
+            showToast(result.error || "File upload failed", "error");
+            return;
+          }
+          state.fileMetadata = normalizeFileMetadataList(result.files || []);
+          clearDatabaseFileInputs();
+          await loadSongs(document.getElementById("database-search")?.value.trim() || "");
+          renderDatabaseSheet(songsCache);
+          showToast("File uploaded", "success");
+          return;
+        }
+
+        state.fileMetadata.push({
+          id: `local-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          name: name || path || "Reference file",
+          kind,
+          path,
+          url: /^https?:\/\//i.test(path) ? path : "",
+          notes,
+          uploaded: false,
+          added_at: new Date().toISOString()
+        });
+        clearDatabaseFileInputs();
+        await saveSong({ quiet: true, skipCapture: true });
+        await loadSongs(document.getElementById("database-search")?.value.trim() || "");
+        renderDatabaseSheet(songsCache);
+        showToast("File metadata added", "success");
+      }
+
+      async function removeDatabaseFile(fileId) {
+        state.fileMetadata = normalizeFileMetadataList(state.fileMetadata);
+        const target = state.fileMetadata.find(file => String(file.id) === String(fileId));
+        if (!target) return;
+
+        if (target.uploaded && state.id) {
+          const res = await fetch(`/api/songs/${state.id}/files/${encodeURIComponent(fileId)}`, {
+            method: "DELETE"
+          });
+          const result = await res.json();
+          if (!res.ok) {
+            showToast(result.error || "Could not remove file", "error");
+            return;
+          }
+          state.fileMetadata = normalizeFileMetadataList(result.files || []);
+        } else {
+          state.fileMetadata = state.fileMetadata.filter(file => String(file.id) !== String(fileId));
+          if (state.id) {
+            await saveSong({ quiet: true, skipCapture: true });
+          }
+        }
+
+        await loadSongs(document.getElementById("database-search")?.value.trim() || "");
+        renderDatabaseSheet(songsCache);
+        showToast("File removed", "success");
       }
 
       function renderChart() {
@@ -7847,7 +10002,8 @@
           songStyle,
           songInstr
         });
-        setPaperView(activePaperView);
+        renderDatabaseSheet(songsCache);
+        setPaperView(activePaperView, { focus: false });
         let pendingScrollTarget = null;
 
         function makeInsertLine(insertIndex) {
@@ -9261,19 +11417,30 @@
         }
       }
 
-      async function loadSongs() {
-        const res = await fetch("/api/songs");
+      async function loadSongs(query = "") {
+        const q = String(query || "").trim();
+        const res = await fetch(q ? `/api/songs?q=${encodeURIComponent(q)}` : "/api/songs");
         const songs = await res.json();
+        songsCache = Array.isArray(songs) ? songs : [];
         const list = document.getElementById("songList");
+        if (!list) {
+          renderDatabaseSheet(songsCache);
+          return;
+        }
         list.innerHTML = "";
-        songs.forEach(s => {
+        songsCache.forEach(s => {
           const d = document.createElement("div");
           d.className = "song-item";
           const listTitle = (s.title || s.title_karen || "Untitled");
-          d.innerHTML = `<strong>${listTitle}</strong><br><small>${s.category} – ${(s.current_key || s.key || "")}</small>`;
+          const strong = document.createElement("strong");
+          strong.textContent = listTitle;
+          const small = document.createElement("small");
+          small.textContent = `${s.category || "—"} - ${(s.current_key || s.key || "")}`;
+          d.append(strong, document.createElement("br"), small);
           d.onclick = () => loadSong(s.id);
           list.appendChild(d);
         });
+        renderDatabaseSheet(songsCache);
       }
 
       async function loadSong(songOrId) {
@@ -9304,6 +11471,7 @@
               info: String(s.reference_media.info || "")
             }
           : { videos: [], images: [], info: "" };
+        state.fileMetadata     = normalizeFileMetadataList(s.file_metadata);
         state.sections         = Array.isArray(chartBundle.sections) ? chartBundle.sections : [];
         state.onlySpans         = Array.isArray(chartBundle.onlySpans) ? chartBundle.onlySpans : [];
         state.slurs             = Array.isArray(chartBundle.slurs) ? chartBundle.slurs : [];
@@ -9351,19 +11519,23 @@
         ft && ft.focus();
       }
 
-      async function saveSong() {
+      async function saveSong(options = {}) {
+        const opts = options && typeof options === "object" ? options : {};
         ensureSong();
 
         let dataUrl = "";
         try {
           const chartEl = document.getElementById("chart-container");
-          const canvas = await html2canvas(chartEl, { scale: 2, useCORS: true });
-          dataUrl = canvas.toDataURL("image/png");
+          if (!opts.skipCapture && chartEl) {
+            const canvas = await html2canvas(chartEl, { scale: 2, useCORS: true });
+            dataUrl = canvas.toDataURL("image/png");
+          }
         } catch (e) {
           console.warn("PNG capture failed", e);
         }
 
         syncMetadataFromInputs();
+        state.fileMetadata = normalizeFileMetadataList(state.fileMetadata);
         const keyCurrent = normalizeKeyToFlat(document.getElementById("songKey").value || state.currentKey || "");
         if (!state.originalKey) state.originalKey = keyCurrent;
         state.currentKey = keyCurrent;
@@ -9383,6 +11555,7 @@
           date_performed: (state.performedDates && state.performedDates.length) ? state.performedDates[state.performedDates.length - 1] : "",
           performed_dates: state.performedDates || [],
           reference_media: state.referenceMedia || { videos: [], images: [], info: "" },
+          file_metadata:  state.fileMetadata || [],
           instruments:    document.getElementById("songInstruments").value || "",
           raweditortext:  document.getElementById("karenText").value      || "",
           chartjson:      {
@@ -9408,8 +11581,23 @@
 
         const result = await res.json();
         if (!state.id && result.id) state.id = result.id;
-        loadSongs();
-        alert("Song Saved!");
+        if (!opts.skipReload) {
+          loadSongs(document.getElementById("database-search")?.value.trim() || "");
+        }
+        if (!opts.quiet) {
+          const saveBtn = document.getElementById("btn-save");
+          if (saveBtn) {
+            saveBtn.classList.add("is-saved");
+            const originalText = saveBtn.textContent;
+            saveBtn.textContent = "Saved";
+            setTimeout(() => {
+              saveBtn.classList.remove("is-saved");
+              saveBtn.textContent = originalText || t("save");
+            }, 1400);
+          }
+          showToast("Song saved", "success");
+        }
+        return result;
       }
 
       function newSong() {
@@ -9420,6 +11608,7 @@
         state.nextPerformanceDate = "";
         state.performedDates = [];
         state.referenceMedia = { videos: [], images: [], info: "" };
+        state.fileMetadata = [];
         state.defaultMeasuresPerRow = getAutoDefaultMeasuresPerRow();
         state.rowDefaultExplicit = false;
         syncDefaultMeasuresPerRowInput();
@@ -10008,6 +12197,235 @@
       let currentLang = localStorage.getItem("karenMusicLang") || null;
       let appInitialized = false;
 
+      const THEME_STORAGE_KEYS = {
+        mode: "karenThemeMode",
+        palette: "karenThemePalette",
+        motion: "karenThemeMotion",
+        density: "karenThemeDensity"
+      };
+
+      const THEME_MODES = ["auto", "light", "dark"];
+      const THEME_PALETTES = ["ivory", "velvet", "aurora", "graphite", "bloom"];
+      const THEME_MOTIONS = ["silky", "calm"];
+      const THEME_DENSITIES = ["compact", "comfy"];
+
+      let themeMode = localStorage.getItem(THEME_STORAGE_KEYS.mode) || "auto";
+      let themePalette = localStorage.getItem(THEME_STORAGE_KEYS.palette) || "ivory";
+      let themeMotion = localStorage.getItem(THEME_STORAGE_KEYS.motion) || "silky";
+      let themeDensity = localStorage.getItem(THEME_STORAGE_KEYS.density) || "compact";
+      let themeMediaQuery = null;
+      let themeControlsBound = false;
+      let silkyScrollBound = false;
+
+      function clampThemeChoice(value, allowed, fallback) {
+        return allowed.includes(value) ? value : fallback;
+      }
+
+      function resolveThemeMode() {
+        const mode = clampThemeChoice(themeMode, THEME_MODES, "auto");
+        if (mode !== "auto") return mode;
+        return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      }
+
+      function applyThemePreferences() {
+        themeMode = clampThemeChoice(themeMode, THEME_MODES, "auto");
+        themePalette = clampThemeChoice(themePalette, THEME_PALETTES, "ivory");
+        themeMotion = clampThemeChoice(themeMotion, THEME_MOTIONS, "silky");
+        themeDensity = clampThemeChoice(themeDensity, THEME_DENSITIES, "compact");
+
+        const root = document.documentElement;
+        const effectiveTheme = resolveThemeMode();
+        root.dataset.themeMode = themeMode;
+        root.dataset.themeEffective = effectiveTheme;
+        root.dataset.palette = themePalette;
+        root.dataset.motion = themeMotion;
+        root.dataset.density = themeDensity;
+        root.style.colorScheme = effectiveTheme;
+
+        document.querySelectorAll("[data-theme-mode]").forEach(btn => {
+          const selected = btn.getAttribute("data-theme-mode") === themeMode;
+          btn.classList.toggle("is-selected", selected);
+          btn.setAttribute("aria-pressed", selected ? "true" : "false");
+        });
+
+        document.querySelectorAll("[data-theme-palette]").forEach(btn => {
+          const selected = btn.getAttribute("data-theme-palette") === themePalette;
+          btn.classList.toggle("is-selected", selected);
+          btn.setAttribute("aria-pressed", selected ? "true" : "false");
+        });
+
+        document.querySelectorAll("[data-motion]").forEach(btn => {
+          const selected = btn.getAttribute("data-motion") === themeMotion;
+          btn.classList.toggle("is-selected", selected);
+          btn.setAttribute("aria-pressed", selected ? "true" : "false");
+        });
+
+        document.querySelectorAll("[data-density]").forEach(btn => {
+          const selected = btn.getAttribute("data-density") === themeDensity;
+          btn.classList.toggle("is-selected", selected);
+          btn.setAttribute("aria-pressed", selected ? "true" : "false");
+        });
+
+        const quickToggle = document.getElementById("theme-toggle");
+        if (quickToggle) {
+          quickToggle.textContent = effectiveTheme === "dark" ? "☾" : "☼";
+          quickToggle.title = `Theme: ${themeMode === "auto" ? "Auto" : effectiveTheme}`;
+          quickToggle.setAttribute("aria-label", quickToggle.title);
+        }
+      }
+
+      function setThemeMode(mode) {
+        themeMode = clampThemeChoice(mode, THEME_MODES, "auto");
+        localStorage.setItem(THEME_STORAGE_KEYS.mode, themeMode);
+        applyThemePreferences();
+      }
+
+      function setThemePalette(palette) {
+        themePalette = clampThemeChoice(palette, THEME_PALETTES, "ivory");
+        localStorage.setItem(THEME_STORAGE_KEYS.palette, themePalette);
+        applyThemePreferences();
+      }
+
+      function setThemeMotion(motion) {
+        themeMotion = clampThemeChoice(motion, THEME_MOTIONS, "silky");
+        localStorage.setItem(THEME_STORAGE_KEYS.motion, themeMotion);
+        applyThemePreferences();
+      }
+
+      function setThemeDensity(density) {
+        themeDensity = clampThemeChoice(density, THEME_DENSITIES, "compact");
+        localStorage.setItem(THEME_STORAGE_KEYS.density, themeDensity);
+        applyThemePreferences();
+      }
+
+      function cycleThemeMode() {
+        const currentIndex = THEME_MODES.indexOf(themeMode);
+        const next = THEME_MODES[(currentIndex + 1 + THEME_MODES.length) % THEME_MODES.length];
+        setThemeMode(next);
+        showToast(`Theme: ${next === "auto" ? "Auto" : next}`, "info");
+      }
+
+      function setupThemeControls() {
+        if (!themeMediaQuery && window.matchMedia) {
+          themeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+          themeMediaQuery.addEventListener?.("change", () => {
+            if (themeMode === "auto") applyThemePreferences();
+          });
+        }
+
+        const quickToggle = document.getElementById("theme-toggle");
+        if (quickToggle && !quickToggle.dataset.bound) {
+          quickToggle.type = "button";
+          quickToggle.addEventListener("click", cycleThemeMode);
+          quickToggle.dataset.bound = "1";
+        }
+
+        if (!themeControlsBound) {
+          document.querySelectorAll("[data-theme-mode]").forEach(btn => {
+            btn.type = "button";
+          });
+          document.querySelectorAll("[data-theme-palette]").forEach(btn => {
+            btn.type = "button";
+          });
+          document.querySelectorAll("[data-motion]").forEach(btn => {
+            btn.type = "button";
+          });
+          document.querySelectorAll("[data-density]").forEach(btn => {
+            btn.type = "button";
+          });
+          themeControlsBound = true;
+        }
+
+        applyThemePreferences();
+      }
+
+      function setupSilkyScroll() {
+        if (silkyScrollBound || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        silkyScrollBound = true;
+        const selectors = [
+          "#sidebar",
+          "#main-editor",
+          "#songList",
+          "#settings-panel",
+          "#shortcut-panel .shortcut-panel-body",
+          ".wizard-card",
+          ".lang-picker-overlay",
+          ".instr-checklist"
+        ];
+
+        selectors.forEach(selector => {
+          document.querySelectorAll(selector).forEach(bindSilkyScroll);
+        });
+      }
+
+      function bindSilkyScroll(el) {
+        if (!el || el.dataset.silkyScroll) return;
+        el.dataset.silkyScroll = "1";
+        let raf = 0;
+        let startTop = 0;
+        let targetTop = 0;
+        let startTime = 0;
+        let duration = 0;
+
+        el.addEventListener("wheel", (ev) => {
+          const interactive = ev.target.closest("input, textarea, select, button, .tempo-control");
+          if (interactive || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
+          if (Math.abs(ev.deltaY) < Math.abs(ev.deltaX)) return;
+
+          const maxScroll = el.scrollHeight - el.clientHeight;
+          if (maxScroll <= 0) return;
+
+          ev.preventDefault();
+
+          const delta = ev.deltaY;
+          const distance = delta * 1.18;
+          const nextTop = Math.max(0, Math.min(maxScroll, (raf ? targetTop : el.scrollTop) + distance));
+          const logDelay = 140 + Math.log1p(Math.abs(delta)) * 68;
+
+          startTop = el.scrollTop;
+          targetTop = nextTop;
+          duration = Math.max(170, Math.min(560, logDelay));
+          startTime = performance.now();
+
+          if (!raf) {
+            raf = requestAnimationFrame(step);
+          }
+        }, { passive: false });
+
+        function step(now) {
+          const t = Math.min(1, (now - startTime) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          el.scrollTop = startTop + (targetTop - startTop) * eased;
+          if (t < 1) {
+            raf = requestAnimationFrame(step);
+          } else {
+            raf = 0;
+          }
+        }
+      }
+
+      function showToast(message, type = "info") {
+        let stack = document.querySelector(".toast-stack");
+        if (!stack) {
+          stack = document.createElement("div");
+          stack.className = "toast-stack";
+          document.body.appendChild(stack);
+        }
+
+        const toast = document.createElement("div");
+        toast.className = `app-toast ${type}`;
+        toast.textContent = message;
+        stack.appendChild(toast);
+
+        requestAnimationFrame(() => toast.classList.add("show"));
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => toast.remove(), 420);
+        }, 2600);
+      }
+
       // translate a key
       function t(key) {
         const lang = currentLang || "english";
@@ -10107,9 +12525,9 @@
         const handleTitle = document.getElementById("karen-flap-title");
         if (handleTitle) handleTitle.textContent = t("karenKeyboard");
 
-        // shortcuts panel title
-        const spHeader = document.querySelector(".shortcut-panel-header span");
-        if (spHeader) spHeader.textContent = t("shortcuts");
+        // guide panel title
+        const guideTitle = document.querySelector(".shortcut-panel-title strong");
+        if (guideTitle) guideTitle.textContent = currentLang === "karen" ? t("shortcuts") : "App Guide";
 
         const langHint = document.getElementById("lang-picker-hint");
         if (langHint) {
@@ -10358,6 +12776,9 @@
         setupKarenFlap();
         setupWizardKeys();
         setupSettingsPanel();
+        setupThemeControls();
+        setupSilkyScroll();
+        setupDatabaseControls();
         setupTempoWheels();
 
         state.sections = [];
@@ -10776,6 +13197,7 @@
       }
 
       function init() {
+        setupThemeControls();
         showLangPicker();
         setupLangToggle();
         applyTranslations();
