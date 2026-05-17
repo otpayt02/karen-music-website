@@ -1,9 +1,10 @@
 const { test, expect } = require("@playwright/test");
-const { chooseLanguageAndEnterEditor, stubWindowPrint } = require("./helpers");
+const { chooseLanguageAndEnterEditor, openSidebar, stubWindowPrint } = require("./helpers");
 
 test.describe("print preview packets", () => {
   test("creates one copy per instrument plus one Reference copy", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
+    await openSidebar(page);
 
     await page.locator('#instr-sidebar .instr-choice[data-value="Piano 1"]').click();
     await page.locator('#instr-sidebar .instr-choice[data-value="Drums"]').click();
@@ -25,6 +26,7 @@ test.describe("print preview packets", () => {
 
   test("keeps print packets to clean one-page sheets with beat-spanning slurs", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
+    await openSidebar(page);
 
     await page.evaluate(() => {
       const measure = createMeasure();

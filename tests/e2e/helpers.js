@@ -16,7 +16,18 @@ async function chooseLanguageAndEnterEditor(page, lang = "english") {
   await visibleSkip.click();
 
   await expect(wizard).toBeHidden();
-  await expect(page.locator("#sidebar")).toBeVisible();
+  await expect(page.locator("#chart-container")).toBeVisible();
+  await expect(page.locator("#sidebar")).toHaveClass(/collapsed/);
+  await expect(page.locator("#focus-trap")).toBeFocused();
+}
+
+async function openSidebar(page) {
+  const sidebar = page.locator("#sidebar");
+  const isCollapsed = await sidebar.evaluate(el => el.classList.contains("collapsed"));
+  if (isCollapsed) {
+    await page.locator("#sidebar-toggle").click();
+  }
+  await expect(sidebar).not.toHaveClass(/collapsed/);
 }
 
 async function stubWindowPrint(page) {
@@ -30,5 +41,6 @@ async function stubWindowPrint(page) {
 
 module.exports = {
   chooseLanguageAndEnterEditor,
+  openSidebar,
   stubWindowPrint
 };

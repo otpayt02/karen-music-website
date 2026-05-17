@@ -4216,6 +4216,317 @@
           opacity: 1 !important;
         }
       }
+
+      /* ============================================================
+        STACKED CHART / LYRICS PAPERS
+      ============================================================ */
+      #sidebar {
+        transition:
+          width 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+          padding 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.36s ease,
+          transform 0.48s cubic-bezier(0.22, 1, 0.36, 1),
+          box-shadow 0.48s ease;
+      }
+
+      .paper-stack {
+        width: 816px;
+        max-width: 100%;
+        margin: 0 auto 20px;
+        position: relative;
+        --paper-peek-x: 18px;
+        --paper-peek-y: -18px;
+      }
+
+      .paper-stage {
+        position: relative;
+        isolation: isolate;
+      }
+
+      .paper-card {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        transition:
+          transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.28s ease,
+          box-shadow 0.42s ease,
+          filter 0.42s ease;
+      }
+
+      .paper-card.is-active {
+        position: relative;
+        z-index: 4;
+        opacity: 1;
+        transform: translate(0, 0);
+        pointer-events: auto;
+        filter: none;
+      }
+
+      .paper-card.is-behind {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        opacity: 0.96;
+        transform: translate(var(--paper-peek-x), var(--paper-peek-y)) scale(0.992);
+        pointer-events: none;
+        filter: saturate(0.88) brightness(0.98);
+        box-shadow:
+          0 20px 42px rgba(58,46,31,0.14),
+          0 1px 0 rgba(255,255,255,0.8) inset;
+      }
+
+      .paper-card.is-behind::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: rgba(255, 250, 242, 0.26);
+        pointer-events: none;
+      }
+
+      .paper-flaps {
+        position: absolute;
+        top: -28px;
+        right: 18px;
+        z-index: 8;
+        display: flex;
+        align-items: flex-end;
+        gap: 6px;
+      }
+
+      .paper-flap {
+        min-width: 86px;
+        height: 32px;
+        margin: 0;
+        padding: 0 16px;
+        border-radius: 10px 10px 0 0;
+        border: 1px solid rgba(64, 51, 34, 0.16);
+        border-bottom: 0;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.82), rgba(237,226,208,0.94)),
+          #efe3cf;
+        color: #3f3529;
+        box-shadow:
+          0 -8px 20px rgba(58,46,31,0.08),
+          inset 0 1px 0 rgba(255,255,255,0.86);
+        font-family: "Sora", var(--font-display);
+        font-size: 0.72em;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .paper-flap:hover {
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.94), rgba(228,216,197,0.98)),
+          #eadcc4;
+        color: #184f5f;
+        transform: translateY(-2px);
+      }
+
+      .paper-flap.is-active {
+        height: 38px;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,242,0.98)),
+          #fffaf2;
+        color: #2b315e;
+        transform: translateY(1px);
+      }
+
+      .lyrics-container {
+        min-height: 1056px;
+        padding: 30px 38px 42px;
+        color: #26231f;
+        border: 1px solid rgba(64, 51, 34, 0.14);
+        border-radius: 10px 10px 4px 4px;
+        background:
+          radial-gradient(circle at 22% 18%, rgba(255,255,255,0.58), transparent 34%),
+          repeating-linear-gradient(0deg, rgba(80, 61, 38, 0.032) 0 1px, transparent 1px 29px),
+          linear-gradient(180deg, rgba(255,252,244,0.98), rgba(244,234,216,0.98)),
+          #f8eedc;
+        box-shadow:
+          0 36px 70px rgba(58,46,31,0.2),
+          0 8px 0 rgba(212,93,69,0.07),
+          inset 0 1px 0 rgba(255,255,255,0.9);
+        font-family: Georgia, "Times New Roman", var(--font-karen), serif;
+      }
+
+      .lyrics-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr);
+        gap: 18px;
+        align-items: end;
+        border-bottom: 2px solid rgba(38, 35, 31, 0.84);
+        padding-bottom: 12px;
+        margin-bottom: 24px;
+      }
+
+      .lyrics-title-block {
+        min-width: 0;
+      }
+
+      .lyrics-karen-title {
+        font-family: var(--font-karen), Georgia, serif;
+        font-size: 1.35em;
+        font-weight: 800;
+        line-height: 1.25;
+        color: #2b315e;
+      }
+
+      .lyrics-english-title {
+        margin-top: 3px;
+        font-family: "Sora", var(--font-display);
+        font-size: 0.78em;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #5d5a50;
+      }
+
+      .lyrics-meta {
+        font-family: "Manrope", var(--font-ui);
+        font-size: 0.74em;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        text-align: right;
+        color: #184f5f;
+      }
+
+      .lyrics-body {
+        display: grid;
+        gap: 18px;
+        font-size: 1.18em;
+        line-height: 1.72;
+        color: #26231f;
+      }
+
+      .lyrics-stanza {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .lyrics-empty {
+        min-height: 680px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: rgba(38, 35, 31, 0.48);
+        font-family: "Manrope", var(--font-ui);
+        font-size: 0.88em;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: 1px dashed rgba(64, 51, 34, 0.18);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.28);
+      }
+
+      .lyrics-footer {
+        position: absolute;
+        left: 38px;
+        right: 38px;
+        bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        border-top: 1px solid rgba(64, 51, 34, 0.18);
+        padding-top: 8px;
+        color: rgba(38, 35, 31, 0.55);
+        font-family: "Manrope", var(--font-ui);
+        font-size: 0.68em;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 920px) {
+        .paper-stack {
+          width: 100%;
+        }
+
+        .paper-flaps {
+          right: 12px;
+        }
+
+        .lyrics-container {
+          padding: 26px 24px 40px;
+        }
+
+        .lyrics-footer {
+          left: 24px;
+          right: 24px;
+        }
+      }
+
+      @media (max-width: 680px) {
+        .paper-stack {
+          --paper-peek-x: 10px;
+          --paper-peek-y: -12px;
+          margin-top: 24px;
+        }
+
+        .paper-flaps {
+          top: -26px;
+          right: 10px;
+        }
+
+        .paper-flap {
+          min-width: 72px;
+          height: 30px;
+          padding: 0 12px;
+          font-size: 0.66em;
+        }
+
+        .paper-flap.is-active {
+          height: 34px;
+        }
+
+        .lyrics-container {
+          min-height: 1056px;
+          padding: 24px 20px 40px;
+        }
+
+        .lyrics-header {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+
+        .lyrics-meta {
+          text-align: left;
+        }
+
+        .lyrics-body {
+          font-size: 1.02em;
+        }
+
+        .lyrics-footer {
+          left: 20px;
+          right: 20px;
+          flex-direction: column;
+          gap: 3px;
+        }
+      }
+
+      @media print {
+        .paper-flaps,
+        .lyrics-container {
+          display: none !important;
+        }
+
+        .paper-stack,
+        .paper-stage,
+        .paper-card {
+          display: block !important;
+          position: static !important;
+          transform: none !important;
+          opacity: 1 !important;
+          filter: none !important;
+          box-shadow: none !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -4444,8 +4755,58 @@
     <!-- Settings toggle -->
     <button id="settings-toggle" title="Settings">⚙</button>
 
+    <!-- Fast appearance toggle -->
+    <button id="theme-toggle" title="Toggle theme">◐</button>
+
     <!-- Settings panel -->
     <div id="settings-panel">
+      <div class="settings-row settings-row-block">
+        <span class="settings-label">Theme</span>
+        <div class="segmented-control theme-mode-control" role="radiogroup" aria-label="Theme">
+          <button type="button" class="theme-mode-option" data-theme-mode="auto" onclick="setThemeMode('auto')">Auto</button>
+          <button type="button" class="theme-mode-option" data-theme-mode="light" onclick="setThemeMode('light')">Light</button>
+          <button type="button" class="theme-mode-option" data-theme-mode="dark" onclick="setThemeMode('dark')">Dark</button>
+        </div>
+      </div>
+      <div class="settings-row settings-row-block">
+        <span class="settings-label">Palette</span>
+        <div class="palette-grid" role="radiogroup" aria-label="Palette">
+          <button type="button" class="palette-option" data-theme-palette="ivory" onclick="setThemePalette('ivory')">
+            <span class="palette-swatch swatch-ivory"></span>
+            <span>Ivory</span>
+          </button>
+          <button type="button" class="palette-option" data-theme-palette="velvet" onclick="setThemePalette('velvet')">
+            <span class="palette-swatch swatch-velvet"></span>
+            <span>Velvet</span>
+          </button>
+          <button type="button" class="palette-option" data-theme-palette="aurora" onclick="setThemePalette('aurora')">
+            <span class="palette-swatch swatch-aurora"></span>
+            <span>Aurora</span>
+          </button>
+          <button type="button" class="palette-option" data-theme-palette="graphite" onclick="setThemePalette('graphite')">
+            <span class="palette-swatch swatch-graphite"></span>
+            <span>Graphite</span>
+          </button>
+          <button type="button" class="palette-option" data-theme-palette="bloom" onclick="setThemePalette('bloom')">
+            <span class="palette-swatch swatch-bloom"></span>
+            <span>Bloom</span>
+          </button>
+        </div>
+      </div>
+      <div class="settings-row settings-row-block settings-row-split">
+        <span class="settings-label">Motion</span>
+        <div class="segmented-control compact-segment" role="radiogroup" aria-label="Motion">
+          <button type="button" class="motion-option" data-motion="silky" onclick="setThemeMotion('silky')">Silky</button>
+          <button type="button" class="motion-option" data-motion="calm" onclick="setThemeMotion('calm')">Calm</button>
+        </div>
+      </div>
+      <div class="settings-row settings-row-block settings-row-split">
+        <span class="settings-label">Density</span>
+        <div class="segmented-control compact-segment" role="radiogroup" aria-label="Density">
+          <button type="button" class="density-option" data-density="compact" onclick="setThemeDensity('compact')">Compact</button>
+          <button type="button" class="density-option" data-density="comfy" onclick="setThemeDensity('comfy')">Comfy</button>
+        </div>
+      </div>
       <div class="settings-row">
         <span class="settings-label">Guided new-song wizard</span>
         <label class="toggle-switch">
@@ -4638,26 +4999,52 @@
         </div>
       </div>
 
-      <!-- White chart container -->
-      <div class="chart-container" id="chart-container">
-        <div class="paper-header" id="paper-header">
-          <div class="paper-head-left">
-            <span class="paper-title-karen" id="ph-title-karen">တၢ်သးဝံၣ်ကညီ</span>
-            <span class="paper-title-english" id="ph-title-english">(New Song)</span>
-          </div>
-          <div class="paper-head-right">
-            <span class="paper-keymeta" id="ph-keymeta"></span>
-            <span class="paper-tempo" id="ph-tempo"></span>
-          </div>
+      <!-- Stacked chart / lyrics paper containers -->
+      <div class="paper-stack" id="paper-stack" data-active-paper="chart">
+        <div class="paper-flaps" aria-label="Paper view tabs">
+          <button type="button" class="paper-flap paper-flap-chart is-active" onclick="setPaperView('chart')" aria-pressed="true">Chart</button>
+          <button type="button" class="paper-flap paper-flap-lyrics" onclick="setPaperView('lyrics')" aria-pressed="false">Lyrics</button>
         </div>
-        <div id="sections-container"></div>
-        <div class="paper-footer">
-          <div class="paper-footer-dates">
-            <span id="ph-footer-created">Date Created: __/__/____</span>
-            <span id="ph-footer-next">Date Performed: __/__/____</span>
+
+        <div class="paper-stage">
+          <div class="chart-container paper-card paper-card-chart is-active" id="chart-container">
+            <div class="paper-header" id="paper-header">
+              <div class="paper-head-left">
+                <span class="paper-title-karen" id="ph-title-karen">တၢ်သးဝံၣ်ကညီ</span>
+                <span class="paper-title-english" id="ph-title-english">(New Song)</span>
+              </div>
+              <div class="paper-head-right">
+                <span class="paper-keymeta" id="ph-keymeta"></span>
+                <span class="paper-tempo" id="ph-tempo"></span>
+              </div>
+            </div>
+            <div id="sections-container"></div>
+            <div class="paper-footer">
+              <div class="paper-footer-dates">
+                <span id="ph-footer-created">Date Created: __/__/____</span>
+                <span id="ph-footer-next">Date Performed: __/__/____</span>
+              </div>
+              <span id="ph-footer-center">Instrument</span>
+              <span id="ph-footer-right"></span>
+            </div>
           </div>
-          <span id="ph-footer-center">Instrument</span>
-          <span id="ph-footer-right"></span>
+
+          <div class="lyrics-container paper-card paper-card-lyrics is-behind" id="lyrics-container" tabindex="0" aria-label="Lyrics sheet">
+            <div class="lyrics-header">
+              <div class="lyrics-title-block">
+                <div class="lyrics-karen-title" id="lyrics-title-karen">တၢ်သးဝံၣ်ကညီ</div>
+                <div class="lyrics-english-title" id="lyrics-title-english">New Song</div>
+              </div>
+              <div class="lyrics-meta" id="lyrics-meta">Lyrics</div>
+            </div>
+            <div class="lyrics-body" id="lyrics-body">
+              <div class="lyrics-empty">Lyrics from the Notes field will appear here.</div>
+            </div>
+            <div class="lyrics-footer">
+              <span id="lyrics-footer-left">Karen Music</span>
+              <span id="lyrics-footer-right">Lyrics Sheet</span>
+            </div>
+          </div>
         </div>
       </div>
       <div id="print-batch"></div>
@@ -7280,6 +7667,107 @@
         return t;
       }
 
+      let activePaperView = "chart";
+
+      function focusEditor(opts = {}) {
+        const ft = document.getElementById("focus-trap");
+        if (!ft) return;
+        const delay = Number(opts.delay) || 0;
+        const run = () => ft.focus({ preventScroll: true });
+        if (delay > 0) {
+          setTimeout(run, delay);
+        } else {
+          run();
+        }
+      }
+
+      function setPaperView(view) {
+        activePaperView = view === "lyrics" ? "lyrics" : "chart";
+        const stack = document.getElementById("paper-stack");
+        const chart = document.getElementById("chart-container");
+        const lyrics = document.getElementById("lyrics-container");
+        const chartFlap = document.querySelector(".paper-flap-chart");
+        const lyricsFlap = document.querySelector(".paper-flap-lyrics");
+        const showLyrics = activePaperView === "lyrics";
+
+        if (stack) stack.dataset.activePaper = activePaperView;
+        if (chart) {
+          chart.classList.toggle("is-active", !showLyrics);
+          chart.classList.toggle("is-behind", showLyrics);
+          chart.setAttribute("aria-hidden", showLyrics ? "true" : "false");
+        }
+        if (lyrics) {
+          lyrics.classList.toggle("is-active", showLyrics);
+          lyrics.classList.toggle("is-behind", !showLyrics);
+          lyrics.setAttribute("aria-hidden", showLyrics ? "false" : "true");
+        }
+        if (chartFlap) {
+          chartFlap.classList.toggle("is-active", !showLyrics);
+          chartFlap.setAttribute("aria-pressed", showLyrics ? "false" : "true");
+        }
+        if (lyricsFlap) {
+          lyricsFlap.classList.toggle("is-active", showLyrics);
+          lyricsFlap.setAttribute("aria-pressed", showLyrics ? "true" : "false");
+        }
+
+        if (showLyrics) {
+          lyrics?.focus({ preventScroll: true });
+        } else {
+          focusEditor();
+        }
+      }
+
+      function renderLyricsSheet(meta) {
+        const titleKaren = document.getElementById("lyrics-title-karen");
+        const titleEnglish = document.getElementById("lyrics-title-english");
+        const lyricsMeta = document.getElementById("lyrics-meta");
+        const body = document.getElementById("lyrics-body");
+        const footerLeft = document.getElementById("lyrics-footer-left");
+        const footerRight = document.getElementById("lyrics-footer-right");
+        if (!body) return;
+
+        const songTitleEnglish = meta?.songTitleEnglish || "";
+        const songTitleKaren = meta?.songTitleKaren || "";
+        const songTitle = meta?.songTitle || "New Song";
+        const songKey = meta?.currentKey || "";
+        const songTempo = meta?.songTempo || "";
+        const songCat = meta?.songCat || "";
+        const songStyle = meta?.songStyle || "";
+        const songInstr = meta?.songInstr || "";
+        const notes = String(document.getElementById("karenText")?.value || "").trim();
+
+        if (titleKaren) titleKaren.textContent = songTitleKaren || songTitleEnglish || "တၢ်သးဝံၣ်ကညီ";
+        if (titleEnglish) titleEnglish.textContent = songTitleEnglish || songTitle;
+        if (lyricsMeta) {
+          lyricsMeta.textContent = [
+            songKey ? `Key - ${songKey}` : "",
+            songTempo ? `${songTempo} BPM` : "",
+            songStyle || "",
+            songCat || ""
+          ].filter(Boolean).join("  /  ") || "Lyrics";
+        }
+        if (footerLeft) footerLeft.textContent = songInstr && songInstr !== "—" ? songInstr : "Karen Music";
+        if (footerRight) footerRight.textContent = "Lyrics Sheet";
+
+        body.innerHTML = "";
+        if (!notes) {
+          const empty = document.createElement("div");
+          empty.className = "lyrics-empty";
+          empty.textContent = "Lyrics from the Notes field will appear here.";
+          body.appendChild(empty);
+          return;
+        }
+
+        notes.split(/\n{2,}/).forEach(block => {
+          const clean = block.trim();
+          if (!clean) return;
+          const stanza = document.createElement("p");
+          stanza.className = "lyrics-stanza";
+          stanza.textContent = clean;
+          body.appendChild(stanza);
+        });
+      }
+
       function renderChart() {
         ensureSong();
 
@@ -7349,6 +7837,17 @@
           ].filter(Boolean).join("  •  ");
         }
         if (viewInstr) viewInstr.textContent = songInstr === "—" ? "" : songInstr;
+        renderLyricsSheet({
+          songTitleEnglish,
+          songTitleKaren,
+          songTitle,
+          currentKey,
+          songTempo,
+          songCat,
+          songStyle,
+          songInstr
+        });
+        setPaperView(activePaperView);
         let pendingScrollTarget = null;
 
         function makeInsertLine(insertIndex) {
@@ -8742,7 +9241,7 @@
             el.addEventListener("input", syncMetadataFromInputs);
           });
 
-        ["songTitle","songTitleKaren","songCategory","songStyle","songTempo"].forEach(id => {
+        ["songTitle","songTitleKaren","songCategory","songStyle","songTempo","karenText"].forEach(id => {
           const el = document.getElementById(id);
           if (!el) return;
           el.addEventListener("input", renderChart);
@@ -9124,7 +9623,12 @@
         toggle.addEventListener("click", () => {
           sidebar.classList.toggle("collapsed");
           syncFlap();
-          toggle.textContent = sidebar.classList.contains("collapsed") ? "☰" : "✕";
+          const closed = sidebar.classList.contains("collapsed");
+          toggle.textContent = closed ? "☰" : "✕";
+          if (closed) {
+            toggle.blur();
+            focusEditor({ delay: 80 });
+          }
         });
       }
 
@@ -9896,18 +10400,21 @@
         overlay.classList.add("dismissing");
         setTimeout(() => {
           overlay.style.display = "none";
-          const ft = document.getElementById("focus-trap");
-          ft && ft.focus();
+          focusEditor();
         }, 450);
       }
 
       function enterEditorFromWizard() {
         const sidebar = document.getElementById("sidebar");
-        if (sidebar) sidebar.classList.remove("collapsed");
+        if (sidebar) sidebar.classList.add("collapsed");
         const toggle = document.getElementById("sidebar-toggle");
-        if (toggle) toggle.textContent = "✕";
+        if (toggle) toggle.textContent = "☰";
         const flap = document.getElementById("karen-flap");
-        if (flap) flap.classList.remove("sidebar-closed");
+        if (flap) {
+          flap.classList.add("sidebar-closed");
+          flap.classList.remove("open");
+        }
+        focusEditor({ delay: 480 });
       }
 
       function skipWizard() {
