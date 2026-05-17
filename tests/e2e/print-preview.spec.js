@@ -71,15 +71,52 @@ test.describe("print preview packets", () => {
       const fr = firstBeat.getBoundingClientRect();
       const lr = lastBeat.getBoundingClientRect();
       return {
-        slurAboveMeasure: sr.bottom <= mr.top + 1,
-        startsAtFirstBeat: sr.left <= fr.left + 4,
-        endsAtLastBeat: sr.right >= lr.right - 4
+        slurAboveBeat: sr.bottom <= fr.top + 2,
+        startsAtFirstBeatCenter: Math.abs(sr.left - (fr.left + fr.width / 2)) <= 2,
+        endsAtLastBeatCenter: Math.abs(sr.right - (lr.left + lr.width / 2)) <= 2
       };
     });
 
     expect(metrics).not.toBeNull();
-    expect(metrics.slurAboveMeasure).toBe(true);
-    expect(metrics.startsAtFirstBeat).toBe(true);
-    expect(metrics.endsAtLastBeat).toBe(true);
+    expect(metrics.slurAboveBeat).toBe(true);
+    expect(metrics.startsAtFirstBeatCenter).toBe(true);
+    expect(metrics.endsAtLastBeatCenter).toBe(true);
+  });
+
+  test("keeps measure bars the same height across a row", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      const tall = createMeasure();
+      tall.beats[0].chordState = { root: "F", flat: false, minor: false, triangle: false, seven: false };
+      tall.beats[0].bass = "C";
+      tall.beats[0].xMarks = 4;
+      tall.beats[0].dot = true;
+
+      const plainA = createMeasure();
+      plainA.beats[0].chordState = { root: "G", flat: false, minor: false, triangle: false, seven: false };
+
+      const plainB = createMeasure();
+      plainB.beats[0].chordState = { root: "A", flat: false, minor: true, triangle: false, seven: false };
+
+      state.sections = [{ type: "Verse", measures: [tall, plainA, plainB] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      renderChart();
+    });
+
+    const metrics = await page.evaluate(() => {
+      const line = document.querySelector(".line");
+      const measures = Array.from(line?.querySelectorAll(":scope > .measure:not([style*='hidden'])") || []);
+      const heights = measures.map(el => el.getBoundingClientRect().height);
+      return {
+        count: heights.length,
+        spread: Math.max(...heights) - Math.min(...heights)
+      };
+    });
+
+    expect(metrics.count).toBe(3);
+    expect(metrics.spread).toBeLessThanOrEqual(1);
   });
 });

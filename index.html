@@ -678,7 +678,7 @@
         grid-template-columns: repeat(8, minmax(0, 1fr));
         margin-bottom: 8px;
         position: relative;
-        align-items: start;
+        align-items: stretch;
         overflow: visible;
         --row-top-space: 0px;
         padding-top: var(--row-top-space);
@@ -727,6 +727,7 @@
         border-left: 2px solid var(--measure-border);
         padding: 3px 4px 2px 4px;
         min-width: 0;
+        height: 100%;
         overflow: visible;
       }
 
@@ -9397,28 +9398,26 @@
         const cRect = container.getBoundingClientRect();
         const startRect = startEl.getBoundingClientRect();
         const endRect = endEl.getBoundingClientRect();
-        const startMeasureRect = (startEl.closest(".measure") || startEl).getBoundingClientRect();
-        const endMeasureRect = (endEl.closest(".measure") || endEl).getBoundingClientRect();
 
-        let x1 = startRect.left - cRect.left + 2;
-        let x2 = endRect.right - cRect.left - 2;
-        if (x2 <= x1) {
-          x1 = startRect.left - cRect.left + startRect.width / 2;
-          x2 = endRect.left - cRect.left + endRect.width / 2;
-        }
+        const x1 = startRect.left - cRect.left + (startRect.width / 2);
+        const x2 = endRect.left - cRect.left + (endRect.width / 2);
 
         const left = Math.min(x1, x2);
         const width = Math.max(18, Math.abs(x2 - x1));
-        const measureTop = Math.min(startMeasureRect.top, endMeasureRect.top) - cRect.top;
         const endpointY = 12;
         const apexY = 2;
         const slurHeight = 15;
-        const y = Math.max(0, measureTop - slurHeight - 1);
+        const beatTop = Math.min(startRect.top, endRect.top) - cRect.top;
+        const y = Math.max(0, beatTop - endpointY - 2);
 
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.classList.add("slur-span");
         svg.setAttribute("width", width);
         svg.setAttribute("height", slurHeight);
+        svg.dataset.startX = String(x1);
+        svg.dataset.endX = String(x2);
+        svg.dataset.startBeat = startEl.dataset.globalbeat || "";
+        svg.dataset.endBeat = endEl.dataset.globalbeat || "";
         svg.style.left = `${left}px`;
         svg.style.top = `${y}px`;
 
@@ -10998,6 +10997,26 @@
           return maxWidth;
         }
 
+        function resetMeasureHeights(measureEls) {
+          measureEls.forEach(measureEl => {
+            measureEl.style.height = "";
+            measureEl.style.minHeight = "";
+          });
+        }
+
+        function equalizeMeasureHeightsInRow(measureEls) {
+          if (!measureEls.length) return;
+          resetMeasureHeights(measureEls);
+          const maxHeight = Math.ceil(Math.max(
+            ...measureEls.map(measureEl => measureEl.getBoundingClientRect().height || 0)
+          ));
+          if (!Number.isFinite(maxHeight) || maxHeight <= 0) return;
+          measureEls.forEach(measureEl => {
+            measureEl.style.height = `${maxHeight}px`;
+            measureEl.style.minHeight = `${maxHeight}px`;
+          });
+        }
+
         function allocateFromBaseline(totalWidth, minWidths, donorOrder) {
           const count = minWidths.length;
           if (!count || totalWidth <= 0) {
@@ -11081,6 +11100,7 @@
           const allMeasures = Array.from(line.querySelectorAll(":scope > .measure"));
           const visibleMeasures = allMeasures.filter(measureEl => measureEl.style.visibility !== "hidden");
           if (!visibleMeasures.length) return;
+          resetMeasureHeights(visibleMeasures);
 
           visibleMeasures.forEach(measureEl => {
             const beatRow = measureEl.querySelector(".beat-row");
@@ -11271,6 +11291,8 @@
 
             measure.beats.forEach(({ beatEl }) => applyBeatScale(beatEl, localScale));
           });
+
+          equalizeMeasureHeightsInRow(visibleMeasures);
         });
       }
 
