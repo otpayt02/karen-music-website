@@ -7,7 +7,27 @@ test.describe("stacked paper views", () => {
 
     await page.evaluate(() => {
       document.getElementById("songTitle").value = "Morning Song";
-      document.getElementById("karenText").value = "Verse one line\nVerse one answer\n\nChorus line";
+      document.getElementById("karenText").value = "Private arrangement notes";
+      state.lyricsSections = [
+        {
+          id: "test-verse",
+          title: "Verse",
+          karenText: "Verse one line\nVerse one answer",
+          romanization: "Verse romanization",
+          translation: "",
+          showRomanization: true,
+          showTranslation: false
+        },
+        {
+          id: "test-chorus",
+          title: "Chorus",
+          karenText: "Chorus line",
+          romanization: "",
+          translation: "",
+          showRomanization: false,
+          showTranslation: false
+        }
+      ];
       renderChart();
     });
 
@@ -18,8 +38,10 @@ test.describe("stacked paper views", () => {
     await page.locator(".paper-flap-lyrics").click();
     await expect(page.locator("#paper-stack")).toHaveAttribute("data-active-paper", "lyrics");
     await expect(page.locator("#lyrics-container")).toHaveClass(/is-active/);
-    await expect(page.locator("#lyrics-body")).toContainText("Verse one line");
-    await expect(page.locator("#lyrics-body")).toContainText("Chorus line");
+    await expect(page.locator(".lyrics-karen-input")).toHaveCount(2);
+    await expect(page.locator(".lyrics-karen-input").nth(0)).toHaveValue(/Verse one line/);
+    await expect(page.locator(".lyrics-karen-input").nth(1)).toHaveValue("Chorus line");
+    await expect(page.locator("#lyrics-body")).not.toContainText("Private arrangement notes");
 
     await page.locator(".paper-flap-chart").click();
     await expect(page.locator("#paper-stack")).toHaveAttribute("data-active-paper", "chart");

@@ -474,8 +474,9 @@ def get_songs():
             OR COALESCE(file_metadata_json, '') LIKE ?
             OR COALESCE(instruments, '') LIKE ?
             OR COALESCE(notes, '') LIKE ?
+            OR COALESCE(chart_json, '') LIKE ?
         )'''
-        params.extend([like] * 16)
+        params.extend([like] * 17)
 
     sql += ' ORDER BY updated_at DESC'
 
