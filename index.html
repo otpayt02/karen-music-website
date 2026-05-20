@@ -7239,7 +7239,7 @@
         <button id="btn-new" onclick="newSong()">New</button>
         <button id="btn-save" onclick="saveSong()">Save</button>
         <button id="btn-print" onclick="printInstrumentPackets()">Print</button>
-        <button id="btn-export" onclick="exportDb()">Export</button>
+        <button id="btn-export" onclick="exportLibrary()">Export</button>
       </div>
 
       <!-- Song Database List -->
@@ -7514,7 +7514,7 @@
               <dt>New</dt><dd>Clear the current form and open the new-song wizard.</dd>
               <dt>Save</dt><dd>Save the song metadata, chart JSON, lead rows, dates, notes, and reference media.</dd>
               <dt>Print</dt><dd>Create one print packet for each selected instrument plus a Reference copy.</dd>
-              <dt>Export</dt><dd>Download the local song database.</dd>
+              <dt>Export</dt><dd>Download a portable song library JSON file with chart formatting.</dd>
               <dt>Instruments</dt><dd>Select instruments in the wheel/list. Selected instruments control print packets and footer labels.</dd>
               <dt>Dates</dt><dd>Date Created, Next Performance, and performed-date log flow into the sheet footer and saved song metadata.</dd>
               <dt>Reference / Media</dt><dd>Store YouTube links, handwritten/photo links, and notes for the song.</dd>
@@ -12749,8 +12749,12 @@
         openWizard();
       }
 
+      function exportLibrary() {
+        window.location.href = "/api/export-library";
+      }
+
       function exportDb() {
-        window.location.href = "/api/export-db";
+        exportLibrary();
       }
 
       // ============================================================

@@ -12,6 +12,7 @@ print("CWD AT STARTUP:", os.getcwd())
 app = Flask(__name__)
 BASE_DIR        = os.path.dirname(os.path.abspath(__file__))
 DB_PATH         = os.path.join(BASE_DIR, 'songs.db')
+PORTABLE_LIBRARY_PATH = os.path.join(BASE_DIR, 'song_library.json')
 LOCAL_IMAGE_DIR = 'chart_images'
 FILE_UPLOAD_DIR = 'song_files'
 SETTINGS_PATH   = 'app_settings.json'
@@ -365,6 +366,120 @@ def song_row_to_dict(row, full=False):
     return d
 
 
+def get_all_songs(full=True):
+    conn = get_db()
+    rows = conn.execute('SELECT * FROM songs ORDER BY updated_at DESC').fetchall()
+    conn.close()
+    return [song_row_to_dict(row, full=full) for row in rows]
+
+
+def write_portable_library():
+    payload = {
+        "schema": "karen-music-song-library",
+        "version": 1,
+        "exported_at": datetime.now().isoformat(timespec="seconds"),
+        "songs": get_all_songs(full=True),
+    }
+    tmp_path = PORTABLE_LIBRARY_PATH + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    os.replace(tmp_path, PORTABLE_LIBRARY_PATH)
+    return payload
+
+
+def load_portable_library():
+    if not os.path.exists(PORTABLE_LIBRARY_PATH):
+        return []
+    with open(PORTABLE_LIBRARY_PATH, "r", encoding="utf-8") as f:
+        payload = json.load(f)
+    if isinstance(payload, list):
+        return payload
+    if isinstance(payload, dict) and isinstance(payload.get("songs"), list):
+        return payload["songs"]
+    return []
+
+
+def import_portable_library_if_empty():
+    if not os.path.exists(PORTABLE_LIBRARY_PATH):
+        return 0
+
+    conn = get_db()
+    try:
+        count = conn.execute('SELECT COUNT(*) FROM songs').fetchone()[0]
+        if count:
+            return 0
+
+        imported = 0
+        for item in load_portable_library():
+            if not isinstance(item, dict):
+                continue
+            data = normalize_song_payload(item)
+            song_id = item.get("id")
+            try:
+                song_id = int(song_id) if song_id is not None else None
+            except Exception:
+                song_id = None
+
+            columns = [
+                "title_karen", "title", "category", "key", "current_key", "original_key", "style", "tempo",
+                "created_date", "next_performance_date", "date_performed", "performed_dates_json",
+                "reference_media_json", "file_metadata_json", "instruments", "chart_json", "row_lead_json",
+                "raw_editor_text", "chart_image_path", "notes", "created_at", "updated_at"
+            ]
+            values = [
+                data.get("title_karen"),
+                data.get("title"),
+                data.get("category"),
+                data.get("key"),
+                data.get("current_key"),
+                data.get("original_key"),
+                data.get("style"),
+                data.get("tempo"),
+                data.get("created_date") or str(item.get("created_at") or "")[:10] or datetime.now().strftime("%Y-%m-%d"),
+                data.get("next_performance_date"),
+                data.get("date_performed"),
+                json.dumps(data.get("performed_dates", []), ensure_ascii=False),
+                json.dumps(data.get("reference_media", {}), ensure_ascii=False),
+                json.dumps(data.get("file_metadata", []), ensure_ascii=False),
+                data.get("instruments"),
+                json.dumps(data.get("chart_json"), ensure_ascii=False),
+                json.dumps(data.get("row_lead_json"), ensure_ascii=False),
+                data.get("raw_editor_text"),
+                item.get("chart_image_path"),
+                data.get("notes"),
+                item.get("created_at") or datetime.now().isoformat(timespec="seconds"),
+                item.get("updated_at") or datetime.now().isoformat(timespec="seconds"),
+            ]
+            if song_id:
+                columns.insert(0, "id")
+                values.insert(0, song_id)
+
+            placeholders = ", ".join(["?"] * len(columns))
+            conn.execute(
+                f"INSERT OR REPLACE INTO songs ({', '.join(columns)}) VALUES ({placeholders})",
+                values,
+            )
+            imported += 1
+
+        conn.commit()
+        return imported
+    finally:
+        conn.close()
+
+
+def sync_portable_library():
+    try:
+        write_portable_library()
+    except Exception as e:
+        print(f"[portable-library] sync failed: {e}")
+
+
+imported_from_portable = import_portable_library_if_empty()
+if imported_from_portable:
+    print(f"[portable-library] imported {imported_from_portable} song(s) from {PORTABLE_LIBRARY_PATH}")
+
+
 # ============================================================
 # ROUTES — pages
 # ============================================================
@@ -535,6 +650,7 @@ def create_song():
     conn.commit()
     conn.close()
     mirror_song_to_alt_dir(song_id)
+    sync_portable_library()
     return jsonify({'id': song_id})
 
 
@@ -578,6 +694,7 @@ def update_song(song_id):
     conn.commit()
     conn.close()
     mirror_song_to_alt_dir(song_id)
+    sync_portable_library()
     return jsonify({'success': True})
 
 
@@ -587,6 +704,7 @@ def delete_song(song_id):
     conn.execute('DELETE FROM songs WHERE id = ?', (song_id,))
     conn.commit()
     conn.close()
+    sync_portable_library()
     return jsonify({'success': True})
 
 
@@ -632,6 +750,7 @@ def upload_song_file(song_id):
     )
     conn.commit()
     conn.close()
+    sync_portable_library()
     return jsonify({'success': True, 'file': item, 'files': files})
 
 
@@ -666,6 +785,7 @@ def delete_song_file(song_id, file_id):
     )
     conn.commit()
     conn.close()
+    sync_portable_library()
     return jsonify({'success': True, 'files': kept})
 
 
@@ -687,18 +807,24 @@ def export_db():
 @app.route('/api/export-json')
 def export_json():
     """Export all songs as a single JSON file."""
-    conn  = get_db()
-    rows  = conn.execute('SELECT * FROM songs ORDER BY updated_at DESC').fetchall()
-    conn.close()
-    songs = []
-    for row in rows:
-        d = song_row_to_dict(row, full=True)
-        songs.append(d)
+    songs = get_all_songs(full=True)
     response = app.response_class(
         response=json.dumps(songs, indent=2),
         mimetype='application/json'
     )
     response.headers['Content-Disposition'] = 'attachment; filename=karen_music_songs.json'
+    return response
+
+
+@app.route('/api/export-library')
+def export_library():
+    """Export the portable JSON library that can seed songs.db on another computer."""
+    payload = write_portable_library()
+    response = app.response_class(
+        response=json.dumps(payload, ensure_ascii=False, indent=2),
+        mimetype='application/json'
+    )
+    response.headers['Content-Disposition'] = 'attachment; filename=song_library.json'
     return response
 
 

@@ -43,4 +43,51 @@ test.describe("database paper", () => {
       await page.request.delete(`/api/songs/${id}`);
     }
   });
+
+  test("exports a portable song library with chart formatting", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const title = `Portable Library ${Date.now()}`;
+    const result = await page.request.post("/api/songs", {
+      data: {
+        title,
+        title_karen: "Portable Karen",
+        category: "Choir",
+        key: "G",
+        current_key: "G",
+        original_key: "G",
+        instruments: "Piano 1",
+        chart_json: {
+          sections: [
+            {
+              name: "Verse",
+              measures: [
+                {
+                  beats: [
+                    { chord: { root: "G", flavor: "", bass: "" }, slash: "" }
+                  ]
+                }
+              ]
+            }
+          ],
+          rowDefaultExplicit: true,
+          defaultMeasuresPerRow: 4
+        }
+      }
+    });
+    expect(result.ok()).toBeTruthy();
+    const { id } = await result.json();
+
+    const exportResponse = await page.request.get("/api/export-library");
+    expect(exportResponse.ok()).toBeTruthy();
+    const payload = await exportResponse.json();
+    const exportedSong = payload.songs.find(song => song.id === id);
+
+    expect(payload.schema).toBe("karen-music-song-library");
+    expect(exportedSong.title).toBe(title);
+    expect(exportedSong.chart_json.defaultMeasuresPerRow).toBe(4);
+    expect(exportedSong.chart_json.sections[0].measures[0].beats[0].chord.root).toBe("G");
+
+    await page.request.delete(`/api/songs/${id}`);
+  });
 });
