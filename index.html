@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
   <meta charset="UTF-8">
@@ -6270,6 +6270,15 @@
         line-height: 1.72;
       }
 
+      #songTitleKaren,
+      #karenText,
+      [data-karen-keyboard="true"],
+      .lyrics-karen-input {
+        direction: ltr !important;
+        unicode-bidi: plaintext;
+        text-align: left !important;
+      }
+
       .lyrics-romanization-input {
         min-height: 96px;
         font-size: 1.08rem !important;
@@ -6962,7 +6971,7 @@
       </div>
       <div class="form-group">
         <label for="songTitleKaren">Song Title (Karen)</label>
-        <input type="text" id="songTitleKaren" placeholder="Karen title">
+        <input type="text" id="songTitleKaren" placeholder="Karen title" dir="ltr" data-karen-keyboard="true">
       </div>
       <div class="form-group">
         <label for="songCategory">Category</label>
@@ -7029,7 +7038,7 @@
       </div>
       <div class="form-group">
         <label for="karenText">Notes</label>
-        <textarea id="karenText" rows="5" placeholder="Type notes here..."></textarea>
+        <textarea id="karenText" rows="5" placeholder="Type notes here..." dir="ltr" data-karen-keyboard="true"></textarea>
       </div>
       <div class="form-group">
         <label id="label-date-created" for="songDateCreated">Date Created</label>
@@ -7751,19 +7760,16 @@
         return next.toISOString().slice(0, 10);
       }
 
-      function getPrintPerformedDateIso(baseIso = null) {
-        const base = baseIso || getTodayIsoDate();
-        const baseDate = new Date(`${base}T00:00:00`);
-        const candidates = (Array.isArray(state.performedDates) ? state.performedDates : [])
+      function getExplicitPerformedDateIso() {
+        const dates = (Array.isArray(state.performedDates) ? state.performedDates : [])
           .map(v => String(v || "").trim())
           .filter(v => /^\d{4}-\d{2}-\d{2}$/.test(v))
-          .filter(v => {
-            const d = new Date(`${v}T00:00:00`);
-            return !Number.isNaN(d.getTime()) && d >= baseDate && d.getDay() === 0;
-          })
           .sort();
-        if (candidates.length) return candidates[0];
-        return getUpcomingSundayIsoDate(base, true);
+        return dates.length ? dates[dates.length - 1] : "";
+      }
+
+      function getPrintPerformedDateIso() {
+        return getExplicitPerformedDateIso();
       }
 
       function normalizeKeyToFlat(raw) {
@@ -7987,7 +7993,7 @@
         if (!source || !host) return;
 
         const createdDate = state.createdDate || "__/__/____";
-        const performedDate = getPrintPerformedDateIso(getTodayIsoDate());
+        const performedDate = getPrintPerformedDateIso();
         const createdLabel = t("dateCreatedLabel");
         const performedLabel = t("datePerformedLabel");
         const instrumentPages = getPrintInstrumentList().map(getDisplayInstrumentNameForPrint).filter(Boolean);
@@ -8026,8 +8032,6 @@
         if (!state.createdDate) {
           state.createdDate = getTodayIsoDate();
         }
-        const printPerformed = getPrintPerformedDateIso(getTodayIsoDate());
-        state.nextPerformanceDate = printPerformed || state.nextPerformanceDate || getUpcomingSundayIsoDate(getTodayIsoDate(), true);
         syncMetadataInputsFromState();
         buildPrintBatch();
         titleBeforePrint = document.title;
@@ -10212,6 +10216,7 @@
         if (field === "karenText") {
           textarea.dataset.karenKeyboard = "true";
           textarea.setAttribute("lang", "ksw");
+          forceKarenTextDirection(textarea);
         }
         textarea.addEventListener("input", () => {
           setLyricsSectionField(section.id, field, textarea.value);
@@ -10700,7 +10705,7 @@
           if (!state.originalKey) state.originalKey = songKey;
         }
         const createdDate = state.createdDate || "";
-        const nextPerf = state.nextPerformanceDate || getPrintPerformedDateIso(getTodayIsoDate());
+        const nextPerf = getExplicitPerformedDateIso();
         const createdLabel = t("dateCreatedLabel");
         const performedLabel = t("datePerformedLabel");
         const origKey = normalizeKeyToFlat(state.originalKey || songKey);
@@ -12622,6 +12627,41 @@
         return id === "songTitle" || id === "wq-songTitle" || id === "wg-songTitle";
       }
 
+      function isKarenTextField(el) {
+        if (!el) return false;
+        return (
+          el.dataset?.karenKeyboard === "true" ||
+          el.id === "songTitleKaren" ||
+          el.id === "karenText"
+        );
+      }
+
+      function forceKarenTextDirection(el) {
+        if (!isKarenTextField(el)) return;
+        el.setAttribute("dir", "ltr");
+        el.style.direction = "ltr";
+        el.style.textAlign = "left";
+        el.style.unicodeBidi = "plaintext";
+      }
+
+      function setupKarenTextDirectionGuards() {
+        const applyAll = () => {
+          document
+            .querySelectorAll("#songTitleKaren, #karenText, [data-karen-keyboard='true']")
+            .forEach(forceKarenTextDirection);
+        };
+
+        applyAll();
+
+        document.addEventListener("focusin", e => {
+          forceKarenTextDirection(e.target);
+        });
+
+        document.addEventListener("beforeinput", e => {
+          forceKarenTextDirection(e.target);
+        });
+      }
+
       function isKarenInsertTarget(el) {
         if (!el) return false;
         const tag = String(el.tagName || "").toLowerCase();
@@ -12630,16 +12670,13 @@
         if (isKarenDisallowedFieldId(el.id || "")) return false;
         if (el.disabled || el.readOnly) return false;
         if (typeof el.value !== "string") return false;
-        const isKarenField =
-          el.dataset?.karenKeyboard === "true" ||
-          el.id === "songTitleKaren" ||
-          el.id === "karenText";
-        if (!isKarenField) return false;
+        if (!isKarenTextField(el)) return false;
         return typeof el.selectionStart === "number" && typeof el.selectionEnd === "number";
       }
 
       function rememberKarenTarget(el) {
         if (!isKarenInsertTarget(el)) return;
+        forceKarenTextDirection(el);
         karenInputTargetEl = el;
         if (el.id) {
           state.karenInputTargetId = el.id;
@@ -12762,6 +12799,7 @@
       function insertAtCaret(idOrNull, char, el) {
         const target = el || (idOrNull ? document.getElementById(idOrNull) : null);
         if (!target) return;
+        forceKarenTextDirection(target);
 
         const start = target.selectionStart;
         const end   = target.selectionEnd;
@@ -13628,6 +13666,7 @@
         initializeInstrumentChoiceButtons();
         setupShortcutPanel();
         setupSidebarToggle();
+        setupKarenTextDirectionGuards();
         setupKarenFlap();
         setupWizardKeys();
         setupSettingsPanel();

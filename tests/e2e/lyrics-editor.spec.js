@@ -24,6 +24,8 @@ test.describe("lyrics editor", () => {
 
     await page.locator(".lyrics-karen-input").fill("ကညီ");
     await expect(page.locator("#karen-flap")).toHaveClass(/open/);
+    await expect(page.locator(".lyrics-karen-input")).toHaveAttribute("dir", "ltr");
+    await expect(page.locator(".lyrics-karen-input")).toHaveCSS("direction", "ltr");
     await expect(page.locator(".karen-zone-consonants .k-key")).toHaveCount(25);
     await expect(page.locator(".karen-zone-vowels .k-key")).toHaveCount(10);
     await expect(page.locator(".karen-zone-tones .k-key")).toHaveCount(5);
@@ -31,6 +33,11 @@ test.describe("lyrics editor", () => {
 
     await page.locator(".karen-zone-consonants .k-key").first().click();
     await expect(page.locator(".lyrics-karen-input")).toHaveValue(/ကညီ./);
+
+    await page.locator(".lyrics-karen-input").fill("");
+    await page.locator(".karen-zone-consonants .k-key").nth(0).click();
+    await page.locator(".karen-zone-consonants .k-key").nth(1).click();
+    await expect(page.locator(".lyrics-karen-input")).toHaveValue("ကခ");
 
     const lyrics = await page.evaluate(() => normalizeLyricsSections(state.lyricsSections));
     expect(lyrics).toMatchObject([
