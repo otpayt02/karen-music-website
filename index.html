@@ -6240,6 +6240,14 @@
           #fffaf2 !important;
       }
 
+      /* Karen text fields must start left-to-right on first focus/input. */
+      #songTitleKaren,
+      #karenText,
+      [data-karen-keyboard="true"] {
+        direction: ltr !important;
+        unicode-bidi: plaintext;
+        text-align: left !important;
+      }
       .lyrics-header {
         grid-template-columns: minmax(0, 1fr) auto !important;
         border: 0 !important;
