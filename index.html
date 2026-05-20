@@ -6248,51 +6248,6 @@
         unicode-bidi: plaintext;
         text-align: left !important;
       }
-</style>
-  </head>
-  <body>
-    <!-- ============================================================
-    LANGUAGE PICKER OVERLAY
-    Shows once on first load (or when lang not set in localStorage).
-    User picks Karen or English — choice persists.
-    ============================================================ -->
-    <div id="lang-picker-overlay" class="lang-picker-overlay">
-      <div class="lang-picker-card">
-        <div class="lang-picker-hero">
-          <img
-            class="lang-picker-photo"
-          src="/static/startup-language-image.png"
-            alt="Karen Music"
-            onerror="this.style.display='none'; this.parentElement.classList.add('no-photo');"
-          >
-          <div class="lang-picker-hero-title">
-            <span class="lang-title-karen">တၢ်သးဝံၣ်ကညီ</span>
-            <span class="lang-title-english">Karen Music</span>
-          </div>
-        </div>
-        <div class="lang-picker-sub" id="lang-picker-sub">Select Language / ဃုထၢတၢ်ကျိၥ်</div>
-
-        <div class="lang-picker-buttons">
-          <button
-            class="lang-btn"
-            id="lang-btn-karen"
-            onclick="setLanguage('karen')"
-          >
-            <span class="lang-btn-script" id="lang-btn-karen-script">ကညီကျိ</span>
-            <span class="lang-btn-label" id="lang-btn-karen-label">S'gaw Karen</span>
-            <span class="lang-btn-arrow lang-btn-arrow-left">&#8592;</span>
-          </button>
-          <button
-            class="lang-btn"
-            id="lang-btn-english"
-            onclick="setLanguage('english')"
-          >
-            <span class="lang-btn-script" id="lang-btn-english-script">အဲကလံၥ်</span>
-            <span class="lang-btn-label" id="lang-btn-english-label">English</span>
-            <span class="lang-btn-arrow lang-btn-arrow-right">&#8594;</span>
-          </button>
-        </div>
-
       .lyrics-header {
         grid-template-columns: minmax(0, 1fr) auto !important;
         border: 0 !important;

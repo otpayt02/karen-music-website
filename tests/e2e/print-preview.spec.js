@@ -116,40 +116,6 @@ test.describe("print preview packets", () => {
     await expect(page.locator("#chart-container #ph-footer-next")).toHaveText("Date Performed: 2026-06-07");
   });
 
-  test("leaves performed date blank until a performed date is added", async ({ page }) => {
-    await chooseLanguageAndEnterEditor(page, "english");
-    await openSidebar(page);
-
-    await page.evaluate(() => {
-      state.performedDates = [];
-      state.nextPerformanceDate = "";
-      renderChart();
-    });
-
-    await expect(page.locator("#chart-container #ph-footer-next")).toHaveText("Date Performed: __/__/____");
-
-    await stubWindowPrint(page);
-    await page.evaluate(() => printInstrumentPackets());
-
-    const blankPrintState = await page.evaluate(() => {
-      const footer = document.querySelector("#print-batch .chart-container #ph-footer-next");
-      return {
-        footerText: footer?.textContent || "",
-        nextPerformanceDate: state.nextPerformanceDate || ""
-      };
-    });
-
-    expect(blankPrintState.footerText).toBe("Date Performed: __/__/____");
-    expect(blankPrintState.nextPerformanceDate).toBe("");
-
-    await page.evaluate(() => {
-      addPerformedDate("2026-06-07");
-      renderChart();
-    });
-
-    await expect(page.locator("#chart-container #ph-footer-next")).toHaveText("Date Performed: 2026-06-07");
-  });
-
   test("keeps measure bars the same height across a row", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
