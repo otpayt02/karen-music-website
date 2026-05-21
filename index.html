@@ -6826,6 +6826,14 @@
           #fffaf2 !important;
       }
 
+      /* Karen text fields must start left-to-right on first focus/input. */
+      #songTitleKaren,
+      #karenText,
+      [data-karen-keyboard="true"] {
+        direction: ltr !important;
+        unicode-bidi: plaintext;
+        text-align: left !important;
+      }
       .lyrics-header {
         grid-template-columns: minmax(0, 1fr) auto !important;
         border: 0 !important;
@@ -14370,7 +14378,7 @@
       let themePalette = localStorage.getItem(THEME_STORAGE_KEYS.palette) || "ivory";
       let themeMotion = localStorage.getItem(THEME_STORAGE_KEYS.motion) || "silky";
       let themeDensity = localStorage.getItem(THEME_STORAGE_KEYS.density) || "compact";
-      let uiDesign = localStorage.getItem(THEME_STORAGE_KEYS.design) || "design-1";
+      let uiDesign = localStorage.getItem(THEME_STORAGE_KEYS.design) || "design-2";
       let karenKeyboardImmersive = localStorage.getItem(THEME_STORAGE_KEYS.keyboardImmersive) !== "off";
       let themeMediaQuery = null;
       let themeControlsBound = false;

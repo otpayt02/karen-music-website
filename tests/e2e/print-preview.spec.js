@@ -82,7 +82,6 @@ test.describe("print preview packets", () => {
     expect(metrics.startsAtFirstBeatCenter).toBe(true);
     expect(metrics.endsAtLastBeatCenter).toBe(true);
   });
-
   test("leaves performed date blank until a performed date is added", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
     await openSidebar(page);
