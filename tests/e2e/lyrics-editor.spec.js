@@ -39,6 +39,27 @@ test.describe("lyrics editor", () => {
     await page.locator(".karen-zone-consonants .k-key").nth(1).click();
     await expect(page.locator(".lyrics-karen-input")).toHaveValue("ကခ");
 
+    const firstChar = await page.locator(".karen-zone-consonants .k-key").nth(0).textContent();
+    const secondChar = await page.locator(".karen-zone-consonants .k-key").nth(1).textContent();
+    await expect(page.locator("#karen-focus-preview")).toContainText(`${firstChar}${secondChar}`);
+
+    await page.keyboard.press("Backspace");
+    await expect(page.locator(".lyrics-karen-input")).toHaveValue(firstChar);
+
+    await page.keyboard.press("Control+Y");
+    await expect(page.locator(".lyrics-karen-input")).toHaveValue(`${firstChar}${secondChar}`);
+
+    await page.locator(".lyrics-karen-input").fill("");
+    await expect(page.locator("#karen-focus-preview")).toHaveText("");
+
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#karen-flap")).not.toHaveClass(/open/);
+
+    await page.evaluate(() => openKarenKeyboardForTarget(document.querySelector(".lyrics-karen-input")));
+    await expect(page.locator("#karen-flap")).toHaveClass(/open/);
+    await page.locator("#karen-flap-close").click();
+    await expect(page.locator("#karen-flap")).not.toHaveClass(/open/);
+
     const lyrics = await page.evaluate(() => normalizeLyricsSections(state.lyricsSections));
     expect(lyrics).toMatchObject([
       {

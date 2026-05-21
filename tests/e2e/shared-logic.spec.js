@@ -87,4 +87,53 @@ test.describe("shared editor logic", () => {
     await expect(page.locator("html")).toHaveAttribute("data-design", "design-3");
     await expect(page.locator("html")).toHaveAttribute("data-karen-keyboard-immersive", "off");
   });
+
+  test("UI design options apply distinct layout systems", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const snapshots = await page.evaluate(() => {
+      const readDesign = (design) => {
+        setUiDesign(design);
+        const rootStyle = getComputedStyle(document.documentElement);
+        const mainStyle = getComputedStyle(document.getElementById("main-editor"));
+        const flapStyle = getComputedStyle(document.querySelector(".paper-flap-chart"));
+        const chartStyle = getComputedStyle(document.getElementById("chart-container"));
+
+        return {
+          concept: rootStyle.getPropertyValue("--design-concept").trim(),
+          sidebarWidth: rootStyle.getPropertyValue("--sidebar-width").trim(),
+          controlRadius: rootStyle.getPropertyValue("--control-radius").trim(),
+          mainAlign: mainStyle.alignItems,
+          paperFlapWritingMode: flapStyle.writingMode,
+          chartRadius: chartStyle.borderTopLeftRadius
+        };
+      };
+
+      return {
+        design1: readDesign("design-1"),
+        design2: readDesign("design-2"),
+        design3: readDesign("design-3")
+      };
+    });
+
+    expect(snapshots.design1).toMatchObject({
+      concept: '"Manuscript Desk"',
+      sidebarWidth: "320px",
+      mainAlign: "center"
+    });
+    expect(snapshots.design2).toMatchObject({
+      concept: '"Control Room"',
+      sidebarWidth: "276px",
+      mainAlign: "stretch",
+      paperFlapWritingMode: "vertical-rl"
+    });
+    expect(snapshots.design3).toMatchObject({
+      concept: '"Stage"',
+      sidebarWidth: "360px",
+      mainAlign: "center"
+    });
+
+    expect(snapshots.design1.controlRadius).not.toBe(snapshots.design2.controlRadius);
+    expect(snapshots.design2.chartRadius).not.toBe(snapshots.design3.chartRadius);
+  });
 });

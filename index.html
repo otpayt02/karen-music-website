@@ -455,6 +455,592 @@
         margin: 0 auto 24px auto;
       }
 
+      /* ============================================================
+        UI DESIGN DIRECTIONS
+        Design switch changes structure, density, spacing, paper
+        treatment, component geometry, and interaction feel.
+      ============================================================ */
+
+      html[data-design="design-1"] {
+        --design-concept: "Manuscript Desk";
+        --sidebar-width: 320px;
+        --panel-radius: 18px;
+        --control-radius: 13px;
+        --field-pad-y: 8px;
+        --field-pad-x: 11px;
+      }
+
+      html[data-design="design-1"] #main-editor {
+        align-items: center;
+        padding: 24px 24px 56px !important;
+      }
+
+      html[data-design="design-1"] .paper-stack {
+        width: 816px;
+        --paper-peek-x: 18px;
+        --paper-peek-y: -18px;
+      }
+
+      html[data-design="design-1"] .chart-container,
+      html[data-design="design-1"] .lyrics-container,
+      html[data-design="design-1"] .database-container {
+        border-radius: 10px 10px 4px 4px !important;
+      }
+
+      html[data-design="design-2"] {
+        --design-concept: "Control Room";
+        --sidebar-width: 276px;
+        --panel-radius: 6px;
+        --control-radius: 4px;
+        --field-pad-y: 6px;
+        --field-pad-x: 8px;
+        --panel-gap: 7px;
+        --app-bg: #0d1114;
+        --app-bg-soft: rgba(13, 17, 20, 0.94);
+        --panel-bg: rgba(17, 23, 28, 0.9);
+        --panel-bg-strong: rgba(21, 28, 34, 0.98);
+        --surface: rgba(20, 28, 34, 0.92);
+        --surface-2: rgba(30, 39, 45, 0.9);
+        --field-bg: rgba(12, 16, 19, 0.82);
+        --text: #e7f0ee;
+        --text-muted: #87989a;
+        --border: rgba(151, 176, 176, 0.16);
+        --accent: #4fb3a4;
+        --accent-2: #d8a657;
+        --accent-3: #8aa2ff;
+        --ambient-1: rgba(79, 179, 164, 0.15);
+        --ambient-2: rgba(216, 166, 87, 0.1);
+        --ambient-3: rgba(138, 162, 255, 0.08);
+        --floating-shadow: 0 18px 0 rgba(0,0,0,0.18), 0 34px 70px rgba(0,0,0,0.44), inset 0 1px 0 rgba(255,255,255,0.08);
+        --deep-shadow: 0 24px 0 rgba(0,0,0,0.22), 0 46px 90px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08);
+        --chart-bg: #f7f4ea;
+        --paper-texture:
+          repeating-linear-gradient(90deg, rgba(13,17,20,0.035) 0 1px, transparent 1px 46px),
+          repeating-linear-gradient(0deg, rgba(13,17,20,0.035) 0 1px, transparent 1px 32px);
+      }
+
+      html[data-design="design-2"] body {
+        background:
+          linear-gradient(90deg, rgba(79,179,164,0.12) 0 1px, transparent 1px 100%),
+          linear-gradient(0deg, rgba(216,166,87,0.08) 0 1px, transparent 1px 100%),
+          radial-gradient(820px 540px at 18% 8%, rgba(79,179,164,0.14), transparent 68%),
+          #0d1114 !important;
+        background-size: 54px 54px, 54px 54px, auto, auto;
+      }
+
+      html[data-design="design-2"] body::before {
+        background:
+          linear-gradient(90deg, rgba(216,166,87,0.18) 0 2px, transparent 2px 100%),
+          linear-gradient(0deg, rgba(79,179,164,0.1) 0 2px, transparent 2px 100%) !important;
+        background-size: 216px 216px;
+        opacity: 0.36;
+      }
+
+      html[data-design="design-2"] #main-editor {
+        align-items: stretch;
+        padding: 62px 36px 42px !important;
+        background:
+          linear-gradient(180deg, rgba(14, 20, 24, 0.94), rgba(11, 14, 16, 0.98)),
+          #0d1114 !important;
+      }
+
+      html[data-design="design-2"] #sidebar {
+        padding: 10px 10px 14px !important;
+        background:
+          linear-gradient(180deg, rgba(25,33,39,0.98), rgba(12,17,20,0.98)) !important;
+        box-shadow:
+          1px 0 0 rgba(255,255,255,0.06),
+          18px 0 0 rgba(79,179,164,0.05),
+          34px 0 70px rgba(0,0,0,0.44) !important;
+      }
+
+      html[data-design="design-2"] .sidebar-title {
+        margin-top: 44px;
+        padding: 8px 8px 10px;
+        border: 1px solid rgba(216,166,87,0.28);
+        border-left: 4px solid var(--accent-2);
+        border-radius: 0 !important;
+        font-family: var(--font-mono) !important;
+        font-size: 0.92rem;
+        text-transform: uppercase;
+      }
+
+      html[data-design="design-2"] .sidebar-title::after,
+      html[data-design="design-2"] #view-title::after {
+        height: 2px !important;
+        border-radius: 0 !important;
+      }
+
+      html[data-design="design-2"] .form-group,
+      html[data-design="design-2"] .settings-row-block,
+      html[data-design="design-2"] .guide-section {
+        border-radius: 4px !important;
+        background: rgba(255,255,255,0.035) !important;
+        box-shadow: inset 3px 0 0 rgba(79,179,164,0.22) !important;
+        padding: 8px;
+      }
+
+      html[data-design="design-2"] label,
+      html[data-design="design-2"] .settings-label,
+      html[data-design="design-2"] .wizard-label,
+      html[data-design="design-2"] .sub-label {
+        font-family: var(--font-mono) !important;
+        font-size: 0.68rem !important;
+        text-transform: uppercase;
+      }
+
+      html[data-design="design-2"] input,
+      html[data-design="design-2"] select,
+      html[data-design="design-2"] textarea,
+      html[data-design="design-2"] .wizard-input {
+        border: 1px solid rgba(151,176,176,0.2) !important;
+        border-left: 3px solid rgba(79,179,164,0.42) !important;
+        background: rgba(5, 8, 10, 0.82) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.04) !important;
+        font-family: var(--font-mono) !important;
+      }
+
+      html[data-design="design-2"] button,
+      html[data-design="design-2"] .paper-flap,
+      html[data-design="design-2"] .segmented-control button,
+      html[data-design="design-2"] .palette-option {
+        border-radius: 4px !important;
+        font-family: var(--font-mono) !important;
+      }
+
+      html[data-design="design-2"] #sidebar-toggle,
+      html[data-design="design-2"] #lang-toggle,
+      html[data-design="design-2"] #settings-toggle,
+      html[data-design="design-2"] #theme-toggle,
+      html[data-design="design-2"] #shortcut-toggle {
+        border-radius: 4px !important;
+        background: rgba(12,17,20,0.94) !important;
+        border: 1px solid rgba(79,179,164,0.3) !important;
+        box-shadow: 0 10px 0 rgba(0,0,0,0.18), 0 18px 36px rgba(0,0,0,0.36) !important;
+      }
+
+      html[data-design="design-2"] #main-editor > div[style*="text-align:center"] {
+        position: fixed;
+        top: 12px;
+        left: calc(var(--sidebar-width) + 72px);
+        right: 118px;
+        z-index: 90;
+        min-height: 38px;
+        margin: 0 !important;
+        padding: 7px 14px !important;
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr) minmax(0, 0.9fr);
+        align-items: center;
+        gap: 12px;
+        text-align: left !important;
+        border-radius: 4px !important;
+        background: rgba(10, 14, 17, 0.88) !important;
+        border: 1px solid rgba(151,176,176,0.16) !important;
+        box-shadow: 0 20px 52px rgba(0,0,0,0.34) !important;
+      }
+
+      html[data-design="design-2"] #sidebar.collapsed + #main-editor > div[style*="text-align:center"] {
+        left: 72px;
+      }
+
+      html[data-design="design-2"] #view-title {
+        font-family: var(--font-mono) !important;
+        font-size: 0.95rem !important;
+        text-align: left !important;
+      }
+
+      html[data-design="design-2"] #view-meta,
+      html[data-design="design-2"] #view-instruments {
+        margin: 0 !important;
+        font-family: var(--font-mono) !important;
+        font-size: 0.72rem !important;
+        text-align: right !important;
+      }
+
+      html[data-design="design-2"] .paper-stack {
+        width: min(980px, 100%);
+        margin: 0 0 20px !important;
+        --paper-peek-x: 10px;
+        --paper-peek-y: 10px;
+      }
+
+      html[data-design="design-2"] .paper-flaps {
+        top: 16px;
+        right: auto;
+        left: -58px;
+        display: grid;
+        gap: 8px;
+        align-items: start;
+      }
+
+      html[data-design="design-2"] .paper-flap {
+        width: 48px;
+        min-width: 48px;
+        height: 92px;
+        padding: 8px 4px;
+        border-radius: 4px 0 0 4px !important;
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        background: rgba(11,16,19,0.96) !important;
+        color: var(--text-muted) !important;
+        border: 1px solid rgba(151,176,176,0.18) !important;
+      }
+
+      html[data-design="design-2"] .paper-flap.is-active {
+        height: 98px;
+        color: #061614 !important;
+        background: linear-gradient(180deg, var(--accent-2), var(--accent)) !important;
+        transform: translateX(-4px);
+      }
+
+      html[data-design="design-2"] .chart-container,
+      html[data-design="design-2"] .lyrics-container,
+      html[data-design="design-2"] .database-container {
+        width: min(980px, 100%) !important;
+        padding: 24px 28px 34px !important;
+        border-radius: 2px !important;
+        background:
+          var(--paper-texture),
+          linear-gradient(180deg, #fffef8, var(--chart-bg)) !important;
+        box-shadow:
+          12px 12px 0 rgba(79,179,164,0.12),
+          24px 24px 0 rgba(216,166,87,0.08),
+          0 38px 90px rgba(0,0,0,0.38) !important;
+      }
+
+      html[data-design="design-2"] .section-header {
+        border-bottom: 2px solid #161616;
+        font-family: var(--font-mono) !important;
+      }
+
+      html[data-design="design-2"] .measure {
+        padding-inline: 5px;
+      }
+
+      html[data-design="design-2"] .beat.active {
+        outline: 2px solid var(--accent-2);
+        outline-offset: -1px;
+        transform: none;
+      }
+
+      html[data-design="design-2"] .wizard-card,
+      html[data-design="design-2"] .modal,
+      html[data-design="design-2"] .lang-picker-card,
+      html[data-design="design-2"] .lead-modal-card,
+      html[data-design="design-2"] #settings-panel,
+      html[data-design="design-2"] #shortcut-panel {
+        border-radius: 6px !important;
+        border: 1px solid rgba(151,176,176,0.18) !important;
+        background:
+          linear-gradient(180deg, rgba(21,28,34,0.98), rgba(11,16,19,0.98)) !important;
+      }
+
+      html[data-design="design-2"] .wizard-card {
+        width: min(760px, calc(100vw - 28px));
+        padding: 18px;
+      }
+
+      html[data-design="design-2"] #wizard-quick .wizard-fields {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+      }
+
+      html[data-design="design-2"] #wizard-quick .wizard-field-group:nth-child(1) {
+        grid-column: span 12;
+      }
+
+      html[data-design="design-2"] #wizard-quick .wizard-fields > div:nth-child(2),
+      html[data-design="design-2"] #wizard-quick .wizard-field-group:nth-child(3),
+      html[data-design="design-2"] #wizard-quick .wizard-field-group:nth-child(4) {
+        grid-column: span 6;
+      }
+
+      html[data-design="design-2"] #wizard-quick .wizard-field-group:nth-child(5) {
+        grid-column: span 12;
+      }
+
+      html[data-design="design-3"] {
+        --design-concept: "Stage";
+        --sidebar-width: 360px;
+        --panel-radius: 28px;
+        --control-radius: 18px;
+        --field-pad-y: 11px;
+        --field-pad-x: 14px;
+        --panel-gap: 12px;
+        --app-bg: #171016;
+        --app-bg-soft: rgba(24, 14, 22, 0.9);
+        --panel-bg: rgba(42, 25, 37, 0.76);
+        --panel-bg-strong: rgba(53, 33, 48, 0.94);
+        --surface: rgba(57, 39, 55, 0.78);
+        --surface-2: rgba(68, 52, 62, 0.78);
+        --field-bg: rgba(255, 248, 239, 0.11);
+        --text: #fff6ef;
+        --text-muted: #d9c8bd;
+        --border: rgba(255, 246, 239, 0.12);
+        --accent: #e35b7f;
+        --accent-2: #21c6ba;
+        --accent-3: #f1c46a;
+        --ambient-1: rgba(227, 91, 127, 0.2);
+        --ambient-2: rgba(33, 198, 186, 0.14);
+        --ambient-3: rgba(241, 196, 106, 0.12);
+        --chart-bg: #fff9f1;
+        --paper-texture:
+          radial-gradient(680px 360px at 18% 0%, rgba(227,91,127,0.11), transparent 72%),
+          radial-gradient(520px 300px at 100% 8%, rgba(33,198,186,0.12), transparent 70%);
+      }
+
+      html[data-design="design-3"] body {
+        background:
+          radial-gradient(900px 620px at 12% 8%, rgba(227,91,127,0.24), transparent 68%),
+          radial-gradient(820px 580px at 90% 18%, rgba(33,198,186,0.16), transparent 70%),
+          radial-gradient(760px 520px at 52% 100%, rgba(241,196,106,0.11), transparent 70%),
+          linear-gradient(145deg, #171016, #0d1117) !important;
+      }
+
+      html[data-design="design-3"] body::before {
+        background:
+          radial-gradient(circle at 50% 12%, rgba(255,255,255,0.12), transparent 18%),
+          linear-gradient(110deg, transparent 0 36%, rgba(255,255,255,0.05) 46%, transparent 58%) !important;
+        opacity: 0.76;
+      }
+
+      html[data-design="design-3"] #main-editor {
+        align-items: center;
+        padding: 46px 34px 72px !important;
+        background:
+          radial-gradient(780px 540px at 50% 0%, rgba(255,255,255,0.08), transparent 62%),
+          linear-gradient(180deg, rgba(23,16,22,0.18), rgba(6,8,12,0.38)) !important;
+      }
+
+      html[data-design="design-3"] #sidebar {
+        padding: 18px 18px 24px !important;
+        background:
+          radial-gradient(420px 240px at 100% 0%, rgba(33,198,186,0.16), transparent 70%),
+          linear-gradient(160deg, rgba(61,38,54,0.94), rgba(25,16,24,0.94)) !important;
+        border-radius: 0 28px 28px 0;
+        box-shadow:
+          28px 0 70px rgba(0,0,0,0.32),
+          inset -1px 0 0 rgba(255,255,255,0.1) !important;
+      }
+
+      html[data-design="design-3"] .sidebar-title {
+        margin-top: 58px;
+        font-size: 1.36rem;
+        text-align: left;
+      }
+
+      html[data-design="design-3"] .form-group,
+      html[data-design="design-3"] .settings-row-block,
+      html[data-design="design-3"] .guide-section {
+        padding: 12px;
+        border-radius: 22px !important;
+        background:
+          linear-gradient(145deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045)) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,0.16),
+          0 16px 34px rgba(0,0,0,0.16) !important;
+      }
+
+      html[data-design="design-3"] input,
+      html[data-design="design-3"] select,
+      html[data-design="design-3"] textarea,
+      html[data-design="design-3"] .wizard-input {
+        min-height: 42px;
+        background: rgba(255, 248, 239, 0.14) !important;
+        box-shadow:
+          0 14px 32px rgba(0,0,0,0.18),
+          inset 0 1px 0 rgba(255,255,255,0.12) !important;
+      }
+
+      html[data-design="design-3"] #main-editor > div[style*="text-align:center"] {
+        width: min(780px, calc(100vw - 36px));
+        padding: 18px 22px !important;
+        margin-bottom: 26px !important;
+        border-radius: 28px !important;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.055)) !important;
+      }
+
+      html[data-design="design-3"] #view-title {
+        font-size: clamp(1.55rem, 4vw, 2.55rem) !important;
+      }
+
+      html[data-design="design-3"] .paper-stack {
+        width: min(880px, 100%);
+        --paper-peek-x: 28px;
+        --paper-peek-y: -26px;
+      }
+
+      html[data-design="design-3"] .paper-flaps {
+        top: -42px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        padding: 6px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.1);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.14);
+      }
+
+      html[data-design="design-3"] .paper-flap {
+        min-width: 104px;
+        height: 38px;
+        border-radius: 999px !important;
+        background: transparent !important;
+        color: rgba(255,246,239,0.72) !important;
+      }
+
+      html[data-design="design-3"] .paper-flap.is-active {
+        color: #171016 !important;
+        background: linear-gradient(135deg, var(--accent-3), #fff4d2) !important;
+        transform: none;
+      }
+
+      html[data-design="design-3"] .chart-container,
+      html[data-design="design-3"] .lyrics-container,
+      html[data-design="design-3"] .database-container {
+        width: min(880px, 100%) !important;
+        padding: 38px 42px 52px !important;
+        border-radius: 32px !important;
+        background:
+          var(--paper-texture),
+          linear-gradient(180deg, rgba(255,255,255,0.99), var(--chart-bg)) !important;
+        box-shadow:
+          0 46px 100px rgba(0,0,0,0.36),
+          0 0 0 12px rgba(255,255,255,0.045),
+          inset 0 1px 0 rgba(255,255,255,0.9) !important;
+      }
+
+      html[data-design="design-3"] .paper-card.is-behind {
+        transform: translate(var(--paper-peek-x), var(--paper-peek-y)) rotate(1.2deg) scale(0.982);
+        filter: blur(0.3px) saturate(0.88);
+      }
+
+      html[data-design="design-3"] .section-header {
+        font-family: var(--font-display) !important;
+        font-size: 1.08rem;
+        border-bottom: 0;
+        padding: 8px 0 6px;
+      }
+
+      html[data-design="design-3"] .section-header::before {
+        content: "";
+        width: 8px;
+        height: 28px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      }
+
+      html[data-design="design-3"] .measure {
+        padding: 5px 7px 4px;
+      }
+
+      html[data-design="design-3"] .beat.active {
+        border-radius: 10px;
+        background: rgba(227,91,127,0.16) !important;
+        box-shadow:
+          0 0 0 2px rgba(227,91,127,0.32),
+          0 16px 28px rgba(227,91,127,0.16);
+      }
+
+      html[data-design="design-3"] .modal,
+      html[data-design="design-3"] .wizard-card,
+      html[data-design="design-3"] .lang-picker-card,
+      html[data-design="design-3"] .lead-modal-card,
+      html[data-design="design-3"] #settings-panel,
+      html[data-design="design-3"] #shortcut-panel {
+        border-radius: 30px !important;
+        background:
+          radial-gradient(480px 240px at 18% 0%, rgba(227,91,127,0.2), transparent 70%),
+          radial-gradient(380px 220px at 100% 8%, rgba(33,198,186,0.18), transparent 72%),
+          linear-gradient(145deg, rgba(61,38,54,0.96), rgba(22,15,23,0.96)) !important;
+      }
+
+      html[data-design="design-3"] .wizard-card {
+        width: min(720px, calc(100vw - 28px));
+        padding: 32px;
+      }
+
+      html[data-design="design-3"] #wizard-quick .wizard-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      html[data-design="design-3"] .wizard-actions {
+        justify-content: center;
+      }
+
+      html[data-design="design-3"] .wizard-btn-primary,
+      html[data-design="design-3"] .wizard-btn-secondary,
+      html[data-design="design-3"] .wizard-btn-skip {
+        min-height: 46px;
+        padding-inline: 22px;
+      }
+
+      html[data-design="design-3"] .instr-checklist {
+        border-radius: 20px;
+        padding: 12px;
+      }
+
+      html[data-design="design-3"] .instr-choice {
+        border-radius: 999px !important;
+        min-height: 44px;
+      }
+
+      @media (max-width: 900px) {
+        html[data-design="design-2"] #main-editor {
+          padding: 66px 18px 42px !important;
+        }
+
+        html[data-design="design-2"] #main-editor > div[style*="text-align:center"] {
+          left: 58px;
+          right: 12px;
+          grid-template-columns: 1fr;
+          gap: 2px;
+        }
+
+        html[data-design="design-2"] #view-meta,
+        html[data-design="design-2"] #view-instruments {
+          text-align: left !important;
+        }
+
+        html[data-design="design-2"] .paper-flaps {
+          position: static;
+          display: flex;
+          transform: none;
+          margin: 0 0 8px;
+        }
+
+        html[data-design="design-2"] .paper-flap {
+          writing-mode: horizontal-tb;
+          width: auto;
+          min-width: 0;
+          height: 36px;
+          border-radius: 4px !important;
+          padding: 0 12px;
+        }
+
+        html[data-design="design-3"] {
+          --sidebar-width: min(92vw, 360px);
+        }
+
+        html[data-design="design-3"] #main-editor {
+          padding-inline: 18px !important;
+        }
+
+        html[data-design="design-3"] .paper-flaps {
+          position: static;
+          transform: none;
+          margin: 0 auto 12px;
+          width: fit-content;
+          max-width: 100%;
+          overflow-x: auto;
+        }
+
+        html[data-design="design-3"] .paper-flap {
+          min-width: 88px;
+        }
+      }
+
       @media print {
         @page {
           size: Letter portrait;
@@ -4664,7 +5250,7 @@
       }
 
       html[data-design="design-1"] {
-        --design-name: "Design 1";
+        --design-name: "Desk";
         --panel-radius: 18px;
         --control-radius: 13px;
         --chart-bg: #fffef9;
@@ -4672,35 +5258,35 @@
       }
 
       html[data-design="design-2"] {
-        --design-name: "Design 2";
-        --panel-radius: 10px;
-        --control-radius: 9px;
-        --accent: #2f6f88;
+        --design-name: "Console";
+        --panel-radius: 6px;
+        --control-radius: 4px;
+        --accent: #4fb3a4;
         --accent-2: #d8a657;
-        --accent-3: #b94a48;
-        --ambient-1: rgba(47, 111, 136, 0.16);
-        --ambient-2: rgba(216, 166, 87, 0.13);
-        --ambient-3: rgba(185, 74, 72, 0.1);
-        --chart-bg: #fbfaf4;
+        --accent-3: #8aa2ff;
+        --ambient-1: rgba(79, 179, 164, 0.15);
+        --ambient-2: rgba(216, 166, 87, 0.1);
+        --ambient-3: rgba(138, 162, 255, 0.08);
+        --chart-bg: #f7f4ea;
         --paper-texture:
-          linear-gradient(90deg, rgba(47,111,136,0.04) 0 1px, transparent 1px 100%),
-          radial-gradient(600px 360px at 100% 0%, rgba(216,166,87,0.2), transparent 72%);
+          repeating-linear-gradient(90deg, rgba(13,17,20,0.035) 0 1px, transparent 1px 46px),
+          repeating-linear-gradient(0deg, rgba(13,17,20,0.035) 0 1px, transparent 1px 32px);
       }
 
       html[data-design="design-3"] {
-        --design-name: "Design 3";
-        --panel-radius: 22px;
-        --control-radius: 16px;
-        --accent: #9b315f;
-        --accent-2: #0f9f9a;
-        --accent-3: #dfb15b;
-        --ambient-1: rgba(155, 49, 95, 0.17);
-        --ambient-2: rgba(15, 159, 154, 0.14);
-        --ambient-3: rgba(223, 177, 91, 0.11);
-        --chart-bg: #fffaf7;
+        --design-name: "Stage";
+        --panel-radius: 28px;
+        --control-radius: 18px;
+        --accent: #e35b7f;
+        --accent-2: #21c6ba;
+        --accent-3: #f1c46a;
+        --ambient-1: rgba(227, 91, 127, 0.2);
+        --ambient-2: rgba(33, 198, 186, 0.14);
+        --ambient-3: rgba(241, 196, 106, 0.12);
+        --chart-bg: #fff9f1;
         --paper-texture:
-          radial-gradient(540px 340px at 0% 10%, rgba(155,49,95,0.12), transparent 72%),
-          radial-gradient(460px 320px at 100% 0%, rgba(15,159,154,0.16), transparent 70%);
+          radial-gradient(680px 360px at 18% 0%, rgba(227,91,127,0.11), transparent 72%),
+          radial-gradient(520px 300px at 100% 8%, rgba(33,198,186,0.12), transparent 70%);
       }
 
       html[data-motion="calm"] {
@@ -6511,25 +7097,60 @@
 
       #karen-flap-handle {
         position: absolute !important;
-        left: 50%;
-        top: 16px;
-        width: min(420px, calc(100vw - 32px));
-        height: 38px !important;
-        transform: translateX(-50%);
+        left: auto;
+        right: max(14px, env(safe-area-inset-right));
+        top: max(12px, env(safe-area-inset-top));
+        width: 48px;
+        height: 48px !important;
+        transform: none;
         border-radius: 999px;
-        background: rgba(255,255,255,0.08);
+        background: transparent;
         color: rgba(255,255,255,0.78) !important;
-        box-shadow:
-          inset 0 1px 0 rgba(255,255,255,0.12),
-          0 18px 40px rgba(0,0,0,0.18);
+        box-shadow: none;
+        z-index: 4;
       }
 
       #karen-flap-handle::before {
         display: none !important;
       }
 
+      #karen-flap-title {
+        display: none !important;
+      }
+
       #karen-flap-close {
+        position: static !important;
+        inset: auto !important;
+        width: 48px !important;
+        min-width: 48px !important;
+        height: 48px !important;
+        min-height: 48px !important;
+        transform: none !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 0 !important;
+        border-radius: 999px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: rgba(255,255,255,0.1) !important;
         color: rgba(255,255,255,0.72) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,0.14),
+          0 16px 34px rgba(0,0,0,0.2);
+        font-size: 28px !important;
+        line-height: 1 !important;
+        cursor: pointer;
+        transition:
+          transform var(--motion-fast) var(--motion-flow),
+          color var(--motion-fast) ease,
+          background var(--motion-fast) ease;
+      }
+
+      #karen-flap-close:hover {
+        transform: translateY(-1px) scale(1.04) !important;
+        background: rgba(255,255,255,0.18) !important;
+        color: #fff !important;
       }
 
       #karen-flap-body {
@@ -6538,18 +7159,19 @@
         max-height: none !important;
         overflow: hidden !important;
         padding: 0 !important;
+        --karen-lens-top: 31%;
       }
 
       .karen-focus-lens {
         position: absolute;
         left: 50%;
-        top: 52%;
-        width: min(820px, 78vw);
-        height: clamp(170px, 28vh, 260px);
+        top: var(--karen-lens-top);
+        width: min(410px, 39vw, calc(100vw - 32px));
+        height: clamp(112px, 18.5vh, 172px);
         transform: translate(-50%, -50%);
-        border-radius: clamp(34px, 9vw, 999px);
-        background:
-          radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0 42%, rgba(255,255,255,0.52) 62%, transparent 76%);
+        border: 1px solid rgba(255,255,255,0.72);
+        border-radius: clamp(18px, 4vw, 30px);
+        background: rgba(255,255,255,0.92);
         box-shadow:
           0 0 0 999px rgba(0,0,0,0.34),
           0 30px 100px rgba(0,0,0,0.34),
@@ -6560,84 +7182,153 @@
       .karen-focus-preview {
         position: absolute;
         left: 50%;
-        top: 52%;
-        width: min(720px, 70vw);
+        top: var(--karen-lens-top);
+        width: min(370px, 35vw, calc(100vw - 54px));
         transform: translate(-50%, -50%);
-        text-align: center;
+        text-align: left;
         color: #112827;
         font-family: var(--font-karen), "Noto Sans Myanmar", serif;
-        font-size: clamp(1.7rem, 4vw, 3.8rem);
+        font-size: clamp(1.6rem, 3.2vw, 3.35rem);
         font-weight: 900;
         line-height: 1.35;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
         word-break: break-word;
-        max-height: clamp(130px, 24vh, 220px);
-        overflow: auto;
-        padding: 0 12px;
+        max-height: clamp(88px, 15vh, 134px);
+        overflow: hidden;
+        padding: 0 20px;
         pointer-events: none;
         text-shadow: 0 1px 0 rgba(255,255,255,0.78);
       }
 
+      .karen-preview-caret {
+        display: inline-block;
+        width: 3px;
+        height: 1.15em;
+        margin: 0 1px;
+        vertical-align: -0.14em;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent) 76%, #112827);
+        box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 45%, transparent);
+        animation: karenPreviewCaretBlink 980ms steps(2, start) infinite;
+      }
+
+      @keyframes karenPreviewCaretBlink {
+        50% { opacity: 0.12; }
+      }
+
       #karen-target-label {
         position: absolute;
-        left: 50%;
-        top: calc(52% - clamp(170px, 28vh, 260px) / 2 - 34px);
-        transform: translateX(-50%);
+        left: auto;
+        right: max(70px, calc(env(safe-area-inset-right) + 70px));
+        top: max(20px, calc(env(safe-area-inset-top) + 20px));
+        max-width: min(340px, calc(100vw - 128px));
+        transform: none;
         color: rgba(255,255,255,0.7) !important;
         font-size: 0.72rem !important;
         font-weight: 900;
-        text-align: center;
+        text-align: right;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
 
       .karen-keys {
-        display: block !important;
+        position: absolute;
+        left: 50%;
+        top: calc(var(--karen-lens-top) + 76px);
+        bottom: 8px;
+        width: min(760px, calc(100vw - 28px));
+        transform: translateX(-50%);
+        display: grid !important;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        justify-items: center;
+        overflow-y: auto;
+        padding: 0 8px 10px;
       }
 
       .karen-zone {
-        position: absolute;
+        position: relative;
         display: grid;
-        gap: 8px;
+        gap: 6px;
         align-content: start;
-        opacity: 0;
-        scale: 0.92;
-        filter: blur(8px);
-        transition:
-          transform var(--motion-soft) var(--motion-flow),
-          opacity var(--motion-soft) ease,
-          scale var(--motion-soft) var(--motion-flow),
-          filter var(--motion-soft) ease;
-      }
-
-      #karen-flap.open .karen-zone {
-        animation: karenZoneFloatIn 820ms var(--motion-flow) both;
-        animation-delay: var(--zone-delay, 0ms);
-      }
-
-      html[data-karen-keyboard-immersive="off"] #karen-flap.open .karen-zone {
-        animation: none;
+        justify-items: center;
+        width: 100% !important;
+        inset: auto !important;
+        transform: none !important;
         opacity: 1;
         scale: 1;
         filter: none;
       }
 
-      @keyframes karenZoneFloatIn {
+      #karen-flap.open:not(.closing) .karen-zone-label {
+        animation: karenZoneLabelFloatIn 300ms var(--motion-flow) both;
+        animation-delay: var(--zone-delay, 0ms);
+      }
+
+      #karen-flap.open:not(.closing) .k-key {
+        animation: karenKeyFloatIn 300ms var(--motion-flow) both;
+        animation-delay: var(--key-delay, 0ms);
+      }
+
+      html[data-karen-keyboard-immersive="off"] #karen-flap.open .karen-zone-label,
+      html[data-karen-keyboard-immersive="off"] #karen-flap.open .k-key {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+
+      #karen-flap.closing {
+        pointer-events: none;
+        animation: karenFlapMinimizeOut 360ms var(--motion-flow) both;
+      }
+
+      @keyframes karenKeyFloatIn {
         from {
           opacity: 0;
-          scale: 0.84;
-          filter: blur(12px);
+          transform: translateY(22px) scale(0.82);
+          filter: blur(10px);
         }
-        62% {
+        70% {
           opacity: 1;
         }
         to {
           opacity: 1;
-          scale: 1;
+          transform: translateY(0) scale(1);
           filter: blur(0);
         }
       }
 
+      @keyframes karenZoneLabelFloatIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes karenFlapMinimizeOut {
+        from {
+          opacity: 1;
+          clip-path: inset(0 0 0 0 round 0);
+          filter: blur(0);
+        }
+        to {
+          opacity: 0;
+          clip-path: inset(44% 38% 42% 38% round 34px);
+          filter: blur(8px);
+        }
+      }
+
       .karen-zone-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
         color: rgba(255,255,255,0.52);
         font-size: 0.68rem;
         font-weight: 900;
@@ -6647,73 +7338,66 @@
 
       .karen-zone-keys {
         display: grid;
+        grid-template-columns: repeat(auto-fit, 48px) !important;
+        justify-content: center;
         gap: 6px;
+        width: 100%;
       }
 
       .karen-zone-consonants {
-        top: 68px;
-        left: 50%;
         width: min(840px, calc(100vw - 44px));
-        transform: translateX(-50%);
-        --zone-delay: 60ms;
+        --zone-delay: 0ms;
       }
 
       .karen-zone-consonants .karen-zone-keys {
-        grid-template-columns: repeat(13, minmax(36px, 1fr));
+        grid-template-columns: repeat(auto-fit, 48px) !important;
       }
 
       .karen-zone-vowels {
-        right: max(24px, calc((100vw - 1040px) / 2));
-        top: 50%;
-        width: 166px;
-        transform: translateY(-50%);
-        --zone-delay: 170ms;
+        --zone-delay: 300ms;
       }
 
       .karen-zone-vowels .karen-zone-keys {
-        grid-template-columns: repeat(2, minmax(58px, 1fr));
+        grid-template-columns: repeat(auto-fit, 48px) !important;
       }
 
       .karen-zone-tones {
-        left: max(24px, calc((100vw - 1040px) / 2));
-        top: calc(50% - 18px);
-        width: 168px;
-        --zone-delay: 310ms;
+        --zone-delay: 600ms;
       }
 
       .karen-zone-tones .karen-zone-keys,
       .karen-zone-medials .karen-zone-keys {
-        grid-template-columns: repeat(5, minmax(26px, 1fr));
+        grid-template-columns: repeat(auto-fit, 48px) !important;
       }
 
       .karen-zone-medials {
-        left: max(24px, calc((100vw - 1040px) / 2));
-        top: calc(50% - 116px);
-        width: 168px;
-        --zone-delay: 240ms;
+        --zone-delay: 900ms;
       }
 
       .karen-zone-extra {
-        left: 50%;
-        bottom: 24px;
         width: min(620px, calc(100vw - 44px));
-        transform: translateX(-50%);
         opacity: 0.78;
-        --zone-delay: 390ms;
+        --zone-delay: 1200ms;
       }
 
       .karen-zone-extra .karen-zone-keys {
-        grid-template-columns: repeat(10, minmax(34px, 1fr));
+        grid-template-columns: repeat(auto-fit, 48px) !important;
+      }
+
+      .karen-zone-commands {
+        --zone-delay: 1500ms;
       }
 
       .k-key {
-        min-height: 38px;
+        width: 48px;
+        height: 48px;
+        min-height: 48px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         border: 0 !important;
-        border-radius: 999px !important;
-        padding: 0 9px !important;
+        border-radius: 15px !important;
+        padding: 0 !important;
         color: rgba(255,255,255,0.92) !important;
         background:
           linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.07)) !important;
@@ -6721,9 +7405,10 @@
           0 12px 30px rgba(0,0,0,0.16),
           inset 0 1px 0 rgba(255,255,255,0.14) !important;
         font-family: var(--font-karen), "Noto Sans Myanmar", serif !important;
-        font-size: 1.08rem !important;
+        font-size: 1.2rem !important;
         font-weight: 900;
         cursor: pointer;
+        opacity: 0;
       }
 
       .k-key:hover {
@@ -6731,6 +7416,13 @@
         background:
           linear-gradient(135deg, rgba(255,255,255,0.92), color-mix(in srgb, var(--accent) 22%, white)) !important;
         transform: translateY(-2px) scale(1.04);
+      }
+
+      .k-key.is-command {
+        font-family: var(--font-ui), sans-serif !important;
+        font-size: 1.35rem !important;
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--accent) 44%, rgba(255,255,255,0.2)), rgba(255,255,255,0.08)) !important;
       }
 
       @media (max-width: 900px) {
@@ -6745,42 +7437,47 @@
           justify-content: flex-start;
         }
 
+        #karen-flap-body {
+          --karen-lens-top: 29%;
+        }
+
         .karen-focus-lens {
-          width: 82vw;
-          height: 190px;
+          width: min(370px, 78vw);
+          height: 124px;
         }
 
-        .karen-zone-consonants {
-          top: 64px;
-          width: calc(100vw - 24px);
+        .karen-focus-preview {
+          width: min(330px, 72vw);
+          font-size: clamp(1.55rem, 8vw, 2.75rem);
+          max-height: 96px;
         }
 
-        .karen-zone-consonants .karen-zone-keys {
-          grid-template-columns: repeat(5, minmax(38px, 1fr));
+        #karen-target-label {
+          right: 66px;
+          top: 20px;
+          max-width: calc(100vw - 120px);
         }
 
-        .karen-zone-vowels {
-          right: 12px;
-          width: 132px;
+        .karen-keys {
+          top: calc(var(--karen-lens-top) + 74px);
+          bottom: 12px;
+          width: calc(100vw - 18px);
         }
 
-        .karen-zone-tones,
-        .karen-zone-medials {
-          left: 12px;
-          width: 132px;
-        }
-
+        .karen-zone-keys,
+        .karen-zone-consonants .karen-zone-keys,
+        .karen-zone-vowels .karen-zone-keys,
         .karen-zone-tones .karen-zone-keys,
-        .karen-zone-medials .karen-zone-keys {
-          grid-template-columns: repeat(2, minmax(44px, 1fr));
-        }
-
-        .karen-zone-extra {
-          bottom: 14px;
-        }
-
+        .karen-zone-medials .karen-zone-keys,
         .karen-zone-extra .karen-zone-keys {
-          grid-template-columns: repeat(5, minmax(34px, 1fr));
+          grid-template-columns: repeat(auto-fit, 44px) !important;
+          gap: 6px;
+        }
+
+        .k-key {
+          width: 44px;
+          height: 44px;
+          min-height: 44px;
         }
       }
 
@@ -6854,8 +7551,6 @@
 
       <!-- MODE 1: Quick single form -->
       <div id="wizard-quick" class="wizard-card" style="display:none;">
-        <div class="wizard-logo">✦</div>
-        <div class="wizard-title" id="wq-title">New Song</div>
         <div class="wizard-fields">
           <div class="wizard-field-group">
             <label class="wizard-label" id="wq-label-title">Song Title</label>
@@ -7059,9 +7754,9 @@
       <div class="settings-row settings-row-block">
         <span class="settings-label">UI Design Direction</span>
         <div class="segmented-control design-direction-control" role="radiogroup" aria-label="UI Design Direction">
-          <button type="button" class="design-option" data-ui-design="design-1" onclick="setUiDesign('design-1')">Design 1</button>
-          <button type="button" class="design-option" data-ui-design="design-2" onclick="setUiDesign('design-2')">Design 2</button>
-          <button type="button" class="design-option" data-ui-design="design-3" onclick="setUiDesign('design-3')">Design 3</button>
+          <button type="button" class="design-option" data-ui-design="design-1" onclick="setUiDesign('design-1')" title="Manuscript Desk">1 Desk</button>
+          <button type="button" class="design-option" data-ui-design="design-2" onclick="setUiDesign('design-2')" title="Control Room">2 Console</button>
+          <button type="button" class="design-option" data-ui-design="design-3" onclick="setUiDesign('design-3')" title="Stage">3 Stage</button>
         </div>
       </div>
       <div class="settings-row settings-row-block settings-row-split">
@@ -7508,6 +8203,19 @@
         </details>
 
         <details class="guide-section">
+          <summary>Karen Keyboard Modal</summary>
+          <div class="guide-section-body">
+            <dl class="guide-grid">
+              <dt>Esc</dt><dd>Close the immersive Karen keyboard.</dd>
+              <dt>&times;</dt><dd>Close the immersive Karen keyboard from the top-right corner.</dd>
+              <dt>Backspace</dt><dd>Undo the latest Karen keyboard insertion or delete the previous character when there is no keyboard insertion history.</dd>
+              <dt>Ctrl + Z</dt><dd>Undo the latest Karen keyboard insertion while the modal is open, or use the normal field undo when no keyboard insertion is pending.</dd>
+              <dt>Ctrl + Y</dt><dd>Redo the latest Karen keyboard insertion while the modal is open.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section">
           <summary>Sidebar Workflows</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
@@ -7530,7 +8238,7 @@
               <dt>Language</dt><dd>Switch between English and Karen UI labels.</dd>
               <dt>Theme</dt><dd>Use Auto, Light, or Dark modes when available.</dd>
               <dt>Palette</dt><dd>Change the interface color set without changing chart data.</dd>
-              <dt>UI Design</dt><dd>Switch among Design 1, Design 2, and Design 3 from the same shared app logic.</dd>
+              <dt>UI Design</dt><dd>Switch among Desk, Console, and Stage layouts from the same shared app logic.</dd>
               <dt>Motion</dt><dd>Choose silky or calmer motion.</dd>
               <dt>Density</dt><dd>Choose compact or comfy control spacing.</dd>
               <dt>Karen Keyboard</dt><dd>Turn the immersive floating keyboard animation on or off. The same Karen text fields stay touch-ready either way.</dd>
@@ -7627,15 +8335,12 @@
     ============================================================ -->
     <div id="karen-flap"> 
       <div id="karen-flap-handle" style="position:relative;">
-        <span id="karen-flap-title">ကညီကျိ KAREN KEYBOARD</span>
-        <button id="karen-flap-close" onclick="document.getElementById('karen-flap').classList.remove('open')"
-          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#888;font-size:20px;cursor:pointer;line-height:1;padding:0 4px;"
-          title="Close keyboard">×</button>
+        <button id="karen-flap-close" type="button" aria-label="Close Karen keyboard" title="Close keyboard">&times;</button>
       </div>
       <div id="karen-flap-body">
         <div class="karen-focus-lens" aria-hidden="true"></div>
         <div id="karen-target-label">Typing into: —</div>
-        <div id="karen-focus-preview" class="karen-focus-preview">ကညီကျိ</div>
+        <div id="karen-focus-preview" class="karen-focus-preview" aria-live="polite"></div>
         <div id="karenKeyboard" class="karen-keys"></div>
       </div>
     </div>
@@ -7654,6 +8359,11 @@
         'ဝ','၁','၂','၃','၄',
         '၅','၆','၇','၈','၉'
       ];
+
+      const KAREN_CONSONANTS = new Set(KAREN_LAYOUT.slice(0, 25));
+      const KAREN_KEY_ZONE_DELAY_MS = 300;
+      const KAREN_KEY_STAGGER_MS = 18;
+      const KAREN_CLOSE_ANIMATION_MS = 360;
 
       const ALT_MAP = {
         "y": "ျ",
@@ -7747,6 +8457,9 @@
       let songsCache = [];
       let databaseSearchTimer = 0;
       let karenInputTargetEl = null;
+      let karenKeyboardCloseTimer = 0;
+      let karenInputUndoStack = [];
+      let karenInputRedoStack = [];
 
       function initializeInstrumentChoiceButtons() {
         ["instr-sidebar","instr-wq","instr-wg"].forEach(id => {
@@ -8493,13 +9206,15 @@
           { key: "vowels", label: "Vowels", chars: KAREN_LAYOUT.slice(25, 35) },
           { key: "tones", label: "Tones", chars: KAREN_LAYOUT.slice(35, 40) },
           { key: "medials", label: "Medials", chars: KAREN_LAYOUT.slice(40, 45) },
-          { key: "extra", label: "Numbers", chars: KAREN_LAYOUT.slice(45) }
+          { key: "extra", label: "Numbers", chars: KAREN_LAYOUT.slice(45) },
+          { key: "commands", label: "Commands", chars: [{ label: "⌫", command: "backspace", title: "Backspace" }] }
         ];
 
-        groups.forEach(group => {
+        groups.forEach((group, zoneIndex) => {
           const zone = document.createElement("section");
           zone.className = `karen-zone karen-zone-${group.key}`;
           zone.dataset.zone = group.key;
+          zone.style.setProperty("--zone-delay", `${zoneIndex * KAREN_KEY_ZONE_DELAY_MS}ms`);
 
           const label = document.createElement("div");
           label.className = "karen-zone-label";
@@ -8509,14 +9224,28 @@
           const keys = document.createElement("div");
           keys.className = "karen-zone-keys";
 
-          group.chars.forEach(char => {
+          group.chars.forEach((item, keyIndex) => {
+            const isCommand = typeof item === "object";
+            const char = isCommand ? item.label : item;
             const btn = document.createElement("button");
             btn.type = "button";
-            btn.className = "k-key";
+            btn.className = isCommand ? "k-key is-command" : "k-key";
             btn.textContent = char;
+            btn.style.setProperty(
+              "--key-delay",
+              `${(zoneIndex * KAREN_KEY_ZONE_DELAY_MS) + (keyIndex * KAREN_KEY_STAGGER_MS)}ms`
+            );
+            if (isCommand && item.title) {
+              btn.title = item.title;
+              btn.setAttribute("aria-label", item.title);
+            }
             btn.addEventListener("mousedown", (e) => {
               e.preventDefault();
-              karenKeyInsert(char);
+              if (isCommand && item.command === "backspace") {
+                deleteLastKarenChange();
+              } else {
+                karenKeyInsert(char);
+              }
             });
             keys.appendChild(btn);
           });
@@ -11544,6 +12273,8 @@
           return;
         }
 
+        if (handleKarenKeyboardShortcut(e)) return;
+
         // ── GUARD: do not steal keys from text inputs / textareas ──
         const tag = e.target.tagName.toLowerCase();
         // Allow focus-trap even though it's an input element
@@ -12914,7 +13645,7 @@
           if (!flap) return;
           const closed = sidebar.classList.contains("collapsed");
           flap.classList.toggle("sidebar-closed", closed);
-          if (closed) flap.classList.remove("open");
+          if (closed) closeKarenKeyboard({ instant: true });
         };
 
         syncFlap();
@@ -13016,21 +13747,92 @@
         const lyricsLabel = fieldGroup?.querySelector?.(".lyrics-field-label")?.textContent?.trim();
         if (lyricsLabel) return lyricsLabel;
         const label = el.id ? document.querySelector(`label[for="${CSS.escape(el.id)}"]`) : null;
-        return el.placeholder || label?.textContent?.trim() || el.id || "Karen text";
+        const ariaLabel = el.getAttribute?.("aria-label")?.trim();
+        return label?.textContent?.trim() || ariaLabel || el.id || "Karen text";
+      }
+
+      function escapeHtml(value) {
+        return String(value || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function getKarenSyllableWindow(value, caret) {
+        if (!value) return { before: "", after: "" };
+
+        const safeCaret = Math.max(0, Math.min(value.length, Number.isFinite(caret) ? caret : value.length));
+        const clusters = [];
+        let clusterStart = 0;
+        let clusterText = "";
+
+        for (let i = 0; i < value.length;) {
+          const char = Array.from(value.slice(i))[0];
+          const isConsonant = KAREN_CONSONANTS.has(char);
+          if (isConsonant && clusterText) {
+            clusters.push({ start: clusterStart, end: i });
+            clusterStart = i;
+            clusterText = char;
+          } else {
+            clusterText += char;
+          }
+          i += char.length;
+        }
+
+        if (clusterText) {
+          clusters.push({ start: clusterStart, end: value.length });
+        }
+
+        if (!clusters.length || !clusters.some(cluster => Array.from(value.slice(cluster.start, cluster.end)).some(char => KAREN_CONSONANTS.has(char)))) {
+          const start = Math.max(0, safeCaret - 48);
+          const end = Math.min(value.length, safeCaret + 12);
+          return {
+            before: value.slice(start, safeCaret),
+            after: value.slice(safeCaret, end)
+          };
+        }
+
+        let activeIndex = clusters.findIndex(cluster => safeCaret >= cluster.start && safeCaret <= cluster.end);
+        if (activeIndex < 0) {
+          activeIndex = clusters.reduce((latest, cluster, index) => cluster.end <= safeCaret ? index : latest, 0);
+        }
+
+        const windowStartIndex = Math.max(0, activeIndex - 4);
+        const windowStart = clusters[windowStartIndex].start;
+        const windowEnd = clusters[activeIndex].end;
+
+        return {
+          before: value.slice(windowStart, safeCaret),
+          after: value.slice(safeCaret, windowEnd)
+        };
       }
 
       function updateKarenFocusPreview(el = getKarenInsertTarget()) {
         const preview = document.getElementById("karen-focus-preview");
         if (!preview) return;
-        const value = String(el?.value || "").trim();
-        if (!value) {
-          preview.textContent = "ကညီကျိ";
+        const value = String(el?.value || "");
+        const caret = Number.isFinite(el?.selectionStart) ? el.selectionStart : value.length;
+        const windowText = getKarenSyllableWindow(value, caret);
+        preview.innerHTML = `${escapeHtml(windowText.before)}<span class="karen-preview-caret" aria-hidden="true"></span>${escapeHtml(windowText.after)}`;
+      }
+
+      function closeKarenKeyboard(options = {}) {
+        const flap = document.getElementById("karen-flap");
+        if (!flap) return;
+        window.clearTimeout(karenKeyboardCloseTimer);
+
+        if (options.instant || !flap.classList.contains("open")) {
+          flap.classList.remove("open", "closing");
           return;
         }
-        const caret = Number.isFinite(el.selectionStart) ? el.selectionStart : value.length;
-        const start = Math.max(0, caret - 48);
-        const end = Math.min(value.length, caret + 48);
-        preview.textContent = value.slice(start, end).trim() || value.slice(-96);
+
+        flap.classList.add("closing");
+        flap.classList.remove("open");
+        karenKeyboardCloseTimer = window.setTimeout(() => {
+          flap.classList.remove("closing");
+        }, KAREN_CLOSE_ANIMATION_MS);
       }
 
       function openKarenKeyboardForTarget(el = getKarenInsertTarget()) {
@@ -13040,7 +13842,38 @@
         const label = document.getElementById("karen-target-label");
         if (label) label.textContent = `${t("typingInto")} ${getKarenTargetName(el)}`;
         updateKarenFocusPreview(el);
-        flap?.classList.add("open");
+        if (flap) {
+          window.clearTimeout(karenKeyboardCloseTimer);
+          flap.classList.remove("closing");
+          flap.classList.add("open");
+        }
+      }
+
+      function handleKarenKeyboardShortcut(e) {
+        const karenFlapOpen = document.getElementById("karen-flap")?.classList.contains("open");
+        if (!karenFlapOpen) return false;
+
+        const key = e.key.toLowerCase();
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeKarenKeyboard();
+          return true;
+        }
+        if (e.key === "Backspace") {
+          e.preventDefault();
+          deleteLastKarenChange();
+          return true;
+        }
+        if (e.ctrlKey && key === "z" && undoKarenInputChange()) {
+          e.preventDefault();
+          return true;
+        }
+        if (e.ctrlKey && key === "y" && redoKarenInputChange()) {
+          e.preventDefault();
+          return true;
+        }
+
+        return false;
       }
 
       function setupKarenFlap() {
@@ -13051,18 +13884,28 @@
 
         if (!flap || !handle) return;
 
+        if (!flap.dataset.shortcutBound) {
+          document.addEventListener("keydown", (e) => {
+            if (handleKarenKeyboardShortcut(e)) {
+              e.stopPropagation();
+            }
+          }, true);
+          flap.dataset.shortcutBound = "true";
+        }
+
         // toggle open/close on handle click
         handle.addEventListener("click", (e) => {
           if (e.target === closeBtn) return;
-          flap.classList.toggle("open");
           if (flap.classList.contains("open")) {
+            closeKarenKeyboard();
+          } else {
             openKarenKeyboardForTarget(getKarenInsertTarget());
           }
         });
 
         closeBtn?.addEventListener("click", (e) => {
           e.stopPropagation();
-          flap.classList.remove("open");
+          closeKarenKeyboard();
         });
 
         // update target label when focus changes
@@ -13074,7 +13917,7 @@
               const typingPrefix = t("typingInto");
               if (!isKarenInsertTarget(e.target)) {
                 label.textContent = typingPrefix + " " + targetName + " (English only)";
-                flap.classList.remove("open");
+                closeKarenKeyboard();
               } else {
                 label.textContent = typingPrefix + " " + targetName;
               }
@@ -13110,6 +13953,103 @@
         insertAtCaret(target.id || null, char, target);
       }
 
+      function getKarenInputSnapshot(target) {
+        return {
+          target,
+          id: target.id || null,
+          value: target.value,
+          selectionStart: target.selectionStart,
+          selectionEnd: target.selectionEnd
+        };
+      }
+
+      function restoreKarenInputSnapshot(snapshot) {
+        const target = snapshot.target?.isConnected
+          ? snapshot.target
+          : snapshot.id
+            ? document.getElementById(snapshot.id)
+            : null;
+
+        if (!isKarenInsertTarget(target)) return false;
+        forceKarenTextDirection(target);
+        target.value = snapshot.value;
+        target.selectionStart = snapshot.selectionStart;
+        target.selectionEnd = snapshot.selectionEnd;
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+        rememberKarenTarget(target);
+        target.focus({ preventScroll: true });
+        updateKarenFocusPreview(target);
+        return true;
+      }
+
+      function recordKarenInputChange(before, after, type = "edit") {
+        karenInputUndoStack.push({ before, after, type });
+        karenInputRedoStack = [];
+      }
+
+      function isKarenChangeForTarget(change, target) {
+        if (!change || !target) return false;
+        const before = change.before || {};
+        const after = change.after || {};
+        return before.target === target ||
+          after.target === target ||
+          (!!target.id && (before.id === target.id || after.id === target.id));
+      }
+
+      function undoKarenInputChange(target = getKarenInsertTarget()) {
+        const latest = karenInputUndoStack[karenInputUndoStack.length - 1];
+        if (!isKarenChangeForTarget(latest, target)) return false;
+        const change = karenInputUndoStack.pop();
+        if (!change) return false;
+        if (!restoreKarenInputSnapshot(change.before)) return false;
+        karenInputRedoStack.push(change);
+        return true;
+      }
+
+      function redoKarenInputChange(target = getKarenInsertTarget()) {
+        const latest = karenInputRedoStack[karenInputRedoStack.length - 1];
+        if (!isKarenChangeForTarget(latest, target)) return false;
+        const change = karenInputRedoStack.pop();
+        if (!change) return false;
+        if (!restoreKarenInputSnapshot(change.after)) return false;
+        karenInputUndoStack.push(change);
+        return true;
+      }
+
+      function deletePreviousKarenCharacter() {
+        const target = getKarenInsertTarget();
+        if (!target) return false;
+        const start = target.selectionStart;
+        const end = target.selectionEnd;
+        if (start === 0 && end === 0) return false;
+
+        const before = getKarenInputSnapshot(target);
+        const val = target.value;
+
+        if (start !== end) {
+          target.value = val.slice(0, start) + val.slice(end);
+          target.selectionStart = target.selectionEnd = start;
+        } else {
+          const previousChar = Array.from(val.slice(0, start)).pop() || "";
+          const deleteStart = Math.max(0, start - previousChar.length);
+          target.value = val.slice(0, deleteStart) + val.slice(end);
+          target.selectionStart = target.selectionEnd = deleteStart;
+        }
+
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+        const after = getKarenInputSnapshot(target);
+        recordKarenInputChange(before, after, "delete");
+        updateKarenFocusPreview(target);
+        return true;
+      }
+
+      function deleteLastKarenChange() {
+        const target = getKarenInsertTarget();
+        const latest = karenInputUndoStack[karenInputUndoStack.length - 1];
+        if (latest?.type === "insert" && isKarenChangeForTarget(latest, target) && undoKarenInputChange(target)) return true;
+        return deletePreviousKarenCharacter();
+      }
+
       // ============================================================
       // INSERT AT CARET
       // works by id (string) or direct element reference
@@ -13122,6 +14062,7 @@
         const start = target.selectionStart;
         const end   = target.selectionEnd;
         const val   = target.value;
+        const before = getKarenInputSnapshot(target);
 
         target.value =
           val.substring(0, start) +
@@ -13129,7 +14070,9 @@
           val.substring(end);
 
         target.selectionStart = target.selectionEnd = start + char.length;
-        target.dispatchEvent(new Event("input"));
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+        const after = getKarenInputSnapshot(target);
+        recordKarenInputChange(before, after, "insert");
         updateKarenFocusPreview(target);
       }
 
@@ -13716,7 +14659,6 @@
         setTextById("song-db-title", t("songDatabase"));
         setTextById("section-modal-title", t("addSection"));
         setTextById("section-modal-exit-btn", t("escToExit"));
-        setTextById("wq-title", t("wizardQuickTitle"));
         setTextById("wq-label-title", t("wizardLabelTitle"));
         setTextById("wq-label-key", t("wizardLabelKey"));
         setTextById("wq-label-tempo", t("wizardLabelTempo"));
@@ -14086,7 +15028,7 @@
         const flap = document.getElementById("karen-flap");
         if (flap) {
           flap.classList.add("sidebar-closed");
-          flap.classList.remove("open");
+          closeKarenKeyboard({ instant: true });
         }
         focusEditor({ delay: 480 });
       }
