@@ -1161,7 +1161,8 @@
         margin-left: auto;
       }
 
-      .section-rowcap-control {
+      .section-rowcap-control,
+      .row-rowcap-control {
         display: inline-flex;
         flex-direction: column;
         align-items: center;
@@ -1170,7 +1171,31 @@
         margin-left: 3px;
       }
 
-      .section-rowcap-btn {
+      .row-rowcap-control {
+        position: absolute;
+        right: -19px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 12;
+        margin-left: 0;
+        padding: 2px 1px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.86);
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+        opacity: 0.55;
+        transition: opacity 0.5s ease, background-color 0.5s ease, box-shadow 0.5s ease;
+      }
+
+      .line:hover .row-rowcap-control,
+      .row-rowcap-control:hover {
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
+      }
+
+      .section-rowcap-btn,
+      .row-rowcap-btn {
         width: 14px;
         height: 14px;
         margin: 0;
@@ -1185,16 +1210,32 @@
         cursor: pointer;
       }
 
-      .section-rowcap-btn:hover {
+      .section-rowcap-btn:hover,
+      .row-rowcap-btn:hover {
         background: #ececec;
       }
 
-      .section-rowcap-value {
+      .section-rowcap-value,
+      .row-rowcap-value {
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 0;
         min-width: 18px;
         text-align: center;
+      }
+
+      .row-rowcap-btn {
+        width: 16px;
+        height: 12px;
+        border: 0;
+        background: transparent;
+        font-size: 10px;
+      }
+
+      .row-rowcap-value {
+        min-width: 16px;
+        font-size: 9px;
+        line-height: 1;
       }
 
       .section-title {
@@ -1550,6 +1591,23 @@
         pointer-events: none;
       }
 
+      .lead-instrument-label {
+        position: absolute;
+        z-index: 9;
+        padding: 1px 4px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.26);
+        color: #111;
+        font-family: var(--font-ui);
+        font-size: 0.56em;
+        font-weight: 900;
+        line-height: 1;
+        letter-spacing: 0.03em;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+
       .lead-note {
         font-size: 9px;
         font-weight: 700;
@@ -1871,8 +1929,31 @@
 
       .measure-roll-label {
         left: 100%;
-        top: -16px;
+        top: -18px;
         transform: translateX(-50%);
+      }
+
+      .cue-stack {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        line-height: 0.95;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .cue-stack .cue-ka {
+        font-family: var(--font-karen), var(--font-ui);
+        font-size: 0.78em;
+        font-weight: 900;
+      }
+
+      .cue-stack .cue-en {
+        font-family: var(--font-ui);
+        font-size: 0.72em;
+        font-weight: 850;
       }
 
       /* ============================================================
@@ -1907,9 +1988,9 @@
       .span-label-2 {
         position: absolute;
         font-weight: bold;
-        font-size: 0.75em;
+        font-size: 0.72em;
         white-space: nowrap;
-        line-height: 1.2;
+        line-height: 1;
         pointer-events: none;
         text-decoration: none;
       }
@@ -2163,6 +2244,14 @@
           inset 0 1px 0 rgba(255,255,255,0.24) !important;
       }
 
+      .lead-instrument-option.selected {
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 72%, transparent), color-mix(in srgb, var(--accent-2) 58%, transparent));
+        color: #fff;
+        box-shadow:
+          0 16px 34px color-mix(in srgb, var(--accent) 22%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.24) !important;
+      }
+
       .only-instrument-option input[type="checkbox"] {
         position: absolute;
         opacity: 0;
@@ -2184,7 +2273,8 @@
         text-overflow: ellipsis;
       }
 
-      .only-instrument-option:has(input:checked) .only-instrument-text {
+      .only-instrument-option:has(input:checked) .only-instrument-text,
+      .lead-instrument-option.selected .only-instrument-text {
         color: #fff;
       }
 
@@ -2289,6 +2379,22 @@
         font-size: 0.92em;
         font-weight: 600;
       }
+      .paper-key-value {
+        font-family: var(--font-display);
+        font-size: 1.18em;
+        font-weight: 900;
+        color: #111;
+        line-height: 1;
+        white-space: nowrap;
+      }
+      .paper-key-extra {
+        font-family: var(--font-ui);
+        font-size: 0.5em;
+        font-weight: 700;
+        color: #444;
+        line-height: 1;
+        white-space: nowrap;
+      }
       .paper-footer {
         position: absolute;
         bottom: 14px;
@@ -2338,6 +2444,55 @@
       .print-en {
         font-family: var(--font-ui);
         color: #333;
+      }
+
+      .instrument-summary {
+        display: none;
+        width: min(100%, 8.5in);
+        margin: 12px auto 0;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.16);
+        box-shadow: 0 12px 34px rgba(15, 23, 42, 0.12);
+        color: #111;
+        font-family: var(--font-ui);
+        align-items: center;
+        gap: 10px;
+      }
+
+      .instrument-summary.is-visible {
+        display: flex;
+      }
+
+      .instrument-summary-label {
+        flex: 0 0 auto;
+        font-size: 0.68em;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #475569;
+      }
+
+      .instrument-summary-list {
+        display: flex;
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .instrument-summary-chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 22px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        font-size: 0.72em;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
       }
 
       .transpose-row {
@@ -2439,6 +2594,8 @@
         #print-batch .section-delete-btn,
         #print-batch .section-rowcap-control,
         #print-batch .section-rowcap-btn,
+        #print-batch .row-rowcap-control,
+        #print-batch .row-rowcap-btn,
         #print-batch .section-premeasure-control,
         #print-batch .section-insert-line,
         #print-batch .section-insert-plus {
@@ -6646,6 +6803,13 @@
           inset 0 1px 0 var(--glass-line);
       }
 
+      #btn-export.is-exporting {
+        filter: brightness(1.08);
+        box-shadow:
+          0 0 0 1px color-mix(in srgb, var(--accent-2) 55%, transparent),
+          0 10px 24px color-mix(in srgb, var(--accent-2) 22%, transparent);
+      }
+
       @media (max-width: 720px) {
         #theme-toggle {
           left: 12px;
@@ -8390,8 +8554,8 @@
       <div class="settings-row settings-row-block settings-row-split">
         <span class="settings-label" data-i18n="motion">Motion</span>
         <div class="segmented-control compact-segment" role="radiogroup" aria-label="Motion">
-          <button type="button" class="motion-option" data-motion="silky" data-i18n="silkyMotion" onclick="setThemeMotion('silky')" title="Silky uses longer eased scrolling and animated paper transitions.">Silky</button>
-          <button type="button" class="motion-option" data-motion="calm" data-i18n="calmMotion" onclick="setThemeMotion('calm')" title="Calm uses shorter transitions and normal scrolling.">Calm</button>
+          <button type="button" class="motion-option" data-motion="silky" data-i18n="silkyMotion" onclick="setThemeMotion('silky')" title="Animated uses longer eased scrolling and paper movement.">Animated</button>
+          <button type="button" class="motion-option" data-motion="calm" data-i18n="calmMotion" onclick="setThemeMotion('calm')" title="Steady uses shorter transitions and less movement.">Steady</button>
         </div>
       </div>
       <div class="settings-row settings-row-block settings-row-split">
@@ -8621,6 +8785,8 @@
               <div class="paper-head-cell paper-head-right">
                 <span class="paper-keymeta print-ka" id="ph-keymeta-karen"></span>
                 <span class="paper-keymeta paper-keymeta-english print-en" id="ph-keymeta-english"></span>
+                <span class="paper-key-value" id="ph-key-value"></span>
+                <span class="paper-key-extra" id="ph-key-extra"></span>
               </div>
             </div>
             <div id="sections-container"></div>
@@ -8717,6 +8883,7 @@
           </div>
         </div>
       </div>
+      <div class="instrument-summary" id="instrument-summary" aria-live="polite"></div>
       <div id="print-batch"></div>
     </div><!-- /main-editor -->
 
@@ -8733,7 +8900,7 @@
         </div>
         <button class="shortcut-close" id="shortcut-close" aria-label="Close guide">×</button>
       </div>
-      <div class="shortcut-panel-body">
+      <div class="shortcut-panel-body" id="shortcut-guide-content">
         <details class="guide-section" open>
           <summary data-i18n="guideStartHere">Start Here</summary>
           <div class="guide-section-body">
@@ -8964,6 +9131,7 @@
         <div id="lead-tab-1" class="lead-tab-panel"></div>
         <div id="lead-tab-2" class="lead-tab-panel" style="display:none;"></div>
         <div id="lead-tab-3" class="lead-tab-panel" style="display:none;"></div>
+        <div id="lead-tab-4" class="lead-tab-panel" style="display:none;"></div>
       </div>
     </div>
 
@@ -9133,6 +9301,7 @@
           if (hidden) hidden.value = checked.join(", ");
         });
         updateAllInstrumentWheels();
+        if (typeof renderInstrumentSummary === "function") renderInstrumentSummary();
       }
 
       function setupInstrumentWheels() {
@@ -9360,17 +9529,20 @@
 
       function formatKeyPair(currentKey, origKey) {
         const current = String(currentKey || "").trim();
-        if (!current) return { karen: "", english: "" };
+        if (!current) return { karen: "", english: "", value: "", extraKaren: "", extraEnglish: "" };
         const keyPair = getBilingualLabel("key", "Key");
-        const englishBase = `Key = ${current}`;
-        const karenBase = keyPair.karen ? `${keyPair.karen} = ${current}` : "";
+        const englishBase = keyPair.english || "Key";
+        const karenBase = keyPair.karen || "";
         if (origKey && origKey !== current) {
           return {
-            karen: karenBase ? `${karenBase} / ${origKey}` : "",
-            english: `${englishBase} (orig. key = ${origKey})`
+            karen: karenBase,
+            english: englishBase,
+            value: current,
+            extraKaren: "",
+            extraEnglish: `orig. key ${origKey}`
           };
         }
-        return { karen: karenBase, english: englishBase };
+        return { karen: karenBase, english: englishBase, value: current, extraKaren: "", extraEnglish: "" };
       }
 
       function formatStyleTempoPair(style, tempo) {
@@ -9403,6 +9575,30 @@
         if (ka) ka.textContent = pair.karen || "";
         if (en) en.textContent = pair.english ? `(${pair.english})` : "";
         rowEl.classList.toggle("missing-karen", !pair.karen);
+      }
+
+      function renderInstrumentSummary() {
+        const host = document.getElementById("instrument-summary");
+        if (!host) return;
+        const instruments = getPrintInstrumentList();
+        host.innerHTML = "";
+        host.classList.toggle("is-visible", instruments.length > 0);
+        if (!instruments.length) return;
+
+        const label = document.createElement("span");
+        label.className = "instrument-summary-label";
+        label.textContent = tEnglish("instruments");
+        host.appendChild(label);
+
+        const list = document.createElement("div");
+        list.className = "instrument-summary-list";
+        instruments.forEach(name => {
+          const chip = document.createElement("span");
+          chip.className = "instrument-summary-chip";
+          chip.textContent = getDisplayInstrumentNameForPrint(name);
+          list.appendChild(chip);
+        });
+        host.appendChild(list);
       }
 
       function measureHasRoll(measure) {
@@ -9575,6 +9771,69 @@
         return getDefaultMeasuresPerRow();
       }
 
+      function ensureRowMeasureCounts(section) {
+        if (!section) return [];
+        if (!Array.isArray(section.rowMeasureCounts)) {
+          section.rowMeasureCounts = [];
+        }
+        return section.rowMeasureCounts;
+      }
+
+      function getRowMeasureCap(sectionIdx, rowIndex = 0) {
+        const section = Number.isInteger(sectionIdx) ? state.sections?.[sectionIdx] : null;
+        if (!section) return getDefaultMeasuresPerRow();
+        const rowCounts = Array.isArray(section.rowMeasureCounts) ? section.rowMeasureCounts : [];
+        const rowValue = Number(rowCounts[rowIndex]);
+        if (Number.isFinite(rowValue) && rowValue >= MIN_MEASURES_PER_ROW) {
+          return clampMeasuresPerRow(rowValue);
+        }
+        return getMeasuresPerRow(sectionIdx);
+      }
+
+      function setRowMeasureCap(sectionIdx, rowIndex, value) {
+        const section = state.sections?.[sectionIdx];
+        if (!section) return;
+        const rowCounts = ensureRowMeasureCounts(section);
+        rowCounts[rowIndex] = clampMeasuresPerRow(value);
+      }
+
+      function changeRowMeasureCap(sectionIdx, rowIndex, delta) {
+        const current = getRowMeasureCap(sectionIdx, rowIndex);
+        const next = clampMeasuresPerRow(current + (Number(delta) || 0));
+        if (next === current) return;
+        saveState();
+        setRowMeasureCap(sectionIdx, rowIndex, next);
+        renderChart();
+      }
+
+      function getSectionRowLayout(sectionIdx) {
+        const section = state.sections?.[sectionIdx];
+        const measures = Array.isArray(section?.measures) ? section.measures : [];
+        const rows = [];
+        let start = 0;
+        let rowIndex = 0;
+        while (start < measures.length) {
+          const cap = getRowMeasureCap(sectionIdx, rowIndex);
+          const end = Math.min(measures.length, start + cap);
+          if (end <= start) break;
+          rows.push({
+            rowIndex,
+            start,
+            end,
+            cap,
+            count: end - start
+          });
+          start = end;
+          rowIndex += 1;
+        }
+        return rows;
+      }
+
+      function getRowLayoutForMeasure(sectionIdx, measureIdx) {
+        const idx = Math.max(0, Number(measureIdx) || 0);
+        return getSectionRowLayout(sectionIdx).find(row => idx >= row.start && idx < row.end) || null;
+      }
+
       function transposeChordStateFlatOnly(cs, semitones) {
         if (!cs || !cs.root) return;
         const note = `${String(cs.root).toUpperCase()}${cs.flat ? "b" : ""}`;
@@ -9629,7 +9888,7 @@
 
       function stripEditorOnlyPrintUi(root) {
         if (!root) return;
-        root.querySelectorAll(".section-delete-btn, .section-rowcap-control, .section-premeasure-control, .section-insert-line, .section-insert-plus")
+        root.querySelectorAll(".section-delete-btn, .section-rowcap-control, .row-rowcap-control, .section-premeasure-control, .section-insert-line, .section-insert-plus")
           .forEach(node => node.remove());
         root.querySelectorAll(".beat.active, .beat.slur-start-pending, .beat.only-start-pending")
           .forEach(node => node.classList.remove("active", "slur-start-pending", "only-start-pending"));
@@ -9706,6 +9965,7 @@
             applyBeatCellLayout(clone);
             renderOnlySpans(clone);
             renderSlurs(clone);
+            renderLeadInstrumentLabels(clone);
           });
         });
       }
@@ -9765,6 +10025,7 @@
         return {
           type: type,
           measuresPerRow: null,
+          rowMeasureCounts: [],
           measures: [createMeasure()]
         };
       }
@@ -9807,7 +10068,7 @@
         if (!section || !Array.isArray(section.measures)) return;
 
         const hadPre = sectionHasPreMeasure(section);
-        const currentPerRow = getMeasuresPerRow(sectionIdx);
+        const currentPerRow = getRowMeasureCap(sectionIdx, 0);
         saveState();
 
         if (hadPre) {
@@ -9815,7 +10076,7 @@
           if (!section.measures.length) {
             section.measures.push(createMeasure());
           }
-          section.measuresPerRow = clampMeasuresPerRow(currentPerRow - 1);
+          setRowMeasureCap(sectionIdx, 0, currentPerRow - 1);
           if (state.currentSectionIdx === sectionIdx) {
             state.currentMeasureIdx = Math.max(0, state.currentMeasureIdx - 1);
             const measure = section.measures[state.currentMeasureIdx] || section.measures[0];
@@ -9823,7 +10084,7 @@
           }
         } else {
           section.measures.unshift(createPreMeasure());
-          section.measuresPerRow = clampMeasuresPerRow(currentPerRow + 1);
+          setRowMeasureCap(sectionIdx, 0, currentPerRow + 1);
           if (state.currentSectionIdx === sectionIdx) {
             state.currentMeasureIdx += 1;
           }
@@ -9887,7 +10148,7 @@
           shiftRowLeadMeasureKeys(sectionIdx, measureIdx + 1, -1);
         }
         if (deletingPreMeasure) {
-          section.measuresPerRow = clampMeasuresPerRow(getMeasuresPerRow(sectionIdx) - 1);
+          setRowMeasureCap(sectionIdx, 0, getRowMeasureCap(sectionIdx, 0) - 1);
         }
 
         if (section.measures.length === 0) {
@@ -10183,11 +10444,10 @@
       function getRowMeasureRange(sectionIdx, measureIdx) {
         const section = state.sections?.[sectionIdx];
         if (!section || !Array.isArray(section.measures) || !section.measures.length) return null;
-        const perRow = getMeasuresPerRow(sectionIdx);
         const idx = Math.max(0, Number(measureIdx) || 0);
-        const start = Math.floor(idx / perRow) * perRow;
-        const end = Math.min(section.measures.length, start + perRow);
-        return { start, end };
+        const row = getRowLayoutForMeasure(sectionIdx, idx);
+        if (!row) return null;
+        return { start: row.start, end: row.end, rowIndex: row.rowIndex, cap: row.cap };
       }
 
       function parseRowKey(rowKey) {
@@ -10230,6 +10490,20 @@
           const key = getRowKey(parsed.sIdx, i);
           const cfg = ensureRowLead(key);
           cfg.baseOctave = normalized;
+        }
+      }
+
+      function syncRowLeadInstrumentForMeasureKey(rowKey, instrumentAbbr) {
+        const parsed = parseRowKey(rowKey);
+        if (!parsed) return;
+        const range = getRowMeasureRange(parsed.sIdx, parsed.measureIdx);
+        if (!range) return;
+        const value = String(instrumentAbbr || "").trim();
+
+        for (let i = range.start; i < range.end; i++) {
+          const key = getRowKey(parsed.sIdx, i);
+          const cfg = ensureRowLead(key);
+          cfg.instrumentAbbr = value;
         }
       }
 
@@ -10383,6 +10657,36 @@
         `;
       }
 
+      function renderLeadTab4(rowState) {
+        const host = document.getElementById("lead-tab-4");
+        const options = getInstrumentOptions().map(name => ({
+          name,
+          label: getInstrumentAbbreviation(name)
+        }));
+        const safeOptions = options.length ? options : [{ name: "Keyboard", label: "KB" }];
+        const current = String(rowState.instrumentAbbr || "").trim();
+
+        host.innerHTML = `
+          <div class="wizard-step-question" style="margin-bottom:8px;">Lead instrument label</div>
+          <div class="wizard-mode-hint" style="margin-bottom:10px;">Pick the abbreviation that prints beside this lead row.</div>
+          <div class="only-instrument-grid lead-instrument-grid">
+            ${safeOptions.map((option, idx) => {
+              const selected = current === option.label || (!current && idx === 0);
+              return `
+                <button
+                  type="button"
+                  class="only-instrument-option lead-instrument-option${selected ? " selected" : ""}"
+                  title="${escapeHtml(option.name)}"
+                  onclick="setLeadInstrumentAbbr('${escapeJs(option.label)}')"
+                >
+                  <span class="only-instrument-text">${escapeHtml(option.label)}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        `;
+      }
+
       function shiftLeadOctave(dir, wheelId) {
         const lm = state.leadModalState;
         if (!lm?.working) return;
@@ -10403,6 +10707,7 @@
           enabled: false,
           baseOctave: null,
           slots: null,
+          instrumentAbbr: "",
           cells: {},
           lastTab: 1,
           history: [],
@@ -10440,6 +10745,7 @@
           enabled: !!lm.working.enabled,
           baseOctave: lm.working.baseOctave ?? null,
           slots: lm.working.slots ?? null,
+          instrumentAbbr: lm.working.instrumentAbbr || "",
           cells: lm.working.cells || {},
           lastTab: lm.working.lastTab || 1
         });
@@ -10461,6 +10767,7 @@
         lm.working.enabled = snap.enabled;
         lm.working.baseOctave = snap.baseOctave;
         lm.working.slots = snap.slots;
+        lm.working.instrumentAbbr = snap.instrumentAbbr || "";
         lm.working.cells = snap.cells || {};
         lm.working.lastTab = snap.lastTab || 1;
       }
@@ -10533,6 +10840,7 @@
         if (saveChanges && lm?.rowKey && lm?.working) {
           state.rowLead[lm.rowKey] = JSON.parse(JSON.stringify(lm.working));
           syncRowBaseOctaveForMeasureKey(lm.rowKey, lm.working.baseOctave);
+          syncRowLeadInstrumentForMeasureKey(lm.rowKey, lm.working.instrumentAbbr);
           applyRowLeadToRow(lm.rowKey);
           saveState();
           renderChart();
@@ -10591,11 +10899,21 @@
           }
         }
 
+        if (tabNum === 4) {
+          const selected = document.querySelector("#lead-tab-4 .lead-instrument-option.selected");
+          const first = document.querySelector("#lead-tab-4 .lead-instrument-option");
+          const target = selected || first;
+          if (target) {
+            target.focus();
+            return;
+          }
+        }
+
         overlay.focus();
       }
 
       function showLeadTab(tabNum) {
-        [1, 2, 3].forEach(n => {
+        [1, 2, 3, 4].forEach(n => {
           const el = document.getElementById(`lead-tab-${n}`);
           if (el) el.style.display = n === tabNum ? "block" : "none";
         });
@@ -10607,6 +10925,7 @@
         if (tabNum === 1) renderLeadTab1(cfg);
         if (tabNum === 2) renderLeadTab2(cfg);
         if (tabNum === 3) renderLeadTab3(cfg);
+        if (tabNum === 4) renderLeadTab4(cfg);
 
         setTimeout(() => focusLeadModalControl(tabNum), 0);
       }
@@ -10616,6 +10935,7 @@
         if (!lm?.working) return;
         if (tabNum === 2 && !lm.working.baseOctave) return;
         if (tabNum === 3 && !lm.working.slots) return;
+        if (tabNum === 4 && !lm.working.slots) return;
         lm.working.lastTab = tabNum;
         showLeadTab(tabNum);
       }
@@ -10670,6 +10990,16 @@
         } else {
           showLeadTab(2);
         }
+      }
+
+      function setLeadInstrumentAbbr(abbr) {
+        const lm = state.leadModalState;
+        if (!lm?.working) return;
+        lm.working.instrumentAbbr = String(abbr || "").trim();
+        lm.working.enabled = true;
+        lm.working.lastTab = 4;
+        pushLeadModalHistory();
+        showLeadTab(4);
       }
 
       function setLeadGridCell(oct, col, val) {
@@ -10794,6 +11124,16 @@
           return;
         }
 
+        if (lm.tab === 4 && /^[1-9]$/.test(e.key)) {
+          const options = getInstrumentOptions().map(name => getInstrumentAbbreviation(name));
+          const picked = options[Number(e.key) - 1];
+          if (picked) {
+            e.preventDefault();
+            setLeadInstrumentAbbr(picked);
+          }
+          return;
+        }
+
         if (e.key === "Enter") {
           e.preventDefault();
 
@@ -10819,13 +11159,19 @@
             closeLeadModal(true);
             return;
           }
+
+          if (lm.tab === 4) {
+            closeLeadModal(true);
+            return;
+          }
         }
 
         if (e.key === "Tab") {
           e.preventDefault();
           if (lm.tab === 1 && lm.working?.baseOctave) leadModalGoTab(2);
           else if (lm.tab === 2 && (lm.slotChoice === 3 || lm.slotChoice === 4 || lm.working?.slots)) commitLeadSlotChoice(true);
-          else if (lm.tab === 3) leadModalGoTab(2);
+          else if (lm.tab === 3) leadModalGoTab(4);
+          else if (lm.tab === 4) leadModalGoTab(2);
           return;
         }
 
@@ -10853,6 +11199,7 @@
         measure.leadBaseOctave = cfg.baseOctave ?? null;
         measure.leadSlotsPerBeat = slotsPerBeat;
         measure.leadSlots = totalSlots;
+        measure.leadInstrumentAbbr = cfg.instrumentAbbr || "";
         measure.rowLeadView = [];
 
         for (let col = 0; col < totalSlots; col++) {
@@ -10895,6 +11242,7 @@
           isPreMeasure: !!opts.isPreMeasure,
           leadEnabled: false,
           leadBaseOctave: null,
+          leadInstrumentAbbr: "",
           leadSlotsPerBeat: 4,
           leadSlots: n * 4,
           isEndingBar: false
@@ -11218,12 +11566,40 @@
         moveFocus(0, 0, -1);
       }
 
+      function moveVerticalRow(direction) {
+        const dir = direction < 0 ? -1 : 1;
+        let s = state.currentSectionIdx;
+        let rows = getSectionRowLayout(s);
+        let rowIdx = rows.findIndex(row => state.currentMeasureIdx >= row.start && state.currentMeasureIdx < row.end);
+        if (rowIdx === -1) return;
+
+        const currentRow = rows[rowIdx];
+        const offset = Math.max(0, state.currentMeasureIdx - currentRow.start);
+        let targetRow = rows[rowIdx + dir];
+
+        if (!targetRow) {
+          const nextSectionIdx = s + dir;
+          if (nextSectionIdx < 0 || nextSectionIdx >= state.sections.length) return;
+          s = nextSectionIdx;
+          rows = getSectionRowLayout(s);
+          if (!rows.length) return;
+          targetRow = dir > 0 ? rows[0] : rows[rows.length - 1];
+        }
+
+        const m = targetRow.start + Math.min(offset, Math.max(0, targetRow.count - 1));
+        const beatCount = getBeatCountForMeasure(state.sections?.[s]?.measures?.[m]);
+        state.currentSectionIdx = s;
+        state.currentMeasureIdx = m;
+        state.currentBeatIdx = Math.min(state.currentBeatIdx, Math.max(0, beatCount - 1));
+        renderChart();
+      }
+
       function moveDown() {
-        moveFocus(0, getMeasuresPerRow(), 0);
+        moveVerticalRow(1);
       }
 
       function moveUp() {
-        moveFocus(0, -getMeasuresPerRow(), 0);
+        moveVerticalRow(-1);
       }
 
       function advanceBeat() {
@@ -11663,6 +12039,43 @@
         renderChart();
       }
 
+      function cueLabelPair(key, englishFallback, prefix = "") {
+        const english = [prefix, englishFallback].filter(Boolean).join(" ").trim();
+        const karenWord = hasUsableKaren(key) ? String(tKarenRaw(key)).trim() : "";
+        const karen = karenWord ? [prefix, karenWord].filter(Boolean).join(" ").trim() : "";
+        return { karen, english };
+      }
+
+      function setCueLabel(el, pair) {
+        if (!el) return;
+        const karen = String(pair?.karen || "").trim();
+        const english = String(pair?.english || "").trim();
+        el.classList.add("cue-stack");
+        el.innerHTML = "";
+        if (karen) {
+          const ka = document.createElement("span");
+          ka.className = "cue-ka";
+          ka.textContent = karen;
+          el.appendChild(ka);
+        }
+        if (english) {
+          const en = document.createElement("span");
+          en.className = "cue-en";
+          en.textContent = `(${english})`;
+          el.appendChild(en);
+        }
+      }
+
+      function getOnlyCuePair(rawLabel) {
+        const raw = String(rawLabel || "").trim() || "Only";
+        const onlyEnglish = tEnglish("onlyLabel") || "Only";
+        const prefix = raw.replace(/\s*only\s*$/i, "").trim();
+        if (!prefix || prefix.toLowerCase() === raw.toLowerCase()) {
+          return cueLabelPair("onlyLabel", raw);
+        }
+        return cueLabelPair("onlyLabel", onlyEnglish, prefix);
+      }
+
       function renderOnlySpans(container = document.getElementById("chart-container")) {
         if (!container) return;
         const old = container.querySelectorAll(".only-span-line, .only-span-line-2, .span-label, .span-label-2, .span-cue-line");
@@ -11682,13 +12095,13 @@
           const hasLead = !!lineEl?.classList.contains("has-lead");
           const hasSlur = !!lineEl?.classList.contains("has-slur");
 
-          const labelText = span.label || "Only";
-          const endText   = span.endLabel || "All In";
+          const labelPair = getOnlyCuePair(span.label || "Only");
+          const endPair = cueLabelPair("allInLabel", span.endLabel || "All In");
 
-          const measureWidth = (text, className) => {
+          const measureCueWidth = (pair, className) => {
             const probe = document.createElement("div");
             probe.className = className;
-            probe.textContent = text;
+            setCueLabel(probe, pair);
             probe.style.position = "absolute";
             probe.style.visibility = "hidden";
             probe.style.left = "-9999px";
@@ -11699,8 +12112,8 @@
             return width;
           };
 
-          const label1Width = measureWidth(labelText, "span-label");
-          const label2Width = measureWidth(endText, "span-label");
+          const label1Width = measureCueWidth(labelPair, "span-label");
+          const label2Width = measureCueWidth(endPair, "span-label");
           const startBeatLeft = sRect.left - cRect.left;
           const endBeatLeft = eRect.left - cRect.left;
           const cueInset = ONLY_SPAN_TUNING.cueInsetPx;
@@ -11720,7 +12133,7 @@
 
           const spanBaseLift = hasLead ? 40 : (hasSlur ? 34 : 30);
           const labelTop = beatTop - spanBaseLift - 10;
-          const cueTop = labelTop + 12;
+          const cueTop = labelTop + 15;
 
           // Both labels default to start at their beat-slot underline origin.
           // If they collide, push them away from each other while cue lines stay fixed.
@@ -11736,13 +12149,13 @@
 
           const label1 = document.createElement("div");
           label1.className = "span-label";
-          label1.textContent = labelText;
+          setCueLabel(label1, labelPair);
           label1.style.left = `${label1Left}px`;
           label1.style.top = `${labelTop}px`;
 
           const label2 = document.createElement("div");
           label2.className = "span-label";
-          label2.textContent = endText;
+          setCueLabel(label2, endPair);
           label2.style.left = `${label2Left}px`;
           label2.style.top = `${labelTop}px`;
 
@@ -11851,6 +12264,54 @@
 
         svg.appendChild(path);
         host.appendChild(svg);
+      }
+
+      function getLeadInstrumentAbbrForLine(line) {
+        const sIdx = Number(line?.dataset?.sectionidx);
+        const rowStart = Number(line?.dataset?.rowstart);
+        const rowCount = Number(line?.dataset?.rowcount);
+        if (!Number.isInteger(sIdx) || !Number.isInteger(rowStart) || !Number.isInteger(rowCount)) return "";
+        const section = state.sections?.[sIdx];
+        for (let i = rowStart; i < rowStart + rowCount; i++) {
+          const cfgValue = String(state.rowLead?.[getRowKey(sIdx, i)]?.instrumentAbbr || "").trim();
+          if (cfgValue) return cfgValue;
+          const measureValue = String(section?.measures?.[i]?.leadInstrumentAbbr || "").trim();
+          if (measureValue) return measureValue;
+        }
+        return "";
+      }
+
+      function renderLeadInstrumentLabels(container = document.getElementById("chart-container")) {
+        if (!container) return;
+        container.querySelectorAll(".lead-instrument-label").forEach(node => node.remove());
+        const lines = Array.from(container.querySelectorAll(".line.has-lead"));
+        lines.forEach(line => {
+          const abbr = getLeadInstrumentAbbrForLine(line);
+          if (!abbr) return;
+          const firstSlot = Array.from(line.querySelectorAll(".lead-subslot"))
+            .find(slot => String(slot.textContent || "").trim() !== "");
+          if (!firstSlot) return;
+
+          const lineRect = line.getBoundingClientRect();
+          const slotRect = firstSlot.getBoundingClientRect();
+          const leadBeat = firstSlot.closest(".lead-beat");
+          const beatRect = leadBeat?.getBoundingClientRect();
+          const beatWidth = Math.max(12, beatRect?.width || slotRect.width || 12);
+
+          const label = document.createElement("div");
+          label.className = "lead-instrument-label";
+          label.textContent = abbr;
+          line.appendChild(label);
+
+          const labelWidth = label.getBoundingClientRect().width || 0;
+          let left = slotRect.left - lineRect.left - (beatWidth * 2) - labelWidth - 4;
+          if (left + labelWidth > slotRect.left - lineRect.left - beatWidth) {
+            left -= beatWidth;
+          }
+          const top = slotRect.top - lineRect.top - 1;
+          label.style.left = `${left}px`;
+          label.style.top = `${top}px`;
+        });
       }
 
       function chordTextFromState(cs) {
@@ -12562,6 +13023,8 @@
         const phTempoEnglish = document.getElementById("ph-tempo-english");
         const phKeymetaKaren = document.getElementById("ph-keymeta-karen");
         const phKeymetaEnglish = document.getElementById("ph-keymeta-english");
+        const phKeyValue = document.getElementById("ph-key-value");
+        const phKeyExtra = document.getElementById("ph-key-extra");
         const phFooterCreated = document.getElementById("ph-footer-created");
         const phFooterNext = document.getElementById("ph-footer-next");
         const phFooterCenter = document.getElementById("ph-footer-center");
@@ -12578,6 +13041,8 @@
         const keyPair = formatKeyPair(currentKey, origKey);
         if (phKeymetaKaren) phKeymetaKaren.textContent = keyPair.karen || "";
         if (phKeymetaEnglish) phKeymetaEnglish.textContent = keyPair.english ? `(${keyPair.english})` : "";
+        if (phKeyValue) phKeyValue.textContent = keyPair.value || "";
+        if (phKeyExtra) phKeyExtra.textContent = keyPair.extraEnglish ? `(${keyPair.extraEnglish})` : "";
         updateFooterDateRow(phFooterCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
         updateFooterDateRow(phFooterNext, formatDatePair("datePerformedLabel", nextPerf || "__/__/____"));
         if (phFooterCenter) phFooterCenter.textContent = songInstr || "—";
@@ -12597,7 +13062,8 @@
             songStyle ? `${songStyle}${songTempo ? ` = ${songTempo} BPM` : ""}` : (songTempo ? `${songTempo} BPM` : "")
           ].filter(Boolean).join("  •  ");
         }
-        if (viewInstr) viewInstr.textContent = songInstr === "—" ? "" : songInstr;
+        if (viewInstr) viewInstr.textContent = "";
+        renderInstrumentSummary();
         renderLyricsSheet({
           songTitleEnglish,
           songTitleKaren,
@@ -12629,6 +13095,39 @@
           return wrap;
         }
 
+        function makeRowCapControl(sectionIdx, rowIndex, cap) {
+          const rowCap = document.createElement("div");
+          rowCap.className = "row-rowcap-control";
+          rowCap.title = "Measures in this row";
+
+          const rowPlus = document.createElement("button");
+          rowPlus.type = "button";
+          rowPlus.className = "row-rowcap-btn";
+          rowPlus.textContent = "▲";
+          rowPlus.onclick = (e) => {
+            e.stopPropagation();
+            changeRowMeasureCap(sectionIdx, rowIndex, 1);
+          };
+
+          const rowValue = document.createElement("div");
+          rowValue.className = "row-rowcap-value";
+          rowValue.textContent = String(cap);
+
+          const rowMinus = document.createElement("button");
+          rowMinus.type = "button";
+          rowMinus.className = "row-rowcap-btn";
+          rowMinus.textContent = "▼";
+          rowMinus.onclick = (e) => {
+            e.stopPropagation();
+            changeRowMeasureCap(sectionIdx, rowIndex, -1);
+          };
+
+          rowCap.appendChild(rowPlus);
+          rowCap.appendChild(rowValue);
+          rowCap.appendChild(rowMinus);
+          return rowCap;
+        }
+
         function getPendingOnlyBeat() {
           if (!state.onlyStart) return null;
           if (typeof state.onlyStart === "object") {
@@ -12646,6 +13145,7 @@
           container.appendChild(makeInsertLine(0));
           renderOnlySpans();
           renderSlurs();
+          renderLeadInstrumentLabels();
           return;
         }
 
@@ -12675,36 +13175,6 @@
           };
           sectionEl.appendChild(preMeasureBtn);
 
-          const rowCap = document.createElement("div");
-          rowCap.className = "section-rowcap-control";
-          rowCap.title = "Measures per row";
-
-          const rowPlus = document.createElement("button");
-          rowPlus.type = "button";
-          rowPlus.className = "section-rowcap-btn";
-          rowPlus.textContent = "+";
-          rowPlus.onclick = (e) => {
-            e.stopPropagation();
-            changeSectionMeasuresPerRow(sIdx, 1);
-          };
-
-          const rowValue = document.createElement("div");
-          rowValue.className = "section-rowcap-value";
-          rowValue.textContent = String(getMeasuresPerRow(sIdx));
-
-          const rowMinus = document.createElement("button");
-          rowMinus.type = "button";
-          rowMinus.className = "section-rowcap-btn";
-          rowMinus.textContent = "-";
-          rowMinus.onclick = (e) => {
-            e.stopPropagation();
-            changeSectionMeasuresPerRow(sIdx, -1);
-          };
-
-          rowCap.appendChild(rowPlus);
-          rowCap.appendChild(rowValue);
-          rowCap.appendChild(rowMinus);
-
           const delBtn = document.createElement("button");
           delBtn.className = "section-delete-btn";
           delBtn.type = "button";
@@ -12728,16 +13198,17 @@
           const headerActions = document.createElement("div");
           headerActions.className = "section-header-actions";
           headerActions.appendChild(delBtn);
-          headerActions.appendChild(rowCap);
           header.appendChild(headerActions);
           sectionEl.appendChild(header);
 
           const measures = Array.isArray(section.measures) ? section.measures : [];
 
-          const perRow = getMeasuresPerRow(sIdx);
-          for (let rowStart = 0; rowStart < measures.length; rowStart += perRow) {
-            const rowMeasures = measures.slice(rowStart, rowStart + perRow);
-            if (!rowMeasures.length) continue;
+          const rowLayouts = getSectionRowLayout(sIdx);
+          rowLayouts.forEach(rowInfo => {
+            const rowStart = rowInfo.start;
+            const perRow = rowInfo.cap;
+            const rowMeasures = measures.slice(rowInfo.start, rowInfo.end);
+            if (!rowMeasures.length) return;
             const bpm = state.beatsPerMeasure || 4;
 
             const rowStartBeat = getGlobalBeatIndex(sIdx, rowStart, 0);
@@ -12749,6 +13220,10 @@
             const line = document.createElement("div");
             line.className = "line";
             line.dataset.perRow = String(perRow);
+            line.dataset.sectionidx = String(sIdx);
+            line.dataset.rowindex = String(rowInfo.rowIndex);
+            line.dataset.rowstart = String(rowStart);
+            line.dataset.rowcount = String(rowMeasures.length);
             line.style.gridTemplateColumns = `repeat(${perRow}, minmax(0, 1fr))`;
 
             const lineHasRoll = rowMeasures.some(m => measureHasRoll(m));
@@ -12973,7 +13448,7 @@
               if (measureRoll) {
                 const rollLabel = document.createElement("div");
                 rollLabel.className = "roll-label measure-roll-label";
-                rollLabel.textContent = "Roll";
+                setCueLabel(rollLabel, cueLabelPair("rollLabel", tEnglish("rollLabel") || "Roll"));
                 measureEl.appendChild(rollLabel);
               }
               line.appendChild(measureEl);
@@ -12990,8 +13465,9 @@
               line.appendChild(spacer);
             }
 
+            line.appendChild(makeRowCapControl(sIdx, rowInfo.rowIndex, perRow));
             sectionEl.appendChild(line);
-          }
+          });
 
           container.appendChild(sectionEl);
         });
@@ -13002,6 +13478,7 @@
         fitChartContentToPaper();
         renderOnlySpans();
         renderSlurs();
+        renderLeadInstrumentLabels();
         if (pendingScrollTarget) {
           const target = pendingScrollTarget;
           state.pendingSectionScrollIdx = null;
@@ -13558,6 +14035,7 @@
         fitChartContentToPaper();
         renderOnlySpans();
         renderSlurs();
+        renderLeadInstrumentLabels();
       }
 
       function applyBeatCellLayout(root = document) {
@@ -14289,6 +14767,18 @@
       }
 
       function exportDb() {
+        const btn = document.getElementById("btn-export");
+        const originalText = btn?.textContent || uiText("exportDb");
+        if (btn) {
+          btn.classList.add("is-exporting");
+          btn.textContent = uiText("exportStarted", { fallback: "Export started" });
+        }
+        showToast(uiText("exportDownloadStarted", { fallback: "Export started. Check your Downloads folder." }), "success");
+        setTimeout(() => {
+          if (!btn) return;
+          btn.classList.remove("is-exporting");
+          btn.textContent = originalText;
+        }, 1800);
         window.location.href = "/api/export-db";
       }
 
@@ -14582,6 +15072,14 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#39;");
+      }
+
+      function escapeJs(value) {
+        return String(value || "")
+          .replace(/\\/g, "\\\\")
+          .replace(/'/g, "\\'")
+          .replace(/\n/g, "\\n")
+          .replace(/\r/g, "\\r");
       }
 
       function getKarenSyllableWindow(value, caret) {
@@ -15017,6 +15515,7 @@
           styleAlternative: "Alternative",
           styleRock: "Rock",
           styleSlow: "Slow",
+          styleCountry: "Country",
           instrumentPiano1: "Piano 1",
           instrumentPiano2: "Piano 2",
           instrumentElectricGuitar: "Electric Guitar",
@@ -15062,6 +15561,78 @@
           guideSidebarWorkflows: "Sidebar Workflows",
           guideSettingsAppearance: "Settings And Appearance",
           guideUndoPrintSafety: "Undo, Print, And Safety",
+          guideStartHereText: "Use this panel as a working reference while editing. Shortcuts respond when the chart has focus; closing panels sends focus back to the editor.",
+          guideHelpToggleDesc: "Open or close this guide.",
+          guideSidebarToggleDesc: "Open or close the sidebar. Closing the sidebar returns focus to the chart editor.",
+          guideSettingsDesc: "Open language, theme, design, palette, motion, density, time signature, default row count, keyboard, and folder settings.",
+          guidePaperTabsDesc: "Switch between the chord chart, lyrics sheet, and database sheet.",
+          guideArrowKeysDesc: "Move the active beat left, right, up, or down. Right Arrow creates a new measure only after the section end.",
+          guideSpaceDesc: "Move forward to the next beat. At the final beat of the section, create a new measure and land on beat 1.",
+          guideTabDesc: "Insert a full measure directly after the current measure, shift later measures right, and land on beat 1.",
+          guideCtrlSpaceDesc: "Insert a new measure after the current one using the current beat number as the new measure length.",
+          guideCtrlTabDesc: "Split the current measure after the active beat, then move into the new measure.",
+          guideBackspaceDesc: "Smart delete the latest visible beat change, or move backward/delete empty trailing structures when the beat is empty.",
+          guideDeleteDesc: "Delete the current measure. If the section has one empty measure, delete the section and jump back.",
+          guideEscDesc: "Clear pending states such as bass-entry, slur-entry, or triangle/superscript mode.",
+          guideRootDesc: "Set the chord root on the active beat. B creates a B root when the beat is empty.",
+          guideFlatDesc: "When a root already exists, toggle flat on that chord.",
+          guideMinorDesc: "Toggle minor on the active chord.",
+          guideSeventhDesc: "Add or toggle a plain seventh.",
+          guideTriangleDesc: "Enter the triangle/superscript seventh sequence.",
+          guideBassDesc: "Arm bass mode, then press a note letter to set the bass note. Press slash again on a beat with bass to clear it.",
+          guideChordNote: "Most chord-quality commands require a root chord first. X marks are allowed on empty beats so rhythm can be marked before choosing a chord.",
+          guideDotDesc: "Toggle push: dot plus underline behavior on the active rooted beat.",
+          guideXDesc: "Add x marks for rhythmic hits. It cycles up to four manual x marks.",
+          guideCircleDesc: "Toggle a circle. Turning on a circle clears dot and x marks for that beat.",
+          guideRollDesc: "Toggle a roll for the current measure. Measure-level roll clears beat-level roll marks.",
+          guideSlurDesc: "Start, finish, or delete a beat-spanning slur.",
+          guideOnlyDesc: "Start or finish an Only / All In cue span.",
+          guideUnderlineDesc: "Toggle manual underline on beat 1, 2, 3, or 4 when that beat has no structural underline.",
+          guideSectionEnterDesc: "Open the Add Section modal from the editor.",
+          guideSectionLettersDesc: "Inside the section modal, add Intro, Verse, Pre-Chorus, Chorus, Bridge, Solo, or Ending.",
+          guideSectionEscDesc: "Close the section modal without adding a section.",
+          guideInsertSectionDesc: "Click an insert line to add a new section at that location.",
+          guidePreMeasureDesc: "Toggle a 2-beat pre-measure for that section.",
+          guideRowMeasureDesc: "Use the small up/down control at the right of a row to set that row's measure count independently.",
+          guideLeadOpenDesc: "Open the lead melody modal for the current row.",
+          guideLeadTab1Desc: "Choose the base octave. Press Enter to confirm and move to lead spacing.",
+          guideLeadTab2Desc: "Choose 3 or 4 lead spaces per beat.",
+          guideLeadTab3Desc: "Place scale-degree notes from 1-7 in the active lead cell.",
+          guideLeadTab4Desc: "Pick the instrument abbreviation that prints to the left of the lead row.",
+          guideLeadTabCycleDesc: "Cycle lead tabs 1, 2, 3, 4, then keep cycling 2, 3, 4.",
+          guideLeadClearDesc: "Clear the active lead cell.",
+          guideLeadMoveDesc: "Move across the lead grid.",
+          guideLeadEnterDesc: "Advance to the next lead step, or save when the modal is complete.",
+          guideLyricsOpenDesc: "Click the Lyrics flap above the paper stack, then add lyrics sections directly on the lyrics sheet.",
+          guideLyricsTogglesDesc: "Use section toggles for romanization and optional English translation.",
+          guideLyricsReturnDesc: "Click Chart to return to chord editing; focus returns to the editor target.",
+          guideLyricsNote: "The Notes field is separate from lyrics. Lyrics are edited on the lyrics sheet.",
+          guideKeyboardEscDesc: "Close the immersive Karen keyboard.",
+          guideKeyboardBackspaceDesc: "Undo the latest Karen keyboard insertion or delete the previous character when there is no keyboard insertion history.",
+          guideKeyboardUndoDesc: "Undo the latest Karen keyboard insertion while the modal is open, or use normal field undo when no keyboard insertion is pending.",
+          guideKeyboardRedoDesc: "Redo the latest Karen keyboard insertion while the modal is open.",
+          guideNewDesc: "Clear the current form and open the new-song wizard.",
+          guideSaveDesc: "Save song metadata, chart JSON, lead rows, dates, notes, and reference media.",
+          guidePrintDesc: "Create one print packet for each selected instrument plus a Reference copy.",
+          guideExportDesc: "Download the local song database. The export button now shows confirmation when the download starts.",
+          guideInstrumentsDesc: "Selected instruments control print packet count and footer labels.",
+          guideDatesDesc: "Date Created, Next Performance, and performed-date history flow into the sheet footer and saved song metadata.",
+          guideReferenceDesc: "Store YouTube links, handwritten/photo links, and notes for the song.",
+          guideWizardModeDesc: "Choose quick song setup or guided step-by-step setup.",
+          guideLanguageDesc: "Switch between English and Karen UI labels.",
+          guideThemeDesc: "Use Auto, Light, or Dark modes.",
+          guidePaletteDesc: "Change the interface color set without changing chart data.",
+          guideUiDesignDesc: "Switch among Desk, Console, and Stage layouts from the same shared app logic.",
+          guideMotionDesc: "Animated uses longer eased movement; Steady uses shorter transitions and less motion.",
+          guideDensityDesc: "Choose compact or comfy control spacing.",
+          guideKeyboardSettingDesc: "Turn the immersive floating keyboard animation on or off.",
+          guideTimeSignatureDesc: "Switch between 4/4 and 3/4 for new measures. Existing measures keep saved beat counts.",
+          guideDefaultRowsDesc: "Set the default measure count for new rows; existing rows can still be adjusted individually.",
+          guideFolderDesc: "Choose or save a different song folder path for backend settings.",
+          guideUndoDesc: "Undo the latest chart edit.",
+          guideRedoDesc: "Redo the latest undone chart edit.",
+          guidePrintShortcutDesc: "Print instrument packets.",
+          guideFocusDesc: "If shortcuts stop responding, close text fields/sidebar or click the chart paper; focus returns to the editor target.",
           theme: "Theme",
           palette: "Palette",
           uiDesignDirection: "UI Design Direction",
@@ -15086,12 +15657,17 @@
           designDesk: "Desk",
           designConsole: "Console",
           designStage: "Stage",
-          silkyMotion: "Silky",
-          calmMotion: "Calm",
+          silkyMotion: "Animated",
+          calmMotion: "Steady",
           compactDensity: "Compact",
           comfyDensity: "Comfy",
           onlyCueTitle: "Only / All In",
           onlyCueHelp: "Pick the instrument abbreviations for this cue.",
+          onlyLabel: "Only",
+          allInLabel: "All In",
+          rollLabel: "Roll",
+          exportStarted: "Export started",
+          exportDownloadStarted: "Export started. Check your Downloads folder.",
           apply: "Apply",
           instrumentPiano1Abbr: "KB1",
           instrumentPiano2Abbr: "KB2",
@@ -15172,6 +15748,7 @@
           styleAlternative: "",
           styleRock: "",
           styleSlow: "",
+          styleCountry: "",
           instrumentPiano1: "တနၢ် ၁",
           instrumentPiano2: "တနၢ် ၂",
           instrumentElectricGuitar: "ကထါအိၣ်ဒီလီမ့ၣ်",
@@ -15247,6 +15824,11 @@
           comfyDensity: "",
           onlyCueTitle: "",
           onlyCueHelp: "",
+          onlyLabel: "",
+          allInLabel: "",
+          rollLabel: "",
+          exportStarted: "",
+          exportDownloadStarted: "",
           apply: "",
           instrumentPiano1Abbr: "KB1",
           instrumentPiano2Abbr: "KB2",
@@ -15304,7 +15886,8 @@
         "ballad": "styleBallad",
         "alternative": "styleAlternative",
         "rock": "styleRock",
-        "slow": "styleSlow"
+        "slow": "styleSlow",
+        "country": "styleCountry"
       };
 
       const TRANSLATION_FILE_KEY_ALIASES = {
@@ -15356,6 +15939,15 @@
         rock_genre: "styleRock",
         rock: "styleRock",
         slow: "styleSlow",
+        country: "styleCountry",
+        only: "onlyLabel",
+        only_label: "onlyLabel",
+        all_in: "allInLabel",
+        "all in": "allInLabel",
+        roll: "rollLabel",
+        roll_label: "rollLabel",
+        export_started: "exportStarted",
+        export_download_started: "exportDownloadStarted",
         bpm: "bpmLabel",
         bpm_label: "bpmLabel",
         beats_per_minute: "bpmLabel"
@@ -15365,6 +15957,19 @@
       const translationDisplayPolicies = {};
       let translationFileVersion = null;
       let translationPollTimer = 0;
+      const SHORTCUT_GUIDE_SECTIONS = [
+        { titleKey: "guideStartHere", introKey: "guideStartHereText", open: true, rows: [["?", "guideHelpToggleDesc"], ["Menu / X", "guideSidebarToggleDesc"], ["Settings", "guideSettingsDesc"], ["Chart / Lyrics / Database", "guidePaperTabsDesc"]] },
+        { titleKey: "guideCoreNavigation", open: true, rows: [["Arrow keys", "guideArrowKeysDesc"], ["Space", "guideSpaceDesc"], ["Tab", "guideTabDesc"], ["Ctrl + Space", "guideCtrlSpaceDesc"], ["Ctrl + Tab", "guideCtrlTabDesc"], ["Backspace", "guideBackspaceDesc"], ["Delete", "guideDeleteDesc"], ["Esc", "guideEscDesc"]] },
+        { titleKey: "guideChordRules", rows: [["A-G", "guideRootDesc"], ["B", "guideFlatDesc"], ["M", "guideMinorDesc"], ["7", "guideSeventhDesc"], ["T then 7", "guideTriangleDesc"], ["/ then A-G", "guideBassDesc"]], noteKey: "guideChordNote" },
+        { titleKey: "guideRhythmSpans", rows: [[".", "guideDotDesc"], ["X", "guideXDesc"], ["O", "guideCircleDesc"], ["R", "guideRollDesc"], ["S", "guideSlurDesc"], [",", "guideOnlyDesc"], ["Ctrl + 1-4", "guideUnderlineDesc"]] },
+        { titleKey: "guideSectionsMeasures", rows: [["Enter", "guideSectionEnterDesc"], ["I / V / P / C / B / S / E", "guideSectionLettersDesc"], ["Esc", "guideSectionEscDesc"], ["+ between sections", "guideInsertSectionDesc"], ["Left section rail", "guidePreMeasureDesc"], ["Row up/down", "guideRowMeasureDesc"]] },
+        { titleKey: "guideLeadModal", rows: [["L", "guideLeadOpenDesc"], ["Tab 1", "guideLeadTab1Desc"], ["Tab 2", "guideLeadTab2Desc"], ["Tab 3", "guideLeadTab3Desc"], ["Tab 4", "guideLeadTab4Desc"], ["Tab", "guideLeadTabCycleDesc"], ["0 / Backspace / Delete", "guideLeadClearDesc"], ["Arrow / Space", "guideLeadMoveDesc"], ["Enter", "guideLeadEnterDesc"]] },
+        { titleKey: "guideLyricsSheet", rows: [["Lyrics flap", "guideLyricsOpenDesc"], ["Section toggles", "guideLyricsTogglesDesc"], ["Chart flap", "guideLyricsReturnDesc"]], noteKey: "guideLyricsNote" },
+        { titleKey: "guideKarenKeyboard", rows: [["Esc / X", "guideKeyboardEscDesc"], ["Backspace", "guideKeyboardBackspaceDesc"], ["Ctrl + Z", "guideKeyboardUndoDesc"], ["Ctrl + Y", "guideKeyboardRedoDesc"]] },
+        { titleKey: "guideSidebarWorkflows", rows: [["New", "guideNewDesc"], ["Save", "guideSaveDesc"], ["Print", "guidePrintDesc"], ["Export", "guideExportDesc"], ["Instruments", "guideInstrumentsDesc"], ["Dates", "guideDatesDesc"], ["Reference / Media", "guideReferenceDesc"]] },
+        { titleKey: "guideSettingsAppearance", rows: [["Wizard mode", "guideWizardModeDesc"], ["Language", "guideLanguageDesc"], ["Theme", "guideThemeDesc"], ["Palette", "guidePaletteDesc"], ["UI Design", "guideUiDesignDesc"], ["Motion", "guideMotionDesc"], ["Density", "guideDensityDesc"], ["Karen Keyboard", "guideKeyboardSettingDesc"], ["Time Signature", "guideTimeSignatureDesc"], ["Measures / row", "guideDefaultRowsDesc"], ["Alternate folder", "guideFolderDesc"]] },
+        { titleKey: "guideUndoPrintSafety", rows: [["Ctrl + Z", "guideUndoDesc"], ["Ctrl + Y", "guideRedoDesc"], ["Ctrl + P", "guidePrintShortcutDesc"], ["Browser focus", "guideFocusDesc"]] }
+      ];
 
       // current language — read from localStorage or default english
       let currentLang = localStorage.getItem("karenMusicLang") || null;
@@ -15678,8 +16283,54 @@
         return lang === "karen" ? `${karen} (${english})` : `${english} (${karen})`;
       }
 
+      function renderShortcutGuide() {
+        const host = document.getElementById("shortcut-guide-content");
+        if (!host) return;
+        host.innerHTML = "";
+        SHORTCUT_GUIDE_SECTIONS.forEach(section => {
+          const details = document.createElement("details");
+          details.className = "guide-section";
+          if (section.open) details.open = true;
+
+          const summary = document.createElement("summary");
+          summary.textContent = uiText(section.titleKey);
+          details.appendChild(summary);
+
+          const body = document.createElement("div");
+          body.className = "guide-section-body";
+
+          if (section.introKey) {
+            const intro = document.createElement("p");
+            intro.textContent = uiText(section.introKey);
+            body.appendChild(intro);
+          }
+
+          const list = document.createElement("dl");
+          list.className = "guide-grid";
+          (section.rows || []).forEach(([shortcut, textKey]) => {
+            const dt = document.createElement("dt");
+            dt.textContent = shortcut;
+            const dd = document.createElement("dd");
+            dd.textContent = uiText(textKey);
+            list.append(dt, dd);
+          });
+          body.appendChild(list);
+
+          if (section.noteKey) {
+            const note = document.createElement("p");
+            note.className = "guide-note";
+            note.textContent = uiText(section.noteKey);
+            body.appendChild(note);
+          }
+
+          details.appendChild(body);
+          host.appendChild(details);
+        });
+      }
+
       function toCamelTranslationKey(raw) {
         const clean = String(raw || "")
+          .replace(/^\uFEFF/, "")
           .trim()
           .toLowerCase()
           .replace(/['"]/g, "")
@@ -15835,6 +16486,7 @@
         // guide panel title
         const guideTitle = document.querySelector(".shortcut-panel-title strong");
         if (guideTitle) guideTitle.textContent = currentLang === "karen" ? uiText("shortcuts") : uiText("appGuideTitle", { fallback: "App Guide" });
+        renderShortcutGuide();
 
         const langHint = document.getElementById("lang-picker-hint");
         if (langHint) {
@@ -16031,6 +16683,7 @@
         const overlay = document.getElementById("lang-picker-overlay");
         if (!overlay) return;
         overlay.style.display = "flex";
+        overlay.style.pointerEvents = "";
         overlay.classList.remove("hidden");
         setupLangPickerKeys();
         setTimeout(() => overlay.focus(), 0);
@@ -16077,7 +16730,8 @@
         const overlay = document.getElementById("lang-picker-overlay");
         if (overlay) {
           overlay.classList.add("hidden");
-          setTimeout(() => { overlay.style.display = "none"; }, 500);
+          overlay.style.pointerEvents = "none";
+          overlay.style.display = "none";
         }
 
         applyTranslations();

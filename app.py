@@ -39,10 +39,12 @@ FILE_UPLOAD_DIR    = os.path.join(DATA_DIR, FILE_UPLOAD_NAME) if IS_FROZEN else 
 SETTINGS_PATH      = os.path.join(DATA_DIR, 'app_settings.json') if IS_FROZEN else 'app_settings.json'
 INDEX_PATH         = os.path.join(RESOURCE_DIR, "index.html")
 TRANSLATION_FILE_CANDIDATES = (
+    "translations_updated.txt",
     "translations_website_updated.txt",
     "translations_website.txt",
     "translations.txt",
 )
+DEFAULT_TRANSLATION_FILE = "translations_updated.txt"
 TRANSLATION_POLICY_BOTH = {"y", "yes", "both", "always", "all"}
 TRANSLATION_POLICY_TOGGLE = {"n", "no", "toggle", "selected", "current"}
 TRANSLATION_KEY_ALIASES = {
@@ -90,6 +92,14 @@ TRANSLATION_KEY_ALIASES = {
     "rock_genre": "styleRock",
     "rock": "styleRock",
     "slow": "styleSlow",
+    "country": "styleCountry",
+    "only": "onlyLabel",
+    "only_label": "onlyLabel",
+    "all_in": "allInLabel",
+    "roll": "rollLabel",
+    "roll_label": "rollLabel",
+    "export_started": "exportStarted",
+    "export_download_started": "exportDownloadStarted",
     "bpm": "bpmLabel",
     "bpm_label": "bpmLabel",
     "beats_per_minute": "bpmLabel",
@@ -113,6 +123,12 @@ def prepare_runtime_storage():
     bundled_db = os.path.join(RESOURCE_DIR, 'songs.db')
     if not os.path.exists(DB_PATH) and os.path.exists(bundled_db):
         shutil.copy2(bundled_db, DB_PATH)
+
+    for name in TRANSLATION_FILE_CANDIDATES:
+        bundled_translation = os.path.join(RESOURCE_DIR, name)
+        editable_translation = os.path.join(DATA_DIR, name)
+        if os.path.exists(bundled_translation) and not os.path.exists(editable_translation):
+            shutil.copy2(bundled_translation, editable_translation)
 
     bundled_images = os.path.join(RESOURCE_DIR, LOCAL_IMAGE_NAME)
     if os.path.isdir(bundled_images):
@@ -282,7 +298,7 @@ def camel_to_snake(value):
 
 
 def to_camel_translation_key(raw):
-    clean = str(raw or "").strip().lower()
+    clean = str(raw or "").lstrip("\ufeff").strip().lower()
     clean = clean.replace("'", "").replace('"', "")
     clean = re.sub(r"[^a-z0-9]+", " ", clean).strip()
     if not clean:
@@ -364,7 +380,7 @@ def parse_translation_file_entries(path):
             if not line or line.startswith("#") or "=" not in line:
                 continue
             key, payload = line.split("=", 1)
-            key = key.strip()
+            key = key.strip().lstrip("\ufeff")
             if not key:
                 continue
             parsed = parse_translation_payload(payload)
@@ -491,14 +507,67 @@ def build_translation_catalog(path=None):
     return catalog
 
 
+def translation_file_write_path(path=None):
+    if path:
+        return path
+    latest = latest_translation_file()
+    if latest:
+        return latest
+    return os.path.join(DATA_DIR, DEFAULT_TRANSLATION_FILE)
+
+
+def sync_translation_file_catalog(path=None):
+    """Append newly registered UI translation keys without changing existing rows."""
+    path = translation_file_write_path(path)
+    source_catalog = extract_source_translation_catalog()
+    if not source_catalog:
+        return {"path": path, "added": 0, "keys": []}
+
+    entries = OrderedDict()
+    if os.path.exists(path):
+        entries = parse_translation_file_entries(path)
+    existing = {
+        to_camel_translation_key(raw_key)
+        for raw_key in entries.keys()
+        if to_camel_translation_key(raw_key)
+    }
+
+    missing = [
+        source
+        for key, source in source_catalog.items()
+        if key not in existing
+    ]
+    if not missing:
+        return {"path": path, "added": 0, "keys": []}
+
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    needs_leading_newline = os.path.exists(path) and os.path.getsize(path) > 0
+    stamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(path, "a", encoding="utf-8", newline="\n") as f:
+        if needs_leading_newline:
+            f.write("\n")
+        f.write(f"# Added by Karen Music Director on {stamp}\n")
+        f.write("# Fill in the Karen translation after =. Add | y to always show both languages, or | n to show only the selected language.\n")
+        f.write("# Rows without y/n stay plain and intentionally do not include descriptions or code references.\n")
+        for source in missing:
+            f.write(f"{source.get('fileKey') or camel_to_snake(source.get('key'))} = \n")
+
+    return {
+        "path": path,
+        "added": len(missing),
+        "keys": [item.get("fileKey") or camel_to_snake(item.get("key")) for item in missing],
+    }
+
+
 def translation_file_info(path):
     if not path:
-        return {"path": None, "mtime": None, "size": 0, "version": None}
+        return {"file": None, "path": None, "mtime": None, "size": 0, "version": None}
     try:
         stat = os.stat(path)
     except OSError:
-        return {"path": path, "mtime": None, "size": 0, "version": None}
+        return {"file": os.path.basename(path), "path": path, "mtime": None, "size": 0, "version": None}
     return {
+        "file": os.path.basename(path),
         "path": path,
         "mtime": stat.st_mtime,
         "size": stat.st_size,
@@ -508,9 +577,9 @@ def translation_file_info(path):
 
 def latest_translation_file():
     roots = [DATA_DIR, BASE_DIR, RESOURCE_DIR]
-    candidates = []
     seen = set()
     for root in roots:
+        candidates = []
         for name in TRANSLATION_FILE_CANDIDATES:
             path = os.path.abspath(os.path.join(root, name))
             if path in seen:
@@ -518,9 +587,23 @@ def latest_translation_file():
             seen.add(path)
             if os.path.isfile(path):
                 candidates.append(path)
-    if not candidates:
-        return None
-    return max(candidates, key=lambda p: os.path.getmtime(p))
+        try:
+            for entry in os.scandir(root):
+                if not entry.is_file():
+                    continue
+                lower_name = entry.name.lower()
+                if "translation" not in lower_name or not lower_name.endswith(".txt"):
+                    continue
+                path = os.path.abspath(entry.path)
+                if path in seen:
+                    continue
+                seen.add(path)
+                candidates.append(path)
+        except OSError:
+            continue
+        if candidates:
+            return max(candidates, key=lambda p: os.path.getmtime(p))
+    return None
 
 
 def normalize_file_metadata_value(value):
@@ -765,12 +848,15 @@ def get_settings():
 @app.route('/api/translations/latest', methods=['GET'])
 def get_latest_translations():
     path = latest_translation_file()
+    sync_result = sync_translation_file_catalog(path)
+    path = sync_result["path"]
     if not path:
         return jsonify({**translation_file_info(None), "translations": {}, "policies": {}})
     try:
         entries = parse_translation_file_entries(path)
         return jsonify({
             **translation_file_info(path),
+            "sync": sync_result,
             "translations": {
                 key: data["value"]
                 for key, data in entries.items()
@@ -791,8 +877,11 @@ def get_latest_translations():
 def get_translation_catalog():
     path = latest_translation_file()
     try:
+        sync_result = sync_translation_file_catalog(path)
+        path = sync_result["path"]
         return jsonify({
             **translation_file_info(path),
+            "sync": sync_result,
             "catalog": build_translation_catalog(path),
             "format": "file_key = Karen translation | y-or-n | plain app location description | generated refs",
             "policy": {
@@ -813,6 +902,8 @@ def get_translation_catalog():
 def get_translation_catalog_text():
     path = latest_translation_file()
     try:
+        sync_result = sync_translation_file_catalog(path)
+        path = sync_result["path"]
         catalog = build_translation_catalog(path)
         lines = [
             "# Karen Music Director translation catalog",
@@ -820,6 +911,7 @@ def get_translation_catalog_text():
             "# file_key = Karen translation | y | plain app location description | generated refs",
             "# Use y to always show both languages. Use n to show only the selected language.",
             "# If a row has no y/n answer, keep it as file_key = Karen translation only.",
+            f"# Synced missing keys into: {sync_result['path']}",
             "",
         ]
         for item in catalog:
@@ -838,6 +930,20 @@ def get_translation_catalog_text():
         return response
     except Exception as e:
         return str(e), 500, {"Content-Type": "text/plain; charset=utf-8"}
+
+
+@app.route('/api/translations/sync', methods=['POST'])
+def sync_translations():
+    path = latest_translation_file()
+    try:
+        sync_result = sync_translation_file_catalog(path)
+        return jsonify({
+            **translation_file_info(sync_result["path"]),
+            "sync": sync_result,
+            "catalogCount": len(build_translation_catalog(sync_result["path"])),
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "path": path}), 500
 
 
 @app.route('/api/settings', methods=['PUT'])

@@ -51,6 +51,12 @@ $pyinstallerArgs = @(
     "karen_music_desktop.py"
 )
 
+$translationFiles = Get-ChildItem -LiteralPath $ProjectRoot -File |
+    Where-Object { $_.Name -match 'translation' -and $_.Extension -ieq '.txt' }
+foreach ($translationFile in $translationFiles) {
+    $pyinstallerArgs += @("--add-data", "$($translationFile.FullName);.")
+}
+
 python -m PyInstaller @pyinstallerArgs
 if ($LASTEXITCODE -ne 0) {
     throw "PyInstaller failed."

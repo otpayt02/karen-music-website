@@ -60,7 +60,8 @@ test.describe("print preview packets", () => {
     await expect(page.locator("#chart-container #ph-title-english")).toHaveText("(Amazing Grace)");
     await expect(page.locator("#chart-container #ph-tempo-karen")).toHaveText("ဂိုဂို = ၁၂၅ ဘီပီအမ်");
     await expect(page.locator("#chart-container #ph-tempo-english")).toHaveText("(Go Go = 125 BPM)");
-    await expect(page.locator("#chart-container #ph-keymeta-english")).toHaveText("(Key = G)");
+    await expect(page.locator("#chart-container #ph-keymeta-english")).toHaveText("(Key)");
+    await expect(page.locator("#chart-container #ph-key-value")).toHaveText("G");
     await expect(page.locator("#chart-container #ph-footer-center")).toContainText("Piano 1");
     await expect(page.locator("#chart-container #ph-footer-right")).toContainText("Choir");
 
