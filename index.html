@@ -31,11 +31,11 @@
         --beat-active-outline: #bb86fc;
         --lead-row-bg: rgba(226, 232, 240, 0.3);
         --lead-row-border: #999;
-        --font-chord: 1em;
-        --font-bass: 0.68em;
-        --font-xmarks: 0.6em;
+        --font-chord: 1.12em;
+        --font-bass: 0.74em;
+        --font-xmarks: 0.58em;
         --font-lead: 10px;
-        --row-height-base: 26px;
+        --row-height-base: 28px;
         --font-ui: "Instrument Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         --font-display: "Fraunces", "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
         --font-mono: "IBM Plex Mono", "Courier New", Courier, monospace;
@@ -62,6 +62,21 @@
         letter-spacing: 0.01em;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+      }
+
+      button,
+      .instr-choice,
+      .paper-flap,
+      .lead-grid-cell,
+      .section-rowcap-btn,
+      .section-insert-plus {
+        transition:
+          background-color 0.18s ease,
+          border-color 0.18s ease,
+          color 0.18s ease,
+          box-shadow 0.18s ease,
+          opacity 0.5s ease,
+          transform 0.18s ease;
       }
 
       h2, h3 {
@@ -446,6 +461,29 @@
         transform-origin: top left;
       }
 
+      .editor-heading {
+        position: relative;
+        width: min(760px, calc(100% - 168px));
+        min-height: 78px;
+        margin-inline: auto !important;
+        padding-inline: 28px !important;
+      }
+
+      .editor-heading::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        opacity: 0;
+        background: rgba(255,255,255,0.055);
+        transition: opacity 0.5s ease;
+      }
+
+      .editor-heading:hover::before {
+        opacity: 1;
+      }
+
       #print-batch {
         display: none;
         width: 100%;
@@ -790,25 +828,26 @@
 
       html[data-design="design-3"] body {
         background:
-          radial-gradient(900px 620px at 12% 8%, rgba(227,91,127,0.24), transparent 68%),
-          radial-gradient(820px 580px at 90% 18%, rgba(33,198,186,0.16), transparent 70%),
-          radial-gradient(760px 520px at 52% 100%, rgba(241,196,106,0.11), transparent 70%),
+          linear-gradient(100deg, color-mix(in srgb, var(--accent) 18%, transparent) 0 16%, transparent 28% 100%),
+          linear-gradient(260deg, color-mix(in srgb, var(--accent-2) 14%, transparent) 0 18%, transparent 30% 100%),
+          linear-gradient(180deg, color-mix(in srgb, var(--accent-3) 10%, transparent), transparent 46%),
           linear-gradient(145deg, #171016, #0d1117) !important;
       }
 
       html[data-design="design-3"] body::before {
         background:
-          radial-gradient(circle at 50% 12%, rgba(255,255,255,0.12), transparent 18%),
-          linear-gradient(110deg, transparent 0 36%, rgba(255,255,255,0.05) 46%, transparent 58%) !important;
-        opacity: 0.76;
+          repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 82px),
+          linear-gradient(110deg, transparent 0 35%, rgba(255,255,255,0.075) 43%, transparent 58%),
+          linear-gradient(250deg, transparent 0 38%, color-mix(in srgb, var(--accent-2) 10%, transparent) 48%, transparent 62%) !important;
+        opacity: 0.82;
       }
 
       html[data-design="design-3"] #main-editor {
         align-items: center;
         padding: 46px 34px 72px !important;
         background:
-          radial-gradient(780px 540px at 50% 0%, rgba(255,255,255,0.08), transparent 62%),
-          linear-gradient(180deg, rgba(23,16,22,0.18), rgba(6,8,12,0.38)) !important;
+          linear-gradient(180deg, color-mix(in srgb, var(--accent) 9%, transparent), rgba(6,8,12,0.38)),
+          linear-gradient(90deg, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 42%, color-mix(in srgb, var(--accent-3) 7%, transparent)) !important;
       }
 
       html[data-design="design-3"] #sidebar {
@@ -950,8 +989,8 @@
       html[data-design="design-3"] #shortcut-panel {
         border-radius: 30px !important;
         background:
-          radial-gradient(480px 240px at 18% 0%, rgba(227,91,127,0.2), transparent 70%),
-          radial-gradient(380px 220px at 100% 8%, rgba(33,198,186,0.18), transparent 72%),
+          linear-gradient(155deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 45%),
+          linear-gradient(35deg, color-mix(in srgb, var(--accent-2) 14%, transparent), transparent 52%),
           linear-gradient(145deg, rgba(61,38,54,0.96), rgba(22,15,23,0.96)) !important;
       }
 
@@ -987,6 +1026,11 @@
       }
 
       @media (max-width: 900px) {
+        #main-editor > .editor-heading {
+          width: min(100%, calc(100vw - 72px));
+          padding-inline: 14px !important;
+        }
+
         html[data-design="design-2"] #main-editor {
           padding: 66px 18px 42px !important;
         }
@@ -1078,6 +1122,13 @@
       .section {
         margin-bottom: 8px;
         position: relative;
+        border-radius: 6px;
+        transition: background-color 0.5s ease, box-shadow 0.5s ease;
+      }
+
+      .section:hover {
+        background: rgba(78, 120, 255, 0.035);
+        box-shadow: 0 0 0 1px rgba(78, 120, 255, 0.12) inset;
       }
 
       .section-header {
@@ -1086,14 +1137,21 @@
         gap: 8px;
         font-family: var(--font-mono);
         font-weight: bold;
-        font-size: 0.95em;
+        font-size: 0.82em;
         border-bottom: 1px dashed #aaa;
         margin-bottom: 3px;
         margin-top: 2px;
         padding-bottom: 2px;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.06em;
         color: #000;
+        border-radius: 4px 4px 0 0;
+        transition: background-color 0.5s ease, border-color 0.5s ease;
+      }
+
+      .section-header:hover {
+        background: rgba(109, 77, 255, 0.055);
+        border-bottom-color: rgba(80, 80, 80, 0.7);
       }
 
       .section-header-actions {
@@ -1142,6 +1200,22 @@
       .section-title {
         flex: 1 1 auto;
         min-width: 0;
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+      }
+
+      .section-title-ka {
+        font-family: var(--font-karen), var(--font-mono);
+        font-weight: 900;
+        letter-spacing: 0.02em;
+      }
+
+      .section-title-en {
+        font-family: var(--font-mono);
+        font-size: 0.92em;
+        color: #333;
+        letter-spacing: 0.04em;
       }
 
       .section-premeasure-control {
@@ -1275,6 +1349,13 @@
         --row-top-space: 0px;
         padding-top: var(--row-top-space);
         min-height: calc(var(--row-height-base) + var(--row-top-space));
+        border-radius: 5px;
+        transition: background-color 0.5s ease, box-shadow 0.5s ease;
+      }
+
+      .line:hover {
+        background: rgba(21, 139, 116, 0.045);
+        box-shadow: 0 0 0 1px rgba(21, 139, 116, 0.12) inset;
       }
 
       .line.has-roll {
@@ -1321,6 +1402,13 @@
         min-width: 0;
         height: 100%;
         overflow: visible;
+        border-radius: 2px;
+        transition: background-color 0.5s ease, box-shadow 0.5s ease;
+      }
+
+      .measure:hover {
+        background: rgba(216, 166, 87, 0.075);
+        box-shadow: 0 0 0 1px rgba(216, 166, 87, 0.18) inset;
       }
 
       .measure.pre-measure {
@@ -1360,8 +1448,14 @@
         justify-content: flex-start;
         padding: 2px 1px 1px;
         cursor: default;
-        transition: background 0.15s;
+        transition: background-color 0.5s ease, box-shadow 0.5s ease, outline-color 0.5s ease;
         overflow: visible;
+        border-radius: 3px;
+      }
+
+      .beat:hover {
+        background: rgba(187, 134, 252, 0.13);
+        box-shadow: 0 0 0 1px rgba(187, 134, 252, 0.22) inset;
       }
 
       .beat.active {
@@ -1395,6 +1489,13 @@
         background: var(--lead-row-bg);
         overflow: visible;
         pointer-events: none;
+        transition: background-color 0.5s ease, box-shadow 0.5s ease;
+      }
+
+      .measure:hover .lead-row,
+      .lead-row:hover {
+        background: rgba(37, 99, 235, 0.12);
+        box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18) inset;
       }
 
       .lead-beat {
@@ -1405,6 +1506,11 @@
         position: relative;
         overflow: visible;
         border-bottom: none;
+        transition: background-color 0.5s ease;
+      }
+
+      .measure:hover .lead-beat {
+        background: rgba(37, 99, 235, 0.045);
       }
 
       .lead-subslot {
@@ -1587,8 +1693,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: 6px;
-        margin-top: 1px;
+        min-height: 4px;
+        margin-top: 0;
         line-height: 1;
       }
 
@@ -1697,9 +1803,9 @@
       .bass-note {
         font-size: var(--font-bass);
         font-weight: bold;
-        margin-top: 1px;
+        margin-top: 0;
         line-height: 1;
-        min-height: 0.9em;
+        min-height: 0.82em;
       }
 
       /* ============================================================
@@ -1712,11 +1818,11 @@
         justify-content: space-evenly;
         white-space: nowrap;
         overflow: visible;
-        margin-top: 0;
+        margin-top: -1px;
         line-height: 1;
         font-weight: 700;
-        min-height: 0.92em;
-        font-size: 0.5em; /* unified to keep dot/non-dot rows visually consistent */
+        min-height: 0.76em;
+        font-size: var(--font-xmarks); /* unified to keep dot/non-dot rows visually consistent */
         padding: 0 1px;
       }
 
@@ -1726,23 +1832,23 @@
       }
 
       .x-marks.count-1 {
-        font-size: 0.5em;
+        font-size: var(--font-xmarks);
       }
 
       .x-marks.count-2 {
-        font-size: 0.5em;
+        font-size: var(--font-xmarks);
       }
 
       .x-marks.count-3 {
-        font-size: 0.5em;
+        font-size: var(--font-xmarks);
       }
 
       .x-marks.count-4 {
-        font-size: 0.5em;
+        font-size: var(--font-xmarks);
       }
 
       .x-marks.count-5 {
-        font-size: 0.5em;
+        font-size: var(--font-xmarks);
       }
 
       .beat-circle {
@@ -1986,24 +2092,117 @@
         margin: 3px;
       }
 
+      .only-instrument-modal {
+        width: min(520px, 92vw);
+        padding: 22px;
+        border: 0 !important;
+        border-radius: 22px !important;
+        background:
+          linear-gradient(155deg, color-mix(in srgb, var(--panel-bg-strong) 94%, white 6%), color-mix(in srgb, var(--surface-2) 70%, transparent)),
+          var(--panel-bg-strong) !important;
+        box-shadow: var(--deep-shadow) !important;
+      }
+
+      .only-instrument-modal h2 {
+        margin: 0;
+        color: color-mix(in srgb, var(--text) 78%, var(--accent) 22%);
+        font-family: var(--font-display);
+        font-size: 1.04rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .only-instrument-help {
+        margin: 5px 0 0;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+        line-height: 1.4;
+      }
+
+      .only-instrument-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
+        gap: 10px;
+        margin: 16px 0 18px;
+      }
+
       .only-instrument-option {
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: 8px;
-        width: 100%;
-        text-align: left;
+        display: grid;
+        place-items: center;
+        min-height: 54px;
+        border: 0 !important;
+        border-radius: 14px;
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--field-bg) 88%, transparent), color-mix(in srgb, var(--surface-2) 48%, transparent));
+        box-shadow:
+          inset 0 1px 0 var(--glass-line),
+          0 10px 22px color-mix(in srgb, #000 11%, transparent);
+        color: var(--text);
+        cursor: pointer;
+        text-align: center;
+        transition:
+          background var(--motion-soft) ease,
+          color var(--motion-soft) ease,
+          transform var(--motion-quick) var(--motion-flow),
+          box-shadow var(--motion-soft) var(--motion-flow);
+      }
+
+      .only-instrument-option:hover {
+        transform: translateY(-2px);
+        background: color-mix(in srgb, var(--accent) 12%, var(--panel-bg));
+        box-shadow:
+          inset 0 1px 0 var(--glass-line),
+          0 14px 28px color-mix(in srgb, var(--accent) 14%, transparent);
+      }
+
+      .only-instrument-option:has(input:checked) {
+        background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 72%, transparent), color-mix(in srgb, var(--accent-2) 58%, transparent));
+        color: #fff;
+        box-shadow:
+          0 16px 34px color-mix(in srgb, var(--accent) 22%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.24) !important;
       }
 
       .only-instrument-option input[type="checkbox"] {
-        margin: 2px 0 0 0;
-        flex: 0 0 auto;
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
       }
 
       .only-instrument-text {
-        flex: 1 1 auto;
-        min-width: 0;
-        text-align: left;
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 8px;
+        color: var(--text);
+        font-size: 0.92rem;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        line-height: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .only-instrument-option:has(input:checked) .only-instrument-text {
+        color: #fff;
+      }
+
+      .only-instrument-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .only-apply-btn {
+        min-width: 112px;
+        min-height: 40px;
+        border: 0 !important;
+        border-radius: var(--pill-radius) !important;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+        color: #fff !important;
+        box-shadow:
+          0 14px 30px color-mix(in srgb, var(--accent) 22%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.22) !important;
       }
 
       .action-grid {
@@ -2025,51 +2224,66 @@
 
       .paper-header {
         display: grid;
-        grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1.45fr) minmax(0, 1.05fr) minmax(0, 0.85fr);
         align-items: end;
-        column-gap: 10px;
+        column-gap: 12px;
         border-bottom: 2px solid #000;
         padding-bottom: 5px;
         margin-bottom: 12px;
       }
-      .paper-head-left {
+      .paper-head-cell {
+        min-width: 0;
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
         gap: 2px;
+      }
+      .paper-head-left {
+        align-items: flex-start;
       }
       .paper-title-karen {
         font-family: var(--font-karen);
-        font-size: 1.12em;
+        font-size: 1.2em;
         font-weight: 900;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.02em;
+        line-height: 1.08;
       }
       .paper-title-english {
         font-family: var(--font-display);
-        font-size: 0.72em;
+        font-size: 0.68em;
         font-weight: 700;
         letter-spacing: 0.02em;
         color: #333;
+        line-height: 1.05;
+      }
+      .paper-head-center {
+        align-items: center;
+        text-align: center;
       }
       .paper-head-right {
-        display: flex;
-        flex-direction: column;
         align-items: flex-end;
-        justify-content: flex-end;
-        gap: 2px;
+        text-align: right;
       }
       .paper-tempo {
         font-family: var(--font-ui);
-        font-size: 0.65em;
-        text-align: right;
+        font-size: 0.64em;
+        font-weight: 850;
         white-space: nowrap;
+        line-height: 1.1;
+      }
+      .paper-tempo-english {
+        font-size: 0.58em;
+        color: #333;
       }
       .paper-keymeta {
         font-family: var(--font-ui);
-        font-size: 0.65em;
+        font-size: 0.62em;
         font-weight: 800;
-        text-align: right;
         white-space: nowrap;
+        line-height: 1.1;
+      }
+      .paper-keymeta-english {
+        font-size: 0.56em;
+        color: #333;
       }
       .paper-keymeta em {
         font-size: 0.92em;
@@ -2081,11 +2295,11 @@
         left: 30px;
         right: 30px;
         display: grid;
-        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 0.8fr);
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr) minmax(0, 0.85fr);
         column-gap: 8px;
         align-items: center;
         font-family: var(--font-ui);
-        font-size: 0.62em;
+        font-size: 0.6em;
         color: #666;
         border-top: 1px solid #ccc;
         padding-top: 4px;
@@ -2095,14 +2309,35 @@
         flex-direction: column;
         gap: 1px;
       }
+      .paper-footer-date-row {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        min-width: 0;
+        white-space: nowrap;
+      }
       #ph-footer-center {
         text-align: center;
         font-weight: 800;
-        font-size: 1.08em;
+        font-size: 1.05em;
         letter-spacing: 0.04em;
       }
       #ph-footer-right {
         text-align: right;
+      }
+      .paper-footer-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        line-height: 1.08;
+      }
+      .print-ka {
+        font-family: var(--font-karen), var(--font-ui);
+        color: #111;
+      }
+      .print-en {
+        font-family: var(--font-ui);
+        color: #333;
       }
 
       .transpose-row {
@@ -2215,6 +2450,31 @@
         #print-batch .beat.only-start-pending {
           background: transparent !important;
           outline: none !important;
+        }
+
+        #print-batch .section,
+        #print-batch .line,
+        #print-batch .measure,
+        #print-batch .beat {
+          background: transparent !important;
+          box-shadow: none !important;
+        }
+
+        #print-batch .paper-header {
+          grid-template-columns: minmax(0, 1.55fr) minmax(0, 1.05fr) minmax(0, 0.88fr) !important;
+          column-gap: 10px !important;
+          margin-bottom: 10px !important;
+        }
+
+        #print-batch .paper-title-karen {
+          font-size: 1.16em !important;
+        }
+
+        #print-batch .paper-title-english,
+        #print-batch .paper-tempo-english,
+        #print-batch .paper-keymeta-english,
+        #print-batch .paper-footer .print-en {
+          color: #333 !important;
         }
 
         #chart-container {
@@ -3044,6 +3304,14 @@
         box-shadow:
           0 18px 48px rgba(0,0,0,0.24),
           inset 0 1px 0 rgba(255,255,255,0.08);
+      }
+
+      #main-editor > .editor-heading {
+        width: min(760px, calc(100% - 168px));
+        min-height: 78px;
+        display: grid;
+        align-content: center;
+        justify-items: center;
       }
 
       #view-title {
@@ -5200,6 +5468,9 @@
       }
 
       html[data-palette="ivory"] {
+        --palette-accent: #184f5f;
+        --palette-accent-2: #d45d45;
+        --palette-accent-3: #2b315e;
         --accent: #184f5f;
         --accent-2: #d45d45;
         --accent-3: #2b315e;
@@ -5210,6 +5481,9 @@
       }
 
       html[data-palette="velvet"] {
+        --palette-accent: #8f6cff;
+        --palette-accent-2: #25d0b5;
+        --palette-accent-3: #ff7188;
         --accent: #8f6cff;
         --accent-2: #25d0b5;
         --accent-3: #ff7188;
@@ -5220,6 +5494,9 @@
       }
 
       html[data-palette="aurora"] {
+        --palette-accent: #0f766e;
+        --palette-accent-2: #7c3aed;
+        --palette-accent-3: #f59e0b;
         --accent: #0f766e;
         --accent-2: #7c3aed;
         --accent-3: #f59e0b;
@@ -5230,6 +5507,9 @@
       }
 
       html[data-palette="graphite"] {
+        --palette-accent: #2f6f88;
+        --palette-accent-2: #d8a657;
+        --palette-accent-3: #b94a48;
         --accent: #2f6f88;
         --accent-2: #d8a657;
         --accent-3: #b94a48;
@@ -5240,6 +5520,9 @@
       }
 
       html[data-palette="bloom"] {
+        --palette-accent: #ad3b72;
+        --palette-accent-2: #0e9f9a;
+        --palette-accent-3: #3c2b6f;
         --accent: #ad3b72;
         --accent-2: #0e9f9a;
         --accent-3: #3c2b6f;
@@ -5261,12 +5544,12 @@
         --design-name: "Console";
         --panel-radius: 6px;
         --control-radius: 4px;
-        --accent: #4fb3a4;
-        --accent-2: #d8a657;
-        --accent-3: #8aa2ff;
-        --ambient-1: rgba(79, 179, 164, 0.15);
-        --ambient-2: rgba(216, 166, 87, 0.1);
-        --ambient-3: rgba(138, 162, 255, 0.08);
+        --accent: var(--palette-accent, #4fb3a4);
+        --accent-2: var(--palette-accent-2, #d8a657);
+        --accent-3: var(--palette-accent-3, #8aa2ff);
+        --ambient-1: color-mix(in srgb, var(--accent) 24%, transparent);
+        --ambient-2: color-mix(in srgb, var(--accent-2) 17%, transparent);
+        --ambient-3: color-mix(in srgb, var(--accent-3) 14%, transparent);
         --chart-bg: #f7f4ea;
         --paper-texture:
           repeating-linear-gradient(90deg, rgba(13,17,20,0.035) 0 1px, transparent 1px 46px),
@@ -5277,12 +5560,12 @@
         --design-name: "Stage";
         --panel-radius: 28px;
         --control-radius: 18px;
-        --accent: #e35b7f;
-        --accent-2: #21c6ba;
-        --accent-3: #f1c46a;
-        --ambient-1: rgba(227, 91, 127, 0.2);
-        --ambient-2: rgba(33, 198, 186, 0.14);
-        --ambient-3: rgba(241, 196, 106, 0.12);
+        --accent: var(--palette-accent, #e35b7f);
+        --accent-2: var(--palette-accent-2, #21c6ba);
+        --accent-3: var(--palette-accent-3, #f1c46a);
+        --ambient-1: color-mix(in srgb, var(--accent) 28%, transparent);
+        --ambient-2: color-mix(in srgb, var(--accent-2) 22%, transparent);
+        --ambient-3: color-mix(in srgb, var(--accent-3) 18%, transparent);
         --chart-bg: #fff9f1;
         --paper-texture:
           radial-gradient(680px 360px at 18% 0%, rgba(227,91,127,0.11), transparent 72%),
@@ -5293,6 +5576,20 @@
         --motion-soft: 260ms;
         --motion-quick: 130ms;
         --motion-slow: 420ms;
+      }
+
+      html[data-motion="calm"],
+      html[data-motion="calm"] #main-editor {
+        scroll-behavior: auto;
+      }
+
+      html[data-motion="calm"] .paper-card.is-active {
+        animation: none;
+      }
+
+      html[data-motion="calm"] .section:hover,
+      html[data-motion="calm"] .beat.active {
+        transform: none;
       }
 
       html[data-density="compact"] {
@@ -5597,6 +5894,61 @@
         border-radius: 10px;
         background: color-mix(in srgb, var(--accent-2) 9%, transparent);
         color: var(--text);
+      }
+
+      #shortcut-panel {
+        width: min(780px, calc(100vw - 28px)) !important;
+      }
+
+      .shortcut-panel-body {
+        max-height: min(660px, calc(100vh - 168px));
+        overflow-y: auto;
+        padding-right: 14px !important;
+      }
+
+      .guide-section summary {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        min-height: 44px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        line-height: 1.25;
+        letter-spacing: 0.035em;
+      }
+
+      .guide-grid {
+        grid-template-columns: minmax(92px, 0.28fr) minmax(0, 1fr);
+        gap: 8px 14px;
+      }
+
+      .guide-grid dt {
+        padding: 4px 6px;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--accent) 9%, transparent);
+        text-align: center;
+      }
+
+      .guide-grid dd {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      @media (max-width: 620px) {
+        #shortcut-panel {
+          left: 14px !important;
+          right: 14px !important;
+          width: auto !important;
+        }
+
+        .guide-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .guide-grid dt {
+          width: fit-content;
+          text-align: left;
+        }
       }
 
       .settings-row {
@@ -6129,18 +6481,31 @@
       .wizard-btn-secondary,
       .wizard-btn-skip {
         min-height: 38px;
+        border: 0 !important;
         border-radius: var(--pill-radius) !important;
+        box-shadow: none !important;
+        transition:
+          transform var(--motion-quick) var(--motion-flow),
+          background var(--motion-soft) var(--motion-flow),
+          color var(--motion-soft) ease,
+          box-shadow var(--motion-soft) var(--motion-flow);
       }
 
       .wizard-btn-primary {
         padding-inline: 24px;
-        background: linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+        background:
+          linear-gradient(135deg, var(--accent), var(--accent-2)) !important;
+        color: #fff !important;
+        box-shadow:
+          0 12px 26px color-mix(in srgb, var(--accent) 20%, transparent),
+          inset 0 1px 0 rgba(255,255,255,0.22) !important;
       }
 
       .wizard-btn-secondary,
       .wizard-btn-skip {
-        background: color-mix(in srgb, var(--text) 7%, transparent) !important;
-        color: var(--text-muted) !important;
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--field-bg) 86%, transparent), color-mix(in srgb, var(--surface-2) 42%, transparent)) !important;
+        color: color-mix(in srgb, var(--text) 76%, var(--text-muted) 24%) !important;
         box-shadow: inset 0 1px 0 var(--glass-line) !important;
       }
 
@@ -6149,6 +6514,7 @@
       .wizard-btn-skip:hover {
         background: color-mix(in srgb, var(--accent) 16%, transparent) !important;
         color: var(--text) !important;
+        transform: translateY(-1px);
       }
 
       .wizard-mode-hint,
@@ -6355,13 +6721,16 @@
       }
 
       html[data-palette="velvet"] {
-        --accent: #9b315f;
-        --accent-2: #0f9f9a;
-        --accent-3: #dfb15b;
-        --accent-dim: rgba(155, 49, 95, 0.15);
-        --ambient-1: rgba(155, 49, 95, 0.16);
-        --ambient-2: rgba(15, 159, 154, 0.13);
-        --ambient-3: rgba(223, 177, 91, 0.11);
+        --palette-accent: #8f6cff;
+        --palette-accent-2: #25d0b5;
+        --palette-accent-3: #ff7188;
+        --accent: #8f6cff;
+        --accent-2: #25d0b5;
+        --accent-3: #ff7188;
+        --accent-dim: rgba(143, 108, 255, 0.2);
+        --ambient-1: rgba(143, 108, 255, 0.22);
+        --ambient-2: rgba(37, 208, 181, 0.16);
+        --ambient-3: rgba(255, 113, 136, 0.14);
       }
 
       *, *::before, *::after {
@@ -7433,6 +7802,195 @@
           linear-gradient(135deg, color-mix(in srgb, var(--accent) 44%, rgba(255,255,255,0.2)), rgba(255,255,255,0.08)) !important;
       }
 
+      /* Polished full-screen Karen keyboard layout. */
+      #karen-flap-body {
+        --karen-lens-top: 38%;
+        --k-key-size: clamp(36px, 5.2vmin, 50px);
+        --k-key-gap: clamp(5px, 0.8vmin, 8px);
+        --karen-zone-muted: rgba(255,255,255,0.58);
+      }
+
+      .karen-focus-lens {
+        top: var(--karen-lens-top) !important;
+        width: min(420px, 38vw, calc(100vw - 40px)) !important;
+        height: clamp(116px, 17vh, 176px) !important;
+      }
+
+      .karen-focus-preview {
+        top: var(--karen-lens-top) !important;
+        width: min(380px, 34vw, calc(100vw - 62px)) !important;
+      }
+
+      .karen-keys {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        transform: none !important;
+        pointer-events: none;
+      }
+
+      .karen-zone {
+        position: absolute !important;
+        width: max-content !important;
+        display: grid !important;
+        gap: 7px;
+        justify-items: start;
+        pointer-events: none;
+      }
+
+      #karen-flap.open .karen-zone {
+        pointer-events: auto;
+      }
+
+      #karen-flap:not(.open) .karen-zone,
+      #karen-flap:not(.open) .k-key {
+        pointer-events: none !important;
+      }
+
+      .karen-zone-label {
+        position: static !important;
+        width: auto !important;
+        height: auto !important;
+        clip: auto !important;
+        overflow: visible !important;
+        color: var(--karen-zone-muted);
+        font-family: var(--font-ui);
+        font-size: clamp(0.58rem, 1.1vmin, 0.68rem);
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        text-align: left;
+      }
+
+      .karen-zone-keys,
+      .karen-zone-consonants .karen-zone-keys,
+      .karen-zone-vowels .karen-zone-keys,
+      .karen-zone-tones .karen-zone-keys,
+      .karen-zone-medials .karen-zone-keys,
+      .karen-zone-extra .karen-zone-keys {
+        display: grid !important;
+        grid-template-columns: repeat(5, var(--k-key-size)) !important;
+        gap: var(--k-key-gap) !important;
+        width: max-content !important;
+      }
+
+      .karen-zone-consonants {
+        right: calc(50% + clamp(228px, 22vw, 278px)) !important;
+        top: var(--karen-lens-top) !important;
+        transform: translateY(-50%) !important;
+        --zone-delay: 360ms;
+      }
+
+      .karen-zone-vowels {
+        left: 50% !important;
+        top: calc(var(--karen-lens-top) + clamp(110px, 18vh, 158px)) !important;
+        transform: translateX(-50%) !important;
+        --zone-delay: 720ms;
+      }
+
+      .karen-zone-medials {
+        left: 50% !important;
+        top: calc(var(--karen-lens-top) + clamp(238px, 35vh, 300px)) !important;
+        transform: translateX(-50%) !important;
+        --zone-delay: 960ms;
+      }
+
+      .karen-zone-tones {
+        left: 50% !important;
+        top: calc(var(--karen-lens-top) - clamp(112px, 17vh, 142px)) !important;
+        transform: translateX(-50%) !important;
+        --zone-delay: 180ms;
+      }
+
+      .karen-zone-extra {
+        right: clamp(20px, 6vw, 96px) !important;
+        top: clamp(68px, 10vh, 106px) !important;
+        opacity: 1 !important;
+        --zone-delay: 0ms;
+      }
+
+      .karen-zone-commands {
+        right: clamp(20px, 5vw, 76px) !important;
+        bottom: clamp(22px, 6vh, 58px) !important;
+        --zone-delay: 1220ms;
+      }
+
+      .karen-zone-tones .karen-zone-label,
+      .karen-zone-vowels .karen-zone-label,
+      .karen-zone-medials .karen-zone-label {
+        justify-self: center;
+        text-align: center;
+      }
+
+      .karen-zone-extra .karen-zone-label,
+      .karen-zone-commands .karen-zone-label {
+        justify-self: end;
+        text-align: right;
+      }
+
+      .k-key {
+        width: var(--k-key-size) !important;
+        height: var(--k-key-size) !important;
+        min-height: var(--k-key-size) !important;
+        border-radius: clamp(10px, 1.6vmin, 16px) !important;
+        font-size: clamp(1rem, 2.1vmin, 1.28rem) !important;
+        will-change: transform, opacity, filter;
+      }
+
+      .k-key.is-command {
+        font-size: clamp(1.1rem, 2.4vmin, 1.45rem) !important;
+      }
+
+      #karen-flap.open:not(.closing) .k-key {
+        animation:
+          karenKeyFloatIn 440ms var(--motion-flow) both,
+          karenKeyDrift 4600ms ease-in-out infinite;
+        animation-delay:
+          var(--key-delay, 0ms),
+          calc(var(--key-delay, 0ms) + 520ms);
+      }
+
+      @keyframes karenKeyDrift {
+        0% {
+          transform: translate3d(0, 0, 0);
+        }
+        38% {
+          transform: translate3d(var(--float-x, 4px), -5px, 0);
+        }
+        72% {
+          transform: translate3d(calc(var(--float-x, 4px) * -0.65), 4px, 0);
+        }
+        100% {
+          transform: translate3d(0, 0, 0);
+        }
+      }
+
+      html[data-karen-keyboard-immersive="off"] #karen-flap.open .karen-zone-label,
+      html[data-karen-keyboard-immersive="off"] #karen-flap.open .k-key {
+        animation: none !important;
+        opacity: 1;
+        transform: none;
+      }
+
+      html[data-design="design-2"] .paper-stack {
+        width: min(1038px, 100%) !important;
+        padding-left: 58px;
+        box-sizing: border-box;
+      }
+
+      html[data-design="design-2"] .paper-flaps {
+        left: 0;
+      }
+
+      html[data-design="design-2"] .paper-flap.is-active {
+        transform: translateX(0);
+      }
+
       @media (max-width: 900px) {
         .lyrics-header,
         .lyrics-section-top {
@@ -7446,7 +8004,9 @@
         }
 
         #karen-flap-body {
-          --karen-lens-top: 29%;
+          --karen-lens-top: 32%;
+          --k-key-size: clamp(31px, 5.2vw, 42px);
+          --k-key-gap: 5px;
         }
 
         .karen-focus-lens {
@@ -7467,9 +8027,40 @@
         }
 
         .karen-keys {
-          top: calc(var(--karen-lens-top) + 74px);
-          bottom: 12px;
-          width: calc(100vw - 18px);
+          inset: 0 !important;
+          width: 100% !important;
+        }
+
+        .karen-zone-consonants {
+          left: clamp(10px, 2vw, 22px) !important;
+          right: auto !important;
+          top: calc(var(--karen-lens-top) + 4px) !important;
+        }
+
+        .karen-zone-extra {
+          right: clamp(10px, 2vw, 20px) !important;
+          top: clamp(66px, 10vh, 88px) !important;
+        }
+
+        .karen-zone-tones {
+          top: calc(var(--karen-lens-top) - clamp(88px, 15vh, 118px)) !important;
+        }
+
+        .karen-zone-vowels {
+          top: calc(var(--karen-lens-top) + clamp(94px, 17vh, 134px)) !important;
+        }
+
+        .karen-zone-medials {
+          top: calc(var(--karen-lens-top) + clamp(178px, 30vh, 220px)) !important;
+        }
+
+        .karen-zone-commands {
+          right: clamp(10px, 2vw, 20px) !important;
+          bottom: clamp(14px, 3vh, 30px) !important;
+        }
+
+        html[data-design="design-2"] .paper-stack {
+          padding-left: 0;
         }
 
         .karen-zone-keys,
@@ -7478,14 +8069,43 @@
         .karen-zone-tones .karen-zone-keys,
         .karen-zone-medials .karen-zone-keys,
         .karen-zone-extra .karen-zone-keys {
-          grid-template-columns: repeat(auto-fit, 44px) !important;
-          gap: 6px;
+          grid-template-columns: repeat(5, var(--k-key-size)) !important;
+          gap: var(--k-key-gap);
         }
 
         .k-key {
-          width: 44px;
-          height: 44px;
-          min-height: 44px;
+          width: var(--k-key-size) !important;
+          height: var(--k-key-size) !important;
+          min-height: var(--k-key-size) !important;
+        }
+      }
+
+      @media (max-width: 700px) {
+        #karen-flap-body {
+          --karen-lens-top: 34%;
+          --karen-lens-left: 70%;
+          --k-key-size: clamp(23px, 6.8vw, 34px);
+          --k-key-gap: 4px;
+        }
+
+        .karen-focus-lens {
+          left: var(--karen-lens-left) !important;
+          width: min(176px, 42vw, calc(100vw - 166px)) !important;
+          min-width: 136px;
+        }
+
+        .karen-focus-preview {
+          left: var(--karen-lens-left) !important;
+          width: min(148px, 38vw, calc(100vw - 188px)) !important;
+          min-width: 118px;
+          padding: 0 10px;
+          font-size: clamp(1.25rem, 7vw, 2.4rem);
+        }
+
+        .karen-zone-tones,
+        .karen-zone-vowels,
+        .karen-zone-medials {
+          left: var(--karen-lens-left) !important;
         }
       }
 
@@ -7727,99 +8347,99 @@
     <!-- Settings panel -->
     <div id="settings-panel">
       <div class="settings-row settings-row-block">
-        <span class="settings-label">Theme</span>
+        <span class="settings-label" data-i18n="theme">Theme</span>
         <div class="segmented-control theme-mode-control" role="radiogroup" aria-label="Theme">
-          <button type="button" class="theme-mode-option" data-theme-mode="auto" onclick="setThemeMode('auto')">Auto</button>
-          <button type="button" class="theme-mode-option" data-theme-mode="light" onclick="setThemeMode('light')">Light</button>
-          <button type="button" class="theme-mode-option" data-theme-mode="dark" onclick="setThemeMode('dark')">Dark</button>
+          <button type="button" class="theme-mode-option" data-theme-mode="auto" data-i18n="autoTheme" onclick="setThemeMode('auto')">Auto</button>
+          <button type="button" class="theme-mode-option" data-theme-mode="light" data-i18n="lightTheme" onclick="setThemeMode('light')">Light</button>
+          <button type="button" class="theme-mode-option" data-theme-mode="dark" data-i18n="darkTheme" onclick="setThemeMode('dark')">Dark</button>
         </div>
       </div>
       <div class="settings-row settings-row-block">
-        <span class="settings-label">Palette</span>
+        <span class="settings-label" data-i18n="palette">Palette</span>
         <div class="palette-grid" role="radiogroup" aria-label="Palette">
           <button type="button" class="palette-option" data-theme-palette="ivory" onclick="setThemePalette('ivory')">
             <span class="palette-swatch swatch-ivory"></span>
-            <span>Ivory</span>
+            <span data-i18n="ivoryPalette">Ivory</span>
           </button>
           <button type="button" class="palette-option" data-theme-palette="velvet" onclick="setThemePalette('velvet')">
             <span class="palette-swatch swatch-velvet"></span>
-            <span>Velvet</span>
+            <span data-i18n="velvetPalette">Velvet</span>
           </button>
           <button type="button" class="palette-option" data-theme-palette="aurora" onclick="setThemePalette('aurora')">
             <span class="palette-swatch swatch-aurora"></span>
-            <span>Aurora</span>
+            <span data-i18n="auroraPalette">Aurora</span>
           </button>
           <button type="button" class="palette-option" data-theme-palette="graphite" onclick="setThemePalette('graphite')">
             <span class="palette-swatch swatch-graphite"></span>
-            <span>Graphite</span>
+            <span data-i18n="graphitePalette">Graphite</span>
           </button>
           <button type="button" class="palette-option" data-theme-palette="bloom" onclick="setThemePalette('bloom')">
             <span class="palette-swatch swatch-bloom"></span>
-            <span>Bloom</span>
+            <span data-i18n="bloomPalette">Bloom</span>
           </button>
         </div>
       </div>
       <div class="settings-row settings-row-block">
-        <span class="settings-label">UI Design Direction</span>
+        <span class="settings-label" data-i18n="uiDesignDirection">UI Design Direction</span>
         <div class="segmented-control design-direction-control" role="radiogroup" aria-label="UI Design Direction">
-          <button type="button" class="design-option" data-ui-design="design-1" onclick="setUiDesign('design-1')" title="Manuscript Desk">1 Desk</button>
-          <button type="button" class="design-option" data-ui-design="design-2" onclick="setUiDesign('design-2')" title="Control Room">2 Console</button>
-          <button type="button" class="design-option" data-ui-design="design-3" onclick="setUiDesign('design-3')" title="Stage">3 Stage</button>
+          <button type="button" class="design-option" data-ui-design="design-1" onclick="setUiDesign('design-1')" title="Manuscript Desk">1 <span data-i18n="designDesk">Desk</span></button>
+          <button type="button" class="design-option" data-ui-design="design-2" onclick="setUiDesign('design-2')" title="Control Room">2 <span data-i18n="designConsole">Console</span></button>
+          <button type="button" class="design-option" data-ui-design="design-3" onclick="setUiDesign('design-3')" title="Stage">3 <span data-i18n="designStage">Stage</span></button>
         </div>
       </div>
       <div class="settings-row settings-row-block settings-row-split">
-        <span class="settings-label">Motion</span>
+        <span class="settings-label" data-i18n="motion">Motion</span>
         <div class="segmented-control compact-segment" role="radiogroup" aria-label="Motion">
-          <button type="button" class="motion-option" data-motion="silky" onclick="setThemeMotion('silky')">Silky</button>
-          <button type="button" class="motion-option" data-motion="calm" onclick="setThemeMotion('calm')">Calm</button>
+          <button type="button" class="motion-option" data-motion="silky" data-i18n="silkyMotion" onclick="setThemeMotion('silky')" title="Silky uses longer eased scrolling and animated paper transitions.">Silky</button>
+          <button type="button" class="motion-option" data-motion="calm" data-i18n="calmMotion" onclick="setThemeMotion('calm')" title="Calm uses shorter transitions and normal scrolling.">Calm</button>
         </div>
       </div>
       <div class="settings-row settings-row-block settings-row-split">
-        <span class="settings-label">Density</span>
+        <span class="settings-label" data-i18n="density">Density</span>
         <div class="segmented-control compact-segment" role="radiogroup" aria-label="Density">
-          <button type="button" class="density-option" data-density="compact" onclick="setThemeDensity('compact')">Compact</button>
-          <button type="button" class="density-option" data-density="comfy" onclick="setThemeDensity('comfy')">Comfy</button>
+          <button type="button" class="density-option" data-density="compact" data-i18n="compactDensity" onclick="setThemeDensity('compact')">Compact</button>
+          <button type="button" class="density-option" data-density="comfy" data-i18n="comfyDensity" onclick="setThemeDensity('comfy')">Comfy</button>
         </div>
       </div>
       <div class="settings-row">
-        <span class="settings-label">Guided new-song wizard</span>
+        <span class="settings-label" data-i18n="guidedNewSongWizard">Guided new-song wizard</span>
         <label class="toggle-switch">
           <input type="checkbox" id="settings-wizard-toggle">
           <div class="toggle-track"></div>
         </label>
       </div>
       <div class="settings-row">
-        <span class="settings-label">Immersive Karen keyboard</span>
+        <span class="settings-label" data-i18n="immersiveKarenKeyboard">Immersive Karen keyboard</span>
         <label class="toggle-switch">
           <input type="checkbox" id="settings-karen-keyboard-immersive-toggle" checked>
           <div class="toggle-track"></div>
         </label>
       </div>
       <div class="settings-row">
-        <span class="settings-label">Language</span>
+        <span class="settings-label" data-i18n="language">Language</span>
         <span id="settings-lang-display"
           style="font-size:11px;color:#bb86fc;cursor:pointer;"
           onclick="showLangPicker()">
-          Change →
+          <span data-i18n="changeAction">Change</span> →
         </span>
       </div>
       <div class="settings-row">
-        <span class="settings-label">Alternate song folder</span>
+        <span class="settings-label" data-i18n="alternateSongFolder">Alternate song folder</span>
         <div style="display:flex;gap:6px;align-items:center;width:100%;">
           <input id="settings-alt-folder" placeholder="C:\Full\Path\To\Songs" style="flex:1;background:#2c2c2c;border:1px solid var(--border);color:#fff;padding:6px 8px;border-radius:4px;">
-          <button type="button" onclick="pickFolder()" style="padding:6px 10px;border-radius:6px;">Browse</button>
-          <button type="button" onclick="saveAlternateFolder()" style="padding:6px 10px;border-radius:6px;">Save</button>
+          <button type="button" onclick="pickFolder()" data-i18n="browse" style="padding:6px 10px;border-radius:6px;">Browse</button>
+          <button type="button" onclick="saveAlternateFolder()" data-i18n="save" style="padding:6px 10px;border-radius:6px;">Save</button>
         </div>
       </div>
       <div class="settings-row">
-        <span class="settings-label">Time Signature</span>
+        <span class="settings-label" data-i18n="timeSignature">Time Signature</span>
         <div style="display:flex;gap:8px;align-items:center;">
           <button type="button" id="time-4-4" class="wizard-btn-secondary" onclick="setBeatsPerMeasure(4)">4/4</button>
           <button type="button" id="time-3-4" class="wizard-btn-secondary" onclick="setBeatsPerMeasure(3)">3/4</button>
         </div>
       </div>
       <div class="settings-row">
-        <span class="settings-label">Default measures / row</span>
+        <span class="settings-label" data-i18n="defaultMeasuresPerRow">Default measures / row</span>
         <div style="display:flex;gap:6px;align-items:center;">
           <button type="button" id="default-mpr-down" class="wizard-btn-secondary" style="padding:4px 8px;line-height:1;" onclick="changeDefaultMeasuresPerRow(-1)">-</button>
           <input id="settings-default-measures-per-row" type="number" min="1" max="16" step="1" value="8" style="width:52px;text-align:center;padding:4px 6px;">
@@ -7842,7 +8462,7 @@
       </div>
       <div class="form-group">
         <label for="songTitleKaren">Song Title (Karen)</label>
-        <input type="text" id="songTitleKaren" placeholder="Karen title" dir="ltr" data-karen-keyboard="true">
+        <input type="text" id="songTitleKaren" placeholder="Karen title" dir="ltr" data-karen-keyboard="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="none" aria-autocomplete="none">
       </div>
       <div class="form-group">
         <label for="songCategory">Category</label>
@@ -7909,7 +8529,7 @@
       </div>
       <div class="form-group">
         <label for="karenText">Notes</label>
-        <textarea id="karenText" rows="5" placeholder="Type notes here..." dir="ltr" data-karen-keyboard="true"></textarea>
+        <textarea id="karenText" rows="5" placeholder="Type notes here..." dir="ltr" data-karen-keyboard="true" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" inputmode="none" aria-autocomplete="none"></textarea>
       </div>
       <div class="form-group">
         <label id="label-date-created" for="songDateCreated">Date Created</label>
@@ -7967,10 +8587,9 @@
       >
 
       <!-- Chart header (song meta display) -->
-      <div style="text-align:center;margin-bottom:16px;">
+      <div class="editor-heading" style="text-align:center;margin-bottom:16px;">
         <div id="view-title"
           style="font-size:1.6em;font-weight:900;letter-spacing:0.06em;color:#fff;">
-          New Song
         </div>
         <div id="view-meta"
           style="font-size:0.85em;color:#aaa;margin-top:2px;letter-spacing:0.08em;">
@@ -7991,23 +8610,33 @@
         <div class="paper-stage">
           <div class="chart-container paper-card paper-card-chart is-active" id="chart-container">
             <div class="paper-header" id="paper-header">
-              <div class="paper-head-left">
-                <span class="paper-title-karen" id="ph-title-karen">တၢ်သးဝံၣ်ကညီ</span>
-                <span class="paper-title-english" id="ph-title-english">(New Song)</span>
+              <div class="paper-head-cell paper-head-left">
+                <span class="paper-title-karen print-ka" id="ph-title-karen"></span>
+                <span class="paper-title-english print-en" id="ph-title-english"></span>
               </div>
-              <div class="paper-head-right">
-                <span class="paper-keymeta" id="ph-keymeta"></span>
-                <span class="paper-tempo" id="ph-tempo"></span>
+              <div class="paper-head-cell paper-head-center">
+                <span class="paper-tempo print-ka" id="ph-tempo-karen"></span>
+                <span class="paper-tempo paper-tempo-english print-en" id="ph-tempo-english"></span>
+              </div>
+              <div class="paper-head-cell paper-head-right">
+                <span class="paper-keymeta print-ka" id="ph-keymeta-karen"></span>
+                <span class="paper-keymeta paper-keymeta-english print-en" id="ph-keymeta-english"></span>
               </div>
             </div>
             <div id="sections-container"></div>
             <div class="paper-footer">
               <div class="paper-footer-dates">
-                <span id="ph-footer-created">Date Created: __/__/____</span>
-                <span id="ph-footer-next">Date Performed: __/__/____</span>
+                <span class="paper-footer-date-row" id="ph-footer-created">
+                  <span class="print-ka" id="ph-footer-created-karen"></span>
+                  <span class="print-en" id="ph-footer-created-english"></span>
+                </span>
+                <span class="paper-footer-date-row" id="ph-footer-next">
+                  <span class="print-ka" id="ph-footer-performed-karen"></span>
+                  <span class="print-en" id="ph-footer-performed-english"></span>
+                </span>
               </div>
-              <span id="ph-footer-center">Instrument</span>
-              <span id="ph-footer-right"></span>
+              <span class="paper-footer-stack" id="ph-footer-center"></span>
+              <span class="paper-footer-stack" id="ph-footer-right"></span>
             </div>
           </div>
 
@@ -8099,14 +8728,14 @@
     <div id="shortcut-panel">
       <div class="shortcut-panel-header">
         <div class="shortcut-panel-title">
-          <strong>App Guide</strong>
-          <span>Shortcuts, workflows, rules, and sequences</span>
+          <strong data-i18n="appGuideTitle">App Guide</strong>
+          <span data-i18n="appGuideSubtitle">Shortcuts, workflows, rules, and sequences</span>
         </div>
         <button class="shortcut-close" id="shortcut-close" aria-label="Close guide">×</button>
       </div>
       <div class="shortcut-panel-body">
         <details class="guide-section" open>
-          <summary>Start Here</summary>
+          <summary data-i18n="guideStartHere">Start Here</summary>
           <div class="guide-section-body">
             <p>The editor listens for chart shortcuts only when focus is on the invisible editor target. When you close the sidebar, exit the wizard, or return from the Chart tab, focus is routed there automatically.</p>
             <dl class="guide-grid">
@@ -8119,11 +8748,11 @@
         </details>
 
         <details class="guide-section" open>
-          <summary>Core Chart Navigation</summary>
+          <summary data-i18n="guideCoreNavigation">Core Chart Navigation</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>Arrow keys</dt><dd>Move the active beat left, right, up, or down. Right Arrow creates a new measure when you move past the last beat of the section.</dd>
-              <dt>Space</dt><dd>Insert an empty beat immediately after the active beat, shift later beats forward, and move into that new beat.</dd>
+              <dt>Space</dt><dd>Move forward to the next beat. At the final beat of the section, create a new measure and land on beat 1.</dd>
               <dt>Tab</dt><dd>Insert a new full measure directly after the current measure, shift later measures right, and land on beat 1 of the new measure.</dd>
               <dt>Ctrl + Space</dt><dd>Insert a new measure directly after the current one using the current beat number as the new measure length.</dd>
               <dt>Ctrl + Tab</dt><dd>Split the current measure after the active beat, then move into a new measure.</dd>
@@ -8135,7 +8764,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Chord Entry Rules</summary>
+          <summary data-i18n="guideChordRules">Chord Entry Rules</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>A-G</dt><dd>Set the chord root on the active beat. B creates a B root when the beat is empty.</dd>
@@ -8150,7 +8779,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Rhythm Marks And Spans</summary>
+          <summary data-i18n="guideRhythmSpans">Rhythm Marks And Spans</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>.</dt><dd>Toggle push: dot plus underline behavior on the active rooted beat.</dd>
@@ -8165,7 +8794,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Sections And Measures</summary>
+          <summary data-i18n="guideSectionsMeasures">Sections And Measures</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>Enter</dt><dd>Open the Add Section modal from the editor.</dd>
@@ -8179,7 +8808,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Lead Melody Modal</summary>
+          <summary data-i18n="guideLeadModal">Lead Melody Modal</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>L</dt><dd>Open the lead melody modal for the current measure.</dd>
@@ -8198,7 +8827,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Lyrics Sheet</summary>
+          <summary data-i18n="guideLyricsSheet">Lyrics Sheet</summary>
           <div class="guide-section-body">
             <ol class="guide-sequence">
               <li>Click the Lyrics flap above the paper stack.</li>
@@ -8211,7 +8840,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Karen Keyboard Modal</summary>
+          <summary data-i18n="guideKarenKeyboard">Karen Keyboard Modal</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>Esc</dt><dd>Close the immersive Karen keyboard.</dd>
@@ -8224,7 +8853,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Sidebar Workflows</summary>
+          <summary data-i18n="guideSidebarWorkflows">Sidebar Workflows</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>New</dt><dd>Clear the current form and open the new-song wizard.</dd>
@@ -8239,7 +8868,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Settings And Appearance</summary>
+          <summary data-i18n="guideSettingsAppearance">Settings And Appearance</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>Wizard mode</dt><dd>Choose quick song setup or guided step-by-step setup.</dd>
@@ -8258,7 +8887,7 @@
         </details>
 
         <details class="guide-section">
-          <summary>Undo, Print, And Safety</summary>
+          <summary data-i18n="guideUndoPrintSafety">Undo, Print, And Safety</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
               <dt>Ctrl + Z</dt><dd>Undo the latest chart edit.</dd>
@@ -8369,8 +8998,8 @@
       ];
 
       const KAREN_CONSONANTS = new Set(KAREN_LAYOUT.slice(0, 25));
-      const KAREN_KEY_ZONE_DELAY_MS = 300;
-      const KAREN_KEY_STAGGER_MS = 18;
+      const KAREN_KEY_ZONE_DELAY_MS = 180;
+      const KAREN_KEY_STAGGER_MS = 22;
       const KAREN_CLOSE_ANIMATION_MS = 360;
 
       const ALT_MAP = {
@@ -8641,6 +9270,141 @@
         return String(name || "").trim();
       }
 
+      function tEnglish(key) {
+        return TRANSLATIONS.english[key] || key;
+      }
+
+      function tKarenRaw(key) {
+        return TRANSLATIONS.karen[key] || "";
+      }
+
+      function hasUsableKaren(key) {
+        const ka = String(tKarenRaw(key) || "").trim();
+        const en = String(tEnglish(key) || "").trim();
+        return !!ka && ka !== en;
+      }
+
+      function getBilingualLabel(key, englishFallback = "") {
+        const english = String(englishFallback || tEnglish(key) || "").trim();
+        const karen = hasUsableKaren(key) ? String(tKarenRaw(key)).trim() : "";
+        return { karen, english };
+      }
+
+      function getCategoryLabelPair(value) {
+        const raw = String(value || "").trim();
+        const key = CATEGORY_VALUE_TO_KEY[raw];
+        return key ? getBilingualLabel(key, tEnglish(key)) : { karen: "", english: raw };
+      }
+
+      function getInstrumentLabelPair(value) {
+        const raw = String(value || "").trim();
+        const key = INSTRUMENT_VALUE_TO_KEY[raw];
+        return key ? getBilingualLabel(key, tEnglish(key)) : { karen: "", english: raw };
+      }
+
+      function getStyleLabelPair(value) {
+        const raw = String(value || "").trim();
+        if (!raw) return { karen: "", english: "" };
+        const key = STYLE_VALUE_TO_KEY[raw.toLowerCase()];
+        return key ? getBilingualLabel(key, tEnglish(key)) : { karen: "", english: raw };
+      }
+
+      function translatePrintValueToKaren(value) {
+        return String(value || "").replace(/\d/g, digit => tKarenRaw(digit) || digit);
+      }
+
+      function setStackedBilingual(el, pair, options = {}) {
+        if (!el) return;
+        const karen = String(pair?.karen || "").trim();
+        const englishRaw = String(pair?.english || "").trim();
+        const english = englishRaw && karen && options.parenthesizeEnglish !== false ? `(${englishRaw})` : englishRaw;
+        el.innerHTML = "";
+        if (karen) {
+          const ka = document.createElement("span");
+          ka.className = "print-ka";
+          ka.textContent = karen;
+          el.appendChild(ka);
+        }
+        if (english) {
+          const en = document.createElement("span");
+          en.className = "print-en";
+          en.textContent = english;
+          el.appendChild(en);
+        }
+      }
+
+      function setInlineBilingual(el, pair) {
+        if (!el) return;
+        const karen = String(pair?.karen || "").trim();
+        const english = String(pair?.english || "").trim();
+        el.innerHTML = "";
+        if (karen) {
+          const ka = document.createElement("span");
+          ka.className = "section-title-ka";
+          ka.textContent = karen;
+          el.appendChild(ka);
+        }
+        if (english) {
+          const en = document.createElement("span");
+          en.className = "section-title-en";
+          en.textContent = karen ? `(${english})` : english;
+          el.appendChild(en);
+        }
+      }
+
+      function formatTitlePair(karenTitle, englishTitle) {
+        const karen = String(karenTitle || "").trim();
+        const english = String(englishTitle || "").trim();
+        return { karen, english };
+      }
+
+      function formatKeyPair(currentKey, origKey) {
+        const current = String(currentKey || "").trim();
+        if (!current) return { karen: "", english: "" };
+        const keyPair = getBilingualLabel("key", "Key");
+        const englishBase = `Key = ${current}`;
+        const karenBase = keyPair.karen ? `${keyPair.karen} = ${current}` : "";
+        if (origKey && origKey !== current) {
+          return {
+            karen: karenBase ? `${karenBase} / ${origKey}` : "",
+            english: `${englishBase} (orig. key = ${origKey})`
+          };
+        }
+        return { karen: karenBase, english: englishBase };
+      }
+
+      function formatStyleTempoPair(style, tempo) {
+        const stylePair = getStyleLabelPair(style);
+        const bpmPair = getBilingualLabel("bpmLabel", "BPM");
+        const tempoValue = String(tempo || "").trim();
+        const karenTempoValue = translatePrintValueToKaren(tempoValue);
+        const englishTempoText = tempoValue ? `${tempoValue} ${bpmPair.english || "BPM"}` : "";
+        const karenTempoText = tempoValue ? `${karenTempoValue} ${bpmPair.karen || bpmPair.english || "BPM"}` : "";
+        const english = [stylePair.english, englishTempoText].filter(Boolean).join(" = ");
+        const karenStyle = stylePair.karen || "";
+        const karen = [karenStyle, karenTempoText].filter(Boolean).join(" = ");
+        return { karen, english };
+      }
+
+      function formatDatePair(labelKey, dateValue) {
+        const labelPair = getBilingualLabel(labelKey, tEnglish(labelKey));
+        const value = String(dateValue || "__/__/____").trim();
+        const karenValue = translatePrintValueToKaren(value);
+        return {
+          karen: labelPair.karen ? `${labelPair.karen}: ${karenValue}` : "",
+          english: `${labelPair.english}: ${value}`
+        };
+      }
+
+      function updateFooterDateRow(rowEl, pair) {
+        if (!rowEl) return;
+        const ka = rowEl.querySelector(".print-ka");
+        const en = rowEl.querySelector(".print-en");
+        if (ka) ka.textContent = pair.karen || "";
+        if (en) en.textContent = pair.english ? `(${pair.english})` : "";
+        rowEl.classList.toggle("missing-karen", !pair.karen);
+      }
+
       function measureHasRoll(measure) {
         if (!measure) return false;
         if (measure.roll) return true;
@@ -8735,7 +9499,7 @@
         const dates = Array.isArray(state.performedDates) ? state.performedDates : [];
         if (!dates.length) {
           const li = document.createElement("li");
-          li.textContent = t("noPerformedDatesYet");
+          li.textContent = uiText("noPerformedDatesYet");
           list.appendChild(li);
           return;
         }
@@ -8914,26 +9678,32 @@
 
         const createdDate = state.createdDate || "__/__/____";
         const performedDate = getPrintPerformedDateIso();
-        const createdLabel = t("dateCreatedLabel");
-        const performedLabel = t("datePerformedLabel");
-        const instrumentPages = getPrintInstrumentList().map(getDisplayInstrumentNameForPrint).filter(Boolean);
-        const pages = [...instrumentPages, t("referenceCopyLabel")];
+        const instrumentPages = getPrintInstrumentList().filter(Boolean).map(name => ({
+          kind: "instrument",
+          name,
+          pair: getInstrumentLabelPair(name)
+        }));
+        const pages = [
+          ...instrumentPages,
+          { kind: "reference", name: "Reference", pair: getBilingualLabel("referenceCopyLabel", "Reference") }
+        ];
         host.innerHTML = "";
 
         withMeasurablePrintBatch(() => {
-          pages.forEach(name => {
+          pages.forEach(pageInfo => {
             const clone = source.cloneNode(true);
             clone.removeAttribute("id");
             stripEditorOnlyPrintUi(clone);
 
             const footerCenter = clone.querySelector("#ph-footer-center");
-            if (footerCenter) footerCenter.textContent = name;
+            setStackedBilingual(footerCenter, pageInfo.pair);
             const footerCreated = clone.querySelector("#ph-footer-created");
-            if (footerCreated) footerCreated.textContent = `${createdLabel}: ${createdDate || "__/__/____"}`;
+            updateFooterDateRow(footerCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
             const footerPerformed = clone.querySelector("#ph-footer-next");
-            if (footerPerformed) footerPerformed.textContent = `${performedLabel}: ${performedDate || "__/__/____"}`;
+            updateFooterDateRow(footerPerformed, formatDatePair("datePerformedLabel", performedDate || "__/__/____"));
 
             host.appendChild(clone);
+            applyBeatCellLayout(clone);
             renderOnlySpans(clone);
             renderSlurs(clone);
           });
@@ -9210,11 +9980,11 @@
         if (!kb) return;
         kb.innerHTML = "";
         const groups = [
+          { key: "extra", label: "Numbers", chars: KAREN_LAYOUT.slice(45) },
+          { key: "tones", label: "Tones", chars: KAREN_LAYOUT.slice(35, 40) },
           { key: "consonants", label: "Consonants", chars: KAREN_LAYOUT.slice(0, 25) },
           { key: "vowels", label: "Vowels", chars: KAREN_LAYOUT.slice(25, 35) },
-          { key: "tones", label: "Tones", chars: KAREN_LAYOUT.slice(35, 40) },
           { key: "medials", label: "Medials", chars: KAREN_LAYOUT.slice(40, 45) },
-          { key: "extra", label: "Numbers", chars: KAREN_LAYOUT.slice(45) },
           { key: "commands", label: "Commands", chars: [{ label: "⌫", command: "backspace", title: "Backspace" }] }
         ];
 
@@ -9243,6 +10013,7 @@
               "--key-delay",
               `${(zoneIndex * KAREN_KEY_ZONE_DELAY_MS) + (keyIndex * KAREN_KEY_STAGGER_MS)}ms`
             );
+            btn.style.setProperty("--float-x", `${((keyIndex % 5) - 2) * 2.5}px`);
             if (isCommand && item.title) {
               btn.title = item.title;
               btn.setAttribute("aria-label", item.title);
@@ -10456,7 +11227,7 @@
       }
 
       function advanceBeat() {
-        insertEmptyBeatAfterCurrent();
+        moveRight();
       }
 
       function advanceMeasure() {
@@ -10731,6 +11502,8 @@
       }
 
       function getInstrumentAbbreviation(name) {
+        const key = INSTRUMENT_VALUE_TO_ABBR_KEY[String(name || "").trim()];
+        if (key) return uiText(key);
         const map = {
           "Piano 1": "KB1",
           "Piano 2": "KB2",
@@ -10752,28 +11525,33 @@
       }
 
       function openOnlyInstrumentModal(globalIdx) {
-        const instruments = getInstrumentOptions().map(getInstrumentAbbreviation);
+        const instruments = getInstrumentOptions().map(name => ({
+          name,
+          label: getInstrumentAbbreviation(name)
+        }));
         const overlay = document.createElement("div");
         overlay.className = "modal-overlay open";
         overlay.style.display = "flex";
         overlay.tabIndex = 0;
 
         const modal = document.createElement("div");
-        modal.className = "modal";
+        modal.className = "modal only-instrument-modal";
         modal.innerHTML = `
-          <h2>Only</h2>
-          <div id="only-instrument-list" style="display:flex;flex-direction:column;gap:8px;text-align:left;margin:12px 0;"></div>
-          <div style="text-align:right;"><button id="only-apply-btn">Apply</button></div>
+          <h2>${escapeHtml(uiText("onlyCueTitle"))}</h2>
+          <p class="only-instrument-help">${escapeHtml(uiText("onlyCueHelp"))}</p>
+          <div id="only-instrument-list" class="only-instrument-grid"></div>
+          <div class="only-instrument-actions"><button id="only-apply-btn" class="only-apply-btn">${escapeHtml(uiText("apply"))}</button></div>
         `;
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
 
         const list = modal.querySelector("#only-instrument-list");
-        const names = instruments.length ? instruments : ["KB"];
-        names.forEach((name, idx) => {
+        const options = instruments.length ? instruments : [{ name: "Keyboard", label: "KB" }];
+        options.forEach((option, idx) => {
           const label = document.createElement("label");
           label.className = "only-instrument-option";
-          label.innerHTML = `<input type="checkbox" data-idx="${idx}" ${names.length === 1 ? "checked" : ""}><span class="only-instrument-text">${name}</span>`;
+          label.title = option.name;
+          label.innerHTML = `<input type="checkbox" data-idx="${idx}" ${options.length === 1 ? "checked" : ""}><span class="only-instrument-text">${escapeHtml(option.label)}</span>`;
           list.appendChild(label);
         });
 
@@ -10785,9 +11563,9 @@
 
         const apply = () => {
           const checked = Array.from(list.querySelectorAll("input:checked"))
-            .map(input => names[Number(input.dataset.idx)])
+            .map(input => options[Number(input.dataset.idx)]?.label)
             .filter(Boolean);
-          const joined = checked.length ? checked.join(" & ") : names[0];
+          const joined = checked.length ? checked.join(" & ") : options[0].label;
           state.onlyStart = {
             globalBeatIndex: globalIdx,
             label: `${joined} only`
@@ -11026,41 +11804,53 @@
       function drawSlurSegment(container, startEl, endEl) {
         if (!container || !startEl || !endEl) return;
 
+        const startLine = startEl.closest(".line");
+        const endLine = endEl.closest(".line");
+        const host = startLine && startLine === endLine ? startLine : container;
         const cRect = container.getBoundingClientRect();
+        const hostRect = host.getBoundingClientRect();
         const startRect = startEl.getBoundingClientRect();
         const endRect = endEl.getBoundingClientRect();
 
-        const x1 = startRect.left - cRect.left + (startRect.width / 2);
-        const x2 = endRect.left - cRect.left + (endRect.width / 2);
+        const x1 = startRect.left - hostRect.left + (startRect.width / 2);
+        const x2 = endRect.left - hostRect.left + (endRect.width / 2);
+        const chartX1 = startRect.left - cRect.left + (startRect.width / 2);
+        const chartX2 = endRect.left - cRect.left + (endRect.width / 2);
 
-        const left = Math.min(x1, x2);
-        const width = Math.max(18, Math.abs(x2 - x1));
-        const endpointY = 12;
+        const visualPad = 4;
+        const left = Math.min(x1, x2) - visualPad;
+        const curveWidth = Math.max(18, Math.abs(x2 - x1));
+        const width = curveWidth + (visualPad * 2);
+        const endpointY = 11;
         const apexY = 2;
-        const slurHeight = 15;
-        const beatTop = Math.min(startRect.top, endRect.top) - cRect.top;
+        const slurHeight = 14;
+        const beatTop = Math.min(startRect.top, endRect.top) - hostRect.top;
         const y = Math.max(0, beatTop - endpointY - 2);
 
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.classList.add("slur-span");
         svg.setAttribute("width", width);
         svg.setAttribute("height", slurHeight);
-        svg.dataset.startX = String(x1);
-        svg.dataset.endX = String(x2);
+        svg.dataset.startX = String(chartX1);
+        svg.dataset.endX = String(chartX2);
+        svg.dataset.localStartX = String(x1);
+        svg.dataset.localEndX = String(x2);
+        svg.dataset.pathStartOffset = String(visualPad);
+        svg.dataset.pathEndOffset = String(visualPad + curveWidth);
         svg.dataset.startBeat = startEl.dataset.globalbeat || "";
         svg.dataset.endBeat = endEl.dataset.globalbeat || "";
         svg.style.left = `${left}px`;
         svg.style.top = `${y}px`;
 
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", `M 0 ${endpointY} C ${width * 0.25} ${apexY} ${width * 0.75} ${apexY} ${width} ${endpointY}`);
+        path.setAttribute("d", `M ${visualPad} ${endpointY} C ${visualPad + curveWidth * 0.25} ${apexY} ${visualPad + curveWidth * 0.75} ${apexY} ${visualPad + curveWidth} ${endpointY}`);
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", "#000");
         path.setAttribute("stroke-width", "2");
         path.setAttribute("stroke-linecap", "round");
 
         svg.appendChild(path);
-        container.appendChild(svg);
+        host.appendChild(svg);
       }
 
       function chordTextFromState(cs) {
@@ -11272,6 +12062,7 @@
         if (field === "karenText") {
           textarea.dataset.karenKeyboard = "true";
           textarea.setAttribute("lang", "ksw");
+          disableKarenTextSuggestions(textarea);
           forceKarenTextDirection(textarea);
         }
         textarea.addEventListener("input", () => {
@@ -11300,7 +12091,7 @@
 
         const songTitleEnglish = meta?.songTitleEnglish || "";
         const songTitleKaren = meta?.songTitleKaren || "";
-        const songTitle = meta?.songTitle || "New Song";
+        const songTitle = meta?.songTitle || "";
         const songKey = meta?.currentKey || "";
         const songTempo = meta?.songTempo || "";
         const songCat = meta?.songCat || "";
@@ -11308,7 +12099,7 @@
         const songInstr = meta?.songInstr || "";
         state.lyricsSections = normalizeLyricsSections(state.lyricsSections || []);
 
-        if (titleKaren) titleKaren.textContent = songTitleKaren || songTitleEnglish || "တၢ်သးဝံၣ်ကညီ";
+        if (titleKaren) titleKaren.textContent = songTitleKaren || songTitleEnglish || "";
         if (titleEnglish) titleEnglish.textContent = songTitleEnglish || songTitle;
         if (lyricsMeta) {
           lyricsMeta.textContent = [
@@ -11431,7 +12222,7 @@
         const instruments = String(document.getElementById("songInstruments")?.value || "").trim();
         const notes = String(document.getElementById("karenText")?.value || "").trim();
         return {
-          title: titleEnglish || titleKaren || "New Song",
+          title: titleEnglish || titleKaren || "",
           titleKaren,
           key,
           tempo,
@@ -11749,7 +12540,7 @@
 
         const songTitleEnglish = String(document.getElementById("songTitle")?.value || "").trim();
         const songTitleKaren = String(document.getElementById("songTitleKaren")?.value || "").trim();
-        const songTitle = songTitleEnglish || songTitleKaren || "New Song";
+        const songTitle = songTitleEnglish || songTitleKaren || "";
         const songKeyInput = document.getElementById("songKey")?.value || "";
         const songKey   = normalizeKeyToFlat(songKeyInput) || songKeyInput || "";
         const songTempo = document.getElementById("songTempo")?.value || "";
@@ -11762,39 +12553,37 @@
         }
         const createdDate = state.createdDate || "";
         const nextPerf = getExplicitPerformedDateIso();
-        const createdLabel = t("dateCreatedLabel");
-        const performedLabel = t("datePerformedLabel");
         const origKey = normalizeKeyToFlat(state.originalKey || songKey);
         const currentKey = normalizeKeyToFlat(state.currentKey || songKey);
 
         const phTitleKaren   = document.getElementById("ph-title-karen");
         const phTitleEnglish = document.getElementById("ph-title-english");
-        const phTempo   = document.getElementById("ph-tempo");
-        const phKeymeta = document.getElementById("ph-keymeta");
+        const phTempoKaren = document.getElementById("ph-tempo-karen");
+        const phTempoEnglish = document.getElementById("ph-tempo-english");
+        const phKeymetaKaren = document.getElementById("ph-keymeta-karen");
+        const phKeymetaEnglish = document.getElementById("ph-keymeta-english");
         const phFooterCreated = document.getElementById("ph-footer-created");
         const phFooterNext = document.getElementById("ph-footer-next");
         const phFooterCenter = document.getElementById("ph-footer-center");
         const phFooterR = document.getElementById("ph-footer-right");
 
-        if (phTitleKaren) phTitleKaren.textContent = songTitleKaren || songTitleEnglish || "New Song";
-        if (phTitleEnglish) phTitleEnglish.textContent = songTitleEnglish ? `(${songTitleEnglish})` : "";
-        if (phTempo) {
-          const styleTempo = [songStyle || "", songTempo ? `${songTempo} BPM` : ""].filter(Boolean).join(" = ");
-          phTempo.textContent = styleTempo;
-        }
-        if (phKeymeta) {
-          if (currentKey && origKey && currentKey !== origKey) {
-            phKeymeta.innerHTML = `Key - ${currentKey} <em>(orig. key - ${origKey})</em>`;
-          } else if (currentKey) {
-            phKeymeta.textContent = `Key - ${currentKey}`;
-          } else {
-            phKeymeta.textContent = "";
-          }
-        }
-        if (phFooterCreated) phFooterCreated.textContent = `${createdLabel}: ${createdDate || "__/__/____"}`;
-        if (phFooterNext) phFooterNext.textContent = `${performedLabel}: ${nextPerf || "__/__/____"}`;
+        const titlePair = formatTitlePair(songTitleKaren, songTitleEnglish);
+        if (phTitleKaren) phTitleKaren.textContent = titlePair.karen || titlePair.english || "";
+        if (phTitleEnglish) phTitleEnglish.textContent = titlePair.english && titlePair.karen ? `(${titlePair.english})` : "";
+
+        const styleTempoPair = formatStyleTempoPair(songStyle, songTempo);
+        if (phTempoKaren) phTempoKaren.textContent = styleTempoPair.karen || "";
+        if (phTempoEnglish) phTempoEnglish.textContent = styleTempoPair.english ? `(${styleTempoPair.english})` : "";
+
+        const keyPair = formatKeyPair(currentKey, origKey);
+        if (phKeymetaKaren) phKeymetaKaren.textContent = keyPair.karen || "";
+        if (phKeymetaEnglish) phKeymetaEnglish.textContent = keyPair.english ? `(${keyPair.english})` : "";
+        updateFooterDateRow(phFooterCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
+        updateFooterDateRow(phFooterNext, formatDatePair("datePerformedLabel", nextPerf || "__/__/____"));
         if (phFooterCenter) phFooterCenter.textContent = songInstr || "—";
-        if (phFooterR) phFooterR.textContent = songCat || "";
+        const firstInstrument = getPrintInstrumentList()[0] || songInstr.split(",").map(s => s.trim()).filter(Boolean)[0] || "";
+        setStackedBilingual(phFooterCenter, firstInstrument ? getInstrumentLabelPair(firstInstrument) : { karen: "", english: "" });
+        setStackedBilingual(phFooterR, getCategoryLabelPair(songCat));
 
         const viewTitle = document.getElementById("view-title");
         const viewMeta  = document.getElementById("view-meta");
@@ -11928,7 +12717,12 @@
 
           const title = document.createElement("span");
           title.className = "section-title";
-          title.textContent = section.type || `Section ${sIdx + 1}`;
+          const sectionEnglish = section.type || `Section ${sIdx + 1}`;
+          const sectionKey = SECTION_VALUE_TO_KEY[sectionEnglish];
+          setInlineBilingual(
+            title,
+            sectionKey ? getBilingualLabel(sectionKey, tEnglish(sectionKey)) : { karen: "", english: sectionEnglish }
+          );
 
           header.appendChild(title);
           const headerActions = document.createElement("div");
@@ -12458,7 +13252,7 @@
           return;
         }
 
-        // ── SPACE: advance to next beat / new measure ──
+        // ── SPACE: travel forward; create a measure only at the section end ──
         if (e.key === " ") {
           e.preventDefault();
           state.pendingBass     = false;
@@ -12468,7 +13262,7 @@
           return;
         }
 
-        // ── TAB: wrap to next row ──
+        // ── TAB: insert a new measure after the current measure ──
         if (e.key === "Tab") {
           e.preventDefault();
           state.pendingBass     = false;
@@ -12751,6 +13545,8 @@
         const contentHeight = sections.scrollHeight || 0;
 
         if (!contentHeight || contentHeight <= availableHeight) return;
+        const renderedLineCount = sections.querySelectorAll(".line").length;
+        if (renderedLineCount < 20) return;
 
         const scale = Math.max(0.12, availableHeight / contentHeight);
         sections.style.transform = `scale(${scale})`;
@@ -12764,10 +13560,14 @@
         renderSlurs();
       }
 
-      function applyBeatCellLayout() {
+      function applyBeatCellLayout(root = document) {
+        const scope = root || document;
+        const scopedById = id =>
+          (typeof scope.getElementById === "function" ? scope.getElementById(id) : null) ||
+          (typeof scope.querySelector === "function" ? scope.querySelector(`#${id}`) : null);
         const chartLines =
-          document.getElementById("chart-lines") ||
-          document.getElementById("sections-container");
+          scopedById("chart-lines") ||
+          scopedById("sections-container");
         if (!chartLines) return;
 
         const OVERFLOW_RATIO = 1.15;
@@ -13680,6 +14480,10 @@
 
       function isKarenTextField(el) {
         if (!el) return false;
+        const tag = String(el.tagName || "").toLowerCase();
+        if (currentLang === "karen" && (tag === "input" || tag === "textarea") && !isKarenDisallowedFieldId(el.id || "")) {
+          return true;
+        }
         return (
           el.dataset?.karenKeyboard === "true" ||
           el.id === "songTitleKaren" ||
@@ -13687,8 +14491,20 @@
         );
       }
 
+      function disableKarenTextSuggestions(el) {
+        if (!isKarenTextField(el)) return;
+        el.setAttribute("autocomplete", "off");
+        el.setAttribute("autocorrect", "off");
+        el.setAttribute("autocapitalize", "off");
+        el.setAttribute("spellcheck", "false");
+        el.setAttribute("inputmode", "none");
+        el.setAttribute("aria-autocomplete", "none");
+        el.spellcheck = false;
+      }
+
       function forceKarenTextDirection(el) {
         if (!isKarenTextField(el)) return;
+        disableKarenTextSuggestions(el);
         el.setAttribute("dir", "ltr");
         el.style.direction = "ltr";
         el.style.textAlign = "left";
@@ -14151,6 +14967,7 @@
           key: "Key",
           style: "Style",
           tempo: "Tempo",
+          bpmLabel: "BPM",
           instruments: "Instruments",
           notes: "Notes",
           dateCreatedLabel: "Date Created",
@@ -14194,6 +15011,12 @@
           sectionEnding: "Ending",
           sectionBridge: "Bridge",
           sectionPreChorus: "Pre-Chorus",
+          styleGoGo: "Go Go",
+          styleReggae: "Reggae",
+          styleBallad: "Ballad",
+          styleAlternative: "Alternative",
+          styleRock: "Rock",
+          styleSlow: "Slow",
           instrumentPiano1: "Piano 1",
           instrumentPiano2: "Piano 2",
           instrumentElectricGuitar: "Electric Guitar",
@@ -14226,6 +15049,57 @@
           tempoPlaceholder: "e.g. 120",
           instrPlaceholder: "e.g. Piano, Guitar, Bass",
           notesPlaceholder: "Type notes here...",
+          appGuideTitle: "App Guide",
+          appGuideSubtitle: "Shortcuts, workflows, rules, and sequences",
+          guideStartHere: "Start Here",
+          guideCoreNavigation: "Core Chart Navigation",
+          guideChordRules: "Chord Entry Rules",
+          guideRhythmSpans: "Rhythm Marks And Spans",
+          guideSectionsMeasures: "Sections And Measures",
+          guideLeadModal: "Lead Melody Modal",
+          guideLyricsSheet: "Lyrics Sheet",
+          guideKarenKeyboard: "Karen Keyboard Modal",
+          guideSidebarWorkflows: "Sidebar Workflows",
+          guideSettingsAppearance: "Settings And Appearance",
+          guideUndoPrintSafety: "Undo, Print, And Safety",
+          theme: "Theme",
+          palette: "Palette",
+          uiDesignDirection: "UI Design Direction",
+          motion: "Motion",
+          density: "Density",
+          guidedNewSongWizard: "Guided new-song wizard",
+          immersiveKarenKeyboard: "Immersive Karen keyboard",
+          language: "Language",
+          changeAction: "Change",
+          alternateSongFolder: "Alternate song folder",
+          browse: "Browse",
+          timeSignature: "Time Signature",
+          defaultMeasuresPerRow: "Default measures / row",
+          autoTheme: "Auto",
+          lightTheme: "Light",
+          darkTheme: "Dark",
+          ivoryPalette: "Ivory",
+          velvetPalette: "Velvet",
+          auroraPalette: "Aurora",
+          graphitePalette: "Graphite",
+          bloomPalette: "Bloom",
+          designDesk: "Desk",
+          designConsole: "Console",
+          designStage: "Stage",
+          silkyMotion: "Silky",
+          calmMotion: "Calm",
+          compactDensity: "Compact",
+          comfyDensity: "Comfy",
+          onlyCueTitle: "Only / All In",
+          onlyCueHelp: "Pick the instrument abbreviations for this cue.",
+          apply: "Apply",
+          instrumentPiano1Abbr: "KB1",
+          instrumentPiano2Abbr: "KB2",
+          instrumentElectricGuitarAbbr: "EGT",
+          instrumentAcousticGuitarAbbr: "AGT",
+          instrumentElectricBassAbbr: "B",
+          instrumentDrumsAbbr: "DR",
+          instrumentKeytarAbbr: "KT",
           newSongTitle: "New Song"
         },
         karen: {
@@ -14248,6 +15122,7 @@
           key: "တၢ်သးဝံၣ်အပျံၤတဘိအဂံၢ်ခိၣ်",
           style: "တၢ်ကျိုတ်",
           tempo: "တၢ်သူၣ်ဝံၣ်သးဆၢတၢ်ဒ့တၢ်အူအထီၣ်အလီၤအယူၥ်",
+          bpmLabel: "",
           instruments: "ကရိနုာ်",
           notes: "တၢ်မၤနီၣ်",
           dateCreatedLabel: "စူၣ်ပလိၣ်သၣ်လၢအမၤကဲထီၣ်",
@@ -14291,6 +15166,12 @@
           sectionEnding: "တၢ်အကတၢၢ်",
           sectionBridge: "အဆၢကတီၢ်",
           sectionPreChorus: "လၢညါခိရၢၥ်",
+          styleGoGo: "",
+          styleReggae: "",
+          styleBallad: "",
+          styleAlternative: "",
+          styleRock: "",
+          styleSlow: "",
           instrumentPiano1: "တနၢ် ၁",
           instrumentPiano2: "တနၢ် ၂",
           instrumentElectricGuitar: "ကထါအိၣ်ဒီလီမ့ၣ်",
@@ -14323,6 +15204,57 @@
           tempoPlaceholder: "လီၤ ၁၂၀",
           instrPlaceholder: "ပၤနိ, ကီတၤ, ဘ့းစ်",
           notesPlaceholder: "ကညီကျိ ကွဲးဖဲဒ်...",
+          appGuideTitle: "App Guide",
+          appGuideSubtitle: "",
+          guideStartHere: "",
+          guideCoreNavigation: "",
+          guideChordRules: "",
+          guideRhythmSpans: "",
+          guideSectionsMeasures: "",
+          guideLeadModal: "",
+          guideLyricsSheet: "",
+          guideKarenKeyboard: "",
+          guideSidebarWorkflows: "",
+          guideSettingsAppearance: "",
+          guideUndoPrintSafety: "",
+          theme: "",
+          palette: "",
+          uiDesignDirection: "",
+          motion: "",
+          density: "",
+          guidedNewSongWizard: "",
+          immersiveKarenKeyboard: "",
+          language: "",
+          changeAction: "",
+          alternateSongFolder: "",
+          browse: "",
+          timeSignature: "",
+          defaultMeasuresPerRow: "",
+          autoTheme: "",
+          lightTheme: "",
+          darkTheme: "",
+          ivoryPalette: "",
+          velvetPalette: "",
+          auroraPalette: "",
+          graphitePalette: "",
+          bloomPalette: "",
+          designDesk: "",
+          designConsole: "",
+          designStage: "",
+          silkyMotion: "",
+          calmMotion: "",
+          compactDensity: "",
+          comfyDensity: "",
+          onlyCueTitle: "",
+          onlyCueHelp: "",
+          apply: "",
+          instrumentPiano1Abbr: "KB1",
+          instrumentPiano2Abbr: "KB2",
+          instrumentElectricGuitarAbbr: "EGT",
+          instrumentAcousticGuitarAbbr: "AGT",
+          instrumentElectricBassAbbr: "B",
+          instrumentDrumsAbbr: "DR",
+          instrumentKeytarAbbr: "KT",
           newSongTitle: "သဝ်အသီ"
         }
       };
@@ -14354,6 +15286,85 @@
         "Drums": "instrumentDrums",
         "Keytar": "instrumentKeytar"
       };
+
+      const INSTRUMENT_VALUE_TO_ABBR_KEY = {
+        "Piano 1": "instrumentPiano1Abbr",
+        "Piano 2": "instrumentPiano2Abbr",
+        "Electric Guitar": "instrumentElectricGuitarAbbr",
+        "Acoustic Guitar": "instrumentAcousticGuitarAbbr",
+        "Electric Bass": "instrumentElectricBassAbbr",
+        "Drums": "instrumentDrumsAbbr",
+        "Keytar": "instrumentKeytarAbbr"
+      };
+
+      const STYLE_VALUE_TO_KEY = {
+        "go go": "styleGoGo",
+        "gogo": "styleGoGo",
+        "reggae": "styleReggae",
+        "ballad": "styleBallad",
+        "alternative": "styleAlternative",
+        "rock": "styleRock",
+        "slow": "styleSlow"
+      };
+
+      const TRANSLATION_FILE_KEY_ALIASES = {
+        song_title_karen_label: "songTitleKarenLabel",
+        song_title_english_label: "songTitleEnglishLabel",
+        karen_title_placeholder: "karenTitlePlaceholder",
+        english_title_placeholder: "englishTitlePlaceholder",
+        date_created_label: "dateCreatedLabel",
+        date_performed_label: "datePerformedLabel",
+        next_performance_label: "nextPerformanceLabel",
+        reference_media_label: "referenceMediaLabel",
+        reference_notes_label: "referenceNotesLabel",
+        reference_copy_label: "referenceCopyLabel",
+        no_performed_dates_yet: "noPerformedDatesYet",
+        song_database: "songDatabase",
+        new_song_button: "newSong",
+        save_song_button: "save",
+        print_song_button: "print",
+        export_song_button: "exportDb",
+        praise_worship_category_selection: "categoryPraiseWorship",
+        choir_category_selection: "categoryChoir",
+        youth_category_selection: "categoryYouth",
+        solo_category_selection: "categorySolo",
+        kids_category_selection: "categoryKids",
+        intro_section_selection: "sectionIntro",
+        verse_section_selection: "sectionVerse",
+        prechorus_section_selection: "sectionPreChorus",
+        pre_chorus_section_selection: "sectionPreChorus",
+        chorus_section_selection: "sectionChorus",
+        bridge_section_selection: "sectionBridge",
+        solo_section_selection: "sectionSolo",
+        ending_section_selection: "sectionEnding",
+        piano_1: "instrumentPiano1",
+        piano_2: "instrumentPiano2",
+        "electric guitar": "instrumentElectricGuitar",
+        electric_guitar: "instrumentElectricGuitar",
+        "acoustic guitar": "instrumentAcousticGuitar",
+        acoustic_guitar: "instrumentAcousticGuitar",
+        "electric bass": "instrumentElectricBass",
+        electric_bass: "instrumentElectricBass",
+        drums: "instrumentDrums",
+        keytar: "instrumentKeytar",
+        go_go: "styleGoGo",
+        "go go": "styleGoGo",
+        gogo: "styleGoGo",
+        reggae: "styleReggae",
+        ballad: "styleBallad",
+        alternative: "styleAlternative",
+        rock_genre: "styleRock",
+        rock: "styleRock",
+        slow: "styleSlow",
+        bpm: "bpmLabel",
+        bpm_label: "bpmLabel",
+        beats_per_minute: "bpmLabel"
+      };
+
+      const BASE_KAREN_TRANSLATIONS = { ...TRANSLATIONS.karen };
+      const translationDisplayPolicies = {};
+      let translationFileVersion = null;
+      let translationPollTimer = 0;
 
       // current language — read from localStorage or default english
       let currentLang = localStorage.getItem("karenMusicLang") || null;
@@ -14572,6 +15583,7 @@
         let duration = 0;
 
         el.addEventListener("wheel", (ev) => {
+          if (document.documentElement.dataset.motion === "calm") return;
           const interactive = ev.target.closest("input, textarea, select, button, .tempo-control");
           if (interactive || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
           if (Math.abs(ev.deltaY) < Math.abs(ev.deltaX)) return;
@@ -14636,99 +15648,193 @@
               key;
       }
 
+      function normalizeDisplayPolicy(value) {
+        const clean = String(value || "").trim().toLowerCase();
+        if (["y", "yes", "both", "always", "all"].includes(clean)) return "both";
+        if (["n", "no", "toggle", "selected", "current"].includes(clean)) return "toggle";
+        return "";
+      }
+
+      function translationPolicyForKey(key) {
+        return normalizeDisplayPolicy(translationDisplayPolicies[key]);
+      }
+
+      function hasTranslationOverride(key) {
+        const karen = String(TRANSLATIONS.karen?.[key] || "").trim();
+        const english = String(TRANSLATIONS.english?.[key] || "").trim();
+        return !!karen && karen !== english;
+      }
+
+      function uiText(key, options = {}) {
+        const lang = currentLang || "english";
+        const english = String(TRANSLATIONS.english?.[key] || options.fallback || key || "").trim();
+        const karen = String(TRANSLATIONS.karen?.[key] || "").trim();
+        const policy = translationPolicyForKey(key);
+        const canShowBoth = policy === "both" && karen && karen !== english;
+        if (!canShowBoth) return t(key);
+        if (options.inline === false) {
+          return lang === "karen" ? `${karen}\n${english}` : `${english}\n${karen}`;
+        }
+        return lang === "karen" ? `${karen} (${english})` : `${english} (${karen})`;
+      }
+
+      function toCamelTranslationKey(raw) {
+        const clean = String(raw || "")
+          .trim()
+          .toLowerCase()
+          .replace(/['"]/g, "")
+          .replace(/[^a-z0-9]+/g, " ")
+          .trim();
+        if (!clean) return "";
+        const aliasKey = clean.replace(/\s+/g, "_");
+        if (TRANSLATION_FILE_KEY_ALIASES[aliasKey]) return TRANSLATION_FILE_KEY_ALIASES[aliasKey];
+        if (TRANSLATION_FILE_KEY_ALIASES[clean]) return TRANSLATION_FILE_KEY_ALIASES[clean];
+        const parts = clean.split(/\s+/);
+        return parts
+          .map((part, idx) => idx === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1))
+          .join("");
+      }
+
+      async function loadLatestTranslationOverrides() {
+        try {
+          const res = await fetch("/api/translations/latest", { cache: "no-store" });
+          if (!res.ok) return false;
+          const data = await res.json();
+          const nextVersion = data?.version || "no-translation-file";
+          if (nextVersion === translationFileVersion) return false;
+          translationFileVersion = nextVersion;
+
+          Object.keys(TRANSLATIONS.karen).forEach(key => delete TRANSLATIONS.karen[key]);
+          Object.assign(TRANSLATIONS.karen, BASE_KAREN_TRANSLATIONS);
+          Object.keys(translationDisplayPolicies).forEach(key => delete translationDisplayPolicies[key]);
+
+          const rows = data?.translations || {};
+          Object.entries(rows).forEach(([rawKey, rawValue]) => {
+            const value = String(rawValue || "").trim();
+            if (!value) return;
+            const key = toCamelTranslationKey(rawKey);
+            if (!key) return;
+            TRANSLATIONS.karen[key] = value;
+          });
+          const policies = data?.policies || {};
+          Object.entries(policies).forEach(([rawKey, rawPolicy]) => {
+            const key = toCamelTranslationKey(rawKey);
+            const policy = normalizeDisplayPolicy(rawPolicy);
+            if (key && policy) translationDisplayPolicies[key] = policy;
+          });
+          return true;
+        } catch (err) {
+          console.warn("Could not load translation overrides", err);
+          return false;
+        }
+      }
+
+      function startTranslationAutoReload() {
+        if (translationPollTimer) return;
+        translationPollTimer = window.setInterval(async () => {
+          const changed = await loadLatestTranslationOverrides();
+          if (!changed || !appInitialized) return;
+          applyTranslations();
+          if (typeof updatePaperHeader === "function") updatePaperHeader();
+          if (typeof renderChart === "function") renderChart();
+          if (typeof renderLyricsSheet === "function") renderLyricsSheet();
+          if (typeof renderDatabaseSheet === "function") renderDatabaseSheet();
+        }, 2400);
+      }
+
       // apply all translations to the DOM
       function applyTranslations() {
         // sidebar labels
         document.querySelector("label[for='songTitle'], label:has(+#songTitle)")
           ?.closest(".form-group")?.querySelector("label")
-          && setLabel("songTitle",      t("songTitleEnglishLabel"));
+          && setLabel("songTitle",      uiText("songTitleEnglishLabel"));
         document.querySelector("label[for='songTitleKaren']")
-          && setLabel("songTitleKaren", t("songTitleKarenLabel"));
+          && setLabel("songTitleKaren", uiText("songTitleKarenLabel"));
         document.querySelector("label[for='songCategory']")
-          && setLabel("songCategory",   t("category"));
+          && setLabel("songCategory",   uiText("category"));
         document.querySelector("label[for='songKey']")
-          && setLabel("songKey",        t("key"));
+          && setLabel("songKey",        uiText("key"));
         document.querySelector("label[for='songStyle']")
-          && setLabel("songStyle",      t("style"));
+          && setLabel("songStyle",      uiText("style"));
         document.querySelector("label[for='songTempo']")
-          && setLabel("songTempo",      t("tempo"));
+          && setLabel("songTempo",      uiText("tempo"));
         document.querySelector("label[for='songInstruments']")
-          && setLabel("songInstruments",t("instruments"));
+          && setLabel("songInstruments",uiText("instruments"));
         document.querySelector("label[for='karenText']")
-          && setLabel("karenText",      t("notes"));
-        setTextById("label-date-created", t("dateCreatedLabel"));
-        setTextById("label-next-performance", t("nextPerformanceLabel"));
-        setTextById("label-date-performed", t("datePerformedLabel"));
-        setTextById("label-reference-media", t("referenceMediaLabel"));
-        setTextById("label-performance-videos", t("performanceVideosLabel"));
-        setTextById("label-handwritten-links", t("handwrittenPhotoLinksLabel"));
-        setTextById("label-reference-notes", t("referenceNotesLabel"));
-        setTextById("btn-add-performed-date", t("addDateLabel"));
-        setTextById("song-db-title", t("songDatabase"));
-        setTextById("section-modal-title", t("addSection"));
-        setTextById("section-modal-exit-btn", t("escToExit"));
-        setTextById("wq-label-title", t("wizardLabelTitle"));
-        setTextById("wq-label-key", t("wizardLabelKey"));
-        setTextById("wq-label-tempo", t("wizardLabelTempo"));
-        setTextById("wq-label-category", t("wizardLabelCategory"));
-        setTextById("wq-label-style", t("wizardLabelStyle"));
-        setTextById("wq-label-instruments", t("wizardLabelInstruments"));
-        setTextById("wq-mode-hint-text", t("wizardPreferGuided"));
-        setTextById("wq-mode-link", t("wizardSwitchGuided"));
-        setTextById("ws-q-0", t("wizardQ0"));
-        setTextById("ws-q-1", t("wizardQ1"));
-        setTextById("ws-q-2", t("wizardQ2"));
-        setTextById("ws-q-3", t("wizardQ3"));
-        setTextById("wizard-back-btn", t("wizardBack"));
-        setTextById("karen-target-label", `${t("typingInto")} —`);
+          && setLabel("karenText",      uiText("notes"));
+        setTextById("label-date-created", uiText("dateCreatedLabel"));
+        setTextById("label-next-performance", uiText("nextPerformanceLabel"));
+        setTextById("label-date-performed", uiText("datePerformedLabel"));
+        setTextById("label-reference-media", uiText("referenceMediaLabel"));
+        setTextById("label-performance-videos", uiText("performanceVideosLabel"));
+        setTextById("label-handwritten-links", uiText("handwrittenPhotoLinksLabel"));
+        setTextById("label-reference-notes", uiText("referenceNotesLabel"));
+        setTextById("btn-add-performed-date", uiText("addDateLabel"));
+        setTextById("song-db-title", uiText("songDatabase"));
+        setTextById("section-modal-title", uiText("addSection"));
+        setTextById("section-modal-exit-btn", uiText("escToExit"));
+        setTextById("wq-label-title", uiText("wizardLabelTitle"));
+        setTextById("wq-label-key", uiText("wizardLabelKey"));
+        setTextById("wq-label-tempo", uiText("wizardLabelTempo"));
+        setTextById("wq-label-category", uiText("wizardLabelCategory"));
+        setTextById("wq-label-style", uiText("wizardLabelStyle"));
+        setTextById("wq-label-instruments", uiText("wizardLabelInstruments"));
+        setTextById("wq-mode-hint-text", uiText("wizardPreferGuided"));
+        setTextById("wq-mode-link", uiText("wizardSwitchGuided"));
+        setTextById("ws-q-0", uiText("wizardQ0"));
+        setTextById("ws-q-1", uiText("wizardQ1"));
+        setTextById("ws-q-2", uiText("wizardQ2"));
+        setTextById("ws-q-3", uiText("wizardQ3"));
+        setTextById("wizard-back-btn", uiText("wizardBack"));
+        setTextById("karen-target-label", `${uiText("typingInto")} —`);
 
         const sideBarTitle = document.querySelector(".sidebar-title");
-        if (sideBarTitle) sideBarTitle.textContent = t("appName");
+        if (sideBarTitle) sideBarTitle.textContent = uiText("appName");
 
         // placeholders
-        setPlaceholder("songTitle",       t("englishTitlePlaceholder"));
-        setPlaceholder("songTitleKaren",  t("karenTitlePlaceholder"));
-        setPlaceholder("songKey",         t("keyPlaceholder"));
-        setPlaceholder("songStyle",       t("stylePlaceholder"));
-        setPlaceholder("songTempo",       t("tempoPlaceholder"));
-        setPlaceholder("songInstruments", t("instrPlaceholder"));
-        setPlaceholder("karenText",       t("notesPlaceholder"));
-        setPlaceholder("wq-songTitle",    t("titlePlaceholder"));
-        setPlaceholder("wq-songKey",      t("keyPlaceholder"));
-        setPlaceholder("wq-songTempo",    t("tempoPlaceholder"));
-        setPlaceholder("wq-songStyle",    t("stylePlaceholder"));
-        setPlaceholder("wg-songTitle",    t("titlePlaceholder"));
-        setPlaceholder("wg-songKey",      t("keyPlaceholder"));
-        setPlaceholder("wg-songTempo",    t("tempoPlaceholder"));
-        setPlaceholder("wg-songStyle",    t("stylePlaceholder"));
-        setPlaceholder("songVideoLinks",  t("oneUrlPerLine"));
-        setPlaceholder("songImageLinks",  t("oneUrlPerLine"));
-        setPlaceholder("songReferenceInfo", t("otherDetailsAndReferences"));
+        setPlaceholder("songTitle",       uiText("englishTitlePlaceholder"));
+        setPlaceholder("songTitleKaren",  uiText("karenTitlePlaceholder"));
+        setPlaceholder("songKey",         uiText("keyPlaceholder"));
+        setPlaceholder("songStyle",       uiText("stylePlaceholder"));
+        setPlaceholder("songTempo",       uiText("tempoPlaceholder"));
+        setPlaceholder("songInstruments", uiText("instrPlaceholder"));
+        setPlaceholder("karenText",       uiText("notesPlaceholder"));
+        setPlaceholder("wq-songTitle",    uiText("titlePlaceholder"));
+        setPlaceholder("wq-songKey",      uiText("keyPlaceholder"));
+        setPlaceholder("wq-songTempo",    uiText("tempoPlaceholder"));
+        setPlaceholder("wq-songStyle",    uiText("stylePlaceholder"));
+        setPlaceholder("wg-songTitle",    uiText("titlePlaceholder"));
+        setPlaceholder("wg-songKey",      uiText("keyPlaceholder"));
+        setPlaceholder("wg-songTempo",    uiText("tempoPlaceholder"));
+        setPlaceholder("wg-songStyle",    uiText("stylePlaceholder"));
+        setPlaceholder("songVideoLinks",  uiText("oneUrlPerLine"));
+        setPlaceholder("songImageLinks",  uiText("oneUrlPerLine"));
+        setPlaceholder("songReferenceInfo", uiText("otherDetailsAndReferences"));
 
         // buttons
-        setButtonText("btn-new",       t("newSong"));
-        setButtonText("btn-save",      t("save"));
-        setButtonText("btn-export",    t("exportDb"));
-        setButtonText("btn-print",     t("print"));
+        setButtonText("btn-new",       uiText("newSong"));
+        setButtonText("btn-save",      uiText("save"));
+        setButtonText("btn-export",    uiText("exportDb"));
+        setButtonText("btn-print",     uiText("print"));
         document.querySelectorAll(".wizard-btn-skip").forEach(btn => {
-          btn.textContent = t("wizardSkip");
+          btn.textContent = uiText("wizardSkip");
         });
         const quickContinueBtn = document.querySelector("#wizard-quick .wizard-btn-primary");
-        if (quickContinueBtn) quickContinueBtn.textContent = t("wizardContinue");
+        if (quickContinueBtn) quickContinueBtn.textContent = uiText("wizardContinue");
         const guidedNextBtn = document.getElementById("wizard-next-btn");
         if (guidedNextBtn) {
           guidedNextBtn.textContent = wizardStep === WIZARD_TOTAL_STEPS - 1
-            ? t("wizardContinue")
-            : t("wizardNext");
+            ? uiText("wizardContinue")
+            : uiText("wizardNext");
         }
 
         // karen flap handle
         const handleTitle = document.getElementById("karen-flap-title");
-        if (handleTitle) handleTitle.textContent = t("karenKeyboard");
+        if (handleTitle) handleTitle.textContent = uiText("karenKeyboard");
 
         // guide panel title
         const guideTitle = document.querySelector(".shortcut-panel-title strong");
-        if (guideTitle) guideTitle.textContent = currentLang === "karen" ? t("shortcuts") : "App Guide";
+        if (guideTitle) guideTitle.textContent = currentLang === "karen" ? uiText("shortcuts") : uiText("appGuideTitle", { fallback: "App Guide" });
 
         const langHint = document.getElementById("lang-picker-hint");
         if (langHint) {
@@ -14756,6 +15862,19 @@
         setTextById("lang-btn-karen-label", TRANSLATIONS.english.languageToggleKarenLabel);
         setTextById("lang-btn-english-label", TRANSLATIONS.english.languageToggleEnglishLabel);
 
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+          const key = el.getAttribute("data-i18n");
+          if (key) el.textContent = uiText(key);
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+          const key = el.getAttribute("data-i18n-placeholder");
+          if (key) el.placeholder = uiText(key);
+        });
+        document.querySelectorAll("[data-i18n-title]").forEach(el => {
+          const key = el.getAttribute("data-i18n-title");
+          if (key) el.title = uiText(key);
+        });
+
         // category option labels
         ["songCategory", "wq-songCategory", "wg-songCategory"].forEach(selectId => {
           const sel = document.getElementById(selectId);
@@ -14766,7 +15885,7 @@
               return;
             }
             const key = CATEGORY_VALUE_TO_KEY[opt.value];
-            if (key) opt.textContent = t(key);
+            if (key) opt.textContent = uiText(key);
           });
         });
 
@@ -14775,7 +15894,7 @@
           const section = btn.getAttribute("data-section") || "";
           const shortcut = btn.getAttribute("data-shortcut") || "";
           const key = SECTION_VALUE_TO_KEY[section];
-          const label = key ? t(key) : section;
+          const label = key ? uiText(key) : section;
           btn.innerHTML = `${label} <span class="shortcut-hint">[${shortcut}]</span>`;
         });
 
@@ -14783,7 +15902,7 @@
         document.querySelectorAll(".instr-choice[data-value]").forEach(btn => {
           const value = btn.getAttribute("data-value") || "";
           const key = INSTRUMENT_VALUE_TO_KEY[value];
-          if (key) btn.textContent = t(key);
+          if (key) btn.textContent = uiText(key);
         });
         if (typeof updateAllInstrumentWheels === "function") {
           requestAnimationFrame(updateAllInstrumentWheels);
@@ -15091,7 +16210,7 @@
           }
         }
         document.getElementById("wizard-back-btn").style.display  = "none";
-        document.getElementById("wizard-next-btn").textContent   = t("wizardNext");
+        document.getElementById("wizard-next-btn").textContent   = uiText("wizardNext");
 
         // focus first input
         const firstInput = document.getElementById("wg-songTitle");
@@ -15159,8 +16278,8 @@
         const nextBtn = document.getElementById("wizard-next-btn");
         if (nextBtn) {
           nextBtn.textContent = wizardStep === WIZARD_TOTAL_STEPS - 1
-            ? t("wizardContinue")
-            : t("wizardNext");
+            ? uiText("wizardContinue")
+            : uiText("wizardNext");
         }
 
         // focus the input in this panel
@@ -15400,14 +16519,24 @@
         }
       }
 
-      function init() {
+      async function init() {
         setupThemeControls();
+        await loadLatestTranslationOverrides();
         showLangPicker();
         setupLangToggle();
         applyTranslations();
+        startTranslationAutoReload();
       }
       
-      window.onload = init;
+      window.onload = () => {
+        init().catch(err => {
+          console.error("App initialization failed", err);
+          showLangPicker();
+          setupLangToggle();
+          applyTranslations();
+          startTranslationAutoReload();
+        });
+      };
 
 // tempo change helpers
 function changeTempo(id, delta) {

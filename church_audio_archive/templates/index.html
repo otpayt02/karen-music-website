@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Church Music Archive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Satoshi', sans-serif; background-color: #f7f6f2; color: #28251d; }
+        .bg-surface { background-color: #f9f8f5; }
+        .text-primary { color: #01696f; }
+        .bg-primary { background-color: #01696f; color: #ffffff; }
+
+        /* Print Styles - Crucial for "on the fly" sheet music printing */
+        @media print {
+            body { background-color: white; color: black; font-family: monospace; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            @page { margin: 1in; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="min-h-screen p-4 md:p-8" x-data="musicApp()">
+
+    <!-- Screen Interface -->
+    <div class="no-print max-w-4xl mx-auto space-y-6">
+        <header class="flex justify-between items-end border-b pb-4 border-gray-300">
+            <div>
+                <h1 class="text-3xl font-bold text-primary">Weekly Band Music Archive</h1>
+                <p class="text-gray-600 mt-1">Chronological repository for Kids, Youth, Praise, and Solos.</p>
+            </div>
+        </header>
+
+        <!-- Search & Filter -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <input type="text" x-model="searchQuery" @input.debounce="fetchSongs" 
+                   placeholder="Search title, style (bossanova, hard rock), key, or date..." 
+                   class="w-full px-4 py-3 rounded shadow-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#01696f]">
+        </div>
+
+        <!-- Loading State -->
+        <div x-show="loading" class="text-center py-10 text-gray-500">Loading sheets...</div>
+
+        <!-- Chronological Song List -->
+        <div class="space-y-10" x-show="!loading">
+            <template x-for="(sections, date) in groupedSongs" :key="date">
+                <div class="bg-surface p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h2 class="text-2xl font-bold border-b border-gray-300 pb-2 mb-4 text-[#28251d]" x-text="'Week of ' + date"></h2>
+
+                    <div class="space-y-8">
+                        <template x-for="sectionName in ['Kids', 'Youth', 'Praise/Worship', 'Solos']" :key="sectionName">
+                            <div x-show="sections[sectionName] && sections[sectionName].length > 0">
+                                <h3 class="text-lg font-semibold text-gray-500 mb-3 uppercase tracking-wider text-sm" x-text="sectionName"></h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <template x-for="song in sections[sectionName]" :key="song.id">
+                                        <div class="bg-white p-4 rounded border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                                            <div class="mb-4">
+                                                <div class="flex justify-between items-start mb-2">
+                                                    <h4 class="font-bold text-lg leading-tight" x-text="song.title"></h4>
+                                                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded border border-gray-200" x-text="'Key: ' + song.musical_key"></span>
+                                                </div>
+                                                <p class="text-sm text-gray-500" x-text="'Style: ' + song.style"></p>
+                                            </div>
+                                            <button @click="printSong(song)" 
+                                                    class="w-full bg-primary py-2 rounded text-sm font-medium hover:bg-[#0c4e54] transition shadow-sm flex justify-center items-center gap-2">
+                                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"></path></svg>
+                                                Print Sheet
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <div x-show="Object.keys(groupedSongs).length === 0" class="text-center py-10 text-gray-500 bg-white rounded border border-gray-200">
+                No songs found matching your criteria.
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Only View -->
+    <div class="hidden print-only" x-show="printData">
+        <h1 class="text-3xl font-bold mb-1" x-text="printData?.title"></h1>
+        <div class="flex gap-6 text-sm mb-6 pb-2 border-b border-black">
+            <span x-text="'Date: ' + printData?.week_date"></span>
+            <span x-text="'Category: ' + printData?.section"></span>
+            <span x-text="'Style: ' + printData?.style"></span>
+            <span class="font-bold" x-text="'Key: ' + printData?.musical_key"></span>
+        </div>
+        <div class="text-base whitespace-pre-wrap leading-relaxed" x-text="printData?.content"></div>
+    </div>
+
+    <script>
+        function musicApp() {
+            return {
+                searchQuery: '',
+                groupedSongs: {},
+                loading: true,
+                printData: null,
+
+                init() {
+                    this.fetchSongs();
+                },
+
+                fetchSongs() {
+                    this.loading = true;
+                    fetch(`/api/songs?q=${encodeURIComponent(this.searchQuery)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            this.groupedSongs = data;
+                            this.loading = false;
+                        });
+                },
+
+                printSong(song) {
+                    this.printData = song;
+                    // Small delay to allow Alpine to render the print view before calling browser print
+                    setTimeout(() => {
+                        window.print();
+                    }, 150);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

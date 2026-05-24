@@ -22,4 +22,21 @@ test.describe("Karen text direction", () => {
     await expect(notes).toHaveAttribute("dir", "ltr");
     await expect(notes).toHaveCSS("direction", "ltr");
   });
+
+  test("opens the Karen keyboard for text boxes in Karen mode except English title", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "karen");
+    await openSidebar(page);
+
+    await page.locator("#songTitle").click();
+    await expect(page.locator("#karen-flap")).not.toHaveClass(/open/);
+
+    await page.locator("#songKey").click();
+    await expect(page.locator("#karen-flap")).toHaveClass(/open/);
+    await expect(page.locator("#songKey")).toHaveAttribute("inputmode", "none");
+
+    await page.locator("#karen-flap-close").click();
+    await expect(page.locator("#karen-flap")).not.toHaveClass(/open/);
+    await page.locator("#songStyle").click();
+    await expect(page.locator("#karen-flap")).toHaveClass(/open/);
+  });
 });

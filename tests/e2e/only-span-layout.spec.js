@@ -2,6 +2,48 @@ const { test, expect } = require("@playwright/test");
 const { chooseLanguageAndEnterEditor } = require("./helpers");
 
 test.describe("Only/All In span layout", () => {
+  test("shows clean abbreviated instrument choices in the Only modal", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      state.sections = [
+        {
+          type: "Verse",
+          measures: [createMeasure()]
+        }
+      ];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      setInstrChecks("instr-sidebar", "Piano 1, Electric Guitar, Drums");
+      renderChart();
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press(",");
+
+    await expect(page.locator(".only-instrument-modal")).toBeVisible();
+    await expect(page.locator(".only-instrument-text")).toHaveText(["KB1", "EGT", "DR"]);
+
+    const metrics = await page.evaluate(() => {
+      const options = Array.from(document.querySelectorAll(".only-instrument-option"));
+      const texts = Array.from(document.querySelectorAll(".only-instrument-text"));
+      return {
+        optionCount: options.length,
+        noWrappedText: texts.every(el => {
+          const rect = el.getBoundingClientRect();
+          const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+          return el.scrollWidth <= el.clientWidth + 1 && rect.height <= lineHeight + 2;
+        }),
+        optionWidths: options.map(el => Math.round(el.getBoundingClientRect().width))
+      };
+    });
+
+    expect(metrics.optionCount).toBe(3);
+    expect(metrics.noWrappedText).toBe(true);
+    expect(Math.min(...metrics.optionWidths)).toBeGreaterThanOrEqual(72);
+  });
+
   test("keeps one-row labels and beat-anchored cue underlines without overlap", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 

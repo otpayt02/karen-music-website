@@ -2,23 +2,125 @@ import os
 import sqlite3
 import json
 import base64
+import shutil
+import sys
+import re
+from collections import OrderedDict
 from datetime import datetime
 from uuid import uuid4
-from flask import Flask, request, jsonify, send_file, send_from_directory, render_template_string
+from flask import Flask, request, jsonify, send_file, send_from_directory, render_template_string, make_response
 from werkzeug.utils import secure_filename
 
 print("CWD AT STARTUP:", os.getcwd())
 
 app = Flask(__name__)
-BASE_DIR        = os.path.dirname(os.path.abspath(__file__))
-DB_PATH         = os.path.join(BASE_DIR, 'songs.db')
-LOCAL_IMAGE_DIR = 'chart_images'
-FILE_UPLOAD_DIR = 'song_files'
-SETTINGS_PATH   = 'app_settings.json'
-INDEX_PATH      = os.path.join(BASE_DIR, "index.html")
+
+IS_FROZEN    = getattr(sys, "frozen", False)
+BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
+RESOURCE_DIR = getattr(sys, "_MEIPASS", BASE_DIR)
+
+
+def get_data_dir():
+    override = os.environ.get("KAREN_MUSIC_DATA_DIR")
+    if override:
+        return os.path.abspath(os.path.expandvars(os.path.expanduser(override)))
+    if IS_FROZEN:
+        local_appdata = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+        return os.path.join(local_appdata, "Karen Music Director")
+    return BASE_DIR
+
+
+DATA_DIR           = get_data_dir()
+DB_PATH            = os.path.join(DATA_DIR, 'songs.db')
+LOCAL_IMAGE_NAME   = 'chart_images'
+FILE_UPLOAD_NAME   = 'song_files'
+LOCAL_IMAGE_DIR    = os.path.join(DATA_DIR, LOCAL_IMAGE_NAME) if IS_FROZEN else LOCAL_IMAGE_NAME
+FILE_UPLOAD_DIR    = os.path.join(DATA_DIR, FILE_UPLOAD_NAME) if IS_FROZEN else FILE_UPLOAD_NAME
+SETTINGS_PATH      = os.path.join(DATA_DIR, 'app_settings.json') if IS_FROZEN else 'app_settings.json'
+INDEX_PATH         = os.path.join(RESOURCE_DIR, "index.html")
+TRANSLATION_FILE_CANDIDATES = (
+    "translations_website_updated.txt",
+    "translations_website.txt",
+    "translations.txt",
+)
+TRANSLATION_POLICY_BOTH = {"y", "yes", "both", "always", "all"}
+TRANSLATION_POLICY_TOGGLE = {"n", "no", "toggle", "selected", "current"}
+TRANSLATION_KEY_ALIASES = {
+    "song_title_karen_label": "songTitleKarenLabel",
+    "song_title_english_label": "songTitleEnglishLabel",
+    "karen_title_placeholder": "karenTitlePlaceholder",
+    "english_title_placeholder": "englishTitlePlaceholder",
+    "date_created_label": "dateCreatedLabel",
+    "date_performed_label": "datePerformedLabel",
+    "next_performance_label": "nextPerformanceLabel",
+    "reference_media_label": "referenceMediaLabel",
+    "reference_notes_label": "referenceNotesLabel",
+    "reference_copy_label": "referenceCopyLabel",
+    "no_performed_dates_yet": "noPerformedDatesYet",
+    "song_database": "songDatabase",
+    "new_song_button": "newSong",
+    "save_song_button": "save",
+    "print_song_button": "print",
+    "export_song_button": "exportDb",
+    "praise_worship_category_selection": "categoryPraiseWorship",
+    "choir_category_selection": "categoryChoir",
+    "youth_category_selection": "categoryYouth",
+    "solo_category_selection": "categorySolo",
+    "kids_category_selection": "categoryKids",
+    "intro_section_selection": "sectionIntro",
+    "verse_section_selection": "sectionVerse",
+    "prechorus_section_selection": "sectionPreChorus",
+    "pre_chorus_section_selection": "sectionPreChorus",
+    "chorus_section_selection": "sectionChorus",
+    "bridge_section_selection": "sectionBridge",
+    "solo_section_selection": "sectionSolo",
+    "ending_section_selection": "sectionEnding",
+    "piano_1": "instrumentPiano1",
+    "piano_2": "instrumentPiano2",
+    "electric_guitar": "instrumentElectricGuitar",
+    "acoustic_guitar": "instrumentAcousticGuitar",
+    "electric_bass": "instrumentElectricBass",
+    "drums": "instrumentDrums",
+    "keytar": "instrumentKeytar",
+    "go_go": "styleGoGo",
+    "gogo": "styleGoGo",
+    "reggae": "styleReggae",
+    "ballad": "styleBallad",
+    "alternative": "styleAlternative",
+    "rock_genre": "styleRock",
+    "rock": "styleRock",
+    "slow": "styleSlow",
+    "bpm": "bpmLabel",
+    "bpm_label": "bpmLabel",
+    "beats_per_minute": "bpmLabel",
+}
 
 # ── keep your local Windows path for image storage ──────────────
-WINDOWS_BASE_PATH = r'C:\Users\olive\Projects\music_director_database\karen_music_website'
+WINDOWS_BASE_PATH = (
+    LOCAL_IMAGE_DIR if IS_FROZEN
+    else r'C:\Users\olive\Projects\music_director_database\karen_music_website'
+)
+
+
+def prepare_runtime_storage():
+    os.makedirs(DATA_DIR, exist_ok=True)
+    os.makedirs(LOCAL_IMAGE_DIR, exist_ok=True)
+    os.makedirs(FILE_UPLOAD_DIR, exist_ok=True)
+
+    if not IS_FROZEN:
+        return
+
+    bundled_db = os.path.join(RESOURCE_DIR, 'songs.db')
+    if not os.path.exists(DB_PATH) and os.path.exists(bundled_db):
+        shutil.copy2(bundled_db, DB_PATH)
+
+    bundled_images = os.path.join(RESOURCE_DIR, LOCAL_IMAGE_NAME)
+    if os.path.isdir(bundled_images):
+        for filename in os.listdir(bundled_images):
+            src = os.path.join(bundled_images, filename)
+            dst = os.path.join(LOCAL_IMAGE_DIR, filename)
+            if os.path.isfile(src) and not os.path.exists(dst):
+                shutil.copy2(src, dst)
 
 
 # ============================================================
@@ -99,7 +201,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-
+prepare_runtime_storage()
 init_db()
 
 
@@ -154,6 +256,271 @@ def save_app_settings(data):
     with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
     return payload
+
+
+def normalize_translation_policy(value):
+    clean = str(value or "").strip().lower()
+    if clean in TRANSLATION_POLICY_BOTH:
+        return "both"
+    if clean in TRANSLATION_POLICY_TOGGLE:
+        return "toggle"
+    return ""
+
+
+def translation_policy_answer(policy):
+    if policy == "both":
+        return "y"
+    if policy == "toggle":
+        return "n"
+    return ""
+
+
+def camel_to_snake(value):
+    text = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", str(value or ""))
+    text = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", text)
+    return text.replace("-", "_").lower()
+
+
+def to_camel_translation_key(raw):
+    clean = str(raw or "").strip().lower()
+    clean = clean.replace("'", "").replace('"', "")
+    clean = re.sub(r"[^a-z0-9]+", " ", clean).strip()
+    if not clean:
+        return ""
+    alias_key = re.sub(r"\s+", "_", clean)
+    if alias_key in TRANSLATION_KEY_ALIASES:
+        return TRANSLATION_KEY_ALIASES[alias_key]
+    if clean in TRANSLATION_KEY_ALIASES:
+        return TRANSLATION_KEY_ALIASES[clean]
+    parts = clean.split()
+    return parts[0] + "".join(part[:1].upper() + part[1:] for part in parts[1:])
+
+
+def humanize_translation_key(key):
+    text = camel_to_snake(key).replace("_", " ").strip()
+    return text[:1].upper() + text[1:] if text else str(key or "")
+
+
+def decode_js_string(value):
+    try:
+        return json.loads(f'"{value}"')
+    except Exception:
+        return value
+
+
+def parse_translation_payload(payload):
+    raw_payload = str(payload or "").strip()
+    comment = ""
+    if "#" in raw_payload:
+        raw_payload, comment = raw_payload.split("#", 1)
+        raw_payload = raw_payload.strip()
+        comment = comment.strip()
+
+    value = raw_payload
+    policy = ""
+    description = ""
+    refs = []
+
+    if "|" in raw_payload:
+        parts = [part.strip() for part in raw_payload.split("|")]
+        value = parts[0].strip()
+        if len(parts) > 1:
+            policy = normalize_translation_policy(parts[1])
+            if not policy:
+                description = parts[1]
+        if len(parts) > 2:
+            description = parts[2]
+        if len(parts) > 3:
+            refs = [ref.strip() for ref in re.split(r"[,;]", parts[3]) if ref.strip()]
+    else:
+        pieces = raw_payload.rsplit(None, 1)
+        if len(pieces) == 2:
+            detected = normalize_translation_policy(pieces[1])
+            if detected:
+                value = pieces[0].strip()
+                policy = detected
+
+    if comment and not description:
+        description = comment
+
+    if not policy:
+        description = ""
+        refs = []
+
+    return {
+        "value": value.strip(),
+        "policy": policy,
+        "policyAnswer": translation_policy_answer(policy),
+        "description": description.strip(),
+        "refs": refs,
+    }
+
+
+def parse_translation_file_entries(path):
+    entries = OrderedDict()
+    with open(path, "r", encoding="utf-8") as f:
+        for line_no, raw_line in enumerate(f, 1):
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, payload = line.split("=", 1)
+            key = key.strip()
+            if not key:
+                continue
+            parsed = parse_translation_payload(payload)
+            parsed["sourceLine"] = line_no
+            parsed["sourceKey"] = key
+            entries[key] = parsed
+    return entries
+
+
+def parse_translation_file(path):
+    entries = parse_translation_file_entries(path)
+    return {
+        key: data["value"]
+        for key, data in entries.items()
+        if data.get("value")
+    }
+
+
+def extract_source_translation_catalog():
+    catalog = OrderedDict()
+    try:
+        with open(INDEX_PATH, "r", encoding="utf-8") as f:
+            source = f.read()
+    except Exception:
+        return catalog
+
+    match = re.search(r"english\s*:\s*\{(?P<body>.*?)\n\s*\},\s*karen\s*:", source, re.S)
+    if not match:
+        return catalog
+
+    body = match.group("body")
+    body_start = match.start("body")
+    item_pattern = re.compile(r"^\s*([A-Za-z0-9_$]+)\s*:\s*(['\"])(.*?)\2\s*,?\s*$", re.M)
+    for item in item_pattern.finditer(body):
+        key = item.group(1)
+        english = decode_js_string(item.group(3))
+        line_no = source[:body_start + item.start()].count("\n") + 1
+        catalog[key] = {
+            "key": key,
+            "fileKey": camel_to_snake(key),
+            "english": english,
+            "description": humanize_translation_key(key),
+            "refs": [f"index.html:{line_no}"],
+        }
+    ref_patterns = (
+        r'data-i18n(?:-[a-z-]+)?="([^"]+)"',
+        r'uiText\(\s*["\']([^"\']+)["\']',
+        r'\bt\(\s*["\']([^"\']+)["\']',
+    )
+    refs_by_key = {}
+    for pattern in ref_patterns:
+        for ref_match in re.finditer(pattern, source):
+            key = ref_match.group(1)
+            line_no = source[:ref_match.start()].count("\n") + 1
+            refs_by_key.setdefault(key, set()).add(f"index.html:{line_no}")
+    for key, refs in refs_by_key.items():
+        if key not in catalog:
+            catalog[key] = {
+                "key": key,
+                "fileKey": camel_to_snake(key),
+                "english": humanize_translation_key(key),
+                "description": humanize_translation_key(key),
+                "refs": [],
+            }
+        merged_refs = list(OrderedDict.fromkeys([*catalog[key].get("refs", []), *sorted(refs)]))
+        catalog[key]["refs"] = merged_refs
+    return catalog
+
+
+def build_translation_catalog(path=None):
+    path = path or latest_translation_file()
+    source_catalog = extract_source_translation_catalog()
+    entries = parse_translation_file_entries(path) if path else OrderedDict()
+    entries_by_canonical = {}
+    for raw_key, entry in entries.items():
+        canonical = to_camel_translation_key(raw_key)
+        if canonical:
+            entries_by_canonical[canonical] = entry
+
+    catalog = []
+    used = set()
+    for key, source in source_catalog.items():
+        entry = entries_by_canonical.get(key)
+        if entry:
+            used.add(entry["sourceKey"])
+        value = entry.get("value", "") if entry else ""
+        policy = entry.get("policy", "") if entry else ""
+        catalog.append({
+            **source,
+            "karen": value,
+            "policy": policy,
+            "policyAnswer": translation_policy_answer(policy),
+            "status": "translated" if value else "untranslated",
+            "sourceKey": entry.get("sourceKey", "") if entry else "",
+            "sourceLine": entry.get("sourceLine") if entry else None,
+            "fileDescription": entry.get("description", "") if entry else "",
+            "fileRefs": entry.get("refs", []) if entry else [],
+        })
+
+    for raw_key, entry in entries.items():
+        if raw_key in used:
+            continue
+        canonical = to_camel_translation_key(raw_key)
+        if canonical in source_catalog:
+            continue
+        value = entry.get("value", "")
+        policy = entry.get("policy", "")
+        catalog.append({
+            "key": canonical or raw_key,
+            "fileKey": camel_to_snake(canonical or raw_key),
+            "english": raw_key,
+            "description": entry.get("description", "") or humanize_translation_key(raw_key),
+            "refs": [],
+            "karen": value,
+            "policy": policy,
+            "policyAnswer": translation_policy_answer(policy),
+            "status": "translated" if value else "untranslated",
+            "sourceKey": raw_key,
+            "sourceLine": entry.get("sourceLine"),
+            "fileDescription": entry.get("description", ""),
+            "fileRefs": entry.get("refs", []),
+        })
+
+    return catalog
+
+
+def translation_file_info(path):
+    if not path:
+        return {"path": None, "mtime": None, "size": 0, "version": None}
+    try:
+        stat = os.stat(path)
+    except OSError:
+        return {"path": path, "mtime": None, "size": 0, "version": None}
+    return {
+        "path": path,
+        "mtime": stat.st_mtime,
+        "size": stat.st_size,
+        "version": f"{stat.st_mtime_ns}:{stat.st_size}",
+    }
+
+
+def latest_translation_file():
+    roots = [DATA_DIR, BASE_DIR, RESOURCE_DIR]
+    candidates = []
+    seen = set()
+    for root in roots:
+        for name in TRANSLATION_FILE_CANDIDATES:
+            path = os.path.abspath(os.path.join(root, name))
+            if path in seen:
+                continue
+            seen.add(path)
+            if os.path.isfile(path):
+                candidates.append(path)
+    if not candidates:
+        return None
+    return max(candidates, key=lambda p: os.path.getmtime(p))
 
 
 def normalize_file_metadata_value(value):
@@ -373,7 +740,9 @@ def song_row_to_dict(row, full=False):
 def index():
     try:
         with open(INDEX_PATH, 'r', encoding='utf-8') as f:
-            return f.read()
+            response = make_response(f.read())
+            response.headers["Cache-Control"] = "no-store, max-age=0"
+            return response
     except FileNotFoundError:
         return f"index.html not found at {INDEX_PATH}", 404
 
@@ -391,6 +760,84 @@ def admin():
 @app.route('/api/settings', methods=['GET'])
 def get_settings():
     return jsonify(load_app_settings())
+
+
+@app.route('/api/translations/latest', methods=['GET'])
+def get_latest_translations():
+    path = latest_translation_file()
+    if not path:
+        return jsonify({**translation_file_info(None), "translations": {}, "policies": {}})
+    try:
+        entries = parse_translation_file_entries(path)
+        return jsonify({
+            **translation_file_info(path),
+            "translations": {
+                key: data["value"]
+                for key, data in entries.items()
+                if data.get("value")
+            },
+            "policies": {
+                key: data["policy"]
+                for key, data in entries.items()
+                if data.get("policy")
+            },
+            "entries": entries,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e), "path": path, "translations": {}}), 500
+
+
+@app.route('/api/translations/catalog', methods=['GET'])
+def get_translation_catalog():
+    path = latest_translation_file()
+    try:
+        return jsonify({
+            **translation_file_info(path),
+            "catalog": build_translation_catalog(path),
+            "format": "file_key = Karen translation | y-or-n | plain app location description | generated refs",
+            "policy": {
+                "y": "show Karen and English together no matter which app language is selected",
+                "n": "show only the currently selected app language",
+                "blank": "same as n until you decide"
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            "error": str(e),
+            **translation_file_info(path),
+            "catalog": []
+        }), 500
+
+
+@app.route('/api/translations/catalog.txt', methods=['GET'])
+def get_translation_catalog_text():
+    path = latest_translation_file()
+    try:
+        catalog = build_translation_catalog(path)
+        lines = [
+            "# Karen Music Director translation catalog",
+            "# Format when translated:",
+            "# file_key = Karen translation | y | plain app location description | generated refs",
+            "# Use y to always show both languages. Use n to show only the selected language.",
+            "# If a row has no y/n answer, keep it as file_key = Karen translation only.",
+            "",
+        ]
+        for item in catalog:
+            key = item.get("fileKey") or camel_to_snake(item.get("key"))
+            karen = item.get("karen") or ""
+            answer = item.get("policyAnswer") or ""
+            if answer:
+                description = item.get("fileDescription") or item.get("description") or ""
+                refs = ", ".join(item.get("refs") or item.get("fileRefs") or [])
+                lines.append(f"{key} = {karen} | {answer} | {description} | {refs}")
+            else:
+                lines.append(f"{key} = {karen}")
+        response = make_response("\n".join(lines) + "\n")
+        response.headers["Content-Type"] = "text/plain; charset=utf-8"
+        response.headers["Cache-Control"] = "no-store, max-age=0"
+        return response
+    except Exception as e:
+        return str(e), 500, {"Content-Type": "text/plain; charset=utf-8"}
 
 
 @app.route('/api/settings', methods=['PUT'])
@@ -604,7 +1051,7 @@ def upload_song_file(song_id):
 
     safe_original = secure_filename(upload.filename) or 'attachment'
     stored_filename = f"{uuid4().hex}_{safe_original}"
-    song_dir = os.path.join(BASE_DIR, FILE_UPLOAD_DIR, f"song_{song_id}")
+    song_dir = os.path.join(FILE_UPLOAD_DIR, f"song_{song_id}")
     os.makedirs(song_dir, exist_ok=True)
     stored_path = os.path.join(song_dir, stored_filename)
     upload.save(stored_path)
@@ -615,7 +1062,7 @@ def upload_song_file(song_id):
         "id": uuid4().hex,
         "name": display_name or upload.filename,
         "kind": str(request.form.get('kind') or "Reference").strip() or "Reference",
-        "path": os.path.join(FILE_UPLOAD_DIR, f"song_{song_id}", stored_filename).replace("\\", "/"),
+        "path": os.path.join(FILE_UPLOAD_NAME, f"song_{song_id}", stored_filename).replace("\\", "/"),
         "url": f"/api/songs/{song_id}/files/{stored_filename}/download",
         "notes": str(request.form.get('notes') or "").strip(),
         "stored_filename": stored_filename,
@@ -653,7 +1100,7 @@ def delete_song_file(song_id, file_id):
             kept.append(item)
 
     if removed and removed.get("stored_filename"):
-        stored_path = os.path.join(BASE_DIR, FILE_UPLOAD_DIR, f"song_{song_id}", removed["stored_filename"])
+        stored_path = os.path.join(FILE_UPLOAD_DIR, f"song_{song_id}", removed["stored_filename"])
         try:
             if os.path.isfile(stored_path):
                 os.remove(stored_path)
@@ -671,7 +1118,7 @@ def delete_song_file(song_id, file_id):
 
 @app.route('/api/songs/<int:song_id>/files/<path:filename>/download', methods=['GET'])
 def download_song_file(song_id, filename):
-    song_dir = os.path.join(BASE_DIR, FILE_UPLOAD_DIR, f"song_{song_id}")
+    song_dir = os.path.join(FILE_UPLOAD_DIR, f"song_{song_id}")
     return send_from_directory(song_dir, filename, as_attachment=False)
 
 

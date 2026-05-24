@@ -49,8 +49,8 @@ test.describe("slur and row geometry", () => {
       return {
         startDelta: Math.abs(Number(slur.dataset.startX) - startCenter),
         endDelta: Math.abs(Number(slur.dataset.endX) - endCenter),
-        startTipDelta: Math.abs((slurRect.left - chartRect.left) - startCenter),
-        endTipDelta: Math.abs((slurRect.right - chartRect.left) - endCenter),
+        startTipDelta: Math.abs((slurRect.left - chartRect.left + Number(slur.dataset.pathStartOffset || 0)) - startCenter),
+        endTipDelta: Math.abs((slurRect.left - chartRect.left + Number(slur.dataset.pathEndOffset || slurRect.width)) - endCenter),
         endpointAboveBeat: slurRect.top + 12 <= Math.min(startRect.top, endRect.top),
         heightSpread: Math.max(...heights) - Math.min(...heights),
         bottomSpread: Math.max(...bottoms) - Math.min(...bottoms)

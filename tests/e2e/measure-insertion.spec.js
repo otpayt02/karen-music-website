@@ -80,7 +80,7 @@ test.describe("measure and beat insertion shortcuts", () => {
     expect(data.nextRoots[0]).toBe("G");
   });
 
-  test("Space inserts an empty beat and shifts later beat contents forward", async ({ page }) => {
+  test("Space moves forward without changing measure contents", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
     await page.evaluate(() => {
@@ -114,10 +114,45 @@ test.describe("measure and beat insertion shortcuts", () => {
 
     expect(data.currentMeasureIdx).toBe(0);
     expect(data.currentBeatIdx).toBe(2);
-    expect(data.lengths).toEqual([4, 4, 1]);
-    expect(data.roots[0]).toEqual(["C", "D", "", "E"]);
-    expect(data.roots[1]).toEqual(["F", "G", "A", "B"]);
-    expect(data.roots[2]).toEqual(["C"]);
+    expect(data.lengths).toEqual([4, 4]);
+    expect(data.roots[0]).toEqual(["C", "D", "E", "F"]);
+    expect(data.roots[1]).toEqual(["G", "A", "B", "C"]);
+  });
+
+  test("Space creates a new measure only after the final beat of the section", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      const measureWithRoots = (roots) => {
+        const measure = createMeasure(roots.length);
+        roots.forEach((root, idx) => {
+          if (!root) return;
+          measure.beats[idx].chordState = { root, flat: false, minor: false, triangle: false, seven: false };
+        });
+        return measure;
+      };
+      state.sections = [{ type: "Verse", measures: [measureWithRoots(["C", "D", "E", "F"])] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 3;
+      renderChart();
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press("Space");
+
+    const data = await page.evaluate(() => ({
+      currentMeasureIdx: state.currentMeasureIdx,
+      currentBeatIdx: state.currentBeatIdx,
+      lengths: state.sections[0].measures.map(m => m.beats.length),
+      roots: state.sections[0].measures.map(m => m.beats.map(b => b.chordState?.root || ""))
+    }));
+
+    expect(data.currentMeasureIdx).toBe(1);
+    expect(data.currentBeatIdx).toBe(0);
+    expect(data.lengths).toEqual([4, 4]);
+    expect(data.roots[0]).toEqual(["C", "D", "E", "F"]);
+    expect(data.roots[1]).toEqual(["", "", "", ""]);
   });
 
   test("Right Arrow creates a new measure when moving past the final beat", async ({ page }) => {

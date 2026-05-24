@@ -1,0 +1,54 @@
+{
+  "id": 20,
+  "title": "Portable Library 1779299203484",
+  "category": "Choir",
+  "key": "G",
+  "style": null,
+  "tempo": null,
+  "date_performed": "",
+  "instruments": "Piano 1",
+  "chart_json": {
+    "sections": [
+      {
+        "name": "Verse",
+        "measures": [
+          {
+            "beats": [
+              {
+                "chord": {
+                  "root": "G",
+                  "flavor": "",
+                  "bass": ""
+                },
+                "slash": ""
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "rowDefaultExplicit": true,
+    "defaultMeasuresPerRow": 4
+  },
+  "raw_editor_text": null,
+  "chart_image_path": null,
+  "created_at": null,
+  "updated_at": null,
+  "notes": null,
+  "row_lead_json": null,
+  "current_key": "G",
+  "original_key": "G",
+  "created_date": "2026-05-20",
+  "next_performance_date": "",
+  "performed_dates_json": "[]",
+  "reference_media_json": "{\"videos\": [], \"images\": [], \"info\": \"\"}",
+  "title_karen": "Portable Karen",
+  "file_metadata_json": "[]",
+  "performed_dates": [],
+  "reference_media": {
+    "videos": [],
+    "images": [],
+    "info": ""
+  },
+  "file_metadata": []
+}

@@ -47,4 +47,26 @@ test.describe("stacked paper views", () => {
     await expect(page.locator("#paper-stack")).toHaveAttribute("data-active-paper", "chart");
     await expect(page.locator("#focus-trap")).toBeFocused();
   });
+
+  test("keeps vertical paper tabs clear of the sidebar in control-room design", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => setUiDesign("design-2"));
+    await page.locator("#sidebar-toggle").click();
+    await expect(page.locator("#sidebar")).not.toHaveClass(/collapsed/);
+
+    const metrics = await page.evaluate(() => {
+      const mainRect = document.getElementById("main-editor").getBoundingClientRect();
+      const flapRects = Array.from(document.querySelectorAll(".paper-flap")).map(el => {
+        const rect = el.getBoundingClientRect();
+        return { left: rect.left, right: rect.right };
+      });
+      return { mainLeft: mainRect.left, flapRects };
+    });
+
+    expect(metrics.flapRects.length).toBe(3);
+    for (const rect of metrics.flapRects) {
+      expect(rect.left).toBeGreaterThanOrEqual(metrics.mainLeft + 2);
+    }
+  });
 });
