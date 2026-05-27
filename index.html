@@ -1101,7 +1101,10 @@
 
         #print-batch {
           display: block !important;
-          width: 100% !important;
+          width: 8.5in !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          background: #fff !important;
         }
 
         #print-batch .chart-container {
@@ -2348,6 +2351,7 @@
       .paper-head-center {
         align-items: center;
         text-align: center;
+        justify-content: center;
       }
       .paper-head-right {
         align-items: flex-end;
@@ -2355,14 +2359,38 @@
       }
       .paper-tempo {
         font-family: var(--font-ui);
-        font-size: 0.64em;
+        font-size: 0.7em;
         font-weight: 850;
         white-space: nowrap;
         line-height: 1.1;
       }
       .paper-tempo-english {
-        font-size: 0.58em;
+        font-size: 0.92em;
         color: #333;
+      }
+      .paper-style-value {
+        font-family: var(--font-display);
+        font-size: 1.12em;
+        font-weight: 900;
+        color: #111;
+        line-height: 1;
+        white-space: nowrap;
+      }
+      .paper-style-english {
+        font-family: var(--font-ui);
+        font-size: 0.52em;
+        font-weight: 800;
+        color: #333;
+        line-height: 1;
+        white-space: nowrap;
+      }
+      .paper-tempo-line {
+        display: inline-flex;
+        justify-content: center;
+        align-items: baseline;
+        gap: 4px;
+        margin-top: 3px;
+        white-space: nowrap;
       }
       .paper-keymeta {
         font-family: var(--font-ui);
@@ -2397,7 +2425,7 @@
       }
       .paper-footer {
         position: absolute;
-        bottom: 14px;
+        bottom: 18px;
         left: 30px;
         right: 30px;
         display: grid;
@@ -2405,10 +2433,13 @@
         column-gap: 8px;
         align-items: center;
         font-family: var(--font-ui);
-        font-size: 0.6em;
+        font-size: 0.62em;
         color: #666;
         border-top: 1px solid #ccc;
-        padding-top: 4px;
+        padding-top: 5px;
+        min-height: 34px;
+        z-index: 20;
+        background: rgba(255,255,255,0.92);
       }
       .paper-footer-dates {
         display: flex;
@@ -2550,13 +2581,16 @@
 
         #print-batch .chart-container {
           display: block !important;
+          position: relative !important;
+          isolation: isolate !important;
+          contain: layout paint !important;
           width: 8.5in !important;
           max-width: none !important;
           height: 10.8in !important;
           min-height: 10.8in !important;
           max-height: 10.8in !important;
           margin: 0 auto !important;
-          padding: 24px 30px 36px 30px !important;
+          padding: 24px 30px 64px 30px !important;
           box-shadow: none !important;
           overflow: hidden !important;
           break-after: page;
@@ -2564,7 +2598,13 @@
         }
 
         #print-batch .paper-footer {
-          bottom: calc(14px + 0.5cm) !important;
+          position: absolute !important;
+          left: 30px !important;
+          right: 30px !important;
+          bottom: 20px !important;
+          min-height: 38px !important;
+          background: #fff !important;
+          z-index: 40 !important;
         }
 
         #print-batch .chart-container:last-child {
@@ -2576,7 +2616,8 @@
         body {
           margin: 0 !important;
           padding: 0 !important;
-          width: 100%;
+          width: 8.5in !important;
+          min-width: 8.5in !important;
           min-height: 100%;
           background: #fff;
           color: #000;
@@ -2585,10 +2626,30 @@
           overflow: visible;
         }
 
+        html[data-design] body,
+        html[data-design] #main-editor {
+          background: #fff !important;
+        }
+
+        html[data-design] #main-editor {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 8.5in !important;
+          min-height: auto !important;
+          overflow: visible !important;
+        }
+
+        html[data-design] body::before {
+          display: none !important;
+        }
+
         #main-editor {
-          padding: 0;
-          overflow: visible;
-          background: #fff;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 8.5in !important;
+          min-height: auto !important;
+          overflow: visible !important;
+          background: #fff !important;
         }
 
         #print-batch .section-delete-btn,
@@ -2628,6 +2689,7 @@
         }
 
         #print-batch .paper-title-english,
+        #print-batch .paper-style-english,
         #print-batch .paper-tempo-english,
         #print-batch .paper-keymeta-english,
         #print-batch .paper-footer .print-en {
@@ -2666,6 +2728,7 @@
       .lang-picker-overlay.hidden {
         opacity: 0;
         pointer-events: none;
+        visibility: hidden;
       }
 
       .lang-picker-card {
@@ -8274,11 +8337,84 @@
       }
 
       @media print {
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+          animation: none !important;
+        }
+
         body::before,
         .toast-stack,
         #theme-toggle,
         .database-container {
           display: none !important;
+        }
+
+        html,
+        html[data-design],
+        body,
+        html[data-design] body {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 8.5in !important;
+          min-width: 8.5in !important;
+          background: #fff !important;
+          overflow: visible !important;
+        }
+
+        body::before,
+        html[data-design] body::before {
+          display: none !important;
+          content: none !important;
+        }
+
+        #main-editor,
+        html[data-design] #main-editor {
+          display: block !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 8.5in !important;
+          min-height: auto !important;
+          background: #fff !important;
+          overflow: visible !important;
+        }
+
+        #print-batch {
+          display: block !important;
+          width: 8.5in !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          background: #fff !important;
+        }
+
+        #print-batch > .chart-container {
+          display: block !important;
+          position: relative !important;
+          box-sizing: border-box !important;
+          isolation: isolate !important;
+          contain: layout paint !important;
+          width: 8.5in !important;
+          max-width: none !important;
+          height: 10.8in !important;
+          min-height: 10.8in !important;
+          max-height: 10.8in !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+          break-after: page;
+          page-break-after: always;
+        }
+
+        #print-batch > .chart-container:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+
+        #print-batch > .chart-container .paper-footer {
+          position: absolute !important;
+          left: 30px !important;
+          right: 30px !important;
+          bottom: 20px !important;
         }
       }
     </style>
@@ -8779,8 +8915,12 @@
                 <span class="paper-title-english print-en" id="ph-title-english"></span>
               </div>
               <div class="paper-head-cell paper-head-center">
-                <span class="paper-tempo print-ka" id="ph-tempo-karen"></span>
-                <span class="paper-tempo paper-tempo-english print-en" id="ph-tempo-english"></span>
+                <span class="paper-style-value print-ka" id="ph-style-value"></span>
+                <span class="paper-style-english print-en" id="ph-style-english"></span>
+                <span class="paper-tempo-line">
+                  <span class="paper-tempo print-ka" id="ph-tempo-karen"></span>
+                  <span class="paper-tempo paper-tempo-english print-en" id="ph-tempo-english"></span>
+                </span>
               </div>
               <div class="paper-head-cell paper-head-right">
                 <span class="paper-keymeta print-ka" id="ph-keymeta-karen"></span>
@@ -9471,6 +9611,12 @@
         return key ? getBilingualLabel(key, tEnglish(key)) : { karen: "", english: raw };
       }
 
+      function getSidebarInstrumentLabel(value) {
+        const raw = String(value || "").trim();
+        const key = INSTRUMENT_VALUE_TO_SIDEBAR_KEY[raw] || INSTRUMENT_VALUE_TO_KEY[raw];
+        return key ? uiText(key) : raw;
+      }
+
       function getStyleLabelPair(value) {
         const raw = String(value || "").trim();
         if (!raw) return { karen: "", english: "" };
@@ -9479,7 +9625,7 @@
       }
 
       function translatePrintValueToKaren(value) {
-        return String(value || "").replace(/\d/g, digit => tKarenRaw(digit) || digit);
+        return String(value || "").replace(/\d/g, digit => String(tKarenRaw(digit) || digit).trim());
       }
 
       function setStackedBilingual(el, pair, options = {}) {
@@ -9550,17 +9696,28 @@
         const bpmPair = getBilingualLabel("bpmLabel", "BPM");
         const tempoValue = String(tempo || "").trim();
         const karenTempoValue = translatePrintValueToKaren(tempoValue);
-        const englishTempoText = tempoValue ? `${tempoValue} ${bpmPair.english || "BPM"}` : "";
-        const karenTempoText = tempoValue ? `${karenTempoValue} ${bpmPair.karen || bpmPair.english || "BPM"}` : "";
-        const english = [stylePair.english, englishTempoText].filter(Boolean).join(" = ");
-        const karenStyle = stylePair.karen || "";
-        const karen = [karenStyle, karenTempoText].filter(Boolean).join(" = ");
-        return { karen, english };
+        const englishBpm = bpmPair.english || "BPM";
+        const karenBpm = bpmPair.karen || englishBpm;
+        const englishTempoText = tempoValue ? `= ${tempoValue} ${englishBpm}` : "";
+        const karenTempoText = tempoValue ? `= ${karenTempoValue} ${karenBpm}` : "";
+        return {
+          styleKaren: stylePair.karen || "",
+          styleEnglish: stylePair.english || String(style || "").trim(),
+          tempoKaren: karenTempoText,
+          tempoEnglish: englishTempoText
+        };
+      }
+
+      function formatDateForPrint(dateValue) {
+        const raw = String(dateValue || "").trim();
+        const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (iso) return `${iso[2]}/${iso[3]}/${iso[1]}`;
+        return raw || "__/__/____";
       }
 
       function formatDatePair(labelKey, dateValue) {
         const labelPair = getBilingualLabel(labelKey, tEnglish(labelKey));
-        const value = String(dateValue || "__/__/____").trim();
+        const value = formatDateForPrint(dateValue);
         const karenValue = translatePrintValueToKaren(value);
         return {
           karen: labelPair.karen ? `${labelPair.karen}: ${karenValue}` : "",
@@ -13019,6 +13176,8 @@
 
         const phTitleKaren   = document.getElementById("ph-title-karen");
         const phTitleEnglish = document.getElementById("ph-title-english");
+        const phStyleValue = document.getElementById("ph-style-value");
+        const phStyleEnglish = document.getElementById("ph-style-english");
         const phTempoKaren = document.getElementById("ph-tempo-karen");
         const phTempoEnglish = document.getElementById("ph-tempo-english");
         const phKeymetaKaren = document.getElementById("ph-keymeta-karen");
@@ -13035,8 +13194,10 @@
         if (phTitleEnglish) phTitleEnglish.textContent = titlePair.english && titlePair.karen ? `(${titlePair.english})` : "";
 
         const styleTempoPair = formatStyleTempoPair(songStyle, songTempo);
-        if (phTempoKaren) phTempoKaren.textContent = styleTempoPair.karen || "";
-        if (phTempoEnglish) phTempoEnglish.textContent = styleTempoPair.english ? `(${styleTempoPair.english})` : "";
+        if (phStyleValue) phStyleValue.textContent = styleTempoPair.styleKaren || styleTempoPair.styleEnglish || "";
+        if (phStyleEnglish) phStyleEnglish.textContent = styleTempoPair.styleEnglish && styleTempoPair.styleKaren ? `(${styleTempoPair.styleEnglish})` : "";
+        if (phTempoKaren) phTempoKaren.textContent = styleTempoPair.tempoKaren || "";
+        if (phTempoEnglish) phTempoEnglish.textContent = styleTempoPair.tempoEnglish ? `(${styleTempoPair.tempoEnglish.replace(/^=\s*/, "")})` : "";
 
         const keyPair = formatKeyPair(currentKey, origKey);
         if (phKeymetaKaren) phKeymetaKaren.textContent = keyPair.karen || "";
@@ -15523,6 +15684,13 @@
           instrumentElectricBass: "Electric Bass",
           instrumentDrums: "Drums",
           instrumentKeytar: "Keytar",
+          instrumentPiano1Sidebar: "Piano 1",
+          instrumentPiano2Sidebar: "Piano 2",
+          instrumentElectricGuitarSidebar: "Electric Guitar",
+          instrumentAcousticGuitarSidebar: "Acoustic Guitar",
+          instrumentElectricBassSidebar: "Electric Bass",
+          instrumentDrumsSidebar: "Drums",
+          instrumentKeytarSidebar: "Keytar",
           wizardQuickTitle: "New Song",
           wizardLabelTitle: "Song Title",
           wizardLabelKey: "Key",
@@ -15869,6 +16037,16 @@
         "Keytar": "instrumentKeytar"
       };
 
+      const INSTRUMENT_VALUE_TO_SIDEBAR_KEY = {
+        "Piano 1": "instrumentPiano1Sidebar",
+        "Piano 2": "instrumentPiano2Sidebar",
+        "Electric Guitar": "instrumentElectricGuitarSidebar",
+        "Acoustic Guitar": "instrumentAcousticGuitarSidebar",
+        "Electric Bass": "instrumentElectricBassSidebar",
+        "Drums": "instrumentDrumsSidebar",
+        "Keytar": "instrumentKeytarSidebar"
+      };
+
       const INSTRUMENT_VALUE_TO_ABBR_KEY = {
         "Piano 1": "instrumentPiano1Abbr",
         "Piano 2": "instrumentPiano2Abbr",
@@ -15922,14 +16100,21 @@
         ending_section_selection: "sectionEnding",
         piano_1: "instrumentPiano1",
         piano_2: "instrumentPiano2",
+        piano_1_sidebar: "instrumentPiano1Sidebar",
+        piano_2_sidebar: "instrumentPiano2Sidebar",
         "electric guitar": "instrumentElectricGuitar",
         electric_guitar: "instrumentElectricGuitar",
+        electric_guitar_sidebar: "instrumentElectricGuitarSidebar",
         "acoustic guitar": "instrumentAcousticGuitar",
         acoustic_guitar: "instrumentAcousticGuitar",
+        acoustic_guitar_sidebar: "instrumentAcousticGuitarSidebar",
         "electric bass": "instrumentElectricBass",
         electric_bass: "instrumentElectricBass",
+        electric_bass_sidebar: "instrumentElectricBassSidebar",
         drums: "instrumentDrums",
+        drums_sidebar: "instrumentDrumsSidebar",
         keytar: "instrumentKeytar",
+        keytar_sidebar: "instrumentKeytarSidebar",
         go_go: "styleGoGo",
         "go go": "styleGoGo",
         gogo: "styleGoGo",
@@ -16553,8 +16738,7 @@
         // instrument button labels
         document.querySelectorAll(".instr-choice[data-value]").forEach(btn => {
           const value = btn.getAttribute("data-value") || "";
-          const key = INSTRUMENT_VALUE_TO_KEY[value];
-          if (key) btn.textContent = uiText(key);
+          btn.textContent = getSidebarInstrumentLabel(value);
         });
         if (typeof updateAllInstrumentWheels === "function") {
           requestAnimationFrame(updateAllInstrumentWheels);
@@ -16684,9 +16868,23 @@
         if (!overlay) return;
         overlay.style.display = "flex";
         overlay.style.pointerEvents = "";
+        overlay.style.visibility = "";
+        overlay.removeAttribute("inert");
+        overlay.setAttribute("aria-hidden", "false");
         overlay.classList.remove("hidden");
         setupLangPickerKeys();
         setTimeout(() => overlay.focus(), 0);
+      }
+
+      function hideLangPicker() {
+        const overlay = document.getElementById("lang-picker-overlay");
+        if (!overlay) return;
+        overlay.classList.add("hidden");
+        overlay.style.pointerEvents = "none";
+        overlay.style.visibility = "hidden";
+        overlay.style.display = "none";
+        overlay.setAttribute("inert", "");
+        overlay.setAttribute("aria-hidden", "true");
       }
 
       // ============================================================
@@ -16702,6 +16900,7 @@
 
       // ── open wizard ──────────────────────────────────────────────
       function openWizard() {
+        hideLangPicker();
         const overlay = document.getElementById("wizard-overlay");
         if (!overlay) return;
 
@@ -16726,13 +16925,7 @@
       function setLanguage(lang) {
         currentLang = lang;
         localStorage.setItem("karenMusicLang", lang);
-
-        const overlay = document.getElementById("lang-picker-overlay");
-        if (overlay) {
-          overlay.classList.add("hidden");
-          overlay.style.pointerEvents = "none";
-          overlay.style.display = "none";
-        }
+        hideLangPicker();
 
         applyTranslations();
         setupLangToggle();
@@ -17176,7 +17369,13 @@
       async function init() {
         setupThemeControls();
         await loadLatestTranslationOverrides();
-        showLangPicker();
+        if (!appInitialized) {
+          if (currentLang) {
+            setLanguage(currentLang);
+          } else {
+            showLangPicker();
+          }
+        }
         setupLangToggle();
         applyTranslations();
         startTranslationAutoReload();
@@ -17185,7 +17384,13 @@
       window.onload = () => {
         init().catch(err => {
           console.error("App initialization failed", err);
-          showLangPicker();
+          if (!appInitialized) {
+            if (currentLang) {
+              setLanguage(currentLang);
+            } else {
+              showLangPicker();
+            }
+          }
           setupLangToggle();
           applyTranslations();
           startTranslationAutoReload();
