@@ -4167,14 +4167,3 @@ instrument_electric_bass_abbr =
 instrument_drums_abbr = 
 instrument_keytar_abbr = 
 new_song_title = 
-
-# Added by Karen Music Director on 2026-05-24 12:54:51
-# Fill in the Karen translation after =. Add | y to always show both languages, or | n to show only the selected language.
-# Rows without y/n stay plain and intentionally do not include descriptions or code references.
-instrument_piano1_sidebar = 
-instrument_piano2_sidebar = 
-instrument_electric_guitar_sidebar = 
-instrument_acoustic_guitar_sidebar = 
-instrument_electric_bass_sidebar = 
-instrument_drums_sidebar = 
-instrument_keytar_sidebar = 

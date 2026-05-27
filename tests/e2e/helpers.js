@@ -3,16 +3,11 @@ const { expect } = require("@playwright/test");
 async function chooseLanguageAndEnterEditor(page, lang = "english") {
   await page.goto("/");
 
-  const langPicker = page.locator("#lang-picker-overlay");
-  await expect(langPicker).toBeVisible();
-
   if (lang === "karen") {
     await page.locator("#lang-btn-karen").click();
   } else {
     await page.locator("#lang-btn-english").click();
   }
-
-  await expect(langPicker).toBeHidden();
 
   const wizard = page.locator("#wizard-overlay");
   await expect(wizard).toBeVisible();

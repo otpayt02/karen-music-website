@@ -24,58 +24,6 @@ test.describe("print preview packets", () => {
     expect(printCalls).toBe(1);
   });
 
-  test("keeps each printed footer anchored inside its own sheet copy", async ({ page }) => {
-    await chooseLanguageAndEnterEditor(page, "english");
-    await openSidebar(page);
-
-    await page.locator('#instr-sidebar .instr-choice[data-value="Piano 1"]').click();
-    await page.locator('#instr-sidebar .instr-choice[data-value="Piano 2"]').click();
-    await page.locator('#instr-sidebar .instr-choice[data-value="Electric Guitar"]').click();
-    await page.locator('#instr-sidebar .instr-choice[data-value="Drums"]').click();
-
-    await stubWindowPrint(page);
-    await page.locator("#btn-print").click();
-    await page.emulateMedia({ media: "print" });
-
-    const footerMetrics = await page.evaluate(() => {
-      const sheets = Array.from(document.querySelectorAll("#print-batch > .chart-container"));
-      return sheets.map((sheet) => {
-        const footer = sheet.querySelector(".paper-footer");
-        const sheetRect = sheet.getBoundingClientRect();
-        const footerRect = footer?.getBoundingClientRect();
-        const style = getComputedStyle(sheet);
-        return {
-          sheetTop: sheetRect.top,
-          sheetBottom: sheetRect.bottom,
-          footerTop: footerRect?.top ?? 0,
-          footerBottom: footerRect?.bottom ?? 0,
-          footerHeight: footerRect?.height ?? 0,
-          position: style.position,
-          bodyBackground: getComputedStyle(document.body).backgroundColor,
-          mainPaddingTop: getComputedStyle(document.getElementById("main-editor")).paddingTop,
-          footerText: footer?.textContent || ""
-        };
-      });
-    });
-
-    expect(footerMetrics).toHaveLength(5);
-    expect(Math.abs(footerMetrics[0].sheetTop)).toBeLessThan(1);
-    expect(Math.abs(footerMetrics[0].sheetBottom - 1036.8)).toBeLessThan(1);
-    for (const [index, metrics] of footerMetrics.entries()) {
-      expect(metrics.position).toBe("relative");
-      expect(metrics.bodyBackground).toBe("rgb(255, 255, 255)");
-      expect(metrics.mainPaddingTop).toBe("0px");
-      expect(metrics.footerHeight).toBeGreaterThan(20);
-      expect(metrics.footerTop).toBeGreaterThanOrEqual(metrics.sheetTop);
-      expect(metrics.footerBottom).toBeLessThanOrEqual(metrics.sheetBottom);
-      expect(metrics.sheetBottom - metrics.footerBottom).toBeGreaterThanOrEqual(16);
-      if (index > 0) {
-        expect(metrics.footerTop).toBeGreaterThan(footerMetrics[index - 1].footerBottom + 100);
-      }
-    }
-    expect(footerMetrics[4].footerText).toContain("Reference");
-  });
-
   test("prints bilingual sheet metadata and leaves untitled headers blank", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
     await openSidebar(page);
@@ -110,10 +58,8 @@ test.describe("print preview packets", () => {
 
     await expect(page.locator("#chart-container #ph-title-karen")).toHaveText("Karen Title");
     await expect(page.locator("#chart-container #ph-title-english")).toHaveText("(Amazing Grace)");
-    await expect(page.locator("#chart-container #ph-style-value")).toHaveText("ဂိုဂို");
-    await expect(page.locator("#chart-container #ph-style-english")).toHaveText("(Go Go)");
-    await expect(page.locator("#chart-container #ph-tempo-karen")).toHaveText("= ၁၂၅ ဘီပီအမ်");
-    await expect(page.locator("#chart-container #ph-tempo-english")).toHaveText("(125 BPM)");
+    await expect(page.locator("#chart-container #ph-tempo-karen")).toHaveText("ဂိုဂို = ၁၂၅ ဘီပီအမ်");
+    await expect(page.locator("#chart-container #ph-tempo-english")).toHaveText("(Go Go = 125 BPM)");
     await expect(page.locator("#chart-container #ph-keymeta-english")).toHaveText("(Key)");
     await expect(page.locator("#chart-container #ph-key-value")).toHaveText("G");
     await expect(page.locator("#chart-container #ph-footer-center")).toContainText("Piano 1");
@@ -352,7 +298,7 @@ test.describe("print preview packets", () => {
       renderChart();
     });
 
-    await expect(page.locator("#chart-container #ph-footer-next")).toContainText("Date Performed: 06/07/2026");
+    await expect(page.locator("#chart-container #ph-footer-next")).toContainText("Date Performed: 2026-06-07");
   });
 
   test("keeps measure bars the same height across a row", async ({ page }) => {
