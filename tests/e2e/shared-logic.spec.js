@@ -2,19 +2,6 @@ const { test, expect } = require("@playwright/test");
 const { chooseLanguageAndEnterEditor } = require("./helpers");
 
 test.describe("shared editor logic", () => {
-  test("waits for a language choice on app launch even when a language was saved", async ({ page }) => {
-    await page.goto("/");
-    await page.evaluate(() => localStorage.setItem("karenMusicLang", "english"));
-    await page.reload();
-
-    await expect(page.locator("#lang-picker-overlay")).toBeVisible();
-    await expect(page.locator("#wizard-overlay")).toBeHidden();
-
-    await page.locator("#lang-btn-english").click();
-    await expect(page.locator("#lang-picker-overlay")).toBeHidden();
-    await expect(page.locator("#wizard-overlay")).toBeVisible();
-  });
-
   test("transpose dropdown applies target keys and Original immediately", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
     await page.locator("#sidebar-toggle").click();
@@ -65,49 +52,6 @@ test.describe("shared editor logic", () => {
     expect(data).toEqual({ beatsPerMeasure: 3, length: 4, fourthRoot: "G" });
   });
 
-  test("repairs legacy chart data before rendering", async ({ page }) => {
-    await chooseLanguageAndEnterEditor(page, "english");
-
-    const repaired = await page.evaluate(() => {
-      state.beatsPerMeasure = 4;
-      state.sections = [{
-        type: "",
-        rowMeasureCounts: ["8", "bad"],
-        measures: [
-          { beats: [{ chordState: { root: "C" }, xMarks: 99 }, null], stray: true },
-          { beats: [] }
-        ]
-      }, null];
-      state.onlySpans = [{ startBeatIndex: 0, endBeatIndex: 1 }, { startBeatIndex: 0, endBeatIndex: 99 }];
-      state.slurs = [{ startBeatIndex: 0, endBeatIndex: 1 }, { startBeatIndex: -1, endBeatIndex: 1 }];
-      const changed = window.__normalizeLoadedChartStateForTest();
-      renderChart();
-      return {
-        changed,
-        sections: state.sections.length,
-        type: state.sections[0].type,
-        xMarks: state.sections[0].measures[0].beats[0].xMarks,
-        secondBeatRoot: state.sections[0].measures[0].beats[1].chordState.root,
-        generatedMeasureBeats: state.sections[0].measures[1].beats.length,
-        onlySpans: state.onlySpans.length,
-        slurs: state.slurs.length,
-        endingBar: state.sections[0].measures[1].isEndingBar
-      };
-    });
-
-    expect(repaired).toEqual({
-      changed: true,
-      sections: 1,
-      type: "Verse",
-      xMarks: 4,
-      secondBeatRoot: "",
-      generatedMeasureBeats: 4,
-      onlySpans: 1,
-      slurs: 1,
-      endingBar: true
-    });
-  });
-
   test("lead modal highlights base octave before Enter advances", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
@@ -137,15 +81,11 @@ test.describe("shared editor logic", () => {
 
     await page.evaluate(() => {
       setUiDesign("design-3");
-      setThemePalette("kawthoolei");
       setKarenKeyboardImmersive(false);
     });
 
     await expect(page.locator("html")).toHaveAttribute("data-design", "design-3");
-    await expect(page.locator("html")).toHaveAttribute("data-palette", "kawthoolei");
     await expect(page.locator("html")).toHaveAttribute("data-karen-keyboard-immersive", "off");
-    await expect(page.locator("#lang-toggle")).toHaveText("ကညီ");
-    await expect(page.locator("#lang-toggle .karen-music-mark")).toHaveCount(0);
   });
 
   test("UI design options apply distinct layout systems", async ({ page }) => {
@@ -177,12 +117,12 @@ test.describe("shared editor logic", () => {
     });
 
     expect(snapshots.design1).toMatchObject({
-      concept: '"Karen Countryside"',
-      sidebarWidth: "304px",
+      concept: '"Manuscript Desk"',
+      sidebarWidth: "320px",
       mainAlign: "center"
     });
     expect(snapshots.design2).toMatchObject({
-      concept: '"Control Console"',
+      concept: '"Control Room"',
       sidebarWidth: "276px",
       mainAlign: "stretch",
       paperFlapWritingMode: "vertical-rl"

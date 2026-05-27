@@ -490,23 +490,7 @@
       }
 
       #print-batch .chart-container {
-        position: relative;
-        box-sizing: border-box;
-        width: 8.5in;
-        max-width: none;
-        height: 10.8in;
-        min-height: 10.8in;
-        max-height: 10.8in;
         margin: 0 auto 24px auto;
-        padding: 24px 30px 64px 30px;
-        overflow: hidden;
-      }
-
-      #print-batch .paper-footer {
-        position: absolute;
-        left: 30px;
-        right: 30px;
-        bottom: 20px;
       }
 
       /* ============================================================
@@ -516,58 +500,17 @@
       ============================================================ */
 
       html[data-design="design-1"] {
-        --design-concept: "Karen Countryside";
-        --sidebar-width: 304px;
-        --panel-radius: 10px;
-        --control-radius: 8px;
+        --design-concept: "Manuscript Desk";
+        --sidebar-width: 320px;
+        --panel-radius: 18px;
+        --control-radius: 13px;
         --field-pad-y: 8px;
         --field-pad-x: 11px;
-        --app-bg: #172618;
-        --app-bg-soft: rgba(25, 44, 30, 0.88);
-        --panel-bg: rgba(244, 230, 198, 0.82);
-        --panel-bg-strong: rgba(255, 241, 204, 0.94);
-        --surface: rgba(238, 219, 177, 0.8);
-        --surface-2: rgba(202, 171, 105, 0.58);
-        --field-bg: rgba(255, 248, 224, 0.86);
-        --text: #1e2419;
-        --text-muted: #5c654a;
-        --accent: #23683f;
-        --accent-2: #b83a32;
-        --accent-3: #d7a53d;
-        --ambient-1: rgba(35, 104, 63, 0.24);
-        --ambient-2: rgba(184, 58, 50, 0.13);
-        --ambient-3: rgba(215, 165, 61, 0.2);
       }
 
       html[data-design="design-1"] #main-editor {
         align-items: center;
-        padding: 30px 28px 60px !important;
-        background:
-          radial-gradient(780px 460px at 18% 8%, rgba(215, 165, 61, 0.16), transparent 72%),
-          linear-gradient(135deg, rgba(23, 38, 24, 0.96), rgba(48, 73, 42, 0.92)),
-          #172618 !important;
-      }
-
-      html[data-design="design-1"] body {
-        background:
-          linear-gradient(120deg, rgba(23, 38, 24, 0.98), rgba(48, 73, 42, 0.94)),
-          #172618 !important;
-      }
-
-      html[data-design="design-1"] body::before {
-        background:
-          repeating-linear-gradient(112deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 18px),
-          radial-gradient(720px 460px at 82% 2%, rgba(184, 58, 50, 0.16), transparent 70%),
-          radial-gradient(620px 360px at 8% 78%, rgba(35, 104, 63, 0.22), transparent 68%) !important;
-        opacity: 0.78;
-      }
-
-      html[data-design="design-1"] #sidebar {
-        background:
-          linear-gradient(180deg, rgba(255, 241, 204, 0.96), rgba(229, 204, 151, 0.9)) !important;
-        box-shadow:
-          18px 0 55px rgba(3, 18, 9, 0.32),
-          inset -1px 0 0 rgba(255,255,255,0.48) !important;
+        padding: 24px 24px 56px !important;
       }
 
       html[data-design="design-1"] .paper-stack {
@@ -579,17 +522,11 @@
       html[data-design="design-1"] .chart-container,
       html[data-design="design-1"] .lyrics-container,
       html[data-design="design-1"] .database-container {
-        border-radius: 6px !important;
-        background:
-          var(--paper-texture),
-          linear-gradient(180deg, #fff9e7, #fff0c7) !important;
-        box-shadow:
-          0 0 0 1px rgba(81, 63, 31, 0.1),
-          0 26px 60px rgba(9, 24, 12, 0.34) !important;
+        border-radius: 10px 10px 4px 4px !important;
       }
 
       html[data-design="design-2"] {
-        --design-concept: "Control Console";
+        --design-concept: "Control Room";
         --sidebar-width: 276px;
         --panel-radius: 6px;
         --control-radius: 4px;
@@ -2434,15 +2371,15 @@
       .paper-style-value {
         font-family: var(--font-display);
         font-size: 1.12em;
-        font-weight: 500;
+        font-weight: 900;
         color: #111;
         line-height: 1;
         white-space: nowrap;
       }
       .paper-style-english {
         font-family: var(--font-ui);
-        font-size: 0.92em;
-        font-weight: 850;
+        font-size: 0.52em;
+        font-weight: 800;
         color: #333;
         line-height: 1;
         white-space: nowrap;
@@ -5815,39 +5752,12 @@
         --ambient-3: rgba(60, 43, 111, 0.11);
       }
 
-      html[data-palette="kawthoolei"] {
-        --palette-accent: #1f6f4a;
-        --palette-accent-2: #c7382f;
-        --palette-accent-3: #d9a744;
-        --accent: #1f6f4a;
-        --accent-2: #c7382f;
-        --accent-3: #d9a744;
-        --accent-dim: rgba(31, 111, 74, 0.17);
-        --ambient-1: rgba(31, 111, 74, 0.23);
-        --ambient-2: rgba(199, 56, 47, 0.14);
-        --ambient-3: rgba(217, 167, 68, 0.17);
-        --chart-bg: #fffaf0;
-        --paper-texture:
-          repeating-linear-gradient(92deg, rgba(35, 86, 55, 0.045) 0 1px, transparent 1px 38px),
-          radial-gradient(760px 380px at 12% 0%, rgba(31, 111, 74, 0.13), transparent 72%),
-          radial-gradient(520px 300px at 92% 4%, rgba(217, 167, 68, 0.14), transparent 70%);
-      }
-
-      html[data-palette="kawthoolei"] body::before {
-        background:
-          linear-gradient(135deg, rgba(31, 111, 74, 0.22), transparent 46%),
-          repeating-linear-gradient(115deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 16px),
-          radial-gradient(620px 440px at 88% 12%, rgba(199, 56, 47, 0.18), transparent 68%);
-      }
-
       html[data-design="design-1"] {
-        --design-name: "Camp";
-        --panel-radius: 10px;
-        --control-radius: 8px;
-        --chart-bg: #fff0c7;
-        --paper-texture:
-          repeating-linear-gradient(92deg, rgba(75, 94, 48, 0.052) 0 1px, transparent 1px 34px),
-          radial-gradient(520px 340px at 14% 0%, rgba(255,255,255,0.48), transparent 70%);
+        --design-name: "Desk";
+        --panel-radius: 18px;
+        --control-radius: 13px;
+        --chart-bg: #fffef9;
+        --paper-texture: radial-gradient(520px 340px at 14% 0%, rgba(255,255,255,0.54), transparent 70%);
       }
 
       html[data-design="design-2"] {
@@ -5864,24 +5774,6 @@
         --paper-texture:
           repeating-linear-gradient(90deg, rgba(13,17,20,0.035) 0 1px, transparent 1px 46px),
           repeating-linear-gradient(0deg, rgba(13,17,20,0.035) 0 1px, transparent 1px 32px);
-      }
-
-      html[data-design="design-2"] #main-editor {
-        background:
-          linear-gradient(90deg, rgba(79,179,164,0.08) 0 1px, transparent 1px 100%),
-          linear-gradient(0deg, rgba(216,166,87,0.055) 0 1px, transparent 1px 100%),
-          linear-gradient(180deg, rgba(10, 14, 17, 0.98), rgba(7, 10, 12, 1)),
-          #090d10 !important;
-        background-size: 44px 44px, 44px 44px, auto, auto;
-      }
-
-      html[data-design="design-2"] .chart-container,
-      html[data-design="design-2"] .lyrics-container,
-      html[data-design="design-2"] .database-container {
-        box-shadow:
-          10px 10px 0 color-mix(in srgb, var(--accent) 15%, transparent),
-          20px 20px 0 color-mix(in srgb, var(--accent-2) 10%, transparent),
-          0 40px 90px rgba(0,0,0,0.44) !important;
       }
 
       html[data-design="design-3"] {
@@ -6393,83 +6285,6 @@
       .swatch-aurora { background: linear-gradient(120deg, #0f766e, #7c3aed, #f59e0b); }
       .swatch-graphite { background: linear-gradient(120deg, #2f6f88, #d8a657, #23272d); }
       .swatch-bloom { background: linear-gradient(120deg, #ad3b72, #0e9f9a, #3c2b6f); }
-      .swatch-kawthoolei { background: linear-gradient(120deg, #1f6f4a 0 34%, #d9a744 34% 66%, #c7382f 66%); }
-
-      .karen-music-mark {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 48px;
-        height: 34px;
-        margin-right: 8px;
-        color: var(--accent-3);
-        font-family: "Myanmar Text", var(--font-display);
-        font-size: 16px;
-        font-weight: 700;
-        line-height: 1;
-      }
-
-      .karen-music-mark::before,
-      .karen-music-mark::after {
-        content: "";
-        position: absolute;
-        left: 3px;
-        right: 3px;
-        border-top: 2px solid currentColor;
-        opacity: 0.86;
-      }
-
-      .karen-music-mark::before {
-        top: 5px;
-        border-radius: 50% 50% 0 0;
-        transform: translateY(-2px) scaleX(0.72);
-        height: 15px;
-        border-top-width: 2px;
-      }
-
-      .karen-music-mark::after {
-        bottom: 4px;
-        box-shadow: 0 -5px 0 -1px currentColor;
-      }
-
-      .karen-music-mark-bars {
-        position: absolute;
-        inset: 8px 6px 6px;
-        border-left: 2px solid currentColor;
-        border-right: 2px solid currentColor;
-        opacity: 0.74;
-      }
-
-      .karen-music-mark-text {
-        position: relative;
-        z-index: 1;
-        text-shadow: 0 1px 0 rgba(0,0,0,0.18);
-        transform: translateY(-1px);
-      }
-
-      .karen-music-mark-x {
-        position: absolute;
-        right: -1px;
-        bottom: 7px;
-        z-index: 1;
-        font-family: var(--font-ui);
-        font-size: 9px;
-        font-weight: 900;
-        color: var(--accent-2);
-      }
-
-      .sidebar-title {
-        display: flex;
-        align-items: center;
-        gap: 2px;
-      }
-
-      #sidebar .karen-music-mark {
-        min-width: 56px;
-        height: 38px;
-        font-size: 18px;
-      }
 
       input,
       select,
@@ -8862,17 +8677,13 @@
             <span class="palette-swatch swatch-bloom"></span>
             <span data-i18n="bloomPalette">Bloom</span>
           </button>
-          <button type="button" class="palette-option" data-theme-palette="kawthoolei" onclick="setThemePalette('kawthoolei')">
-            <span class="palette-swatch swatch-kawthoolei"></span>
-            <span data-i18n="kawthooleiPalette">Kawthoolei</span>
-          </button>
         </div>
       </div>
       <div class="settings-row settings-row-block">
         <span class="settings-label" data-i18n="uiDesignDirection">UI Design Direction</span>
         <div class="segmented-control design-direction-control" role="radiogroup" aria-label="UI Design Direction">
-          <button type="button" class="design-option" data-ui-design="design-1" onclick="setUiDesign('design-1')" title="Karen Countryside">1 <span data-i18n="designDesk">Camp</span></button>
-          <button type="button" class="design-option" data-ui-design="design-2" onclick="setUiDesign('design-2')" title="Control Console">2 <span data-i18n="designConsole">Console</span></button>
+          <button type="button" class="design-option" data-ui-design="design-1" onclick="setUiDesign('design-1')" title="Manuscript Desk">1 <span data-i18n="designDesk">Desk</span></button>
+          <button type="button" class="design-option" data-ui-design="design-2" onclick="setUiDesign('design-2')" title="Control Room">2 <span data-i18n="designConsole">Console</span></button>
           <button type="button" class="design-option" data-ui-design="design-3" onclick="setUiDesign('design-3')" title="Stage">3 <span data-i18n="designStage">Stage</span></button>
         </div>
       </div>
@@ -8942,14 +8753,7 @@
     ============================================================ -->
     <div id="sidebar" class="collapsed">
 
-      <h2 class="sidebar-title">
-        <span class="karen-music-mark" aria-hidden="true">
-          <span class="karen-music-mark-bars"></span>
-          <span class="karen-music-mark-text">ကညီ</span>
-          <span class="karen-music-mark-x">x</span>
-        </span>
-        <span class="sidebar-title-text">KAREN MUSIC</span>
-      </h2>
+      <h2 class="sidebar-title">KAREN MUSIC</h2>
 
       <!-- Song Metadata -->
       <div class="form-group">
@@ -9813,33 +9617,10 @@
         return key ? uiText(key) : raw;
       }
 
-      function normalizeTranslationLookupValue(value) {
-        return String(value || "")
-          .trim()
-          .replace(/_/g, " ")
-          .replace(/\s+/g, " ")
-          .toLowerCase();
-      }
-
-      function keyForTranslatedFieldValue(value, valueToKeyMap) {
-        const raw = String(value || "").trim();
-        if (!raw) return "";
-        const normalized = normalizeTranslationLookupValue(raw);
-        if (valueToKeyMap?.[normalized]) return valueToKeyMap[normalized];
-
-        for (const [englishValue, key] of Object.entries(valueToKeyMap || {})) {
-          const english = String(TRANSLATIONS.english?.[key] || englishValue || "").trim();
-          const karen = String(TRANSLATIONS.karen?.[key] || "").trim();
-          if (normalizeTranslationLookupValue(english) === normalized) return key;
-          if (karen && karen === raw) return key;
-        }
-        return "";
-      }
-
       function getStyleLabelPair(value) {
         const raw = String(value || "").trim();
         if (!raw) return { karen: "", english: "" };
-        const key = keyForTranslatedFieldValue(raw, STYLE_VALUE_TO_KEY);
+        const key = STYLE_VALUE_TO_KEY[raw.toLowerCase()];
         return key ? getBilingualLabel(key, tEnglish(key)) : { karen: "", english: raw };
       }
 
@@ -10339,7 +10120,6 @@
 
             host.appendChild(clone);
             applyBeatCellLayout(clone);
-            fitChartContentToPaper(clone);
             renderOnlySpans(clone);
             renderSlurs(clone);
             renderLeadInstrumentLabels(clone);
@@ -11632,147 +11412,6 @@
           m.isEndingBar = i === section.measures.length - 1;
         });
       }
-
-      function normalizeLoadedBeat(beat) {
-        const clean = createEmptyBeat();
-        if (!beat || typeof beat !== "object") return { beat: clean, changed: true };
-
-        let changed = false;
-        const sourceChord = (beat.chordState && typeof beat.chordState === "object") ? beat.chordState : {};
-        clean.chordState = {
-          root: String(sourceChord.root || ""),
-          flat: !!sourceChord.flat,
-          minor: !!sourceChord.minor,
-          triangle: !!sourceChord.triangle,
-          seven: !!sourceChord.seven
-        };
-        clean.bass = String(beat.bass || "");
-        clean.xMarks = Math.max(0, Math.min(4, Number(beat.xMarks) || 0));
-        clean.dot = !!beat.dot;
-        clean.manualUnderline = !!beat.manualUnderline;
-        clean.circle = !!beat.circle;
-        clean.roll = !!beat.roll;
-        clean.lead = Array.isArray(beat.lead) ? beat.lead.map(v => String(v || "")) : [];
-        clean.editStack = Array.isArray(beat.editStack) ? beat.editStack.filter(Boolean).map(v => String(v)) : [];
-
-        const before = JSON.stringify(beat);
-        const after = JSON.stringify(clean);
-        if (before !== after) changed = true;
-        return { beat: clean, changed };
-      }
-
-      function normalizeLoadedMeasure(measure, fallbackBeatCount) {
-        const template = createMeasure(fallbackBeatCount || state.beatsPerMeasure || 4);
-        if (!measure || typeof measure !== "object") return { measure: template, changed: true };
-
-        let changed = false;
-        const rawBeats = Array.isArray(measure.beats) && measure.beats.length
-          ? measure.beats
-          : template.beats;
-        const beats = rawBeats.map(rawBeat => {
-          const normalized = normalizeLoadedBeat(rawBeat);
-          if (normalized.changed) changed = true;
-          return normalized.beat;
-        });
-
-        const normalizedMeasure = {
-          beats,
-          roll: !!measure.roll,
-          forceUnderline: !!measure.forceUnderline,
-          isPreMeasure: !!measure.isPreMeasure,
-          leadEnabled: !!measure.leadEnabled,
-          leadBaseOctave: Number.isFinite(Number(measure.leadBaseOctave)) ? Number(measure.leadBaseOctave) : null,
-          leadInstrumentAbbr: String(measure.leadInstrumentAbbr || ""),
-          leadSlotsPerBeat: Number(measure.leadSlotsPerBeat) === 3 ? 3 : 4,
-          leadSlots: Math.max(0, Number(measure.leadSlots) || beats.length * 4),
-          isEndingBar: !!measure.isEndingBar
-        };
-        if (!Array.isArray(measure.beats) || !measure.beats.length) changed = true;
-        return { measure: normalizedMeasure, changed };
-      }
-
-      function normalizeLoadedSections(sections) {
-        let changed = false;
-        const source = Array.isArray(sections) ? sections : [];
-        const normalized = source
-          .filter(section => section && typeof section === "object")
-          .map(section => {
-            const rawMeasures = Array.isArray(section.measures) && section.measures.length
-              ? section.measures
-              : [createMeasure()];
-            if (!Array.isArray(section.measures) || !section.measures.length) changed = true;
-
-            const measures = rawMeasures.map(measure => {
-              const normalizedMeasure = normalizeLoadedMeasure(measure, state.beatsPerMeasure || 4);
-              if (normalizedMeasure.changed) changed = true;
-              return normalizedMeasure.measure;
-            });
-            const clean = {
-              ...section,
-              type: String(section.type || "Verse"),
-              measuresPerRow: Number.isFinite(Number(section.measuresPerRow)) ? clampMeasuresPerRow(section.measuresPerRow) : null,
-              rowMeasureCounts: Array.isArray(section.rowMeasureCounts)
-                ? section.rowMeasureCounts.map(v => Number.isFinite(Number(v)) ? clampMeasuresPerRow(v) : null)
-                : [],
-              measures
-            };
-            refreshSectionEndingBars(clean);
-            return clean;
-          });
-        if (source.length !== normalized.length) changed = true;
-        return { sections: normalized, changed };
-      }
-
-      function normalizeBeatIndexedSpanList(list, totalBeats, defaults = {}) {
-        let changed = false;
-        const source = Array.isArray(list) ? list : [];
-        const normalized = [];
-        source.forEach(item => {
-          const start = Number(item?.startBeatIndex);
-          const end = Number(item?.endBeatIndex);
-          if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end < 0 || start >= totalBeats || end >= totalBeats) {
-            changed = true;
-            return;
-          }
-          normalized.push({
-            ...defaults,
-            ...item,
-            startBeatIndex: Math.min(start, end),
-            endBeatIndex: Math.max(start, end)
-          });
-        });
-        if (source.length !== normalized.length) changed = true;
-        return { list: normalized, changed };
-      }
-
-      function normalizeLoadedChartState() {
-        let repaired = false;
-        const normalizedSections = normalizeLoadedSections(state.sections);
-        state.sections = normalizedSections.sections;
-        repaired = repaired || normalizedSections.changed;
-
-        const totalBeats = state.sections.reduce((sum, section) => (
-          sum + (section.measures || []).reduce((inner, measure) => inner + getBeatCountForMeasure(measure), 0)
-        ), 0);
-        const only = normalizeBeatIndexedSpanList(state.onlySpans, totalBeats, { label: "KB", endLabel: "All In" });
-        state.onlySpans = only.list;
-        repaired = repaired || only.changed;
-        const slurs = normalizeBeatIndexedSpanList(state.slurs, totalBeats);
-        state.slurs = slurs.list;
-        repaired = repaired || slurs.changed;
-
-        state.onlyStart = null;
-        state.slurStart = null;
-        state.currentSectionIdx = Math.max(0, Math.min(Number(state.currentSectionIdx) || 0, Math.max(0, state.sections.length - 1)));
-        const section = state.sections[state.currentSectionIdx];
-        state.currentMeasureIdx = Math.max(0, Math.min(Number(state.currentMeasureIdx) || 0, Math.max(0, (section?.measures?.length || 1) - 1)));
-        const measure = section?.measures?.[state.currentMeasureIdx];
-        state.currentBeatIdx = Math.max(0, Math.min(Number(state.currentBeatIdx) || 0, Math.max(0, getBeatCountForMeasure(measure) - 1)));
-        state.lyricsSections = normalizeLyricsSections(state.lyricsSections || []);
-        state.rowLead = state.rowLead && typeof state.rowLead === "object" ? state.rowLead : {};
-        return repaired;
-      }
-      window.__normalizeLoadedChartStateForTest = normalizeLoadedChartState;
 
       // REPLACE addMeasure()
       function addMeasure(sectionIdx) {
@@ -14521,9 +14160,9 @@
         return
       }
 
-      function fitChartContentToPaper(chartRoot = document.getElementById("chart-container")) {
-        const chart = chartRoot;
-        const sections = chart?.querySelector("#sections-container");
+      function fitChartContentToPaper() {
+        const chart = document.getElementById("chart-container");
+        const sections = document.getElementById("sections-container");
         const header = chart?.querySelector(".paper-header");
         const footer = chart?.querySelector(".paper-footer");
         if (!chart || !sections || !header || !footer) return;
@@ -14544,6 +14183,9 @@
         const contentHeight = sections.scrollHeight || 0;
 
         if (!contentHeight || contentHeight <= availableHeight) return;
+        const renderedLineCount = sections.querySelectorAll(".line").length;
+        if (renderedLineCount < 20) return;
+
         const scale = Math.max(0.12, availableHeight / contentHeight);
         sections.style.transform = `scale(${scale})`;
         sections.style.width = `${100 / scale}%`;
@@ -15144,7 +14786,6 @@
         state.slurStart         = null;
         state.history           = [];
         state.historyIndex      = -1;
-        const repairedLegacyChart = normalizeLoadedChartState();
 
         document.getElementById("songTitle").value      = s.title      || "";
         document.getElementById("songTitleKaren").value = s.title_karen || "";
@@ -15159,10 +14800,6 @@
 
         saveState();
         renderChart();
-        if (repairedLegacyChart && state.id) {
-          saveSong({ quiet: true, skipCapture: true, skipReload: true })
-            .catch(err => console.warn("Could not save repaired song chart", err));
-        }
 
         const ft = document.getElementById("focus-trap");
         ft && ft.focus();
@@ -16185,8 +15822,7 @@
           auroraPalette: "Aurora",
           graphitePalette: "Graphite",
           bloomPalette: "Bloom",
-          kawthooleiPalette: "Kawthoolei",
-          designDesk: "Camp",
+          designDesk: "Desk",
           designConsole: "Console",
           designStage: "Stage",
           silkyMotion: "Animated",
@@ -16347,7 +15983,6 @@
           auroraPalette: "",
           graphitePalette: "",
           bloomPalette: "",
-          kawthooleiPalette: "",
           designDesk: "",
           designConsole: "",
           designStage: "",
@@ -16535,7 +16170,7 @@
       };
 
       const THEME_MODES = ["auto", "light", "dark"];
-      const THEME_PALETTES = ["ivory", "velvet", "aurora", "graphite", "bloom", "kawthoolei"];
+      const THEME_PALETTES = ["ivory", "velvet", "aurora", "graphite", "bloom"];
       const THEME_MOTIONS = ["silky", "calm"];
       const THEME_DENSITIES = ["compact", "comfy"];
       const UI_DESIGNS = ["design-1", "design-2", "design-3"];
@@ -16914,15 +16549,8 @@
             const value = String(rawValue || "").trim();
             if (!value) return;
             const key = toCamelTranslationKey(rawKey);
-            if (key) {
-              TRANSLATIONS.karen[key] = value;
-              return;
-            }
-
-            const reverseKey = toCamelTranslationKey(value);
-            if (reverseKey && String(rawKey || "").trim()) {
-              TRANSLATIONS.karen[reverseKey] = String(rawKey || "").trim();
-            }
+            if (!key) return;
+            TRANSLATIONS.karen[key] = value;
           });
           const policies = data?.policies || {};
           Object.entries(policies).forEach(([rawKey, rawPolicy]) => {
@@ -16996,7 +16624,7 @@
         setTextById("wizard-back-btn", uiText("wizardBack"));
         setTextById("karen-target-label", `${uiText("typingInto")} —`);
 
-        const sideBarTitle = document.querySelector(".sidebar-title-text");
+        const sideBarTitle = document.querySelector(".sidebar-title");
         if (sideBarTitle) sideBarTitle.textContent = uiText("appName");
 
         // placeholders
@@ -17159,7 +16787,6 @@
         }
 
         lt.style.display = "flex";
-        lt.textContent = currentLang === "karen" ? "EN" : "\u1000\u100A\u102E";
         lt.onclick = (e) => {
           e.preventDefault();
           const next = currentLang === "karen" ? "english" : "karen";
@@ -17743,7 +17370,11 @@
         setupThemeControls();
         await loadLatestTranslationOverrides();
         if (!appInitialized) {
-          showLangPicker();
+          if (currentLang) {
+            setLanguage(currentLang);
+          } else {
+            showLangPicker();
+          }
         }
         setupLangToggle();
         applyTranslations();
@@ -17754,7 +17385,11 @@
         init().catch(err => {
           console.error("App initialization failed", err);
           if (!appInitialized) {
-            showLangPicker();
+            if (currentLang) {
+              setLanguage(currentLang);
+            } else {
+              showLangPicker();
+            }
           }
           setupLangToggle();
           applyTranslations();

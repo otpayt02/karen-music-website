@@ -162,8 +162,7 @@ your_plural = သု
 9 = ၉
 0 = ၀
 Country = ဒူးသဝီ
-Go_Go = ကိကိ
-ကိကိ = "Go Go"
+Go_Go = လဲၤလဲၤ
 bpm_label = ဘ့းဖ့ၤအဲၣ်
 reference_copy_label = စးခိတဘ့ၣ်လၢပကဘၣ်ထွဲ
 က
@@ -4179,8 +4178,3 @@ instrument_acoustic_guitar_sidebar =
 instrument_electric_bass_sidebar = 
 instrument_drums_sidebar = 
 instrument_keytar_sidebar = 
-
-# Added by Karen Music Director on 2026-05-24 21:09:26
-# Fill in the Karen translation after =. Add | y to always show both languages, or | n to show only the selected language.
-# Rows without y/n stay plain and intentionally do not include descriptions or code references.
-kawthoolei_palette = 

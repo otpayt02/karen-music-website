@@ -585,8 +585,8 @@ def translation_file_info(path):
 def latest_translation_file():
     roots = [DATA_DIR, BASE_DIR, RESOURCE_DIR]
     seen = set()
-    candidates = []
     for root in roots:
+        candidates = []
         for name in TRANSLATION_FILE_CANDIDATES:
             path = os.path.abspath(os.path.join(root, name))
             if path in seen:
@@ -608,9 +608,9 @@ def latest_translation_file():
                 candidates.append(path)
         except OSError:
             continue
-    if not candidates:
-        return None
-    return max(candidates, key=lambda p: os.path.getmtime(p))
+        if candidates:
+            return max(candidates, key=lambda p: os.path.getmtime(p))
+    return None
 
 
 def normalize_file_metadata_value(value):
