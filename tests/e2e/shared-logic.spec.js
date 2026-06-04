@@ -95,6 +95,69 @@ test.describe("shared editor logic", () => {
     expect(beat).toEqual({ bass: "Ab", root: "C", rootFlat: false });
   });
 
+  test("uses only the immediate post-slash flat window for bass flats", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      const measure = createMeasure(4);
+      measure.beats[0].chordState = { root: "F", flat: false, minor: false, triangle: false, seven: false };
+      state.sections = [{ type: "Verse", measures: [measure] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      renderChart();
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press("/");
+    await page.keyboard.press("A");
+    await page.keyboard.press("C");
+
+    const afterSwallowedRoot = await page.evaluate(() => {
+      const active = state.sections[0].measures[0].beats[0];
+      return {
+        bass: active.bass,
+        root: active.chordState.root,
+        rootFlat: active.chordState.flat
+      };
+    });
+
+    expect(afterSwallowedRoot).toEqual({ bass: "A", root: "F", rootFlat: false });
+
+    await page.keyboard.press("D");
+    await page.keyboard.press("b");
+
+    const afterRootFlat = await page.evaluate(() => {
+      const active = state.sections[0].measures[0].beats[0];
+      return {
+        bass: active.bass,
+        root: active.chordState.root,
+        rootFlat: active.chordState.flat
+      };
+    });
+
+    expect(afterRootFlat).toEqual({ bass: "A", root: "D", rootFlat: true });
+  });
+
+  test("roll labels remain English-only when Karen sheet text is enabled", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const labelText = await page.evaluate(() => {
+      localStorage.setItem(THEME_STORAGE_KEYS.printKaren, "on");
+      TRANSLATIONS.karen.rollLabel = "ကညီ Roll";
+      const measure = createMeasure(4);
+      measure.roll = true;
+      state.sections = [{ type: "Verse", measures: [measure] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      renderChart();
+      return document.querySelector(".measure-roll-label")?.textContent?.trim() || "";
+    });
+
+    expect(labelText).toBe("Roll");
+  });
+
   test("ctrl shortcuts add sus and aug as chord exponents", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 

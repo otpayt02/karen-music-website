@@ -158,16 +158,24 @@ test.describe("print preview packets", () => {
     await expect(page.locator("#chart-container #ph-style-english")).toHaveText("Go Go");
     await expect(page.locator("#chart-container #ph-tempo-karen")).toContainText("(");
     await expect(page.locator("#chart-container #ph-tempo-english")).toHaveText("125 BPM");
-    await expect(page.locator("#chart-container #ph-keymeta-english")).toHaveText("Key");
+    await expect(page.locator("#chart-container #ph-keymeta-english")).toHaveText("");
     await expect(page.locator("#chart-container #ph-key-value")).toHaveText("G");
     await expect(page.locator("#chart-container .paper-head-tempo #ph-tempo-english")).toBeVisible();
     const headerSizing = await page.evaluate(() => {
       const styleSize = parseFloat(getComputedStyle(document.getElementById("ph-style-english")).fontSize);
       const tempoSize = parseFloat(getComputedStyle(document.getElementById("ph-tempo-english")).fontSize);
+      const tempoRect = document.getElementById("ph-tempo-english").getBoundingClientRect();
+      const headerRect = document.getElementById("paper-header").getBoundingClientRect();
       const titleKarenWeight = getComputedStyle(document.getElementById("ph-title-karen")).fontWeight;
-      return { styleSize, tempoSize, titleKarenWeight };
+      return {
+        styleSize,
+        tempoSize,
+        titleKarenWeight,
+        tempoNearRight: headerRect.right - tempoRect.right < 12
+      };
     });
     expect(headerSizing.tempoSize).toBeLessThan(headerSizing.styleSize);
+    expect(headerSizing.tempoNearRight).toBe(true);
     expect(Number(headerSizing.titleKarenWeight)).toBeLessThan(700);
     await expect(page.locator("#chart-container #ph-footer-center")).toContainText("Piano 1");
     await expect(page.locator("#chart-container #ph-footer-right")).toContainText("Choir");

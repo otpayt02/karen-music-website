@@ -8724,6 +8724,34 @@
         font-weight: 400 !important;
       }
 
+      .paper-header .paper-keymeta {
+        display: none !important;
+      }
+
+      .paper-head-tempo {
+        align-self: start !important;
+        align-items: flex-end !important;
+        justify-content: flex-start !important;
+        padding-top: 1px;
+      }
+
+      .paper-header .paper-tempo-line {
+        justify-content: flex-end !important;
+        gap: 2px !important;
+        opacity: 0.82;
+      }
+
+      .paper-header .paper-tempo {
+        font-size: 0.48em !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+      }
+
+      .paper-header .paper-tempo-english {
+        font-size: 0.54em !important;
+        font-weight: 700 !important;
+      }
+
       #print-batch .paper-title-english,
       #print-batch .paper-style-english {
         font-size: 1.22em !important;
@@ -14023,8 +14051,8 @@
         if (phTempoKaren) phTempoKaren.textContent = maybeParenthesizeKaren(styleTempoPair.tempoKaren ? styleTempoPair.tempoKaren.replace(/^=\s*/, "") : "");
 
         const keyPair = formatKeyPair(currentKey, origKey);
-        if (phKeymetaEnglish) phKeymetaEnglish.textContent = keyPair.english || "";
-        if (phKeymetaKaren) phKeymetaKaren.textContent = maybeParenthesizeKaren(keyPair.karen);
+        if (phKeymetaEnglish) phKeymetaEnglish.textContent = "";
+        if (phKeymetaKaren) phKeymetaKaren.textContent = "";
         if (phKeyValue) phKeyValue.textContent = keyPair.value || "";
         if (phKeyExtra) phKeyExtra.textContent = keyPair.extraEnglish ? `(${keyPair.extraEnglish})` : "";
         updateFooterDateRow(phFooterCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
@@ -14439,7 +14467,7 @@
               if (measureRoll) {
                 const rollLabel = document.createElement("div");
                 rollLabel.className = "roll-label measure-roll-label";
-                setCueLabel(rollLabel, cueLabelPair("rollLabel", tEnglish("rollLabel") || "Roll"));
+                rollLabel.textContent = tEnglish("rollLabel") || "Roll";
                 measureEl.appendChild(rollLabel);
               }
               line.appendChild(measureEl);
@@ -14656,9 +14684,29 @@
         if (!beat) return;
         const beatHasRoot = !!(beat.chordState && beat.chordState.root);
 
-        if ((state.pendingBassFlat || beat.awaitingBassFlat) && e.key !== "b" && e.key !== "B") {
+        const waitingForBassFlat = !!(state.pendingBassFlat || beat.awaitingBassFlat);
+
+        if (waitingForBassFlat && (e.key === "b" || e.key === "B") && /^[A-G]$/.test(String(beat.bass || "").trim())) {
+          e.preventDefault();
+          saveState();
+          const baseBass = String(beat.bass).trim()[0]?.toUpperCase() || "";
+          const flatBass = normalizeKeyToFlat(`${baseBass}b`) || `${baseBass}b`;
+          beat.bass = flatBass;
+          recordBeatEdit(beat, "bass");
           state.pendingBassFlat = false;
           delete beat.awaitingBassFlat;
+          renderChart();
+          return;
+        }
+
+        if (waitingForBassFlat) {
+          state.pendingBassFlat = false;
+          delete beat.awaitingBassFlat;
+          if (/^[a-gA-G]$/.test(e.key)) {
+            e.preventDefault();
+            renderChart();
+            return;
+          }
         }
 
         if (e.ctrlKey && !e.altKey && !e.metaKey && ["s", "a"].includes(e.key.toLowerCase())) {
@@ -14946,6 +14994,7 @@
 
         // ── PENDING BASS: next A-G sets bass note ──
         if (state.pendingBass) {
+          let committedBass = false;
           if (/^[a-gA-G]$/.test(e.key)) {
             e.preventDefault();
 
@@ -14956,6 +15005,7 @@
               recordBeatEdit(beat, "bass");
               state.pendingBassFlat = true;
               beat.awaitingBassFlat = true;
+              committedBass = true;
             }
             state.pendingBass = false;
             renderChart();
@@ -14966,26 +15016,10 @@
             // do NOT return — let the key fall through to other handlers below
           }
           // if we committed bass, return; otherwise fall through
-          if (!state.pendingBass) return;
+          if (committedBass) return;
         }
 
         // ── FLAT: B key toggles flat on current beat ──
-        // After / then A-G, one following B belongs to the bass note, not the root chord.
-        if ((e.key === "b" || e.key === "B") && /^[A-G]$/.test(String(beat.bass || "").trim())) {
-          e.preventDefault();
-          if (beat.bass) {
-            saveState();
-            const baseBass = String(beat.bass).trim()[0]?.toUpperCase() || "";
-            const flatBass = normalizeKeyToFlat(`${baseBass}b`) || `${baseBass}b`;
-            beat.bass = flatBass;
-            recordBeatEdit(beat, "bass");
-            renderChart();
-          }
-          state.pendingBassFlat = false;
-          delete beat.awaitingBassFlat;
-          return;
-        }
-
         if ((e.key === "b" || e.key === "B") && !beatHasRoot) {
           e.preventDefault();
           saveState();
