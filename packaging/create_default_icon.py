@@ -44,7 +44,7 @@ def make_icon(size):
     except Exception:
         font = ImageFont.load_default()
 
-    syllables = ["ကညီ", "ကျိ", "တၢ်", "သး"]
+    syllables = ["က", "ညီ", "သး", "ဝံ"]
     centers = [p(13.2), p(25.8), p(38.3), p(50.8)]
     for i, text in enumerate(syllables):
         bbox = draw.textbbox((0, 0), text, font=font)
