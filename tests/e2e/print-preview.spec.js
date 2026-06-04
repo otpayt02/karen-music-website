@@ -23,6 +23,50 @@ test.describe("print preview packets", () => {
     await expect.poll(() => page.evaluate(() => window.__printCalls || 0)).toBe(1);
   });
 
+  test("prints lead melody notes only on their assigned instrument copy", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const result = await page.evaluate(() => {
+      const measures = [createMeasure(), createMeasure(), createMeasure(), createMeasure()];
+      const ranges = [
+        { abbr: "EGT", startMeasureIdx: 0, startBeatIdx: 0, endMeasureIdx: 1, endBeatIdx: 3 },
+        { abbr: "KB1", startMeasureIdx: 2, startBeatIdx: 0, endMeasureIdx: 3, endBeatIdx: 3 }
+      ];
+
+      measures.forEach((measure, idx) => {
+        measure.leadEnabled = true;
+        measure.leadBaseOctave = 4;
+        measure.leadSlotsPerBeat = 4;
+        measure.leadSlots = 16;
+        measure.leadInstrumentRanges = ranges;
+        measure.rowLeadView = Array.from({ length: 16 }, () => "");
+        measure.rowLeadView[0] = String(idx + 1);
+      });
+
+      state.sections = [{ type: "Solo", measures }];
+      state.rowLead = {};
+      document.getElementById("songInstruments").value = "Piano 1, Electric Guitar";
+      buildPrintBatch();
+
+      return Array.from(document.querySelectorAll("#print-batch .chart-container")).map(sheet => ({
+        footer: sheet.querySelector("#ph-footer-center")?.textContent || "",
+        notes: Array.from(sheet.querySelectorAll(".lead-note")).map(note => note.textContent.trim()),
+        labels: Array.from(sheet.querySelectorAll(".lead-instrument-label")).map(label => label.textContent.trim())
+      }));
+    });
+
+    expect(result).toHaveLength(3);
+    expect(result[0].footer).toContain("Piano 1");
+    expect(result[0].notes).toEqual(["3", "4"]);
+    expect(result[0].labels).toEqual([]);
+    expect(result[1].footer).toContain("Electric Guitar");
+    expect(result[1].notes).toEqual(["1", "2"]);
+    expect(result[1].labels).toEqual([]);
+    expect(result[2].footer).toContain("Reference");
+    expect(result[2].notes).toEqual(["1", "2", "3", "4"]);
+    expect(result[2].labels).toEqual([]);
+  });
+
   test("keeps each printed footer anchored inside its own sheet copy", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
     await openSidebar(page);

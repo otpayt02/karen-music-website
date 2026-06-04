@@ -10427,6 +10427,59 @@
           .forEach(node => node.remove());
         root.querySelectorAll(".beat.active, .beat.slur-start-pending, .beat.only-start-pending")
           .forEach(node => node.classList.remove("active", "slur-start-pending", "only-start-pending"));
+        root.querySelectorAll(".lead-instrument-label").forEach(node => node.remove());
+        root.querySelectorAll(".lead-beat.lead-range-start, .lead-beat.lead-range-end, .lead-beat.lead-range-two")
+          .forEach(node => node.classList.remove("lead-range-start", "lead-range-end", "lead-range-two"));
+      }
+
+      function normalizeLeadInstrumentAbbr(value) {
+        return String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+      }
+
+      function leadRangeContainsBeat(range, globalBeat) {
+        if (!range || !Number.isFinite(Number(globalBeat))) return false;
+        const start = Number(range.startGlobalBeat);
+        const end = Number(range.endGlobalBeat);
+        if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+        return Number(globalBeat) >= Math.min(start, end) && Number(globalBeat) <= Math.max(start, end);
+      }
+
+      function filterLeadRowsForPrintPage(root, pageInfo) {
+        if (!root || pageInfo?.kind === "reference") return;
+        const targetAbbr = normalizeLeadInstrumentAbbr(getInstrumentAbbreviation(pageInfo?.name || ""));
+        if (!targetAbbr) return;
+
+        root.querySelectorAll(".line.has-lead").forEach(line => {
+          const ranges = getLeadInstrumentRangesForLine(line);
+          let lineHasVisibleLead = false;
+
+          line.querySelectorAll(".lead-beat").forEach(leadBeat => {
+            const globalBeat = Number(leadBeat.dataset.globalbeat);
+            const matchingRange = ranges.find(range =>
+              normalizeLeadInstrumentAbbr(range.abbr) === targetAbbr &&
+              leadRangeContainsBeat(range, globalBeat)
+            );
+            const keepBeatLead = !!matchingRange;
+
+            leadBeat.querySelectorAll(".lead-subslot").forEach(slot => {
+              const note = slot.querySelector(".lead-note");
+              if (!note) return;
+              if (keepBeatLead) {
+                lineHasVisibleLead = true;
+              } else {
+                note.remove();
+              }
+            });
+
+            const stillHasLead = !!leadBeat.querySelector(".lead-note");
+            leadBeat.classList.toggle("with-guides", stillHasLead);
+          });
+
+          if (!lineHasVisibleLead) {
+            line.classList.remove("has-lead");
+            line.querySelectorAll(".lead-row, .lead-row-base-oct, .lead-instrument-label").forEach(node => node.remove());
+          }
+        });
       }
 
       function withMeasurablePrintBatch(work) {
@@ -10495,13 +10548,13 @@
             updateFooterDateRow(footerCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
             const footerPerformed = clone.querySelector("#ph-footer-next");
             updateFooterDateRow(footerPerformed, formatDatePair("datePerformedLabel", performedDate || "__/__/____"));
+            filterLeadRowsForPrintPage(clone, pageInfo);
 
             host.appendChild(clone);
             applyBeatCellLayout(clone);
             fitChartContentToPaper(clone);
             renderOnlySpans(clone);
             renderSlurs(clone);
-            renderLeadInstrumentLabels(clone);
           });
         });
       }
@@ -13224,12 +13277,9 @@
           const ranges = getLeadInstrumentRangesForLine(line);
           if (!ranges.length) return;
 
-          const lineRect = line.getBoundingClientRect();
           ranges.forEach((range, idx) => {
             const startBeat = line.querySelector(`.lead-beat[data-globalbeat="${range.startGlobalBeat}"]`);
             const endBeat = line.querySelector(`.lead-beat[data-globalbeat="${range.endGlobalBeat}"]`);
-            const anchorBeat = startBeat || endBeat || line.querySelector(".lead-beat");
-            if (!anchorBeat) return;
 
             startBeat?.classList.add("lead-range-start");
             endBeat?.classList.add("lead-range-end");
@@ -13237,20 +13287,6 @@
               startBeat?.classList.add("lead-range-two");
               endBeat?.classList.add("lead-range-two");
             }
-
-            const beatRect = anchorBeat.getBoundingClientRect();
-            const label = document.createElement("div");
-            label.className = `lead-instrument-label${idx === 1 ? " is-right" : ""}`;
-            label.textContent = range.abbr;
-            line.appendChild(label);
-
-            const labelWidth = label.getBoundingClientRect().width || 0;
-            const top = beatRect.top - lineRect.top - 1;
-            const left = idx === 1
-              ? (lineRect.width + 4)
-              : (-labelWidth - 8);
-            label.style.left = `${left}px`;
-            label.style.top = `${top}px`;
           });
         });
       }

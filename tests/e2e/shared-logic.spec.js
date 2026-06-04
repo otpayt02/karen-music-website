@@ -149,7 +149,7 @@ test.describe("shared editor logic", () => {
     });
   });
 
-  test("lead instrument ranges render separate row labels and corner markers", async ({ page }) => {
+  test("lead instrument ranges render corner markers without row labels", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
     const result = await page.evaluate(() => {
@@ -175,19 +175,13 @@ test.describe("shared editor logic", () => {
       renderChart();
       renderLeadInstrumentLabels();
 
-      const labels = Array.from(document.querySelectorAll(".lead-instrument-label")).map(el => ({
-        text: el.textContent.trim(),
-        right: el.classList.contains("is-right")
-      }));
+      const labels = Array.from(document.querySelectorAll(".lead-instrument-label")).map(el => el.textContent.trim());
       const starts = Array.from(document.querySelectorAll(".lead-beat.lead-range-start")).map(el => Number(el.dataset.globalbeat));
       const ends = Array.from(document.querySelectorAll(".lead-beat.lead-range-end")).map(el => Number(el.dataset.globalbeat));
       return { labels, starts, ends };
     });
 
-    expect(result.labels).toEqual([
-      { text: "EG", right: false },
-      { text: "KB1", right: true }
-    ]);
+    expect(result.labels).toEqual([]);
     expect(result.starts).toEqual([0, 8]);
     expect(result.ends).toEqual([7, 15]);
   });
