@@ -227,6 +227,7 @@ test.describe("print preview packets", () => {
         return measure;
       });
       state.sections = [{ type: "Verse", measuresPerRow: 1, measures }];
+      state.slurs = [{ startBeatIndex: 81, endBeatIndex: 83 }];
       state.currentSectionIdx = 0;
       state.currentMeasureIdx = 0;
       state.currentBeatIdx = 0;
@@ -255,6 +256,7 @@ test.describe("print preview packets", () => {
     await stubWindowPrint(page);
     await page.locator("#btn-print").click();
     await page.emulateMedia({ media: "print" });
+    await page.waitForTimeout(100);
 
     const printMetrics = await page.evaluate(() => {
       const sheet = document.querySelector("#print-batch .chart-container");
@@ -262,17 +264,27 @@ test.describe("print preview packets", () => {
       const lines = Array.from(sheet.querySelectorAll(".line"));
       const lastLine = lines[lines.length - 1];
       const footer = sheet.querySelector(".paper-footer");
+      const slur = sheet.querySelector('.slur-span[data-start-beat="81"][data-end-beat="83"]');
+      const startBeat = sheet.querySelector('.beat[data-globalbeat="81"]');
+      const endBeat = sheet.querySelector('.beat[data-globalbeat="83"]');
       const lastRect = lastLine.getBoundingClientRect();
       const footerRect = footer.getBoundingClientRect();
+      const slurRect = slur?.getBoundingClientRect();
+      const startRect = startBeat?.getBoundingClientRect();
+      const endRect = endBeat?.getBoundingClientRect();
       return {
         scale: new DOMMatrixReadOnly(getComputedStyle(sections).transform).a || 1,
         lastLineBottom: lastRect.bottom,
-        footerTop: footerRect.top
+        footerTop: footerRect.top,
+        startsAtBeatCenter: !!slurRect && !!startRect && Math.abs((slurRect.left + Number(slur.dataset.pathStartOffset || 0)) - (startRect.left + startRect.width / 2)) <= 2,
+        endsAtBeatCenter: !!slurRect && !!endRect && Math.abs((slurRect.left + Number(slur.dataset.pathEndOffset || slurRect.width)) - (endRect.left + endRect.width / 2)) <= 2
       };
     });
 
     expect(printMetrics.scale).toBeLessThan(1);
     expect(printMetrics.lastLineBottom).toBeLessThanOrEqual(printMetrics.footerTop);
+    expect(printMetrics.startsAtBeatCenter).toBe(true);
+    expect(printMetrics.endsAtBeatCenter).toBe(true);
   });
 
   test("keeps print packets to clean one-page sheets with beat-spanning slurs", async ({ page }) => {

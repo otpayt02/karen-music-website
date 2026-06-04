@@ -10594,6 +10594,12 @@
 
       let titleBeforePrint = null;
 
+      function rebuildPrintBatchForPrintLayout() {
+        const host = document.getElementById("print-batch");
+        if (!host || !host.children.length) return;
+        buildPrintBatch();
+      }
+
       function printInstrumentPackets() {
         syncAllInstrFields();
         if (!state.createdDate) {
@@ -10610,6 +10616,10 @@
         });
       }
 
+      window.addEventListener("beforeprint", () => {
+        rebuildPrintBatchForPrintLayout();
+      });
+
       window.addEventListener("afterprint", () => {
         clearPrintBatch();
         if (titleBeforePrint !== null) {
@@ -10617,6 +10627,22 @@
           titleBeforePrint = null;
         }
       });
+
+      if (window.matchMedia) {
+        const printMediaQuery = window.matchMedia("print");
+        const handlePrintMediaChange = event => {
+          if (!event.matches) return;
+          requestAnimationFrame(() => {
+            rebuildPrintBatchForPrintLayout();
+          });
+        };
+        if (typeof printMediaQuery.addEventListener === "function") {
+          printMediaQuery.addEventListener("change", handlePrintMediaChange);
+        } else if (typeof printMediaQuery.addListener === "function") {
+          printMediaQuery.addListener(handlePrintMediaChange);
+        }
+      }
+
 
       function createEmptyBeat() {
         return {
@@ -12564,6 +12590,7 @@
         state.currentMeasureIdx = m;
         state.currentBeatIdx = Math.min(state.currentBeatIdx, Math.max(0, beatCount - 1));
         renderChart();
+        scrollActiveRowToEditorTop();
       }
 
       function moveDown() {
@@ -12855,6 +12882,7 @@
         state.currentMeasureIdx = m;
         state.currentBeatIdx = b;
         renderChart();
+        scrollActiveRowToEditorTop();
       }
 
       function getInstrumentAbbreviation(name) {
@@ -13162,7 +13190,7 @@
 
         const start = Math.min(startBeat, endBeat);
         const end = Math.max(startBeat, endBeat);
-        const beatEls = Array.from(container.querySelectorAll("[data-globalbeat]"))
+        const beatEls = Array.from(container.querySelectorAll(".beat[data-globalbeat]"))
           .map(el => ({ el, gb: Number(el.dataset.globalbeat) }))
           .filter(item => Number.isFinite(item.gb) && item.gb >= start && item.gb <= end)
           .sort((a, b) => a.gb - b.gb);
@@ -13185,10 +13213,10 @@
           const firstGroup = idx === 0;
           const lastGroup = idx === groups.length - 1;
           const startEl = firstGroup
-            ? container.querySelector(`[data-globalbeat="${start}"]`)
+            ? container.querySelector(`.beat[data-globalbeat="${start}"]`)
             : group.beats[0];
           const endEl = lastGroup
-            ? container.querySelector(`[data-globalbeat="${end}"]`)
+            ? container.querySelector(`.beat[data-globalbeat="${end}"]`)
             : group.beats[group.beats.length - 1];
           drawSlurSegment(container, startEl, endEl);
         });
@@ -13206,8 +13234,17 @@
         const startRect = startEl.getBoundingClientRect();
         const endRect = endEl.getBoundingClientRect();
 
-        const x1 = startRect.left - hostRect.left + (startRect.width / 2);
-        const x2 = endRect.left - hostRect.left + (endRect.width / 2);
+        const scaleXRaw = hostRect.width && startLine.offsetWidth
+          ? hostRect.width / startLine.offsetWidth
+          : 1;
+        const scaleYRaw = hostRect.height && startLine.offsetHeight
+          ? hostRect.height / startLine.offsetHeight
+          : 1;
+        const scaleX = Number.isFinite(scaleXRaw) && scaleXRaw > 0 ? scaleXRaw : 1;
+        const scaleY = Number.isFinite(scaleYRaw) && scaleYRaw > 0 ? scaleYRaw : 1;
+
+        const x1 = ((startRect.left - hostRect.left) / scaleX) + ((startRect.width / scaleX) / 2);
+        const x2 = ((endRect.left - hostRect.left) / scaleX) + ((endRect.width / scaleX) / 2);
         const chartX1 = startRect.left - cRect.left + (startRect.width / 2);
         const chartX2 = endRect.left - cRect.left + (endRect.width / 2);
 
@@ -13220,7 +13257,7 @@
         const endpointY = 12;
         const apexY = 2;
         const slurHeight = 14;
-        const beatTop = Math.min(startRect.top, endRect.top) - hostRect.top;
+        const beatTop = (Math.min(startRect.top, endRect.top) - hostRect.top) / scaleY;
         const y = Math.max(0, beatTop - endpointY);
 
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -13231,8 +13268,12 @@
         svg.dataset.endX = String(chartX2);
         svg.dataset.localStartX = String(x1);
         svg.dataset.localEndX = String(x2);
-        svg.dataset.pathStartOffset = String(startOffset);
-        svg.dataset.pathEndOffset = String(endOffset);
+        svg.dataset.pathStartOffset = String(startOffset * scaleX);
+        svg.dataset.pathEndOffset = String(endOffset * scaleX);
+        svg.dataset.localPathStartOffset = String(startOffset);
+        svg.dataset.localPathEndOffset = String(endOffset);
+        svg.dataset.scaleX = String(scaleX);
+        svg.dataset.scaleY = String(scaleY);
         svg.dataset.startBeat = startEl.dataset.globalbeat || "";
         svg.dataset.endBeat = endEl.dataset.globalbeat || "";
         svg.style.left = `${left}px`;
@@ -14405,6 +14446,7 @@
                   state.currentMeasureIdx = mIdx;
                   state.currentBeatIdx = bIdx;
                   renderChart();
+                  scrollActiveRowToEditorTop();
                   const ft = document.getElementById("focus-trap");
                   ft && ft.focus();
                 });
@@ -15101,6 +15143,20 @@
         renderOnlySpans();
         renderSlurs();
         renderLeadInstrumentLabels();
+      }
+
+      function scrollActiveRowToEditorTop() {
+        const editor = document.getElementById("main-editor");
+        const activeBeat = document.querySelector("#chart-container .beat.active");
+        const activeLine = activeBeat?.closest(".line");
+        if (!editor || !activeLine) return;
+
+        requestAnimationFrame(() => {
+          const editorRect = editor.getBoundingClientRect();
+          const lineRect = activeLine.getBoundingClientRect();
+          const nextTop = editor.scrollTop + (lineRect.top - editorRect.top);
+          editor.scrollTo({ top: Math.max(0, nextTop), behavior: "smooth" });
+        });
       }
 
       function applyBeatCellLayout(root = document) {

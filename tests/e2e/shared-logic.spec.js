@@ -158,6 +158,52 @@ test.describe("shared editor logic", () => {
     expect(labelText).toBe("Roll");
   });
 
+  test("beat click and arrow navigation keep the active row at the editor top", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      const measures = Array.from({ length: 18 }, (_, idx) => {
+        const measure = createMeasure(4);
+        measure.beats[0].chordState = {
+          root: ["C", "D", "E", "F", "G", "A"][idx % 6],
+          flat: false,
+          minor: false,
+          triangle: false,
+          seven: false
+        };
+        return measure;
+      });
+      state.sections = [{ type: "Verse", measuresPerRow: 3, measures }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      renderChart();
+      const editor = document.getElementById("main-editor");
+      if (editor) editor.scrollTop = 0;
+    });
+
+    await page.evaluate(() => {
+      const target = document.querySelector('.beat[data-measureidx="12"][data-beatidx="0"]');
+      target?.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }));
+    });
+
+    await expect.poll(() => page.evaluate(() => {
+      const editor = document.getElementById("main-editor");
+      const line = document.querySelector("#chart-container .beat.active")?.closest(".line");
+      if (!editor || !line) return 9999;
+      return Math.abs(line.getBoundingClientRect().top - editor.getBoundingClientRect().top);
+    })).toBeLessThan(8);
+
+    await page.keyboard.press("ArrowRight");
+
+    await expect.poll(() => page.evaluate(() => {
+      const editor = document.getElementById("main-editor");
+      const line = document.querySelector("#chart-container .beat.active")?.closest(".line");
+      if (!editor || !line) return 9999;
+      return Math.abs(line.getBoundingClientRect().top - editor.getBoundingClientRect().top);
+    })).toBeLessThan(8);
+  });
+
   test("ctrl shortcuts add sus and aug as chord exponents", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
