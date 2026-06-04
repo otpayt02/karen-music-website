@@ -149,6 +149,49 @@ test.describe("shared editor logic", () => {
     });
   });
 
+  test("lead instrument ranges render separate row labels and corner markers", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const result = await page.evaluate(() => {
+      state.sections = [{
+        type: "Solo",
+        measures: [createMeasure(), createMeasure(), createMeasure(), createMeasure()]
+      }];
+      state.rowLead = {};
+      const rowKey = getRowKey(0, 0);
+      const cfg = ensureRowLead(rowKey);
+      cfg.baseOctave = 4;
+      cfg.slots = 4;
+      cfg.instrumentAbbr = "EG";
+      cfg.instrumentRanges = [
+        { abbr: "EG", startMeasureIdx: 0, startBeatIdx: 0, endMeasureIdx: 1, endBeatIdx: 3 },
+        { abbr: "KB1", startMeasureIdx: 2, startBeatIdx: 0, endMeasureIdx: 3, endBeatIdx: 3 }
+      ];
+      cfg.cells = { "base:0": "1", "base:4": "2", "base:8": "3", "base:12": "4" };
+      syncRowBaseOctaveForMeasureKey(rowKey, cfg.baseOctave);
+      syncRowLeadInstrumentForMeasureKey(rowKey, cfg.instrumentAbbr);
+      syncRowLeadInstrumentRangesForMeasureKey(rowKey, cfg.instrumentRanges);
+      applyRowLeadToRow(rowKey);
+      renderChart();
+      renderLeadInstrumentLabels();
+
+      const labels = Array.from(document.querySelectorAll(".lead-instrument-label")).map(el => ({
+        text: el.textContent.trim(),
+        right: el.classList.contains("is-right")
+      }));
+      const starts = Array.from(document.querySelectorAll(".lead-beat.lead-range-start")).map(el => Number(el.dataset.globalbeat));
+      const ends = Array.from(document.querySelectorAll(".lead-beat.lead-range-end")).map(el => Number(el.dataset.globalbeat));
+      return { labels, starts, ends };
+    });
+
+    expect(result.labels).toEqual([
+      { text: "EG", right: false },
+      { text: "KB1", right: true }
+    ]);
+    expect(result.starts).toEqual([0, 8]);
+    expect(result.ends).toEqual([7, 15]);
+  });
+
   test("repairs legacy chart data before rendering", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 

@@ -1707,6 +1707,39 @@
         pointer-events: none;
       }
 
+      .lead-instrument-label.is-right {
+        transform: translateX(0);
+      }
+
+      .lead-beat.lead-range-start::before,
+      .lead-beat.lead-range-end::after {
+        content: "";
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      .lead-beat.lead-range-start::before {
+        left: 0;
+        top: 0;
+        border-left: 2px solid #111;
+        border-top: 2px solid #111;
+      }
+
+      .lead-beat.lead-range-end::after {
+        right: 0;
+        bottom: 0;
+        border-right: 2px solid #111;
+        border-bottom: 2px solid #111;
+      }
+
+      .lead-beat.lead-range-two.lead-range-start::before,
+      .lead-beat.lead-range-two.lead-range-end::after {
+        border-color: #7a1f1f;
+      }
+
       .lead-note {
         font-size: 9px;
         font-weight: 700;
@@ -11019,6 +11052,24 @@
         }
       }
 
+      function syncRowLeadInstrumentRangesForMeasureKey(rowKey, ranges) {
+        const parsed = parseRowKey(rowKey);
+        if (!parsed) return;
+        const range = getRowMeasureRange(parsed.sIdx, parsed.measureIdx);
+        if (!range) return;
+        const normalized = normalizeLeadInstrumentRanges(ranges, "");
+        const section = state.sections?.[parsed.sIdx];
+
+        for (let i = range.start; i < range.end; i++) {
+          const key = getRowKey(parsed.sIdx, i);
+          const cfg = ensureRowLead(key);
+          cfg.instrumentRanges = JSON.parse(JSON.stringify(normalized));
+          if (section?.measures?.[i]) {
+            section.measures[i].leadInstrumentRanges = JSON.parse(JSON.stringify(normalized));
+          }
+        }
+      }
+
       function getRowLeadInstrumentForRange(sIdx, rowStart, rowCount) {
         const section = state.sections?.[sIdx];
         for (let i = rowStart; i < rowStart + rowCount; i++) {
@@ -11028,6 +11079,17 @@
           if (measureValue) return measureValue;
         }
         return "";
+      }
+
+      function getRowLeadInstrumentRangesForRange(sIdx, rowStart, rowCount) {
+        const section = state.sections?.[sIdx];
+        for (let i = rowStart; i < rowStart + rowCount; i++) {
+          const cfgRanges = normalizeLeadInstrumentRanges(state.rowLead?.[getRowKey(sIdx, i)]?.instrumentRanges, "");
+          if (cfgRanges.length) return cfgRanges;
+          const measureRanges = normalizeLeadInstrumentRanges(section?.measures?.[i]?.leadInstrumentRanges, "");
+          if (measureRanges.length) return measureRanges;
+        }
+        return [];
       }
 
       function applyRowLeadToRow(rowKey) {
@@ -11187,11 +11249,24 @@
           label: getInstrumentAbbreviation(name)
         }));
         const safeOptions = options.length ? options : [{ name: "Keyboard", label: "KB" }];
-        const current = String(rowState.instrumentAbbr || "").trim();
+        const ranges = normalizeLeadInstrumentRanges(rowState.instrumentRanges, rowState.instrumentAbbr);
+        const activeIdx = Math.max(0, Math.min(1, Number(rowState.activeRangeIndex) || 0));
+        const activeRange = ranges[activeIdx] || null;
+        const current = String(activeRange?.abbr || rowState.instrumentAbbr || "").trim();
+        const point = getLeadCursorRangePoint(state.leadModalState.rowKey, rowState);
+        const rangeSummary = [0, 1].map(idx => {
+          const r = ranges[idx];
+          const selected = idx === activeIdx ? " selected" : "";
+          const label = r?.abbr ? `${escapeHtml(r.abbr)}: M${r.startMeasureIdx + 1}.${r.startBeatIdx + 1} - M${r.endMeasureIdx + 1}.${r.endBeatIdx + 1}` : `Range ${idx + 1}`;
+          return `<button type="button" class="only-instrument-option lead-range-option${selected}" onclick="setLeadInstrumentRangeSlot(${idx})">${label}</button>`;
+        }).join("");
 
         host.innerHTML = `
           <div class="wizard-step-question" style="margin-bottom:8px;">Lead instrument label</div>
-          <div class="wizard-mode-hint" style="margin-bottom:10px;">Pick the abbreviation that prints beside this lead row.</div>
+          <div class="wizard-mode-hint" style="margin-bottom:10px;">Pick Range 1 or 2, choose the abbreviation, then mark where that instrument starts and ends. Current cursor: M${point.measureIdx + 1}.${point.beatIdx + 1}</div>
+          <div class="only-instrument-grid lead-instrument-grid" style="margin-bottom:10px;">
+            ${rangeSummary}
+          </div>
           <div class="only-instrument-grid lead-instrument-grid">
             ${safeOptions.map((option, idx) => {
               const selected = current === option.label || (!current && idx === 0);
@@ -11206,6 +11281,11 @@
                 </button>
               `;
             }).join("")}
+          </div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;">
+            <button type="button" class="wizard-btn-primary" onclick="setLeadInstrumentRangeEndpoint('start')">Start here</button>
+            <button type="button" class="wizard-btn-primary" onclick="setLeadInstrumentRangeEndpoint('end')">End here</button>
+            <button type="button" class="wizard-btn-secondary" onclick="clearLeadInstrumentRange()">Clear range</button>
           </div>
         `;
       }
@@ -11231,6 +11311,8 @@
           baseOctave: null,
           slots: null,
           instrumentAbbr: "",
+          instrumentRanges: [],
+          activeRangeIndex: 0,
           cells: {},
           lastTab: 1,
           history: [],
@@ -11238,9 +11320,112 @@
         };
       }
 
+      function normalizeLeadInstrumentRanges(ranges, fallbackAbbr = "") {
+        const source = Array.isArray(ranges) ? ranges : [];
+        const normalized = [];
+        source.forEach((range, idx) => {
+          const abbr = String(range?.abbr || range?.instrumentAbbr || "").trim();
+          if (!abbr) return;
+          const startMeasureIdx = Math.max(0, Math.floor(Number(range.startMeasureIdx) || 0));
+          const endMeasureIdx = Math.max(startMeasureIdx, Math.floor(Number(range.endMeasureIdx) || startMeasureIdx));
+          const startBeatIdx = Math.max(0, Math.floor(Number(range.startBeatIdx) || 0));
+          const endBeatIdx = Math.max(0, Math.floor(Number(range.endBeatIdx) || startBeatIdx));
+          normalized.push({
+            abbr,
+            startMeasureIdx,
+            startBeatIdx,
+            endMeasureIdx,
+            endBeatIdx,
+            side: idx === 1 ? "right" : "left"
+          });
+        });
+        if (!normalized.length && String(fallbackAbbr || "").trim()) {
+          normalized.push({
+            abbr: String(fallbackAbbr || "").trim(),
+            startMeasureIdx: 0,
+            startBeatIdx: 0,
+            endMeasureIdx: 9999,
+            endBeatIdx: 9999,
+            side: "left"
+          });
+        }
+        return normalized.slice(0, 2);
+      }
+
+      function getLeadCursorRangePoint(rowKey, cfg) {
+        const parsed = parseRowKey(rowKey);
+        const slotsPerBeat = getLeadSlotsPerBeat(cfg);
+        const beatIdx = Math.max(0, Math.floor((Number(state.leadModalState?.cursorCol) || 0) / slotsPerBeat));
+        return {
+          measureIdx: Math.max(0, Number(parsed?.measureIdx) || 0),
+          beatIdx
+        };
+      }
+
+      function setLeadInstrumentRangeEndpoint(endpoint) {
+        const lm = state.leadModalState;
+        if (!lm?.working) return;
+        const activeIdx = Math.max(0, Math.min(1, Number(lm.working.activeRangeIndex) || 0));
+        const ranges = normalizeLeadInstrumentRanges(lm.working.instrumentRanges, lm.working.instrumentAbbr);
+        while (ranges.length <= activeIdx) {
+          ranges.push({
+            abbr: lm.working.instrumentAbbr || "",
+            startMeasureIdx: 0,
+            startBeatIdx: 0,
+            endMeasureIdx: 0,
+            endBeatIdx: 0,
+            side: ranges.length === 1 ? "right" : "left"
+          });
+        }
+        const point = getLeadCursorRangePoint(lm.rowKey, lm.working);
+        const range = ranges[activeIdx];
+        if (!range.abbr) range.abbr = lm.working.instrumentAbbr || "";
+        if (endpoint === "start") {
+          range.startMeasureIdx = point.measureIdx;
+          range.startBeatIdx = point.beatIdx;
+          if (range.endMeasureIdx < range.startMeasureIdx || (range.endMeasureIdx === range.startMeasureIdx && range.endBeatIdx < range.startBeatIdx)) {
+            range.endMeasureIdx = range.startMeasureIdx;
+            range.endBeatIdx = range.startBeatIdx;
+          }
+        } else {
+          range.endMeasureIdx = point.measureIdx;
+          range.endBeatIdx = point.beatIdx;
+          if (range.endMeasureIdx < range.startMeasureIdx || (range.endMeasureIdx === range.startMeasureIdx && range.endBeatIdx < range.startBeatIdx)) {
+            range.startMeasureIdx = range.endMeasureIdx;
+            range.startBeatIdx = range.endBeatIdx;
+          }
+        }
+        lm.working.instrumentRanges = ranges.slice(0, 2);
+        pushLeadModalHistory();
+        showLeadTab(4);
+      }
+
+      function setLeadInstrumentRangeSlot(idx) {
+        const lm = state.leadModalState;
+        if (!lm?.working) return;
+        lm.working.activeRangeIndex = Math.max(0, Math.min(1, Number(idx) || 0));
+        showLeadTab(4);
+      }
+
+      function clearLeadInstrumentRange(idx = null) {
+        const lm = state.leadModalState;
+        if (!lm?.working) return;
+        const activeIdx = idx === null ? (Number(lm.working.activeRangeIndex) || 0) : Number(idx);
+        const ranges = normalizeLeadInstrumentRanges(lm.working.instrumentRanges, "");
+        ranges.splice(Math.max(0, Math.min(1, activeIdx)), 1);
+        lm.working.instrumentRanges = ranges;
+        pushLeadModalHistory();
+        showLeadTab(4);
+      }
+
       function ensureRowLead(rowKey) {
         if (!state.rowLead) state.rowLead = {};
         if (!state.rowLead[rowKey]) state.rowLead[rowKey] = makeRowLeadState();
+        state.rowLead[rowKey].instrumentRanges = normalizeLeadInstrumentRanges(
+          state.rowLead[rowKey].instrumentRanges,
+          ""
+        );
+        state.rowLead[rowKey].activeRangeIndex = Math.max(0, Math.min(1, Number(state.rowLead[rowKey].activeRangeIndex) || 0));
         return state.rowLead[rowKey];
       }
 
@@ -11269,6 +11454,8 @@
           baseOctave: lm.working.baseOctave ?? null,
           slots: lm.working.slots ?? null,
           instrumentAbbr: lm.working.instrumentAbbr || "",
+          instrumentRanges: normalizeLeadInstrumentRanges(lm.working.instrumentRanges, ""),
+          activeRangeIndex: Number(lm.working.activeRangeIndex) || 0,
           cells: lm.working.cells || {},
           lastTab: lm.working.lastTab || 1
         });
@@ -11291,6 +11478,8 @@
         lm.working.baseOctave = snap.baseOctave;
         lm.working.slots = snap.slots;
         lm.working.instrumentAbbr = snap.instrumentAbbr || "";
+        lm.working.instrumentRanges = normalizeLeadInstrumentRanges(snap.instrumentRanges, "");
+        lm.working.activeRangeIndex = Number(snap.activeRangeIndex) || 0;
         lm.working.cells = snap.cells || {};
         lm.working.lastTab = snap.lastTab || 1;
       }
@@ -11323,11 +11512,17 @@
         const rowInstrument = rowRange
           ? getRowLeadInstrumentForRange(state.currentSectionIdx, rowRange.start, rowRange.end - rowRange.start)
           : "";
+        const rowInstrumentRanges = rowRange
+          ? getRowLeadInstrumentRangesForRange(state.currentSectionIdx, rowRange.start, rowRange.end - rowRange.start)
+          : [];
         if ((!cfg.baseOctave || Number(cfg.baseOctave) < 1) && Number.isFinite(Number(rowBase))) {
           cfg.baseOctave = Number(rowBase);
         }
         if (!String(cfg.instrumentAbbr || "").trim() && rowInstrument) {
           cfg.instrumentAbbr = rowInstrument;
+        }
+        if (!normalizeLeadInstrumentRanges(cfg.instrumentRanges, "").length && rowInstrumentRanges.length) {
+          cfg.instrumentRanges = JSON.parse(JSON.stringify(rowInstrumentRanges));
         }
         const startTab = cfg.baseOctave ? (cfg.lastTab || 2) : 1;
         openLeadModal(measureKey, startTab);
@@ -11370,6 +11565,7 @@
           state.rowLead[lm.rowKey] = JSON.parse(JSON.stringify(lm.working));
           syncRowBaseOctaveForMeasureKey(lm.rowKey, lm.working.baseOctave);
           syncRowLeadInstrumentForMeasureKey(lm.rowKey, lm.working.instrumentAbbr);
+          syncRowLeadInstrumentRangesForMeasureKey(lm.rowKey, lm.working.instrumentRanges);
           applyRowLeadToRow(lm.rowKey);
           saveState();
           renderChart();
@@ -11524,7 +11720,23 @@
       function setLeadInstrumentAbbr(abbr) {
         const lm = state.leadModalState;
         if (!lm?.working) return;
-        lm.working.instrumentAbbr = String(abbr || "").trim();
+        const value = String(abbr || "").trim();
+        lm.working.instrumentAbbr = value;
+        const activeIdx = Math.max(0, Math.min(1, Number(lm.working.activeRangeIndex) || 0));
+        const ranges = normalizeLeadInstrumentRanges(lm.working.instrumentRanges, "");
+        while (ranges.length <= activeIdx) {
+          const point = getLeadCursorRangePoint(lm.rowKey, lm.working);
+          ranges.push({
+            abbr: value,
+            startMeasureIdx: point.measureIdx,
+            startBeatIdx: point.beatIdx,
+            endMeasureIdx: point.measureIdx,
+            endBeatIdx: point.beatIdx,
+            side: ranges.length === 1 ? "right" : "left"
+          });
+        }
+        ranges[activeIdx].abbr = value;
+        lm.working.instrumentRanges = ranges.slice(0, 2);
         lm.working.enabled = true;
         lm.working.lastTab = 4;
         pushLeadModalHistory();
@@ -11729,6 +11941,7 @@
         measure.leadSlotsPerBeat = slotsPerBeat;
         measure.leadSlots = totalSlots;
         measure.leadInstrumentAbbr = cfg.instrumentAbbr || "";
+        measure.leadInstrumentRanges = normalizeLeadInstrumentRanges(cfg.instrumentRanges, cfg.instrumentAbbr);
         measure.rowLeadView = [];
 
         for (let col = 0; col < totalSlots; col++) {
@@ -11772,6 +11985,7 @@
           leadEnabled: false,
           leadBaseOctave: null,
           leadInstrumentAbbr: "",
+          leadInstrumentRanges: [],
           leadSlotsPerBeat: 4,
           leadSlots: n * 4,
           isEndingBar: false
@@ -11838,6 +12052,7 @@
           leadEnabled: !!measure.leadEnabled,
           leadBaseOctave: Number.isFinite(Number(measure.leadBaseOctave)) ? Number(measure.leadBaseOctave) : null,
           leadInstrumentAbbr: String(measure.leadInstrumentAbbr || ""),
+          leadInstrumentRanges: normalizeLeadInstrumentRanges(measure.leadInstrumentRanges, ""),
           leadSlotsPerBeat: Number(measure.leadSlotsPerBeat) === 3 ? 3 : 4,
           leadSlots: Math.max(0, Number(measure.leadSlots) || beats.length * 4),
           isEndingBar: !!measure.isEndingBar
@@ -12915,10 +13130,9 @@
         const chartX1 = startRect.left - cRect.left + (startRect.width / 2);
         const chartX2 = endRect.left - cRect.left + (endRect.width / 2);
 
-        const visualPad = 4;
-        const left = Math.min(x1, x2) - visualPad;
-        const right = Math.max(x1, x2) + visualPad;
-        const width = Math.max(22, right - left);
+        const left = Math.min(x1, x2);
+        const right = Math.max(x1, x2);
+        const width = Math.max(1, right - left);
         const startOffset = x1 - left;
         const endOffset = x2 - left;
         const curveWidth = Math.max(18, Math.abs(endOffset - startOffset));
@@ -12964,36 +13178,80 @@
         return getRowLeadInstrumentForRange(sIdx, rowStart, rowCount);
       }
 
+      function getLeadInstrumentRangesForLine(line) {
+        const sIdx = Number(line?.dataset?.sectionidx);
+        const rowStart = Number(line?.dataset?.rowstart);
+        const rowCount = Number(line?.dataset?.rowcount);
+        if (!Number.isInteger(sIdx) || !Number.isInteger(rowStart) || !Number.isInteger(rowCount)) return [];
+        const section = state.sections?.[sIdx];
+        let ranges = [];
+        for (let i = rowStart; i < rowStart + rowCount; i++) {
+          const cfg = state.rowLead?.[getRowKey(sIdx, i)];
+          ranges = normalizeLeadInstrumentRanges(cfg?.instrumentRanges, "");
+          if (ranges.length) break;
+          ranges = normalizeLeadInstrumentRanges(section?.measures?.[i]?.leadInstrumentRanges, "");
+          if (ranges.length) break;
+        }
+        if (!ranges.length) {
+          const abbr = getLeadInstrumentAbbrForLine(line);
+          if (abbr) {
+            ranges = normalizeLeadInstrumentRanges([], abbr);
+          }
+        }
+        return ranges.map((range, idx) => {
+          const startMeasureIdx = Math.max(rowStart, Math.min(rowStart + rowCount - 1, Number(range.startMeasureIdx) || rowStart));
+          const endMeasureIdx = Math.max(rowStart, Math.min(rowStart + rowCount - 1, Number(range.endMeasureIdx) || startMeasureIdx));
+          const startMeasure = section?.measures?.[startMeasureIdx];
+          const endMeasure = section?.measures?.[endMeasureIdx];
+          const startBeatIdx = Math.max(0, Math.min(getBeatCountForMeasure(startMeasure) - 1, Number(range.startBeatIdx) || 0));
+          const endBeatIdx = Math.max(0, Math.min(getBeatCountForMeasure(endMeasure) - 1, Number(range.endBeatIdx) || startBeatIdx));
+          return {
+            ...range,
+            side: idx === 1 ? "right" : "left",
+            startGlobalBeat: getGlobalBeatIndex(sIdx, startMeasureIdx, startBeatIdx),
+            endGlobalBeat: getGlobalBeatIndex(sIdx, endMeasureIdx, endBeatIdx)
+          };
+        }).slice(0, 2);
+      }
+
       function renderLeadInstrumentLabels(container = document.getElementById("chart-container")) {
         if (!container) return;
         container.querySelectorAll(".lead-instrument-label").forEach(node => node.remove());
+        container.querySelectorAll(".lead-beat.lead-range-start, .lead-beat.lead-range-end, .lead-beat.lead-range-two")
+          .forEach(node => node.classList.remove("lead-range-start", "lead-range-end", "lead-range-two"));
         const lines = Array.from(container.querySelectorAll(".line.has-lead"));
         lines.forEach(line => {
-          const abbr = getLeadInstrumentAbbrForLine(line);
-          if (!abbr) return;
-          const firstSlot = Array.from(line.querySelectorAll(".lead-subslot"))
-            .find(slot => String(slot.textContent || "").trim() !== "");
-          if (!firstSlot) return;
+          const ranges = getLeadInstrumentRangesForLine(line);
+          if (!ranges.length) return;
 
           const lineRect = line.getBoundingClientRect();
-          const slotRect = firstSlot.getBoundingClientRect();
-          const leadBeat = firstSlot.closest(".lead-beat");
-          const beatRect = leadBeat?.getBoundingClientRect();
-          const beatWidth = Math.max(12, beatRect?.width || slotRect.width || 12);
+          ranges.forEach((range, idx) => {
+            const startBeat = line.querySelector(`.lead-beat[data-globalbeat="${range.startGlobalBeat}"]`);
+            const endBeat = line.querySelector(`.lead-beat[data-globalbeat="${range.endGlobalBeat}"]`);
+            const anchorBeat = startBeat || endBeat || line.querySelector(".lead-beat");
+            if (!anchorBeat) return;
 
-          const label = document.createElement("div");
-          label.className = "lead-instrument-label";
-          label.textContent = abbr;
-          line.appendChild(label);
+            startBeat?.classList.add("lead-range-start");
+            endBeat?.classList.add("lead-range-end");
+            if (idx === 1) {
+              startBeat?.classList.add("lead-range-two");
+              endBeat?.classList.add("lead-range-two");
+            }
 
-          const labelWidth = label.getBoundingClientRect().width || 0;
-          let left = slotRect.left - lineRect.left - (beatWidth * 2) - labelWidth - 4;
-          if (left + labelWidth > slotRect.left - lineRect.left - beatWidth) {
-            left -= beatWidth;
-          }
-          const top = slotRect.top - lineRect.top - 1;
-          label.style.left = `${left}px`;
-          label.style.top = `${top}px`;
+            const beatRect = anchorBeat.getBoundingClientRect();
+            const label = document.createElement("div");
+            label.className = `lead-instrument-label${idx === 1 ? " is-right" : ""}`;
+            label.textContent = range.abbr;
+            line.appendChild(label);
+
+            const labelWidth = label.getBoundingClientRect().width || 0;
+            const top = beatRect.top - lineRect.top - 1;
+            const left = idx === 1
+              ? (lineRect.width + 4)
+              : (-labelWidth - 8);
+            label.style.left = `${left}px`;
+            label.style.top = `${top}px`;
+          });
         });
       }
 
@@ -13987,6 +14245,10 @@
                 for (let bIdx = 0; bIdx < measureBeatCount; bIdx++) {
                   const leadBeat = document.createElement("div");
                   leadBeat.className = "lead-beat";
+                  leadBeat.dataset.globalbeat = String(getGlobalBeatIndex(sIdx, mIdx, bIdx));
+                  leadBeat.dataset.sectionidx = String(sIdx);
+                  leadBeat.dataset.measureidx = String(mIdx);
+                  leadBeat.dataset.beatidx = String(bIdx);
                   leadBeat.style.gridTemplateColumns = `repeat(${leadSlotsPerBeat}, minmax(0, 1fr))`;
                   const beatHasAnyLead = Array.from({ length: leadSlotsPerBeat }, (_, slotIdx) => {
                     const tokenIdx = (bIdx * leadSlotsPerBeat) + slotIdx;
