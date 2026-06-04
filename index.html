@@ -9442,7 +9442,7 @@
               <dt>B</dt><dd>When a root already exists, toggle flat on that chord.</dd>
               <dt>M</dt><dd>Toggle minor on the active chord.</dd>
               <dt>7</dt><dd>Add or toggle a plain seventh.</dd>
-              <dt>T then 7</dt><dd>Enter the triangle/superscript seventh sequence.</dd>
+              <dt>T then 7/8/9</dt><dd>Enter Δ7, sus, or aug in the exponent position.</dd>
               <dt>/ then A-G</dt><dd>Arm bass mode, then press a note letter to set the bass note. Press / again on a beat with bass to clear it.</dd>
             </dl>
             <p class="guide-note">Most chord-quality commands require a root chord first. X marks are allowed on empty beats so you can mark rhythm before choosing a chord.</p>
@@ -12300,9 +12300,36 @@
 
         beat.chordState.triangle = true;
         beat.chordState.seven = true;
+        beat.chordState.quality = "";
         delete beat.chordState.sup;
         delete beat.chordState.sub;
         recordBeatEdit(beat, 'triangleSeven');
+        return true;
+      }
+
+      function applySuperscriptQualityToCurrentBeat(qualityName) {
+        const beat = getCurrentBeat();
+        if (!beat) return false;
+        const quality = String(qualityName || "").trim().toLowerCase();
+        if (!["sus", "aug"].includes(quality)) return false;
+
+        if (!beat.chordState) {
+          beat.chordState = {
+            root: '',
+            flat: false,
+            minor: false,
+            triangle: false,
+            seven: false,
+            quality: ""
+          };
+        }
+
+        beat.chordState.triangle = false;
+        beat.chordState.seven = false;
+        beat.chordState.quality = beat.chordState.quality === quality ? "" : quality;
+        delete beat.chordState.sup;
+        delete beat.chordState.sub;
+        recordBeatEdit(beat, "quality");
         return true;
       }
 
@@ -12322,6 +12349,7 @@
 
   beat.chordState.triangle = false;
   beat.chordState.seven = true;
+  beat.chordState.quality = "";
   delete beat.chordState.sup;
   delete beat.chordState.sub;
   recordBeatEdit(beat, 'seven');
@@ -14759,15 +14787,13 @@
           state.pendingSup = false;
           if (!beatHasRoot) return;
           saveState();
-          if (!beat.chordState) beat.chordState = {};
           const nextQuality = e.key.toLowerCase() === "s" ? "sus" : "aug";
-          beat.chordState.quality = beat.chordState.quality === nextQuality ? "" : nextQuality;
-          if (beat.chordState.quality) recordBeatEdit(beat, "quality");
+          applySuperscriptQualityToCurrentBeat(nextQuality);
           renderChart();
           return;
         }
 
-        // ── T then 7 => superscript Δ7 ──
+        // ── T then 7/8/9 => exponent Δ7/sus/aug ──
         if (e.key.toLowerCase() === "t") {
           e.preventDefault();
           state.pendingSup = true;
@@ -14783,6 +14809,16 @@
           } else {
             applySubscript7ToCurrentBeat();
           }
+          renderChart();
+          return;
+        }
+
+        if ((e.key === "8" || e.key === "9") && state.pendingSup) {
+          e.preventDefault();
+          state.pendingSup = false;
+          if (!beatHasRoot) return;
+          saveState();
+          applySuperscriptQualityToCurrentBeat(e.key === "8" ? "sus" : "aug");
           renderChart();
           return;
         }
@@ -16718,7 +16754,7 @@
           guideFlatDesc: "When a root already exists, toggle flat on that chord.",
           guideMinorDesc: "Toggle minor on the active chord.",
           guideSeventhDesc: "Add or toggle a plain seventh.",
-          guideTriangleDesc: "Enter the triangle/superscript seventh sequence.",
+          guideTriangleDesc: "Enter Δ7, sus, or aug in the exponent position.",
           guideBassDesc: "Arm bass mode, then press a note letter to set the bass note. Press slash again on a beat with bass to clear it.",
           guideChordNote: "Most chord-quality commands require a root chord first. X marks are allowed on empty beats so rhythm can be marked before choosing a chord.",
           guideDotDesc: "Toggle push: dot plus underline behavior on the active rooted beat.",
@@ -17121,7 +17157,7 @@
       const SHORTCUT_GUIDE_SECTIONS = [
         { titleKey: "guideStartHere", introKey: "guideStartHereText", open: true, rows: [["?", "guideHelpToggleDesc"], ["Menu / X", "guideSidebarToggleDesc"], ["Settings", "guideSettingsDesc"], ["Chart / Lyrics / Database", "guidePaperTabsDesc"]] },
         { titleKey: "guideCoreNavigation", open: true, rows: [["Arrow keys", "guideArrowKeysDesc"], ["Space", "guideSpaceDesc"], ["Tab", "guideTabDesc"], ["Ctrl + Space", "guideCtrlSpaceDesc"], ["Ctrl + Tab", "guideCtrlTabDesc"], ["Backspace", "guideBackspaceDesc"], ["Delete", "guideDeleteDesc"], ["Esc", "guideEscDesc"]] },
-        { titleKey: "guideChordRules", rows: [["A-G", "guideRootDesc"], ["B", "guideFlatDesc"], ["M", "guideMinorDesc"], ["7", "guideSeventhDesc"], ["T then 7", "guideTriangleDesc"], ["/ then A-G", "guideBassDesc"]], noteKey: "guideChordNote" },
+        { titleKey: "guideChordRules", rows: [["A-G", "guideRootDesc"], ["B", "guideFlatDesc"], ["M", "guideMinorDesc"], ["7", "guideSeventhDesc"], ["T then 7/8/9", "guideTriangleDesc"], ["/ then A-G", "guideBassDesc"]], noteKey: "guideChordNote" },
         { titleKey: "guideRhythmSpans", rows: [[".", "guideDotDesc"], ["X", "guideXDesc"], ["O", "guideCircleDesc"], ["R", "guideRollDesc"], ["S", "guideSlurDesc"], [",", "guideOnlyDesc"], ["Ctrl + 1-4", "guideUnderlineDesc"]] },
         { titleKey: "guideSectionsMeasures", rows: [["Enter", "guideSectionEnterDesc"], ["I / V / P / C / B / S / E", "guideSectionLettersDesc"], ["Esc", "guideSectionEscDesc"], ["+ between sections", "guideInsertSectionDesc"], ["Left section rail", "guidePreMeasureDesc"], ["Row up/down", "guideRowMeasureDesc"]] },
         { titleKey: "guideLeadModal", rows: [["L", "guideLeadOpenDesc"], ["Tab 1", "guideLeadTab1Desc"], ["Tab 2", "guideLeadTab2Desc"], ["Tab 3", "guideLeadTab3Desc"], ["Tab 4", "guideLeadTab4Desc"], ["Tab", "guideLeadTabCycleDesc"], ["0 / Backspace / Delete", "guideLeadClearDesc"], ["Arrow / Space", "guideLeadMoveDesc"], ["Enter", "guideLeadEnterDesc"]] },

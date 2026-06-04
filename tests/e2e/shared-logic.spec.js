@@ -227,6 +227,45 @@ test.describe("shared editor logic", () => {
     await expect(page.locator(".beat.active .chord-sup")).toContainText("aug");
   });
 
+  test("T7 T8 and T9 share the chord exponent slot", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      const measure = createMeasure(4);
+      measure.beats[0].chordState = { root: "C", flat: false, minor: false, triangle: false, seven: false, quality: "" };
+      state.sections = [{ type: "Verse", measures: [measure] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      renderChart();
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press("t");
+    await page.keyboard.press("7");
+    await expect.poll(() => page.evaluate(() => {
+      const cs = state.sections[0].measures[0].beats[0].chordState;
+      return { triangle: cs.triangle, seven: cs.seven, quality: cs.quality || "" };
+    })).toEqual({ triangle: true, seven: true, quality: "" });
+    await expect(page.locator(".beat.active .chord-sup")).toContainText("Δ7");
+
+    await page.keyboard.press("t");
+    await page.keyboard.press("8");
+    await expect.poll(() => page.evaluate(() => {
+      const cs = state.sections[0].measures[0].beats[0].chordState;
+      return { triangle: cs.triangle, seven: cs.seven, quality: cs.quality || "" };
+    })).toEqual({ triangle: false, seven: false, quality: "sus" });
+    await expect(page.locator(".beat.active .chord-sup")).toContainText("sus");
+
+    await page.keyboard.press("t");
+    await page.keyboard.press("9");
+    await expect.poll(() => page.evaluate(() => {
+      const cs = state.sections[0].measures[0].beats[0].chordState;
+      return { triangle: cs.triangle, seven: cs.seven, quality: cs.quality || "" };
+    })).toEqual({ triangle: false, seven: false, quality: "aug" });
+    await expect(page.locator(".beat.active .chord-sup")).toContainText("aug");
+  });
+
   test("lead instrument assignment propagates across the current measure row", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
