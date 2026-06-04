@@ -156,6 +156,7 @@ test.describe("shared editor logic", () => {
       state.beatsPerMeasure = 4;
       state.sections = [{
         type: "",
+        measuresPerRow: 1,
         rowMeasureCounts: ["8", "bad"],
         measures: [
           { beats: [{ chordState: { root: "C" }, xMarks: 99 }, null], stray: true },
@@ -173,6 +174,8 @@ test.describe("shared editor logic", () => {
         xMarks: state.sections[0].measures[0].beats[0].xMarks,
         secondBeatRoot: state.sections[0].measures[0].beats[1].chordState.root,
         generatedMeasureBeats: state.sections[0].measures[1].beats.length,
+        measuresPerRow: state.sections[0].measuresPerRow,
+        firstRowCap: getSectionRowLayout(0)[0]?.cap,
         onlySpans: state.onlySpans.length,
         slurs: state.slurs.length,
         endingBar: state.sections[0].measures[1].isEndingBar
@@ -186,6 +189,8 @@ test.describe("shared editor logic", () => {
       xMarks: 4,
       secondBeatRoot: "",
       generatedMeasureBeats: 4,
+      measuresPerRow: null,
+      firstRowCap: 8,
       onlySpans: 1,
       slurs: 1,
       endingBar: true

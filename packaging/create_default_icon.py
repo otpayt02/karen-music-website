@@ -1,4 +1,5 @@
 import sys
+import math
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
@@ -35,9 +36,6 @@ def make_icon(size):
     for x in (p(19.5), p(32), p(44.5)):
         draw.line((x, top, x, bottom), fill=(255, 223, 129, 185), width=max(1, p(1)))
 
-    # Slur leans into the vowel area of the second beat.
-    draw.arc((p(10), p(7), p(36), p(30)), start=196, end=350, fill=ink, width=max(1, p(2)))
-
     font_path = Path(r"C:\Windows\Fonts\mmrtextb.ttf")
     try:
         font = ImageFont.truetype(str(font_path), p(10))
@@ -60,6 +58,18 @@ def make_icon(size):
         x_half = p(2.4)
         draw.line((centers[i] - x_half, x_y - x_half, centers[i] + x_half, x_y + x_half), fill=red, width=max(1, p(1.4)))
         draw.line((centers[i] + x_half, x_y - x_half, centers[i] - x_half, x_y + x_half), fill=red, width=max(1, p(1.4)))
+
+    # The slur is part of the lettering: it crosses the second syllable's upper
+    # vowel mark and continues through the last syllable's rounded form.
+    slur_points = []
+    start_x, end_x = p(8.8), p(56.2)
+    for step in range(37):
+        t = step / 36
+        x = start_x + (end_x - start_x) * t
+        y = p(23.4) - math.sin(math.pi * t) * p(5.2) + t * p(0.8)
+        slur_points.append((int(round(x)), int(round(y))))
+    draw.line(slur_points, fill=(0, 0, 0, 125), width=max(1, p(2.4)), joint="curve")
+    draw.line(slur_points, fill=ink, width=max(1, p(1.65)), joint="curve")
 
     return image
 

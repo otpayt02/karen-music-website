@@ -32,7 +32,7 @@
         --lead-row-bg: rgba(226, 232, 240, 0.3);
         --lead-row-border: #999;
         --font-chord: 1.12em;
-        --font-bass: 0.96em;
+        --font-bass: 0.88em;
         --font-xmarks: 0.58em;
         --font-lead: 10px;
         --row-height-base: 28px;
@@ -2414,7 +2414,7 @@
 
       .paper-header {
         display: grid;
-        grid-template-columns: minmax(0, 1.45fr) minmax(0, 1.05fr) minmax(0, 0.85fr);
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr) minmax(0, 0.72fr) minmax(0, 0.54fr);
         align-items: end;
         column-gap: 12px;
         border-bottom: 2px solid #000;
@@ -2434,7 +2434,7 @@
         font-family: var(--font-karen);
         order: 2;
         font-size: 0.72em;
-        font-weight: 600;
+        font-weight: 400;
         letter-spacing: 0.02em;
         line-height: 1.08;
         color: #444;
@@ -2449,13 +2449,19 @@
         line-height: 1.05;
       }
       .paper-head-center {
+        align-items: flex-start;
+        text-align: left;
+        justify-content: center;
+      }
+      .paper-head-right {
         align-items: center;
         text-align: center;
         justify-content: center;
       }
-      .paper-head-right {
+      .paper-head-tempo {
         align-items: flex-end;
         text-align: right;
+        justify-content: center;
       }
       .paper-tempo {
         font-family: var(--font-ui);
@@ -2466,9 +2472,9 @@
       }
       .paper-tempo-english {
         order: 1;
-        font-size: 1.08em;
-        font-weight: 900;
-        color: #111;
+        font-size: 0.72em;
+        font-weight: 700;
+        color: #444;
       }
       .paper-style-value {
         font-family: var(--font-display);
@@ -2489,11 +2495,11 @@
         white-space: nowrap;
       }
       .paper-tempo-line {
-        display: inline-flex;
-        justify-content: center;
+        display: flex;
+        justify-content: flex-end;
         align-items: baseline;
         gap: 4px;
-        margin-top: 3px;
+        margin-top: 0;
         white-space: nowrap;
       }
       .paper-keymeta {
@@ -2592,6 +2598,9 @@
       .print-ka.is-omitted,
       html[data-print-karen="off"] .print-ka {
         display: none !important;
+      }
+      html[data-print-karen="off"] .paper-title-karen {
+        display: inline !important;
       }
       .print-category .print-ka {
         display: inline-flex !important;
@@ -8674,8 +8683,12 @@
       .paper-header .paper-style-value,
       .paper-header .paper-tempo.print-ka,
       .paper-header .paper-keymeta.print-ka {
-        font-weight: 600 !important;
+        font-weight: 500 !important;
         color: #444 !important;
+      }
+
+      .paper-header .paper-title-karen {
+        font-weight: 400 !important;
       }
 
       #print-batch .paper-title-english,
@@ -9205,16 +9218,18 @@
               <div class="paper-head-cell paper-head-center">
                 <span class="paper-style-value print-ka" id="ph-style-value"></span>
                 <span class="paper-style-english print-en" id="ph-style-english"></span>
-                <span class="paper-tempo-line">
-                  <span class="paper-tempo print-ka" id="ph-tempo-karen"></span>
-                  <span class="paper-tempo paper-tempo-english print-en" id="ph-tempo-english"></span>
-                </span>
               </div>
               <div class="paper-head-cell paper-head-right">
                 <span class="paper-keymeta print-ka" id="ph-keymeta-karen"></span>
                 <span class="paper-keymeta paper-keymeta-english print-en" id="ph-keymeta-english"></span>
                 <span class="paper-key-value" id="ph-key-value"></span>
                 <span class="paper-key-extra" id="ph-key-extra"></span>
+              </div>
+              <div class="paper-head-cell paper-head-tempo">
+                <span class="paper-tempo-line">
+                  <span class="paper-tempo print-ka" id="ph-tempo-karen"></span>
+                  <span class="paper-tempo paper-tempo-english print-en" id="ph-tempo-english"></span>
+                </span>
               </div>
             </div>
             <div id="sections-container"></div>
@@ -10227,6 +10242,13 @@
 
       function getAutoDefaultMeasuresPerRow() {
         return (state.beatsPerMeasure || 4) === 3 ? 9 : 8;
+      }
+
+      function normalizeLoadedMeasuresPerRowOverride(value) {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return null;
+        const clamped = clampMeasuresPerRow(n);
+        return clamped >= 4 ? clamped : null;
       }
 
       function getDefaultMeasuresPerRow() {
@@ -11843,12 +11865,15 @@
             const clean = {
               ...section,
               type: String(section.type || "Verse"),
-              measuresPerRow: Number.isFinite(Number(section.measuresPerRow)) ? clampMeasuresPerRow(section.measuresPerRow) : null,
+              measuresPerRow: normalizeLoadedMeasuresPerRowOverride(section.measuresPerRow),
               rowMeasureCounts: Array.isArray(section.rowMeasureCounts)
                 ? section.rowMeasureCounts.map(v => Number.isFinite(Number(v)) ? clampMeasuresPerRow(v) : null)
                 : [],
               measures
             };
+            if (clean.measuresPerRow !== (Number.isFinite(Number(section.measuresPerRow)) ? clampMeasuresPerRow(section.measuresPerRow) : null)) {
+              changed = true;
+            }
             refreshSectionEndingBars(clean);
             return clean;
           });
@@ -13695,7 +13720,7 @@
 
         const titlePair = formatTitlePair(songTitleKaren, songTitleEnglish);
         if (phTitleEnglish) phTitleEnglish.textContent = titlePair.english || titlePair.karen || "";
-        if (phTitleKaren) phTitleKaren.textContent = maybeParenthesizeKaren(titlePair.karen);
+        if (phTitleKaren) phTitleKaren.textContent = titlePair.karen ? `(${titlePair.karen})` : "";
 
         const styleTempoPair = formatStyleTempoPair(songStyle, songTempo);
         if (phStyleEnglish) phStyleEnglish.textContent = styleTempoPair.styleEnglish || styleTempoPair.styleKaren || "";
@@ -15317,7 +15342,7 @@
         })();
         setBeatsPerMeasure(inferredBpm, { render: false, normalizeExisting: false });
         const savedDefaultMpr = Number(chartBundle.defaultMeasuresPerRow);
-        if (Number.isFinite(savedDefaultMpr) && savedDefaultMpr >= MIN_MEASURES_PER_ROW) {
+        if (Number.isFinite(savedDefaultMpr) && savedDefaultMpr >= 4) {
           state.defaultMeasuresPerRow = clampMeasuresPerRow(savedDefaultMpr);
           state.rowDefaultExplicit = chartBundle.rowDefaultExplicit !== false;
         } else {

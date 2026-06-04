@@ -116,8 +116,23 @@ test.describe("print preview packets", () => {
     await expect(page.locator("#chart-container #ph-tempo-english")).toHaveText("125 BPM");
     await expect(page.locator("#chart-container #ph-keymeta-english")).toHaveText("Key");
     await expect(page.locator("#chart-container #ph-key-value")).toHaveText("G");
+    await expect(page.locator("#chart-container .paper-head-tempo #ph-tempo-english")).toBeVisible();
+    const headerSizing = await page.evaluate(() => {
+      const styleSize = parseFloat(getComputedStyle(document.getElementById("ph-style-english")).fontSize);
+      const tempoSize = parseFloat(getComputedStyle(document.getElementById("ph-tempo-english")).fontSize);
+      const titleKarenWeight = getComputedStyle(document.getElementById("ph-title-karen")).fontWeight;
+      return { styleSize, tempoSize, titleKarenWeight };
+    });
+    expect(headerSizing.tempoSize).toBeLessThan(headerSizing.styleSize);
+    expect(Number(headerSizing.titleKarenWeight)).toBeLessThan(700);
     await expect(page.locator("#chart-container #ph-footer-center")).toContainText("Piano 1");
     await expect(page.locator("#chart-container #ph-footer-right")).toContainText("Choir");
+
+    await page.evaluate(() => setPrintKarenVisible(false));
+    await expect(page.locator("#chart-container #ph-title-karen")).toBeVisible();
+    await expect(page.locator("#chart-container #ph-title-karen")).toHaveText("(Karen Title)");
+    await expect(page.locator("#chart-container #ph-style-value")).toBeHidden();
+    await page.evaluate(() => setPrintKarenVisible(true));
 
     await stubWindowPrint(page);
     await page.locator("#btn-print").click();
