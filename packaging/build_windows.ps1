@@ -46,6 +46,9 @@ $pyinstallerArgs = @(
     "--add-data", "$ProjectRoot\static;static",
     "--add-data", "$ProjectRoot\chart_images;chart_images",
     "--add-data", "$IconPath;.",
+    "--hidden-import", "werkzeug.serving",
+    "--collect-submodules", "werkzeug",
+    "--collect-data", "werkzeug",
     "--collect-submodules", "webview",
     "--collect-data", "webview",
     "karen_music_desktop.py"

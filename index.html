@@ -32,7 +32,7 @@
         --lead-row-bg: rgba(226, 232, 240, 0.3);
         --lead-row-border: #999;
         --font-chord: 1.12em;
-        --font-bass: 0.74em;
+        --font-bass: 0.96em;
         --font-xmarks: 0.58em;
         --font-lead: 10px;
         --row-height-base: 28px;
@@ -1314,14 +1314,17 @@
 
       .section-title-ka {
         font-family: var(--font-karen), var(--font-mono);
-        font-weight: 900;
+        font-size: 0.74em;
+        font-weight: 600;
+        color: #444;
         letter-spacing: 0.02em;
       }
 
       .section-title-en {
         font-family: var(--font-mono);
-        font-size: 0.92em;
-        color: #333;
+        font-size: 1.02em;
+        font-weight: 900;
+        color: #111;
         letter-spacing: 0.04em;
       }
 
@@ -1528,6 +1531,36 @@
 
       .measure.ending-bar {
         border-right: 2px solid var(--measure-border) !important;
+      }
+
+      .measure.has-bass-note {
+        border-left-color: transparent;
+        --measure-bar-visible-height: calc(100% - 1.04em);
+      }
+
+      .measure.has-bass-note:last-child,
+      .measure.has-bass-note.ending-bar {
+        border-right-color: transparent !important;
+      }
+
+      .measure.has-bass-note::before,
+      .measure.has-bass-note::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        height: max(18px, var(--measure-bar-visible-height));
+        pointer-events: none;
+      }
+
+      .measure.has-bass-note::before {
+        left: 0;
+        border-left: 2px solid var(--measure-border);
+      }
+
+      .measure.has-bass-note:last-child::after,
+      .measure.has-bass-note.ending-bar::after {
+        right: 0;
+        border-right: 2px solid var(--measure-border);
       }
 
       /* ============================================================
@@ -1926,7 +1959,7 @@
       ============================================================ */
       .bass-note {
         font-size: var(--font-bass);
-        font-weight: bold;
+        font-weight: 900;
         margin-top: 0;
         line-height: 1;
         min-height: 0.82em;
@@ -2079,6 +2112,7 @@
         position: absolute;
         pointer-events: none;
         overflow: visible;
+        z-index: 12;
       }
 
       .beat.slur-start-pending {
@@ -2398,17 +2432,20 @@
       }
       .paper-title-karen {
         font-family: var(--font-karen);
-        font-size: 1.2em;
-        font-weight: 900;
+        order: 2;
+        font-size: 0.72em;
+        font-weight: 600;
         letter-spacing: 0.02em;
         line-height: 1.08;
+        color: #444;
       }
       .paper-title-english {
         font-family: var(--font-display);
-        font-size: 0.68em;
-        font-weight: 700;
+        order: 1;
+        font-size: 1.22em;
+        font-weight: 900;
         letter-spacing: 0.02em;
-        color: #333;
+        color: #111;
         line-height: 1.05;
       }
       .paper-head-center {
@@ -2422,28 +2459,32 @@
       }
       .paper-tempo {
         font-family: var(--font-ui);
-        font-size: 0.7em;
-        font-weight: 850;
+        font-size: 0.66em;
+        font-weight: 600;
         white-space: nowrap;
         line-height: 1.1;
       }
       .paper-tempo-english {
-        font-size: 0.92em;
-        color: #333;
+        order: 1;
+        font-size: 1.08em;
+        font-weight: 900;
+        color: #111;
       }
       .paper-style-value {
         font-family: var(--font-display);
-        font-size: 1.12em;
-        font-weight: 500;
-        color: #111;
+        order: 2;
+        font-size: 0.72em;
+        font-weight: 600;
+        color: #444;
         line-height: 1;
         white-space: nowrap;
       }
       .paper-style-english {
         font-family: var(--font-ui);
-        font-size: 0.92em;
-        font-weight: 850;
-        color: #333;
+        order: 1;
+        font-size: 1.22em;
+        font-weight: 900;
+        color: #111;
         line-height: 1;
         white-space: nowrap;
       }
@@ -2457,14 +2498,15 @@
       }
       .paper-keymeta {
         font-family: var(--font-ui);
-        font-size: 0.62em;
-        font-weight: 800;
+        font-size: 0.58em;
+        font-weight: 600;
         white-space: nowrap;
         line-height: 1.1;
       }
       .paper-keymeta-english {
-        font-size: 0.56em;
-        color: #333;
+        font-size: 0.82em;
+        font-weight: 900;
+        color: #111;
       }
       .paper-keymeta em {
         font-size: 0.92em;
@@ -2480,8 +2522,8 @@
       }
       .paper-key-extra {
         font-family: var(--font-ui);
-        font-size: 0.5em;
-        font-weight: 700;
+        font-size: 0.56em;
+        font-weight: 900;
         color: #444;
         line-height: 1;
         white-space: nowrap;
@@ -2516,6 +2558,14 @@
         min-width: 0;
         white-space: nowrap;
       }
+      .paper-footer-date-row .print-en {
+        order: 1;
+        font-weight: 800;
+      }
+      .paper-footer-date-row .print-ka {
+        order: 2;
+        font-size: 0.84em;
+      }
       #ph-footer-center {
         text-align: center;
         font-weight: 800;
@@ -2538,6 +2588,15 @@
       .print-en {
         font-family: var(--font-ui);
         color: #333;
+      }
+      .print-ka.is-omitted,
+      html[data-print-karen="off"] .print-ka {
+        display: none !important;
+      }
+      .print-category .print-ka {
+        display: inline-flex !important;
+        font-size: 1.12em;
+        font-weight: 800;
       }
 
       .instrument-summary {
@@ -8602,6 +8661,32 @@
           bottom: 20px !important;
         }
       }
+
+      .paper-header .paper-title-english,
+      .paper-header .paper-style-english,
+      .paper-header .paper-tempo-english,
+      .paper-header .paper-keymeta-english {
+        font-weight: 900 !important;
+        color: #111 !important;
+      }
+
+      .paper-header .paper-title-karen,
+      .paper-header .paper-style-value,
+      .paper-header .paper-tempo.print-ka,
+      .paper-header .paper-keymeta.print-ka {
+        font-weight: 600 !important;
+        color: #444 !important;
+      }
+
+      #print-batch .paper-title-english,
+      #print-batch .paper-style-english {
+        font-size: 1.22em !important;
+      }
+
+      #print-batch .paper-title-karen,
+      #print-batch .paper-style-value {
+        font-size: 0.72em !important;
+      }
     </style>
   </head>
   <body>
@@ -8901,6 +8986,13 @@
         <span class="settings-label" data-i18n="immersiveKarenKeyboard">Immersive Karen keyboard</span>
         <label class="toggle-switch">
           <input type="checkbox" id="settings-karen-keyboard-immersive-toggle" checked>
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label" data-i18n="showKarenOnSheets">Show Karen on sheets</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="settings-print-karen-toggle">
           <div class="toggle-track"></div>
         </label>
       </div>
@@ -9574,6 +9666,7 @@
         pendingLeadPicker: false,
         pendingLeadBeat: null,
         pendingBass: false,
+        pendingBassFlat: false,
         pendingTriangle: false,
         pendingSup: false,
         leadEditMode: false,
@@ -9847,24 +9940,35 @@
         return String(value || "").replace(/\d/g, digit => String(tKarenRaw(digit) || digit).trim());
       }
 
+      function showKarenOnSheets() {
+        return localStorage.getItem(THEME_STORAGE_KEYS.printKaren) === "on";
+      }
+
+      function maybeParenthesizeKaren(karen, options = {}) {
+        const value = String(karen || "").trim();
+        if (!value || !showKarenOnSheets()) return "";
+        return options.parenthesizeKaren === false ? value : `(${value})`;
+      }
+
       function setStackedBilingual(el, pair, options = {}) {
         if (!el) return;
-        const karen = String(pair?.karen || "").trim();
+        const karen = maybeParenthesizeKaren(pair?.karen, options);
         const englishRaw = String(pair?.english || "").trim();
-        const english = englishRaw && karen && options.parenthesizeEnglish !== false ? `(${englishRaw})` : englishRaw;
+        const english = englishRaw;
         el.innerHTML = "";
-        if (karen) {
-          const ka = document.createElement("span");
-          ka.className = "print-ka";
-          ka.textContent = karen;
-          el.appendChild(ka);
-        }
         if (english) {
           const en = document.createElement("span");
           en.className = "print-en";
           en.textContent = english;
           el.appendChild(en);
         }
+        if (karen) {
+          const ka = document.createElement("span");
+          ka.className = "print-ka";
+          ka.textContent = karen;
+          el.appendChild(ka);
+        }
+        el.classList.toggle("print-category", !!options.category);
       }
 
       function setInlineBilingual(el, pair) {
@@ -9872,17 +9976,17 @@
         const karen = String(pair?.karen || "").trim();
         const english = String(pair?.english || "").trim();
         el.innerHTML = "";
-        if (karen) {
-          const ka = document.createElement("span");
-          ka.className = "section-title-ka";
-          ka.textContent = karen;
-          el.appendChild(ka);
-        }
         if (english) {
           const en = document.createElement("span");
           en.className = "section-title-en";
-          en.textContent = karen ? `(${english})` : english;
+          en.textContent = english;
           el.appendChild(en);
+        }
+        if (karen && showKarenOnSheets()) {
+          const ka = document.createElement("span");
+          ka.className = "section-title-ka";
+          ka.textContent = `(${karen})`;
+          el.appendChild(ka);
         }
       }
 
@@ -9948,9 +10052,9 @@
         if (!rowEl) return;
         const ka = rowEl.querySelector(".print-ka");
         const en = rowEl.querySelector(".print-en");
-        if (ka) ka.textContent = pair.karen || "";
-        if (en) en.textContent = pair.english ? `(${pair.english})` : "";
-        rowEl.classList.toggle("missing-karen", !pair.karen);
+        if (en) en.textContent = pair.english || "";
+        if (ka) ka.textContent = maybeParenthesizeKaren(pair.karen);
+        rowEl.classList.toggle("missing-karen", !pair.karen || !showKarenOnSheets());
       }
 
       function renderInstrumentSummary() {
@@ -10385,7 +10489,8 @@
             flat: false,
             minor: false,
             triangle: false,
-            seven: false
+            seven: false,
+            quality: ""
           },
           bass: "",
           xMarks: 0,
@@ -10587,7 +10692,11 @@
         if (!beat.chordState) beat.chordState = {};
         const cs = beat.chordState;
 
-        // 1) subscripts / superscripts (triangle / seven)
+        // 1) typed superscript qualities, then triangle / seven markings
+        if (cs.quality) {
+          cs.quality = "";
+          return true;
+        }
         if (cs.triangle || cs.seven) {
           cs.triangle = false;
           cs.seven = false;
@@ -10876,12 +10985,27 @@
         const range = getRowMeasureRange(parsed.sIdx, parsed.measureIdx);
         if (!range) return;
         const value = String(instrumentAbbr || "").trim();
+        const section = state.sections?.[parsed.sIdx];
 
         for (let i = range.start; i < range.end; i++) {
           const key = getRowKey(parsed.sIdx, i);
           const cfg = ensureRowLead(key);
           cfg.instrumentAbbr = value;
+          if (section?.measures?.[i]) {
+            section.measures[i].leadInstrumentAbbr = value;
+          }
         }
+      }
+
+      function getRowLeadInstrumentForRange(sIdx, rowStart, rowCount) {
+        const section = state.sections?.[sIdx];
+        for (let i = rowStart; i < rowStart + rowCount; i++) {
+          const cfgValue = String(state.rowLead?.[getRowKey(sIdx, i)]?.instrumentAbbr || "").trim();
+          if (cfgValue) return cfgValue;
+          const measureValue = String(section?.measures?.[i]?.leadInstrumentAbbr || "").trim();
+          if (measureValue) return measureValue;
+        }
+        return "";
       }
 
       function applyRowLeadToRow(rowKey) {
@@ -11174,8 +11298,14 @@
         const rowBase = rowRange
           ? getRowBaseOctaveForLine(state.currentSectionIdx, rowRange.start, rowRange.end - rowRange.start)
           : null;
+        const rowInstrument = rowRange
+          ? getRowLeadInstrumentForRange(state.currentSectionIdx, rowRange.start, rowRange.end - rowRange.start)
+          : "";
         if ((!cfg.baseOctave || Number(cfg.baseOctave) < 1) && Number.isFinite(Number(rowBase))) {
           cfg.baseOctave = Number(rowBase);
+        }
+        if (!String(cfg.instrumentAbbr || "").trim() && rowInstrument) {
+          cfg.instrumentAbbr = rowInstrument;
         }
         const startTab = cfg.baseOctave ? (cfg.lastTab || 2) : 1;
         openLeadModal(measureKey, startTab);
@@ -11644,7 +11774,10 @@
           flat: !!sourceChord.flat,
           minor: !!sourceChord.minor,
           triangle: !!sourceChord.triangle,
-          seven: !!sourceChord.seven
+          seven: !!sourceChord.seven,
+          quality: ["sus", "aug"].includes(String(sourceChord.quality || "").toLowerCase())
+            ? String(sourceChord.quality || "").toLowerCase()
+            : ""
         };
         clean.bass = String(beat.bass || "");
         clean.xMarks = Math.max(0, Math.min(4, Number(beat.xMarks) || 0));
@@ -12249,6 +12382,10 @@
           beat.manualUnderline = false;
           return true;
         }
+        if (type === "quality" && cs.quality) {
+          cs.quality = "";
+          return true;
+        }
         if (type === "triangleSeven" && (cs.triangle || cs.seven)) {
           cs.triangle = false;
           cs.seven = false;
@@ -12306,6 +12443,10 @@
         }
         if (beat.manualUnderline) {
           beat.manualUnderline = false;
+          return true;
+        }
+        if (cs.quality) {
+          cs.quality = "";
           return true;
         }
         if (cs.triangle || cs.seven) {
@@ -12737,9 +12878,10 @@
 
         const startLine = startEl.closest(".line");
         const endLine = endEl.closest(".line");
-        const host = startLine && startLine === endLine ? startLine : container;
+        if (!startLine || startLine !== endLine) return;
+
         const cRect = container.getBoundingClientRect();
-        const hostRect = host.getBoundingClientRect();
+        const hostRect = startLine.getBoundingClientRect();
         const startRect = startEl.getBoundingClientRect();
         const endRect = endEl.getBoundingClientRect();
 
@@ -12750,13 +12892,16 @@
 
         const visualPad = 4;
         const left = Math.min(x1, x2) - visualPad;
-        const curveWidth = Math.max(18, Math.abs(x2 - x1));
-        const width = curveWidth + (visualPad * 2);
-        const endpointY = 11;
+        const right = Math.max(x1, x2) + visualPad;
+        const width = Math.max(22, right - left);
+        const startOffset = x1 - left;
+        const endOffset = x2 - left;
+        const curveWidth = Math.max(18, Math.abs(endOffset - startOffset));
+        const endpointY = 12;
         const apexY = 2;
         const slurHeight = 14;
         const beatTop = Math.min(startRect.top, endRect.top) - hostRect.top;
-        const y = Math.max(0, beatTop - endpointY - 2);
+        const y = Math.max(0, beatTop - endpointY);
 
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.classList.add("slur-span");
@@ -12766,22 +12911,24 @@
         svg.dataset.endX = String(chartX2);
         svg.dataset.localStartX = String(x1);
         svg.dataset.localEndX = String(x2);
-        svg.dataset.pathStartOffset = String(visualPad);
-        svg.dataset.pathEndOffset = String(visualPad + curveWidth);
+        svg.dataset.pathStartOffset = String(startOffset);
+        svg.dataset.pathEndOffset = String(endOffset);
         svg.dataset.startBeat = startEl.dataset.globalbeat || "";
         svg.dataset.endBeat = endEl.dataset.globalbeat || "";
         svg.style.left = `${left}px`;
         svg.style.top = `${y}px`;
 
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", `M ${visualPad} ${endpointY} C ${visualPad + curveWidth * 0.25} ${apexY} ${visualPad + curveWidth * 0.75} ${apexY} ${visualPad + curveWidth} ${endpointY}`);
+        const controlA = startOffset + (endOffset - startOffset) * 0.25;
+        const controlB = startOffset + (endOffset - startOffset) * 0.75;
+        path.setAttribute("d", `M ${startOffset} ${endpointY} C ${controlA} ${apexY} ${controlB} ${apexY} ${endOffset} ${endpointY}`);
         path.setAttribute("fill", "none");
         path.setAttribute("stroke", "#000");
         path.setAttribute("stroke-width", "2");
         path.setAttribute("stroke-linecap", "round");
 
         svg.appendChild(path);
-        host.appendChild(svg);
+        startLine.appendChild(svg);
       }
 
       function getLeadInstrumentAbbrForLine(line) {
@@ -12789,14 +12936,7 @@
         const rowStart = Number(line?.dataset?.rowstart);
         const rowCount = Number(line?.dataset?.rowcount);
         if (!Number.isInteger(sIdx) || !Number.isInteger(rowStart) || !Number.isInteger(rowCount)) return "";
-        const section = state.sections?.[sIdx];
-        for (let i = rowStart; i < rowStart + rowCount; i++) {
-          const cfgValue = String(state.rowLead?.[getRowKey(sIdx, i)]?.instrumentAbbr || "").trim();
-          if (cfgValue) return cfgValue;
-          const measureValue = String(section?.measures?.[i]?.leadInstrumentAbbr || "").trim();
-          if (measureValue) return measureValue;
-        }
-        return "";
+        return getRowLeadInstrumentForRange(sIdx, rowStart, rowCount);
       }
 
       function renderLeadInstrumentLabels(container = document.getElementById("chart-container")) {
@@ -12843,6 +12983,9 @@
         }
         if (cs.seven) {
           t += "7";
+        }
+        if (cs.quality) {
+          t += String(cs.quality);
         }
         return t;
       }
@@ -13551,18 +13694,18 @@
         const phFooterR = document.getElementById("ph-footer-right");
 
         const titlePair = formatTitlePair(songTitleKaren, songTitleEnglish);
-        if (phTitleKaren) phTitleKaren.textContent = titlePair.karen || titlePair.english || "";
-        if (phTitleEnglish) phTitleEnglish.textContent = titlePair.english && titlePair.karen ? `(${titlePair.english})` : "";
+        if (phTitleEnglish) phTitleEnglish.textContent = titlePair.english || titlePair.karen || "";
+        if (phTitleKaren) phTitleKaren.textContent = maybeParenthesizeKaren(titlePair.karen);
 
         const styleTempoPair = formatStyleTempoPair(songStyle, songTempo);
-        if (phStyleValue) phStyleValue.textContent = styleTempoPair.styleKaren || styleTempoPair.styleEnglish || "";
-        if (phStyleEnglish) phStyleEnglish.textContent = styleTempoPair.styleEnglish && styleTempoPair.styleKaren ? `(${styleTempoPair.styleEnglish})` : "";
-        if (phTempoKaren) phTempoKaren.textContent = styleTempoPair.tempoKaren || "";
-        if (phTempoEnglish) phTempoEnglish.textContent = styleTempoPair.tempoEnglish ? `(${styleTempoPair.tempoEnglish.replace(/^=\s*/, "")})` : "";
+        if (phStyleEnglish) phStyleEnglish.textContent = styleTempoPair.styleEnglish || styleTempoPair.styleKaren || "";
+        if (phStyleValue) phStyleValue.textContent = maybeParenthesizeKaren(styleTempoPair.styleKaren);
+        if (phTempoEnglish) phTempoEnglish.textContent = styleTempoPair.tempoEnglish ? styleTempoPair.tempoEnglish.replace(/^=\s*/, "") : "";
+        if (phTempoKaren) phTempoKaren.textContent = maybeParenthesizeKaren(styleTempoPair.tempoKaren ? styleTempoPair.tempoKaren.replace(/^=\s*/, "") : "");
 
         const keyPair = formatKeyPair(currentKey, origKey);
-        if (phKeymetaKaren) phKeymetaKaren.textContent = keyPair.karen || "";
-        if (phKeymetaEnglish) phKeymetaEnglish.textContent = keyPair.english ? `(${keyPair.english})` : "";
+        if (phKeymetaEnglish) phKeymetaEnglish.textContent = keyPair.english || "";
+        if (phKeymetaKaren) phKeymetaKaren.textContent = maybeParenthesizeKaren(keyPair.karen);
         if (phKeyValue) phKeyValue.textContent = keyPair.value || "";
         if (phKeyExtra) phKeyExtra.textContent = keyPair.extraEnglish ? `(${keyPair.extraEnglish})` : "";
         updateFooterDateRow(phFooterCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
@@ -13570,7 +13713,7 @@
         if (phFooterCenter) phFooterCenter.textContent = songInstr || "—";
         const firstInstrument = getPrintInstrumentList()[0] || songInstr.split(",").map(s => s.trim()).filter(Boolean)[0] || "";
         setStackedBilingual(phFooterCenter, firstInstrument ? getInstrumentLabelPair(firstInstrument) : { karen: "", english: "" });
-        setStackedBilingual(phFooterR, getCategoryLabelPair(songCat));
+        setStackedBilingual(phFooterR, getCategoryLabelPair(songCat), { category: true, parenthesizeKaren: false });
 
         const viewTitle = document.getElementById("view-title");
         const viewMeta  = document.getElementById("view-meta");
@@ -13781,6 +13924,9 @@
               const mIdx = rowStart + rowOffset;
               const measureEl = document.createElement("div");
               measureEl.className = "measure";
+              if (Array.isArray(measure?.beats) && measure.beats.some(beat => String(beat?.bass || "").trim())) {
+                measureEl.classList.add("has-bass-note");
+              }
               if (measure?.isPreMeasure) {
                 measureEl.classList.add("pre-measure");
               }
@@ -14187,6 +14333,27 @@
         if (!beat) return;
         const beatHasRoot = !!(beat.chordState && beat.chordState.root);
 
+        if ((state.pendingBassFlat || beat.awaitingBassFlat) && e.key !== "b" && e.key !== "B") {
+          state.pendingBassFlat = false;
+          delete beat.awaitingBassFlat;
+        }
+
+        if (e.ctrlKey && !e.altKey && !e.metaKey && ["s", "a"].includes(e.key.toLowerCase())) {
+          e.preventDefault();
+          state.pendingBass = false;
+          state.pendingBassFlat = false;
+          state.pendingTriangle = false;
+          state.pendingSup = false;
+          if (!beatHasRoot) return;
+          saveState();
+          if (!beat.chordState) beat.chordState = {};
+          const nextQuality = e.key.toLowerCase() === "s" ? "sus" : "aug";
+          beat.chordState.quality = beat.chordState.quality === nextQuality ? "" : nextQuality;
+          if (beat.chordState.quality) recordBeatEdit(beat, "quality");
+          renderChart();
+          return;
+        }
+
         // ── T then 7 => superscript Δ7 ──
         if (e.key.toLowerCase() === "t") {
           e.preventDefault();
@@ -14433,10 +14600,12 @@
             if (beat.bass) {
               beat.bass = "";
               state.pendingBass = false;
+              state.pendingBassFlat = false;
               renderChart();
               return;
             }
             state.pendingBass = true;
+            state.pendingBassFlat = false;
 
             // show the underline immediately as visual feedback
             if (!(beat.xMarks > 0) && !beat.dot && !beat.bass) {
@@ -14447,6 +14616,7 @@
           } else {
             // no root chord: ignore slash entirely
             state.pendingBass = false;
+            state.pendingBassFlat = false;
           }
           return;
         }
@@ -14461,12 +14631,15 @@
               saveState();
               beat.bass = e.key.toUpperCase();
               recordBeatEdit(beat, "bass");
+              state.pendingBassFlat = true;
+              beat.awaitingBassFlat = true;
             }
             state.pendingBass = false;
             renderChart();
           } else {
             // any non-chord-root key cancels bass mode
             state.pendingBass = false;
+            state.pendingBassFlat = false;
             // do NOT return — let the key fall through to other handlers below
           }
           // if we committed bass, return; otherwise fall through
@@ -14474,6 +14647,22 @@
         }
 
         // ── FLAT: B key toggles flat on current beat ──
+        // After / then A-G, one following B belongs to the bass note, not the root chord.
+        if ((e.key === "b" || e.key === "B") && /^[A-G]$/.test(String(beat.bass || "").trim())) {
+          e.preventDefault();
+          if (beat.bass) {
+            saveState();
+            const baseBass = String(beat.bass).trim()[0]?.toUpperCase() || "";
+            const flatBass = normalizeKeyToFlat(`${baseBass}b`) || `${baseBass}b`;
+            beat.bass = flatBass;
+            recordBeatEdit(beat, "bass");
+            renderChart();
+          }
+          state.pendingBassFlat = false;
+          delete beat.awaitingBassFlat;
+          return;
+        }
+
         if ((e.key === "b" || e.key === "B") && !beatHasRoot) {
           e.preventDefault();
           saveState();
@@ -15349,6 +15538,13 @@
           sub.textContent = "7";
           container.appendChild(sub);
         }
+
+        if (cs.quality) {
+          const quality = document.createElement("span");
+          quality.className = "chord-sup";
+          quality.textContent = String(cs.quality);
+          container.appendChild(quality);
+        }
       }
 
       // ============================================================
@@ -15357,7 +15553,7 @@
       function beatIsEmpty(beat) {
         if (!beat) return true;
         const cs = beat.chordState || {};
-        const hasChord = cs.root || cs.flat || cs.minor || cs.triangle || cs.seven;
+        const hasChord = cs.root || cs.flat || cs.minor || cs.triangle || cs.seven || cs.quality;
         const hasOther =
           beat.bass   ||
           beat.xMarks ||
@@ -16171,6 +16367,7 @@
           density: "Density",
           guidedNewSongWizard: "Guided new-song wizard",
           immersiveKarenKeyboard: "Immersive Karen keyboard",
+          showKarenOnSheets: "Show Karen on sheets",
           language: "Language",
           changeAction: "Change",
           alternateSongFolder: "Alternate song folder",
@@ -16326,6 +16523,7 @@
           guideSidebarWorkflows: "",
           guideSettingsAppearance: "",
           guideUndoPrintSafety: "",
+          showKarenOnSheets: "",
           theme: "",
           palette: "",
           uiDesignDirection: "",
@@ -16531,7 +16729,8 @@
         motion: "karenThemeMotion",
         density: "karenThemeDensity",
         design: "karenUiDesign",
-        keyboardImmersive: "karenKeyboardImmersive"
+        keyboardImmersive: "karenKeyboardImmersive",
+        printKaren: "karenPrintShowKaren"
       };
 
       const THEME_MODES = ["auto", "light", "dark"];
@@ -16546,6 +16745,7 @@
       let themeDensity = localStorage.getItem(THEME_STORAGE_KEYS.density) || "compact";
       let uiDesign = localStorage.getItem(THEME_STORAGE_KEYS.design) || "design-2";
       let karenKeyboardImmersive = localStorage.getItem(THEME_STORAGE_KEYS.keyboardImmersive) !== "off";
+      let printKarenVisible = localStorage.getItem(THEME_STORAGE_KEYS.printKaren) === "on";
       let themeMediaQuery = null;
       let themeControlsBound = false;
       let silkyScrollBound = false;
@@ -16578,6 +16778,7 @@
         root.dataset.density = themeDensity;
         root.dataset.design = uiDesign;
         root.dataset.karenKeyboardImmersive = karenKeyboardImmersive ? "on" : "off";
+        root.dataset.printKaren = printKarenVisible ? "on" : "off";
         root.style.colorScheme = effectiveTheme;
 
         document.querySelectorAll("[data-theme-mode]").forEach(btn => {
@@ -16612,6 +16813,8 @@
 
         const immersiveToggle = document.getElementById("settings-karen-keyboard-immersive-toggle");
         if (immersiveToggle) immersiveToggle.checked = !!karenKeyboardImmersive;
+        const printKarenToggle = document.getElementById("settings-print-karen-toggle");
+        if (printKarenToggle) printKarenToggle.checked = !!printKarenVisible;
 
         const quickToggle = document.getElementById("theme-toggle");
         if (quickToggle) {
@@ -16655,6 +16858,13 @@
         karenKeyboardImmersive = !!enabled;
         localStorage.setItem(THEME_STORAGE_KEYS.keyboardImmersive, karenKeyboardImmersive ? "on" : "off");
         applyThemePreferences();
+      }
+
+      function setPrintKarenVisible(enabled) {
+        printKarenVisible = !!enabled;
+        localStorage.setItem(THEME_STORAGE_KEYS.printKaren, printKarenVisible ? "on" : "off");
+        applyThemePreferences();
+        if (typeof renderChart === "function") renderChart();
       }
 
       function cycleThemeMode() {
@@ -16704,6 +16914,14 @@
             setKarenKeyboardImmersive(immersiveToggle.checked);
           });
           immersiveToggle.dataset.bound = "1";
+        }
+
+        const printKarenToggle = document.getElementById("settings-print-karen-toggle");
+        if (printKarenToggle && !printKarenToggle.dataset.bound) {
+          printKarenToggle.addEventListener("change", () => {
+            setPrintKarenVisible(printKarenToggle.checked);
+          });
+          printKarenToggle.dataset.bound = "1";
         }
 
         applyThemePreferences();

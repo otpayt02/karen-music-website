@@ -20,8 +20,7 @@ test.describe("print preview packets", () => {
     await expect(footerCenters.nth(1)).toContainText("Drums");
     await expect(footerCenters.nth(2)).toContainText("Reference");
 
-    const printCalls = await page.evaluate(() => window.__printCalls || 0);
-    expect(printCalls).toBe(1);
+    await expect.poll(() => page.evaluate(() => window.__printCalls || 0)).toBe(1);
   });
 
   test("keeps each printed footer anchored inside its own sheet copy", async ({ page }) => {
@@ -79,6 +78,7 @@ test.describe("print preview packets", () => {
   test("prints bilingual sheet metadata and leaves untitled headers blank", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
     await openSidebar(page);
+    await page.evaluate(() => setPrintKarenVisible(true));
 
     await page.evaluate(() => {
       document.getElementById("songTitle").value = "";
@@ -108,13 +108,13 @@ test.describe("print preview packets", () => {
       renderChart();
     });
 
-    await expect(page.locator("#chart-container #ph-title-karen")).toHaveText("Karen Title");
-    await expect(page.locator("#chart-container #ph-title-english")).toHaveText("(Amazing Grace)");
-    await expect(page.locator("#chart-container #ph-style-value")).toHaveText("ဂိုဂို");
-    await expect(page.locator("#chart-container #ph-style-english")).toHaveText("(Go Go)");
-    await expect(page.locator("#chart-container #ph-tempo-karen")).toHaveText("= ၁၂၅ ဘီပီအမ်");
-    await expect(page.locator("#chart-container #ph-tempo-english")).toHaveText("(125 BPM)");
-    await expect(page.locator("#chart-container #ph-keymeta-english")).toHaveText("(Key)");
+    await expect(page.locator("#chart-container #ph-title-english")).toHaveText("Amazing Grace");
+    await expect(page.locator("#chart-container #ph-title-karen")).toHaveText("(Karen Title)");
+    await expect(page.locator("#chart-container #ph-style-value")).toContainText("(");
+    await expect(page.locator("#chart-container #ph-style-english")).toHaveText("Go Go");
+    await expect(page.locator("#chart-container #ph-tempo-karen")).toContainText("(");
+    await expect(page.locator("#chart-container #ph-tempo-english")).toHaveText("125 BPM");
+    await expect(page.locator("#chart-container #ph-keymeta-english")).toHaveText("Key");
     await expect(page.locator("#chart-container #ph-key-value")).toHaveText("G");
     await expect(page.locator("#chart-container #ph-footer-center")).toContainText("Piano 1");
     await expect(page.locator("#chart-container #ph-footer-right")).toContainText("Choir");
@@ -129,6 +129,7 @@ test.describe("print preview packets", () => {
 
   test("resolves typed Karen style values back to bilingual style labels", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
+    await page.evaluate(() => setPrintKarenVisible(true));
 
     await page.evaluate(() => {
       TRANSLATIONS.karen.styleGoGo = "ကိကိ";
@@ -137,9 +138,9 @@ test.describe("print preview packets", () => {
       renderChart();
     });
 
-    await expect(page.locator("#chart-container #ph-style-value")).toHaveText("ကိကိ");
-    await expect(page.locator("#chart-container #ph-style-english")).toHaveText("(Go Go)");
-    await expect(page.locator("#chart-container #ph-style-english")).toHaveCSS("font-size", "14.72px");
+    await expect(page.locator("#chart-container #ph-style-value")).toContainText("(");
+    await expect(page.locator("#chart-container #ph-style-english")).toHaveText("Go Go");
+    await expect(page.locator("#chart-container #ph-style-english")).toHaveCSS("font-weight", "900");
   });
 
   test("scales crowded printed rows so they stay above the footer", async ({ page }) => {

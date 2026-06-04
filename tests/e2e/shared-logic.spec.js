@@ -65,6 +65,90 @@ test.describe("shared editor logic", () => {
     expect(data).toEqual({ beatsPerMeasure: 3, length: 4, fourthRoot: "G" });
   });
 
+  test("waits for bass-note flat before applying root flat", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      const measure = createMeasure(4);
+      measure.beats[0].chordState = { root: "C", flat: false, minor: false, triangle: false, seven: false };
+      state.sections = [{ type: "Verse", measures: [measure] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      renderChart();
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press("/");
+    await page.keyboard.press("A");
+    await page.keyboard.press("b");
+
+    const beat = await page.evaluate(() => {
+      const active = state.sections[0].measures[0].beats[0];
+      return {
+        bass: active.bass,
+        root: active.chordState.root,
+        rootFlat: active.chordState.flat
+      };
+    });
+
+    expect(beat).toEqual({ bass: "Ab", root: "C", rootFlat: false });
+  });
+
+  test("ctrl shortcuts add sus and aug as chord exponents", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      const measure = createMeasure(4);
+      measure.beats[0].chordState = { root: "C", flat: false, minor: false, triangle: false, seven: false, quality: "" };
+      state.sections = [{ type: "Verse", measures: [measure] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      renderChart();
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press(process.platform === "darwin" ? "Meta+S" : "Control+S");
+    await expect.poll(() => page.evaluate(() => state.sections[0].measures[0].beats[0].chordState.quality)).toBe("sus");
+    await expect(page.locator(".beat.active .chord-sup")).toContainText("sus");
+
+    await page.keyboard.press(process.platform === "darwin" ? "Meta+A" : "Control+A");
+    await expect.poll(() => page.evaluate(() => state.sections[0].measures[0].beats[0].chordState.quality)).toBe("aug");
+    await expect(page.locator(".beat.active .chord-sup")).toContainText("aug");
+  });
+
+  test("lead instrument assignment propagates across the current measure row", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const result = await page.evaluate(() => {
+      state.sections = [{
+        type: "Verse",
+        measures: [createMeasure(), createMeasure(), createMeasure()]
+      }];
+      state.rowLead = {};
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 1;
+      state.currentBeatIdx = 0;
+      const rowKey = getRowKey(0, 1);
+      syncRowLeadInstrumentForMeasureKey(rowKey, "P1");
+      applyRowLeadToRow(rowKey);
+      renderChart();
+      const line = document.querySelector(".line");
+      return {
+        rowLeadValues: [0, 1, 2].map(i => state.rowLead[getRowKey(0, i)]?.instrumentAbbr || ""),
+        measureValues: state.sections[0].measures.map(measure => measure.leadInstrumentAbbr || ""),
+        lineValue: getLeadInstrumentAbbrForLine(line)
+      };
+    });
+
+    expect(result).toEqual({
+      rowLeadValues: ["P1", "P1", "P1"],
+      measureValues: ["P1", "P1", "P1"],
+      lineValue: "P1"
+    });
+  });
+
   test("repairs legacy chart data before rendering", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
