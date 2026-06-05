@@ -41,6 +41,7 @@
         --font-mono: "IBM Plex Mono", "Courier New", Courier, monospace;
         --font-karen: "Noto Sans Myanmar", "Myanmar Text", sans-serif;
         --sidebar-width: 320px;
+        --editor-zoom: 1;
       }
 
       /* ============================================================
@@ -264,13 +265,14 @@
       #main-editor {
         flex: 1;
         padding: 24px 24px 56px 24px;
-        overflow-y: auto;
+        overflow: auto;
         background: #1a1a2e;
         position: relative;
         min-width: 0;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
+        scroll-padding: 84px 24px;
       }
 
       /* ============================================================
@@ -8860,6 +8862,53 @@
         }
       }
 
+      .editor-zoom-toolbar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        align-self: center;
+        margin: -4px auto 14px;
+        padding: 5px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.16);
+      }
+
+      .editor-zoom-btn,
+      .editor-zoom-fit {
+        min-width: 30px;
+        height: 30px;
+        margin: 0;
+        padding: 0 9px;
+        border-radius: 999px;
+        font-size: 0.78em;
+        line-height: 1;
+        box-shadow: none;
+      }
+
+      .editor-zoom-btn {
+        width: 30px;
+        padding: 0;
+        font-size: 1.05em;
+      }
+
+      .editor-zoom-label {
+        min-width: 44px;
+        color: rgba(255,255,255,0.88);
+        font-size: 0.74em;
+        font-weight: 900;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .paper-stack {
+        transform: scale(var(--editor-zoom));
+        transform-origin: top center;
+        margin-bottom: calc(20px + var(--editor-zoom-extra-y, 0px));
+      }
+
       .paper-header .paper-title-english,
       .paper-header .paper-style-english,
       .paper-header .paper-tempo-english,
@@ -8916,6 +8965,39 @@
       #print-batch .paper-title-karen,
       #print-batch .paper-style-value {
         font-size: 0.72em !important;
+      }
+
+      @media screen {
+        #main-editor,
+        html[data-design] #main-editor {
+          padding-bottom: max(56px, calc(50vh + 96px)) !important;
+        }
+      }
+
+      .instr-checklist:not(.scroll-locked) {
+        overflow-y: hidden !important;
+        overscroll-behavior: auto;
+        scroll-snap-type: none !important;
+      }
+
+      .instr-checklist.scroll-locked {
+        overflow-y: auto !important;
+        outline: 2px solid color-mix(in srgb, var(--accent) 72%, transparent);
+        outline-offset: 2px;
+        box-shadow:
+          0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent),
+          inset 0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent);
+      }
+
+      .instr-checklist.scroll-locked .instr-choice.is-wheel-focus {
+        opacity: 1;
+      }
+
+      @media print {
+        .paper-stack {
+          transform: none !important;
+          margin-bottom: 0 !important;
+        }
       }
     </style>
   </head>
@@ -9416,6 +9498,14 @@
         <div id="view-instruments"
           style="font-size:0.8em;color:#888;margin-top:2px;">
         </div>
+      </div>
+
+      <div class="editor-zoom-toolbar" aria-label="Chart zoom controls">
+        <button type="button" id="editor-zoom-out" class="editor-zoom-btn" title="Zoom out" onclick="changeEditorZoom(-0.1)">−</button>
+        <span id="editor-zoom-label" class="editor-zoom-label">100%</span>
+        <button type="button" id="editor-zoom-in" class="editor-zoom-btn" title="Zoom in" onclick="changeEditorZoom(0.1)">+</button>
+        <button type="button" id="editor-zoom-fit" class="editor-zoom-fit" title="Fit chart to editor width" onclick="fitEditorZoomToWidth()">Fit</button>
+        <button type="button" id="editor-zoom-reset" class="editor-zoom-fit" title="Reset chart zoom" onclick="setEditorZoom(1)">100</button>
       </div>
 
       <!-- Stacked chart / lyrics paper containers -->
@@ -9930,6 +10020,11 @@
       let karenKeyboardCloseTimer = 0;
       let karenInputUndoStack = [];
       let karenInputRedoStack = [];
+      const EDITOR_ZOOM_STORAGE_KEY = "karenMusicEditorZoom";
+      const EDITOR_ZOOM_MIN = 0.55;
+      const EDITOR_ZOOM_MAX = 1.85;
+      let editorZoom = 1;
+      let activeInstrumentScrollGroup = null;
 
       function initializeInstrumentChoiceButtons() {
         ["instr-sidebar","instr-wq","instr-wg"].forEach(id => {
@@ -9937,6 +10032,8 @@
           if (!group) return;
           group.setAttribute("role", "listbox");
           group.setAttribute("aria-multiselectable", "true");
+          group.setAttribute("aria-label", "Instrument choices");
+          group.tabIndex = 0;
           group.querySelectorAll(".instr-choice").forEach(btn => {
             btn.type = "button";
             btn.setAttribute("role", "option");
@@ -9990,6 +10087,31 @@
           group.addEventListener("scroll", requestWheelUpdate, { passive: true });
           group.addEventListener("focusin", requestWheelUpdate);
           group.addEventListener("pointermove", requestWheelUpdate, { passive: true });
+          group.addEventListener("wheel", (e) => {
+            if (activeInstrumentScrollGroup === group) return;
+            if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+            if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
+            const fallbackScroller = group.closest("#sidebar, .wizard-card") || document.getElementById("main-editor");
+            if (!fallbackScroller) return;
+            const priorTop = group.scrollTop;
+            e.preventDefault();
+            group.scrollTop = priorTop;
+            fallbackScroller.scrollTop += e.deltaY;
+            requestAnimationFrame(() => {
+              if (activeInstrumentScrollGroup !== group) {
+                group.scrollTop = priorTop;
+                updateInstrumentWheel(group);
+              }
+            });
+          }, { passive: false });
+          group.addEventListener("pointerdown", (e) => {
+            if (activeInstrumentScrollGroup === group) return;
+            e.preventDefault();
+            e.stopPropagation();
+            group.dataset.scrollJustActivated = "1";
+            lockInstrumentScrollGroup(group);
+            group.focus({ preventScroll: true });
+          }, true);
           group.addEventListener("keydown", (e) => {
             const btn = e.target.closest?.(".instr-choice");
             if (!btn || !group.contains(btn)) return;
@@ -10076,6 +10198,120 @@
           top: group.scrollTop + delta,
           behavior
         });
+      }
+
+      function clampEditorZoom(value) {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return 1;
+        return Math.max(EDITOR_ZOOM_MIN, Math.min(EDITOR_ZOOM_MAX, n));
+      }
+
+      function refreshEditorViewportLayout() {
+        requestAnimationFrame(() => {
+          renderOnlySpansAndSlursOnResize();
+          requestAnimationFrame(renderOnlySpansAndSlursOnResize);
+        });
+      }
+
+      function applyEditorZoom(options = {}) {
+        const opts = options && typeof options === "object" ? options : {};
+        const zoom = clampEditorZoom(editorZoom);
+        editorZoom = zoom;
+        document.documentElement.style.setProperty("--editor-zoom", zoom.toFixed(2));
+        const stack = document.getElementById("paper-stack");
+        const extraY = stack ? Math.max(0, (zoom - 1) * (stack.offsetHeight || 1056)) : 0;
+        document.documentElement.style.setProperty("--editor-zoom-extra-y", `${Math.round(extraY)}px`);
+
+        const label = document.getElementById("editor-zoom-label");
+        if (label) label.textContent = `${Math.round(zoom * 100)}%`;
+
+        document.getElementById("editor-zoom-out")?.toggleAttribute("disabled", zoom <= EDITOR_ZOOM_MIN + 0.001);
+        document.getElementById("editor-zoom-in")?.toggleAttribute("disabled", zoom >= EDITOR_ZOOM_MAX - 0.001);
+
+        if (opts.persist !== false) {
+          localStorage.setItem(EDITOR_ZOOM_STORAGE_KEY, zoom.toFixed(2));
+        }
+        if (opts.refresh !== false) refreshEditorViewportLayout();
+      }
+
+      function setEditorZoom(value, options = {}) {
+        editorZoom = clampEditorZoom(value);
+        applyEditorZoom(options);
+      }
+
+      function changeEditorZoom(delta) {
+        setEditorZoom(editorZoom + Number(delta || 0));
+      }
+
+      function fitEditorZoomToWidth() {
+        const editor = document.getElementById("main-editor");
+        const stack = document.getElementById("paper-stack");
+        if (!editor || !stack) return;
+        const available = Math.max(260, editor.clientWidth - 36);
+        const baseWidth = Math.max(260, stack.offsetWidth || 816);
+        setEditorZoom(available / baseWidth);
+      }
+
+      function setupEditorZoomControls() {
+        const rawSaved = localStorage.getItem(EDITOR_ZOOM_STORAGE_KEY);
+        const saved = rawSaved === null ? NaN : Number(rawSaved);
+        editorZoom = Number.isFinite(saved) ? clampEditorZoom(saved) : 1;
+        applyEditorZoom({ persist: false, refresh: false });
+
+        const editor = document.getElementById("main-editor");
+        if (editor && !editor.dataset.zoomWheelBound) {
+          editor.addEventListener("wheel", (event) => {
+            if (!event.ctrlKey && !event.metaKey) return;
+            event.preventDefault();
+            changeEditorZoom(event.deltaY < 0 ? 0.1 : -0.1);
+          }, { passive: false });
+          editor.dataset.zoomWheelBound = "1";
+        }
+      }
+
+      function lockInstrumentScrollGroup(group) {
+        if (!group) return;
+        if (activeInstrumentScrollGroup && activeInstrumentScrollGroup !== group) {
+          activeInstrumentScrollGroup.classList.remove("scroll-locked");
+          activeInstrumentScrollGroup.setAttribute("aria-label", "Instrument choices");
+        }
+        activeInstrumentScrollGroup = group;
+        group.classList.add("scroll-locked");
+        group.setAttribute("aria-label", "Instrument choices, scroll active");
+        updateInstrumentWheel(group);
+      }
+
+      function unlockInstrumentScrollGroup() {
+        if (!activeInstrumentScrollGroup) return;
+        activeInstrumentScrollGroup.classList.remove("scroll-locked");
+        activeInstrumentScrollGroup.setAttribute("aria-label", "Instrument choices");
+        activeInstrumentScrollGroup = null;
+      }
+
+      function setupInstrumentScrollLock() {
+        if (document.documentElement.dataset.instrumentScrollLockBound === "1") return;
+        document.documentElement.dataset.instrumentScrollLockBound = "1";
+
+        document.addEventListener("pointerdown", (event) => {
+          const group = event.target?.closest?.(".instr-checklist");
+          if (!group && activeInstrumentScrollGroup) {
+            unlockInstrumentScrollGroup();
+          }
+        }, true);
+
+        document.addEventListener("wheel", (event) => {
+          const group = activeInstrumentScrollGroup;
+          if (!group || !group.isConnected) {
+            unlockInstrumentScrollGroup();
+            return;
+          }
+          if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+          if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+
+          event.preventDefault();
+          group.scrollTop += event.deltaY;
+          updateInstrumentWheel(group);
+        }, { passive: false, capture: true });
       }
 
       function setInstrChecks(groupId, valueStr) {
@@ -13111,6 +13347,7 @@
         state.currentMeasureIdx = insertIdx;
         state.currentBeatIdx = 0;
         renderChart();
+        scrollActiveRowToEditorTop();
         return true;
       }
 
@@ -13891,7 +14128,7 @@
         const apexY = 2;
         const slurHeight = 14;
         const beatTop = (Math.min(startRect.top, endRect.top) - hostRect.top) / scaleY;
-        const y = Math.max(0, beatTop - endpointY);
+        const y = Math.max(0, beatTop - endpointY - 2);
 
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.classList.add("slur-span");
@@ -15018,7 +15255,6 @@
                 state.currentMeasureIdx = PRE_MEASURE_INDEX;
                 state.currentBeatIdx = 0;
                 renderChart();
-                scrollActiveRowToEditorTop();
                 const ft = document.getElementById("focus-trap");
                 ft && ft.focus();
               });
@@ -15217,7 +15453,6 @@
                   state.currentMeasureIdx = mIdx;
                   state.currentBeatIdx = bIdx;
                   renderChart();
-                  scrollActiveRowToEditorTop();
                   const ft = document.getElementById("focus-trap");
                   ft && ft.focus();
                 });
@@ -15924,7 +16159,8 @@
         renderLeadInstrumentLabels();
       }
 
-      function scrollActiveRowToEditorTop() {
+      function scrollActiveRowToEditorTop(options = {}) {
+        const opts = options && typeof options === "object" ? options : {};
         const editor = document.getElementById("main-editor");
         const activeBeat = document.querySelector("#chart-container .beat.active");
         const activeLine = activeBeat?.closest(".line");
@@ -15933,8 +16169,32 @@
         requestAnimationFrame(() => {
           const editorRect = editor.getBoundingClientRect();
           const lineRect = activeLine.getBoundingClientRect();
-          const nextTop = editor.scrollTop + (lineRect.top - editorRect.top);
-          editor.scrollTo({ top: Math.max(0, nextTop), behavior: "smooth" });
+          const beatRect = activeBeat.getBoundingClientRect();
+          const yPad = Math.max(18, Math.min(54, editorRect.height * 0.12));
+          const xPad = Math.max(18, Math.min(44, editorRect.width * 0.06));
+          const isAbove = lineRect.top < editorRect.top + yPad;
+          const isBelow = lineRect.bottom > editorRect.bottom - yPad;
+          const isLeft = beatRect.left < editorRect.left + xPad;
+          const isRight = beatRect.right > editorRect.right - xPad;
+          const shouldCenterY = !!opts.force || isAbove || isBelow;
+          const shouldCenterX = !!opts.forceX || isLeft || isRight;
+
+          if (!shouldCenterY && !shouldCenterX) return;
+
+          const next = { behavior: opts.instant ? "auto" : "smooth" };
+          if (shouldCenterY) {
+            const lineCenter = lineRect.top + lineRect.height / 2;
+            const editorCenter = editorRect.top + editorRect.height / 2;
+            const maxTop = Math.max(0, editor.scrollHeight - editor.clientHeight);
+            next.top = Math.max(0, Math.min(maxTop, editor.scrollTop + (lineCenter - editorCenter)));
+          }
+          if (shouldCenterX) {
+            const beatCenter = beatRect.left + beatRect.width / 2;
+            const editorCenterX = editorRect.left + editorRect.width / 2;
+            const maxLeft = Math.max(0, editor.scrollWidth - editor.clientWidth);
+            next.left = Math.max(0, Math.min(maxLeft, editor.scrollLeft + (beatCenter - editorCenterX)));
+          }
+          editor.scrollTo(next);
         });
       }
 
@@ -16373,8 +16633,20 @@
           if (!group) return;
           group.addEventListener("click", (e) => {
             const btn = e.target.closest(".instr-choice");
+            if (!btn && group.dataset.scrollJustActivated === "1") {
+              delete group.dataset.scrollJustActivated;
+              return;
+            }
             if (!btn || !group.contains(btn)) return;
             e.preventDefault();
+            if (group.dataset.scrollJustActivated === "1") {
+              delete group.dataset.scrollJustActivated;
+              return;
+            }
+            if (activeInstrumentScrollGroup !== group) {
+              lockInstrumentScrollGroup(group);
+              return;
+            }
             const nextSelected = !btn.classList.contains("selected");
             btn.classList.toggle("selected", nextSelected);
             btn.setAttribute("aria-pressed", nextSelected ? "true" : "false");
@@ -16869,11 +17141,18 @@
 
         syncFlap();
 
+        sidebar.addEventListener("transitionend", (event) => {
+          if (!["width", "transform", "padding-left", "padding-right"].includes(event.propertyName)) return;
+          refreshEditorViewportLayout();
+        });
+
         toggle.addEventListener("click", () => {
           sidebar.classList.toggle("collapsed");
           syncFlap();
           const closed = sidebar.classList.contains("collapsed");
           toggle.textContent = closed ? "☰" : "✕";
+          refreshEditorViewportLayout();
+          setTimeout(refreshEditorViewportLayout, 540);
           if (closed) {
             toggle.blur();
             focusEditor({ delay: 80 });
@@ -18138,8 +18417,7 @@
           "#settings-panel",
           "#shortcut-panel .shortcut-panel-body",
           ".wizard-card",
-          ".lang-picker-overlay",
-          ".instr-checklist"
+          ".lang-picker-overlay"
         ];
 
         selectors.forEach(selector => {
@@ -18730,6 +19008,8 @@
         renderKarenKeyboard();
         setupEventListeners();
         initializeInstrumentChoiceButtons();
+        setupInstrumentScrollLock();
+        setupEditorZoomControls();
         setupShortcutPanel();
         setupSidebarToggle();
         setupKarenTextDirectionGuards();

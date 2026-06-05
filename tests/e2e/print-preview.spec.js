@@ -6,6 +6,7 @@ test.describe("print preview packets", () => {
     await chooseLanguageAndEnterEditor(page, "english");
     await openSidebar(page);
 
+    await page.locator("#instr-sidebar").click({ position: { x: 12, y: 12 } });
     await page.locator('#instr-sidebar .instr-choice[data-value="Piano 1"]').click();
     await page.locator('#instr-sidebar .instr-choice[data-value="Drums"]').click();
 
@@ -71,6 +72,7 @@ test.describe("print preview packets", () => {
     await chooseLanguageAndEnterEditor(page, "english");
     await openSidebar(page);
 
+    await page.locator("#instr-sidebar").click({ position: { x: 12, y: 12 } });
     await page.locator('#instr-sidebar .instr-choice[data-value="Piano 1"]').click();
     await page.locator('#instr-sidebar .instr-choice[data-value="Piano 2"]').click();
     await page.locator('#instr-sidebar .instr-choice[data-value="Electric Guitar"]').click();

@@ -158,11 +158,11 @@ test.describe("shared editor logic", () => {
     expect(labelText).toBe("Roll");
   });
 
-  test("beat click and arrow navigation keep the active row at the editor top", async ({ page }) => {
+  test("beat clicks preserve scroll while keyboard navigation centers only offscreen rows", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
     await page.evaluate(() => {
-      const measures = Array.from({ length: 18 }, (_, idx) => {
+      const measures = Array.from({ length: 90 }, (_, idx) => {
         const measure = createMeasure(4);
         measure.beats[0].chordState = {
           root: ["C", "D", "E", "F", "G", "A"][idx % 6],
@@ -179,29 +179,74 @@ test.describe("shared editor logic", () => {
       state.currentBeatIdx = 0;
       renderChart();
       const editor = document.getElementById("main-editor");
-      if (editor) editor.scrollTop = 0;
+      const targetLine = document.querySelector('.beat[data-measureidx="6"][data-beatidx="0"]')?.closest(".line");
+      if (editor && targetLine) {
+        editor.scrollTop = Math.max(0, targetLine.offsetTop - editor.clientHeight / 2);
+      }
     });
+
+    const clickScroll = await page.evaluate(() => {
+      const editor = document.getElementById("main-editor");
+      const before = editor?.scrollTop || 0;
+      const target = document.querySelector('.beat[data-measureidx="6"][data-beatidx="0"]');
+      target?.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }));
+      return { before, after: editor?.scrollTop || 0 };
+    });
+
+    expect(Math.abs(clickScroll.after - clickScroll.before)).toBeLessThan(2);
+
+    await page.keyboard.press("ArrowRight");
+
+    const sameRowScroll = await page.evaluate(() => document.getElementById("main-editor")?.scrollTop || 0);
+    expect(Math.abs(sameRowScroll - clickScroll.before)).toBeLessThan(4);
 
     await page.evaluate(() => {
-      const target = document.querySelector('.beat[data-measureidx="12"][data-beatidx="0"]');
-      target?.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }));
-    });
-
-    await expect.poll(() => page.evaluate(() => {
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 87;
+      state.currentBeatIdx = 0;
+      renderChart();
       const editor = document.getElementById("main-editor");
-      const line = document.querySelector("#chart-container .beat.active")?.closest(".line");
-      if (!editor || !line) return 9999;
-      return Math.abs(line.getBoundingClientRect().top - editor.getBoundingClientRect().top);
-    })).toBeLessThan(8);
-
+      if (editor) editor.scrollTop = 0;
+      document.getElementById("focus-trap")?.focus();
+    });
     await page.keyboard.press("ArrowRight");
 
     await expect.poll(() => page.evaluate(() => {
       const editor = document.getElementById("main-editor");
       const line = document.querySelector("#chart-container .beat.active")?.closest(".line");
       if (!editor || !line) return 9999;
-      return Math.abs(line.getBoundingClientRect().top - editor.getBoundingClientRect().top);
-    })).toBeLessThan(8);
+      const editorCenter = editor.getBoundingClientRect().top + editor.getBoundingClientRect().height / 2;
+      const lineCenter = line.getBoundingClientRect().top + line.getBoundingClientRect().height / 2;
+      return Math.abs(lineCenter - editorCenter);
+    })).toBeLessThan(42);
+  });
+
+  test("editor zoom controls resize the chart and sidebar close restores paper width", async ({ page }) => {
+    await page.setViewportSize({ width: 760, height: 920 });
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => setEditorZoom(1, { persist: false }));
+    const closedWidth = await page.locator("#chart-container").evaluate(el => el.getBoundingClientRect().width);
+
+    await page.locator("#sidebar-toggle").click();
+    await expect(page.locator("#sidebar")).not.toHaveClass(/collapsed/);
+    await page.waitForTimeout(650);
+    const openWidth = await page.locator("#chart-container").evaluate(el => el.getBoundingClientRect().width);
+
+    await page.locator("#sidebar-toggle").click();
+    await expect(page.locator("#sidebar")).toHaveClass(/collapsed/);
+    await page.waitForTimeout(650);
+    const restoredWidth = await page.locator("#chart-container").evaluate(el => el.getBoundingClientRect().width);
+
+    expect(openWidth).toBeLessThan(closedWidth - 120);
+    expect(Math.abs(restoredWidth - closedWidth)).toBeLessThan(3);
+
+    await page.locator("#editor-zoom-in").click();
+    await page.locator("#editor-zoom-in").click();
+    await expect(page.locator("#editor-zoom-label")).toHaveText("120%");
+
+    const zoomedWidth = await page.locator("#chart-container").evaluate(el => el.getBoundingClientRect().width);
+    expect(zoomedWidth).toBeGreaterThan(restoredWidth * 1.15);
   });
 
   test("ctrl shortcuts add sus and aug as chord exponents", async ({ page }) => {
