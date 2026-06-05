@@ -1461,6 +1461,7 @@
         min-height: calc(var(--row-height-base) + var(--row-top-space));
         border-radius: 5px;
         transition: background-color 0.5s ease, box-shadow 0.5s ease;
+        --premeasure-lane-width: 28px;
       }
 
       .line:hover {
@@ -1522,7 +1523,21 @@
       }
 
       .measure.pre-measure {
-        left: -6px;
+        position: absolute;
+        left: calc(-1 * var(--premeasure-lane-width));
+        top: var(--row-top-space);
+        bottom: 0;
+        width: calc(var(--premeasure-lane-width) - 5px);
+        min-width: 0;
+        z-index: 4;
+        padding-inline: 2px;
+        background: rgba(255, 255, 255, 0.94);
+        border-right: 2px solid var(--measure-border);
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+      }
+
+      .measure.pre-measure .beat {
+        padding-inline: 0;
       }
 
       .measure:last-child {
@@ -1773,6 +1788,139 @@
         align-items: center;
       }
 
+      .lead-grid-head-row,
+      .lead-grid-single-row {
+        grid-template-columns: repeat(var(--lead-cols, 4), minmax(16px, 1fr));
+      }
+
+      .lead-grid-single-row {
+        min-height: 46px;
+        align-items: center;
+      }
+
+      .lead-modal-topbar {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr) auto 34px;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .lead-modal-title-block {
+        min-width: 0;
+      }
+
+      .lead-measure-nav {
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.22);
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .lead-measure-nav:disabled {
+        opacity: 0.28;
+        cursor: default;
+      }
+
+      .lead-measure-badge {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #f4e7ff;
+        border: 1px solid rgba(255,255,255,0.18);
+        border-radius: 999px;
+        padding: 5px 9px;
+        white-space: nowrap;
+      }
+
+      .lead-base-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 5px 8px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.06);
+        color: #ddd;
+        font-size: 11px;
+      }
+
+      .lead-base-row strong {
+        color: #fff;
+        font-size: 15px;
+      }
+
+      .lead-subdivision-map {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 10px;
+      }
+
+      .lead-subdivision-beat {
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 10px;
+        padding: 8px;
+        background: rgba(0,0,0,0.16);
+      }
+
+      .lead-subdivision-beat.active {
+        outline: 2px solid rgba(187,134,252,0.75);
+        background: rgba(187,134,252,0.12);
+      }
+
+      .lead-subdivision-label {
+        font-size: 10px;
+        color: #cfc3df;
+        margin-bottom: 6px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .lead-subdivision-choice-row {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-bottom: 7px;
+      }
+
+      .lead-subdivision-choice {
+        min-width: 25px;
+        height: 24px;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .lead-subdivision-choice.selected {
+        background: #bb86fc;
+        color: #151515;
+      }
+
+      .lead-subdivision-preview {
+        display: grid;
+        gap: 2px;
+      }
+
+      .lead-subdivision-preview span {
+        min-width: 0;
+        height: 12px;
+        border-radius: 2px;
+        background: rgba(255,255,255,0.12);
+        color: rgba(255,255,255,0.72);
+        font-size: 8px;
+        line-height: 12px;
+        text-align: center;
+      }
+
       .lead-grid-head-row {
         margin-bottom: 2px;
       }
@@ -1806,6 +1954,14 @@
       .lead-grid-cell.active {
         outline: 3px solid #bb86fc;
         background: #34306b;
+      }
+
+      .lead-grid-cell.oct-up {
+        transform: translateY(-5px);
+      }
+
+      .lead-grid-cell.oct-down {
+        transform: translateY(5px);
       }
 
       .lead-oct-wheel {
@@ -9091,6 +9247,7 @@
         <div style="display:flex;gap:8px;align-items:center;">
           <button type="button" id="time-4-4" class="wizard-btn-secondary" onclick="setBeatsPerMeasure(4)">4/4</button>
           <button type="button" id="time-3-4" class="wizard-btn-secondary" onclick="setBeatsPerMeasure(3)">3/4</button>
+          <button type="button" id="time-6-8" class="wizard-btn-secondary" onclick="setBeatsPerMeasure(6)">6/8</button>
         </div>
       </div>
       <div class="settings-row">
@@ -9472,7 +9629,7 @@
               <dt>I / V / P / C / B / S / E</dt><dd>Inside the section modal, add Intro, Verse, Pre-Chorus, Chorus, Bridge, Solo, or Ending.</dd>
               <dt>Esc</dt><dd>Close the section modal without adding a section.</dd>
               <dt>+ between sections</dt><dd>Click an insert line to add a new section at that location.</dd>
-              <dt>Left section rail</dt><dd>Toggle a 2-beat pre-measure for that section.</dd>
+              <dt>Left section rail</dt><dd>Toggle a one-beat pre-section measure in the left margin.</dd>
               <dt>Row +/-</dt><dd>Use the section controls to change how many measures fit on each row.</dd>
             </dl>
           </div>
@@ -9694,6 +9851,9 @@
       };
       const MIN_MEASURES_PER_ROW = 1;
       const MAX_MEASURES_PER_ROW = 16;
+      const PRE_MEASURE_INDEX = -1;
+      const REGULAR_LEAD_SLOT_CHOICES = [3, 4, 6];
+      const PRE_MEASURE_LEAD_SLOT_CHOICES = [1, 2, 3, 4, 5, 6];
       const NOTE_INDEX = {
         C: 0, "B#": 0,
         "C#": 1, Db: 1,
@@ -10670,12 +10830,13 @@
           type: type,
           measuresPerRow: null,
           rowMeasureCounts: [],
+          preMeasure: null,
           measures: [createMeasure()]
         };
       }
 
       function sectionHasPreMeasure(section) {
-        return !!(section && Array.isArray(section.measures) && section.measures[0] && section.measures[0].isPreMeasure);
+        return !!(section && section.preMeasure && Array.isArray(section.preMeasure.beats));
       }
 
       function setSectionMeasuresPerRow(sectionIdx, value) {
@@ -10704,7 +10865,11 @@
       }
 
       function createPreMeasure() {
-        return createMeasure(2, { isPreMeasure: true });
+        const measure = createMeasure(1, { isPreMeasure: true });
+        measure.leadSlotsPerBeat = 6;
+        measure.leadSlotsByBeat = [6];
+        measure.leadSlots = 6;
+        return measure;
       }
 
       function toggleSectionPreMeasure(sectionIdx) {
@@ -10712,26 +10877,22 @@
         if (!section || !Array.isArray(section.measures)) return;
 
         const hadPre = sectionHasPreMeasure(section);
-        const currentPerRow = getRowMeasureCap(sectionIdx, 0);
         saveState();
 
         if (hadPre) {
-          section.measures.shift();
-          if (!section.measures.length) {
-            section.measures.push(createMeasure());
-          }
-          setRowMeasureCap(sectionIdx, 0, currentPerRow - 1);
+          section.preMeasure = null;
           if (state.currentSectionIdx === sectionIdx) {
-            state.currentMeasureIdx = Math.max(0, state.currentMeasureIdx - 1);
+            if (state.currentMeasureIdx === PRE_MEASURE_INDEX) {
+              state.currentMeasureIdx = 0;
+            }
             const measure = section.measures[state.currentMeasureIdx] || section.measures[0];
             state.currentBeatIdx = Math.min(state.currentBeatIdx, getBeatCountForMeasure(measure) - 1);
           }
         } else {
-          section.measures.unshift(createPreMeasure());
-          setRowMeasureCap(sectionIdx, 0, currentPerRow + 1);
-          if (state.currentSectionIdx === sectionIdx) {
-            state.currentMeasureIdx += 1;
-          }
+          section.preMeasure = createPreMeasure();
+          state.currentSectionIdx = sectionIdx;
+          state.currentMeasureIdx = PRE_MEASURE_INDEX;
+          state.currentBeatIdx = 0;
         }
 
         refreshSectionEndingBars(section);
@@ -10991,6 +11152,7 @@
         syncDefaultMeasuresPerRowInput();
         document.getElementById('time-4-4')?.classList.toggle('selected', state.beatsPerMeasure === 4);
         document.getElementById('time-3-4')?.classList.toggle('selected', state.beatsPerMeasure === 3);
+        document.getElementById('time-6-8')?.classList.toggle('selected', state.beatsPerMeasure === 6);
         if (state.currentKey) {
           const keyEl = document.getElementById("songKey");
           if (keyEl) keyEl.value = state.currentKey;
@@ -11018,6 +11180,68 @@
         return Math.max(1, measure.beats.length);
       }
 
+      function isPreMeasureKey(rowKey) {
+        const parsed = parseRowKey(rowKey);
+        return !!parsed && parsed.measureIdx === PRE_MEASURE_INDEX;
+      }
+
+      function getLeadMeasureForRowKey(rowKey) {
+        const parsed = parseRowKey(rowKey);
+        if (!parsed) return null;
+        const section = state.sections?.[parsed.sIdx];
+        if (!section) return null;
+        return parsed.measureIdx === PRE_MEASURE_INDEX
+          ? section.preMeasure || null
+          : section.measures?.[parsed.measureIdx] || null;
+      }
+
+      function getDefaultLeadSlotsForBeatCount(beatCount, isPreMeasure = false) {
+        if (isPreMeasure) return 6;
+        const beats = Number(beatCount) || state.beatsPerMeasure || 4;
+        if (beats === 3) return 3;
+        if (beats === 6) return 6;
+        return 4;
+      }
+
+      function normalizeLeadSlotValue(value, fallback = 4, isPreMeasure = false) {
+        const n = Math.round(Number(value));
+        const choices = isPreMeasure ? PRE_MEASURE_LEAD_SLOT_CHOICES : REGULAR_LEAD_SLOT_CHOICES;
+        if (choices.includes(n)) return n;
+        return choices.includes(fallback) ? fallback : choices[0];
+      }
+
+      function normalizeLeadSlotsByBeat(rowKey, cfg = {}) {
+        const measure = getLeadMeasureForRowKey(rowKey);
+        const isPre = isPreMeasureKey(rowKey) || !!measure?.isPreMeasure;
+        const beatCount = Math.max(1, getBeatCountForMeasure(measure));
+        const fallback = normalizeLeadSlotValue(
+          cfg.slots,
+          getDefaultLeadSlotsForBeatCount(beatCount, isPre),
+          isPre
+        );
+        const raw = Array.isArray(cfg.slotsByBeat) ? cfg.slotsByBeat : [];
+        return Array.from({ length: beatCount }, (_, idx) =>
+          normalizeLeadSlotValue(raw[idx], fallback, isPre)
+        );
+      }
+
+      function getLeadBeatColumnStart(rowKey, cfg, beatIdx) {
+        const slots = normalizeLeadSlotsByBeat(rowKey, cfg);
+        const idx = Math.max(0, Math.min(slots.length, Number(beatIdx) || 0));
+        return slots.slice(0, idx).reduce((sum, n) => sum + n, 0);
+      }
+
+      function getLeadBeatIndexForColumn(rowKey, cfg, col) {
+        const slots = normalizeLeadSlotsByBeat(rowKey, cfg);
+        let cursor = 0;
+        const target = Math.max(0, Number(col) || 0);
+        for (let i = 0; i < slots.length; i++) {
+          if (target < cursor + slots[i]) return i;
+          cursor += slots[i];
+        }
+        return Math.max(0, slots.length - 1);
+      }
+
       function getGlobalBeatIndex(sIdx, mIdx, bIdx) {
         let count = 0;
         for (let i = 0; i < sIdx; i++) {
@@ -11036,6 +11260,7 @@
       }
 
       function getCurrentGlobalBeatIndex() {
+        if (state.currentMeasureIdx === PRE_MEASURE_INDEX) return null;
         return getGlobalBeatIndex(
           state.currentSectionIdx,
           state.currentMeasureIdx,
@@ -11070,23 +11295,23 @@
       }
 
       function getLeadMeasureBeatCount(rowKey) {
-        if (!rowKey) return Math.max(1, Number(state.beatsPerMeasure) || 4);
-        const [sIdxStr, measureIdxStr] = String(rowKey).split(":");
-        const sIdx = Number(sIdxStr);
-        const mIdx = Number(measureIdxStr);
-        const section = state.sections?.[sIdx];
-        const measure = section?.measures?.[mIdx];
+        const measure = getLeadMeasureForRowKey(rowKey);
         return Math.max(1, getBeatCountForMeasure(measure));
       }
 
-      function getLeadSlotsPerBeat(cfg) {
-        return Number(cfg?.slots) === 3 ? 3 : 4;
+      function getLeadSlotsPerBeat(cfg, rowKey = null) {
+        const measure = getLeadMeasureForRowKey(rowKey);
+        const isPre = isPreMeasureKey(rowKey) || !!measure?.isPreMeasure;
+        const beatCount = Math.max(1, getBeatCountForMeasure(measure));
+        return normalizeLeadSlotValue(
+          cfg?.slots,
+          getDefaultLeadSlotsForBeatCount(beatCount, isPre),
+          isPre
+        );
       }
 
       function getLeadTotalColumns(rowKey, cfg) {
-        const beats = getLeadMeasureBeatCount(rowKey);
-        const slotsPerBeat = getLeadSlotsPerBeat(cfg);
-        return Math.max(1, beats * slotsPerBeat);
+        return Math.max(1, normalizeLeadSlotsByBeat(rowKey, cfg).reduce((sum, n) => sum + n, 0));
       }
 
       function getRowMeasureRange(sectionIdx, measureIdx) {
@@ -11202,6 +11427,10 @@
       function applyRowLeadToRow(rowKey) {
         const parsed = parseRowKey(rowKey);
         if (!parsed) return;
+        if (parsed.measureIdx === PRE_MEASURE_INDEX) {
+          applyRowLeadToMeasures(rowKey);
+          return;
+        }
         const range = getRowMeasureRange(parsed.sIdx, parsed.measureIdx);
         if (!range) return;
 
@@ -11212,39 +11441,72 @@
 
       function getLeadGridLinearIndex() {
         const lm = state.leadModalState;
-        const rows = getLeadGridRows();
-        const rowIndex = Math.max(0, rows.indexOf(lm.cursorOct));
         const col = Math.max(0, Number(lm.cursorCol) || 0);
-        return (col * rows.length) + rowIndex;
+        return col;
       }
 
       function setLeadGridLinearIndex(idx) {
         const lm = state.leadModalState;
         const slots = getLeadTotalColumns(lm?.rowKey, lm?.working);
-        const rows = getLeadGridRows();
-        const total = slots * rows.length;
+        const total = slots;
         if (!total) return;
 
         const wrapped = ((idx % total) + total) % total;
-        lm.cursorCol = Math.floor(wrapped / rows.length);
-        lm.cursorOct = rows[wrapped % rows.length];
+        lm.cursorCol = wrapped;
       }
 
       function setLeadSlotChoice(n) {
         const lm = state.leadModalState;
         if (!lm?.working) return;
-        lm.slotChoice = (Number(n) === 3) ? 3 : 4;
+        const isPre = isPreMeasureKey(lm.rowKey);
+        const currentBeat = getLeadBeatIndexForColumn(lm.rowKey, lm.working, lm.cursorCol);
+        const fallback = getDefaultLeadSlotsForBeatCount(getLeadMeasureBeatCount(lm.rowKey), isPre);
+        const chosen = normalizeLeadSlotValue(n, fallback, isPre);
+        lm.slotChoice = chosen;
+        lm.working.slotsByBeat = normalizeLeadSlotsByBeat(lm.rowKey, lm.working);
+        lm.working.slotsByBeat[currentBeat] = chosen;
+        lm.working.slots = lm.working.slotsByBeat[0] || chosen;
+        const totalCols = getLeadTotalColumns(lm.rowKey, lm.working);
+        lm.cursorCol = Math.min(Math.max(0, getLeadBeatColumnStart(lm.rowKey, lm.working, currentBeat)), totalCols - 1);
+        lm.working.enabled = true;
+        pushLeadModalHistory();
         showLeadTab(2);
       }
 
       function commitLeadSlotChoice(goToTab3 = true) {
         const lm = state.leadModalState;
         if (!lm?.working) return;
-        const chosen = (lm.slotChoice === 3 || lm.slotChoice === 4)
-          ? lm.slotChoice
-          : (lm.working.slots || 4);
+        lm.working.slotsByBeat = normalizeLeadSlotsByBeat(lm.rowKey, lm.working);
+        lm.working.slots = lm.working.slotsByBeat[0] || getLeadSlotsPerBeat(lm.working, lm.rowKey);
+        lm.working.enabled = true;
+        lm.working.lastTab = goToTab3 ? 3 : 2;
+        pushLeadModalHistory();
+        showLeadTab(goToTab3 ? 3 : 2);
+      }
 
-        chooseLeadSlotsForRow(chosen, goToTab3);
+      function handleLeadBaseButtonKeydown(event) {
+        if (event.key !== "Enter") return;
+        if (state.leadModalState?.tab !== 1) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const lm = state.leadModalState;
+        if (lm?.working?.baseOctave) leadModalGoTab(2);
+      }
+
+      function handleLeadSubdivisionButtonKeydown(event) {
+        if (event.key !== "Enter") return;
+        if (state.leadModalState?.tab !== 2) return;
+        event.preventDefault();
+        event.stopPropagation();
+        commitLeadSlotChoice(true);
+      }
+
+      function handleLeadGridCellButtonKeydown(event) {
+        if (event.key !== "Enter") return;
+        if (state.leadModalState?.tab !== 3) return;
+        event.preventDefault();
+        event.stopPropagation();
+        closeLeadModal(true);
       }
 
       function renderLeadTab1(rowState) {
@@ -11255,7 +11517,7 @@
           <div class="wizard-mode-hint">Press 1–8 to highlight, then Enter to continue.</div>
           <div class="lead-octave-grid">
             ${Array.from({ length: 8 }, (_, i) => `
-              <button class="wizard-btn-primary${chosen === i + 1 ? " is-selected" : ""}" onclick="chooseLeadBaseOctave(${i + 1}, true)">${i + 1}</button>
+              <button class="wizard-btn-primary${chosen === i + 1 ? " is-selected" : ""}" onclick="chooseLeadBaseOctave(${i + 1}, true)" onkeydown="handleLeadBaseButtonKeydown(event)">${i + 1}</button>
             `).join("")}
           </div>
         `;
@@ -11292,6 +11554,130 @@
           <div style="display:flex;gap:12px;justify-content:center;margin-top:4px;">
             <button type="button" id="lead-slot-3" class="wizard-btn-primary" ${style3} onclick="setLeadSlotChoice(3)">3</button>
             <button type="button" id="lead-slot-4" class="wizard-btn-primary" ${style4} onclick="setLeadSlotChoice(4)">4</button>
+          </div>
+        `;
+      }
+
+      function renderLeadTab2Advanced(rowState) {
+        const host = document.getElementById("lead-tab-2");
+        const cur = rowState.baseOctave ?? 4;
+        const lm = state.leadModalState;
+        const isPre = isPreMeasureKey(lm.rowKey);
+        const slotsByBeat = normalizeLeadSlotsByBeat(lm.rowKey, rowState);
+        rowState.slotsByBeat = slotsByBeat;
+        rowState.slots = slotsByBeat[0] || getLeadSlotsPerBeat(rowState, lm.rowKey);
+        const choices = isPre ? PRE_MEASURE_LEAD_SLOT_CHOICES : REGULAR_LEAD_SLOT_CHOICES;
+        const activeBeatIdx = getLeadBeatIndexForColumn(lm.rowKey, rowState, lm.cursorCol);
+        const measureNav = getLeadModalMeasureNavInfo();
+
+        host.innerHTML = `
+          <div class="lead-modal-topbar">
+            <button type="button" class="lead-measure-nav" ${measureNav.canPrev ? "" : "disabled"} onclick="shiftLeadModalMeasure(-1)">‹</button>
+            <div class="lead-modal-title-block">
+              <div class="wizard-step-question">Lead spaces per beat</div>
+              <div class="wizard-mode-hint">${isPre ? "Pre-section measure: choose 1-6 lead spaces." : "Choose 3, 4, or 6 lead spaces for each beat."}</div>
+            </div>
+            <div class="lead-measure-badge">${escapeHtml(measureNav.label)}</div>
+            <button type="button" class="lead-measure-nav" ${measureNav.canNext ? "" : "disabled"} onclick="shiftLeadModalMeasure(1)">›</button>
+          </div>
+
+          <div class="lead-base-row">
+            <button type="button" class="oct-wheel-btn" onclick="shiftLeadOctave(-1,'t2')">Ctrl Down</button>
+            <span>Base octave</span>
+            <strong>${cur}</strong>
+            <button type="button" class="oct-wheel-btn" onclick="shiftLeadOctave(1,'t2')">Ctrl Up</button>
+          </div>
+
+          <div class="lead-subdivision-map">
+            ${slotsByBeat.map((slots, beatIdx) => `
+              <div class="lead-subdivision-beat${beatIdx === activeBeatIdx ? " active" : ""}">
+                <div class="lead-subdivision-label">Beat ${beatIdx + 1}</div>
+                <div class="lead-subdivision-choice-row">
+                  ${choices.map(choice => `
+                    <button
+                      type="button"
+                      id="lead-slot-${beatIdx}-${choice}"
+                      class="lead-subdivision-choice${slots === choice ? " selected" : ""}"
+                      onclick="state.leadModalState.cursorCol=getLeadBeatColumnStart(state.leadModalState.rowKey,state.leadModalState.working,${beatIdx}); setLeadSlotChoice(${choice})"
+                      onkeydown="handleLeadSubdivisionButtonKeydown(event)"
+                    >${choice}</button>
+                  `).join("")}
+                </div>
+                <div class="lead-subdivision-preview" style="grid-template-columns:repeat(${slots}, minmax(0, 1fr));">
+                  ${Array.from({ length: slots }, (_, i) => `<span>${i + 1}</span>`).join("")}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      function getLeadCellState(cfg, col) {
+        const up = cfg?.cells?.[`up:${col}`] || "";
+        const base = cfg?.cells?.[`base:${col}`] || "";
+        const down = cfg?.cells?.[`down:${col}`] || "";
+        if (/^[1-7]$/.test(String(up))) return { value: String(up), oct: "up", className: " oct-up" };
+        if (/^[1-7]$/.test(String(base))) return { value: String(base), oct: "base", className: "" };
+        if (/^[1-7]$/.test(String(down))) return { value: String(down), oct: "down", className: " oct-down" };
+        return { value: "", oct: "base", className: "" };
+      }
+
+      function renderLeadTab3Advanced(rowState) {
+        const host = document.getElementById("lead-tab-3");
+        const lm = state.leadModalState;
+        const cur = rowState.baseOctave ?? 4;
+        const slotsByBeat = normalizeLeadSlotsByBeat(lm.rowKey, rowState);
+        rowState.slotsByBeat = slotsByBeat;
+        rowState.slots = slotsByBeat[0] || getLeadSlotsPerBeat(rowState, lm.rowKey);
+        const totalCols = getLeadTotalColumns(lm.rowKey, rowState);
+        if (lm.cursorCol >= totalCols) lm.cursorCol = totalCols - 1;
+        if (lm.cursorCol < 0) lm.cursorCol = 0;
+        const measureNav = getLeadModalMeasureNavInfo();
+
+        let running = 0;
+        const headCells = slotsByBeat.flatMap((slots, beatIdx) => {
+          const cells = Array.from({ length: slots }, (_, slotIdx) => {
+            const col = running + slotIdx;
+            return `<div class="lead-grid-head${slotIdx === 0 ? " beat-start" : ""}" data-col="${col}">${beatIdx + 1}.${slotIdx + 1}</div>`;
+          });
+          running += slots;
+          return cells;
+        }).join("");
+
+        host.innerHTML = `
+          <div class="lead-modal-topbar">
+            <button type="button" class="lead-measure-nav" ${measureNav.canPrev ? "" : "disabled"} onclick="shiftLeadModalMeasure(-1)">‹</button>
+            <div class="lead-modal-title-block">
+              <div class="wizard-step-question">Enter lead notes</div>
+              <div class="wizard-mode-hint">Numbers place notes. Up/Down nudges the active note. Ctrl+Up/Ctrl+Down changes base octave.</div>
+            </div>
+            <div class="lead-measure-badge">${escapeHtml(measureNav.label)}</div>
+            <button type="button" class="lead-measure-nav" ${measureNav.canNext ? "" : "disabled"} onclick="shiftLeadModalMeasure(1)">›</button>
+          </div>
+          <div class="lead-base-row">
+            <button type="button" class="oct-wheel-btn" onclick="shiftLeadOctave(-1,'t3')">Ctrl Down</button>
+            <span>Base octave</span>
+            <strong>${cur}</strong>
+            <button type="button" class="oct-wheel-btn" onclick="shiftLeadOctave(1,'t3')">Ctrl Up</button>
+          </div>
+          <div class="lead-grid-scroll">
+            <div class="lead-grid-row lead-grid-head-row" style="--lead-cols:${totalCols};">
+              ${headCells}
+            </div>
+            <div class="lead-grid-row lead-grid-single-row" id="lead-grid" style="--lead-cols:${totalCols};">
+              ${Array.from({ length: totalCols }, (_, i) => {
+                const cell = getLeadCellState(rowState, i);
+                const active = lm.cursorCol === i ? " active" : "";
+                return `
+                  <button
+                    type="button"
+                    class="lead-grid-cell${active}${cell.className}"
+                    onclick="state.leadModalState.cursorCol=${i}; state.leadModalState.cursorOct='${cell.oct}'; showLeadTab(3);"
+                    onkeydown="handleLeadGridCellButtonKeydown(event)"
+                  >${cell.value || "○"}</button>
+                `;
+              }).join("")}
+            </div>
           </div>
         `;
       }
@@ -11397,6 +11783,77 @@
         `;
       }
 
+      function getLeadModalMeasureNavInfo() {
+        const lm = state.leadModalState;
+        const parsed = parseRowKey(lm?.rowKey);
+        if (!parsed) {
+          return { label: "Measure", canPrev: false, canNext: false };
+        }
+        const section = state.sections?.[parsed.sIdx];
+        if (!section) {
+          return { label: "Measure", canPrev: false, canNext: false };
+        }
+        if (parsed.measureIdx === PRE_MEASURE_INDEX) {
+          return {
+            label: "Pre-section",
+            canPrev: false,
+            canNext: Array.isArray(section.measures) && section.measures.length > 0
+          };
+        }
+        const row = getRowMeasureRange(parsed.sIdx, parsed.measureIdx);
+        const start = row?.start ?? 0;
+        const end = row?.end ?? (section.measures?.length || 0);
+        const rowNumber = (row?.rowIndex ?? 0) + 1;
+        const inRow = parsed.measureIdx - start + 1;
+        const totalInRow = Math.max(1, end - start);
+        return {
+          label: `Row ${rowNumber} - M${inRow}/${totalInRow}`,
+          canPrev: parsed.measureIdx > start || (parsed.measureIdx === 0 && sectionHasPreMeasure(section)),
+          canNext: parsed.measureIdx < end - 1
+        };
+      }
+
+      function commitLeadModalWorkingToState() {
+        const lm = state.leadModalState;
+        if (!lm?.rowKey || !lm?.working) return;
+        state.rowLead[lm.rowKey] = JSON.parse(JSON.stringify(lm.working));
+        applyRowLeadToRow(lm.rowKey);
+      }
+
+      function shiftLeadModalMeasure(delta) {
+        const lm = state.leadModalState;
+        const parsed = parseRowKey(lm?.rowKey);
+        if (!lm?.working || !parsed) return;
+        const section = state.sections?.[parsed.sIdx];
+        if (!section) return;
+
+        let targetIdx = parsed.measureIdx;
+        if (parsed.measureIdx === PRE_MEASURE_INDEX) {
+          if (delta > 0 && section.measures?.length) targetIdx = 0;
+        } else {
+          const row = getRowMeasureRange(parsed.sIdx, parsed.measureIdx);
+          if (!row) return;
+          targetIdx = parsed.measureIdx + (delta < 0 ? -1 : 1);
+          if (targetIdx < row.start) {
+            targetIdx = parsed.measureIdx === 0 && sectionHasPreMeasure(section)
+              ? PRE_MEASURE_INDEX
+              : row.start;
+          }
+          if (targetIdx >= row.end) targetIdx = row.end - 1;
+        }
+
+        if (targetIdx === parsed.measureIdx) return;
+        commitLeadModalWorkingToState();
+        lm.rowKey = getRowKey(parsed.sIdx, targetIdx);
+        const saved = ensureRowLead(lm.rowKey);
+        lm.working = JSON.parse(JSON.stringify(saved));
+        lm.working.slotsByBeat = normalizeLeadSlotsByBeat(lm.rowKey, lm.working);
+        lm.slotChoice = getLeadSlotsPerBeat(lm.working, lm.rowKey);
+        lm.cursorCol = 0;
+        lm.cursorOct = "base";
+        showLeadTab(lm.tab);
+      }
+
       function shiftLeadOctave(dir, wheelId) {
         const lm = state.leadModalState;
         if (!lm?.working) return;
@@ -11417,6 +11874,7 @@
           enabled: false,
           baseOctave: null,
           slots: null,
+          slotsByBeat: [],
           instrumentAbbr: "",
           instrumentRanges: [],
           activeRangeIndex: 0,
@@ -11461,8 +11919,7 @@
 
       function getLeadCursorRangePoint(rowKey, cfg) {
         const parsed = parseRowKey(rowKey);
-        const slotsPerBeat = getLeadSlotsPerBeat(cfg);
-        const beatIdx = Math.max(0, Math.floor((Number(state.leadModalState?.cursorCol) || 0) / slotsPerBeat));
+        const beatIdx = getLeadBeatIndexForColumn(rowKey, cfg, Number(state.leadModalState?.cursorCol) || 0);
         return {
           measureIdx: Math.max(0, Number(parsed?.measureIdx) || 0),
           beatIdx
@@ -11528,6 +11985,8 @@
       function ensureRowLead(rowKey) {
         if (!state.rowLead) state.rowLead = {};
         if (!state.rowLead[rowKey]) state.rowLead[rowKey] = makeRowLeadState();
+        state.rowLead[rowKey].slotsByBeat = normalizeLeadSlotsByBeat(rowKey, state.rowLead[rowKey]);
+        state.rowLead[rowKey].slots = state.rowLead[rowKey].slotsByBeat[0] || getLeadSlotsPerBeat(state.rowLead[rowKey], rowKey);
         state.rowLead[rowKey].instrumentRanges = normalizeLeadInstrumentRanges(
           state.rowLead[rowKey].instrumentRanges,
           ""
@@ -11560,6 +12019,7 @@
           enabled: !!lm.working.enabled,
           baseOctave: lm.working.baseOctave ?? null,
           slots: lm.working.slots ?? null,
+          slotsByBeat: normalizeLeadSlotsByBeat(lm.rowKey, lm.working),
           instrumentAbbr: lm.working.instrumentAbbr || "",
           instrumentRanges: normalizeLeadInstrumentRanges(lm.working.instrumentRanges, ""),
           activeRangeIndex: Number(lm.working.activeRangeIndex) || 0,
@@ -11584,6 +12044,7 @@
         lm.working.enabled = snap.enabled;
         lm.working.baseOctave = snap.baseOctave;
         lm.working.slots = snap.slots;
+        lm.working.slotsByBeat = normalizeLeadSlotsByBeat(lm.rowKey, snap);
         lm.working.instrumentAbbr = snap.instrumentAbbr || "";
         lm.working.instrumentRanges = normalizeLeadInstrumentRanges(snap.instrumentRanges, "");
         lm.working.activeRangeIndex = Number(snap.activeRangeIndex) || 0;
@@ -11612,6 +12073,13 @@
       function openLeadModalForCurrentRow() {
         const measureKey = getRowKey(state.currentSectionIdx, state.currentMeasureIdx);
         const cfg = ensureRowLead(measureKey);
+        if (state.currentMeasureIdx === PRE_MEASURE_INDEX) {
+          if ((!cfg.baseOctave || Number(cfg.baseOctave) < 1)) {
+            cfg.baseOctave = 4;
+          }
+          openLeadModal(measureKey, cfg.baseOctave ? (cfg.lastTab || 2) : 1);
+          return;
+        }
         const rowRange = getRowMeasureRange(state.currentSectionIdx, state.currentMeasureIdx);
         const rowBase = rowRange
           ? getRowBaseOctaveForLine(state.currentSectionIdx, rowRange.start, rowRange.end - rowRange.start)
@@ -11644,10 +12112,11 @@
         lm.open = true;
         lm.rowKey = rowKey;
         lm.tab = startTab;
-        lm.cursorOct = "up";
+        lm.cursorOct = "base";
         lm.cursorCol = 0;
-        lm.slotChoice = saved.slots || 4;
+        lm.slotChoice = getLeadSlotsPerBeat(saved, rowKey);
         lm.working = JSON.parse(JSON.stringify(saved));
+        lm.working.slotsByBeat = normalizeLeadSlotsByBeat(rowKey, lm.working);
 
         if (!Array.isArray(lm.working.history)) lm.working.history = [];
         if (typeof lm.working.historyIndex !== "number") lm.working.historyIndex = -1;
@@ -11670,9 +12139,11 @@
 
         if (saveChanges && lm?.rowKey && lm?.working) {
           state.rowLead[lm.rowKey] = JSON.parse(JSON.stringify(lm.working));
-          syncRowBaseOctaveForMeasureKey(lm.rowKey, lm.working.baseOctave);
-          syncRowLeadInstrumentForMeasureKey(lm.rowKey, lm.working.instrumentAbbr);
-          syncRowLeadInstrumentRangesForMeasureKey(lm.rowKey, lm.working.instrumentRanges);
+          if (!isPreMeasureKey(lm.rowKey)) {
+            syncRowBaseOctaveForMeasureKey(lm.rowKey, lm.working.baseOctave);
+            syncRowLeadInstrumentForMeasureKey(lm.rowKey, lm.working.instrumentAbbr);
+            syncRowLeadInstrumentRangesForMeasureKey(lm.rowKey, lm.working.instrumentRanges);
+          }
           applyRowLeadToRow(lm.rowKey);
           saveState();
           renderChart();
@@ -11713,8 +12184,8 @@
         }
 
         if (tabNum === 2) {
-          const chosen = lm.slotChoice === 3 ? 3 : 4;
-          const target = document.getElementById(chosen === 3 ? "lead-slot-3" : "lead-slot-4");
+          const target = document.querySelector("#lead-tab-2 .lead-subdivision-choice.selected")
+            || document.querySelector("#lead-tab-2 .lead-subdivision-choice");
           if (target) {
             target.focus();
             return;
@@ -11755,8 +12226,8 @@
         if (!cfg) return;
 
         if (tabNum === 1) renderLeadTab1(cfg);
-        if (tabNum === 2) renderLeadTab2(cfg);
-        if (tabNum === 3) renderLeadTab3(cfg);
+        if (tabNum === 2) renderLeadTab2Advanced(cfg);
+        if (tabNum === 3) renderLeadTab3Advanced(cfg);
         if (tabNum === 4) renderLeadTab4(cfg);
 
         setTimeout(() => focusLeadModalControl(tabNum), 0);
@@ -11766,8 +12237,8 @@
         const lm = state.leadModalState;
         if (!lm?.working) return;
         if (tabNum === 2 && !lm.working.baseOctave) return;
-        if (tabNum === 3 && !lm.working.slots) return;
-        if (tabNum === 4 && !lm.working.slots) return;
+        if (tabNum === 3 && !normalizeLeadSlotsByBeat(lm.rowKey, lm.working).length) return;
+        if (tabNum === 4 && !normalizeLeadSlotsByBeat(lm.rowKey, lm.working).length) return;
         lm.working.lastTab = tabNum;
         showLeadTab(tabNum);
       }
@@ -11793,8 +12264,13 @@
         const lm = state.leadModalState;
         if (!lm?.working) return;
 
-        const chosen = Number(n) === 3 ? 3 : 4;
+        const chosen = normalizeLeadSlotValue(
+          n,
+          getDefaultLeadSlotsForBeatCount(getLeadMeasureBeatCount(lm.rowKey), isPreMeasureKey(lm.rowKey)),
+          isPreMeasureKey(lm.rowKey)
+        );
         lm.slotChoice = chosen;
+        lm.working.slotsByBeat = normalizeLeadSlotsByBeat(lm.rowKey, lm.working).map(() => chosen);
         lm.working.slots = chosen;
         lm.working.enabled = true;
         lm.working.lastTab = goToTab3 ? 3 : 2;
@@ -11811,12 +12287,12 @@
 
         if (lm.cursorCol >= totalCols) lm.cursorCol = totalCols - 1;
         if (lm.cursorCol < 0) lm.cursorCol = 0;
-        if (!["up", "base", "down"].includes(lm.cursorOct)) lm.cursorOct = "up";
+        if (!["up", "base", "down"].includes(lm.cursorOct)) lm.cursorOct = "base";
 
         pushLeadModalHistory();
 
         if (goToTab3) {
-          lm.cursorOct = "up";
+          lm.cursorOct = "base";
           lm.cursorCol = 0;
           showLeadTab(3);
         } else {
@@ -11874,11 +12350,29 @@
         showLeadTab(3);
       }
 
+      function nudgeLeadGridCellOffset(dir) {
+        const lm = state.leadModalState;
+        if (!lm?.working) return;
+        const col = Math.max(0, Number(lm.cursorCol) || 0);
+        const current = getLeadCellState(lm.working, col);
+        const order = ["down", "base", "up"];
+        const currentIdx = Math.max(0, order.indexOf(current.value ? current.oct : (lm.cursorOct || "base")));
+        const nextIdx = Math.max(0, Math.min(order.length - 1, currentIdx + (dir > 0 ? 1 : -1)));
+        const nextOct = order[nextIdx];
+        lm.cursorOct = nextOct;
+
+        if (current.value) {
+          setLeadGridCell(nextOct, col, current.value);
+        } else {
+          showLeadTab(3);
+        }
+      }
+
       function handleLeadGridKeydown(e) {
         const lm = state.leadModalState;
-        if (!lm?.working?.slots) return;
+        if (!lm?.working) return;
 
-        const total = getLeadTotalColumns(lm.rowKey, lm.working) * 3;
+        const total = getLeadTotalColumns(lm.rowKey, lm.working);
 
         if (e.key === "ArrowRight") {
           e.preventDefault();
@@ -11891,6 +12385,18 @@
           e.preventDefault();
           setLeadGridLinearIndex(getLeadGridLinearIndex() - 1);
           showLeadTab(3);
+          return;
+        }
+
+        if (e.ctrlKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+          e.preventDefault();
+          shiftLeadOctave(e.key === "ArrowUp" ? 1 : -1, "t3");
+          return;
+        }
+
+        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+          e.preventDefault();
+          nudgeLeadGridCellOffset(e.key === "ArrowUp" ? 1 : -1);
           return;
         }
 
@@ -11915,6 +12421,7 @@
       }
 
       function handleLeadModalKeydown(e) {
+        if (e.defaultPrevented) return;
         const lm = state.leadModalState;
         if (!lm?.open) return;
 
@@ -11944,17 +12451,18 @@
 
         if (lm.tab === 2 && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
           e.preventDefault();
-          setLeadSlotChoice(e.key === "ArrowLeft" ? 3 : 4);
+          shiftLeadModalMeasure(e.key === "ArrowLeft" ? -1 : 1);
           return;
         }
 
-        if (lm.tab === 2 && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+        if (lm.tab === 2 && e.ctrlKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
           e.preventDefault();
           shiftLeadOctave(e.key === "ArrowUp" ? 1 : -1, "t2");
           return;
         }
 
-        if (lm.tab === 2 && /^(3|4)$/.test(e.key)) {
+        if (lm.tab === 2 && /^[1-6]$/.test(e.key)) {
+          if (!isPreMeasureKey(lm.rowKey) && !REGULAR_LEAD_SLOT_CHOICES.includes(Number(e.key))) return;
           e.preventDefault();
           setLeadSlotChoice(Number(e.key));
           return;
@@ -11963,12 +12471,6 @@
         if (lm.tab === 2 && /^[1-8]$/.test(e.key)) {
           e.preventDefault();
           chooseLeadBaseOctave(Number(e.key), true);
-          return;
-        }
-
-        if (lm.tab === 3 && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
-          e.preventDefault();
-          shiftLeadOctave(e.key === "ArrowUp" ? 1 : -1, "t3");
           return;
         }
 
@@ -12000,7 +12502,7 @@
               leadModalGoTab(1);
               return;
             }
-            if (!lm.working?.slots) {
+            if (!normalizeLeadSlotsByBeat(lm.rowKey, lm.working).length) {
               leadModalGoTab(2);
               return;
             }
@@ -12017,7 +12519,7 @@
         if (e.key === "Tab") {
           e.preventDefault();
           if (lm.tab === 1 && lm.working?.baseOctave) leadModalGoTab(2);
-          else if (lm.tab === 2 && (lm.slotChoice === 3 || lm.slotChoice === 4 || lm.working?.slots)) commitLeadSlotChoice(true);
+          else if (lm.tab === 2 && normalizeLeadSlotsByBeat(lm.rowKey, lm.working).length) commitLeadSlotChoice(true);
           else if (lm.tab === 3) leadModalGoTab(4);
           else if (lm.tab === 4) leadModalGoTab(2);
           return;
@@ -12036,16 +12538,20 @@
         const cfg = state.rowLead[rowKey];
 
         if (!section || !cfg) return;
-        const measure = section.measures?.[measureIdx];
+        const measure = measureIdx === PRE_MEASURE_INDEX
+          ? section.preMeasure
+          : section.measures?.[measureIdx];
         if (!measure) return;
 
-        const slotsPerBeat = getLeadSlotsPerBeat(cfg);
         const beatCount = getBeatCountForMeasure(measure);
-        const totalSlots = beatCount * slotsPerBeat;
+        const slotsByBeat = normalizeLeadSlotsByBeat(rowKey, cfg);
+        const totalSlots = slotsByBeat.reduce((sum, n) => sum + n, 0);
+        const slotsPerBeat = slotsByBeat[0] || getDefaultLeadSlotsForBeatCount(beatCount, !!measure.isPreMeasure);
 
-        measure.leadEnabled = !!cfg.baseOctave && !!cfg.slots;
+        measure.leadEnabled = !!cfg.baseOctave && slotsByBeat.length > 0;
         measure.leadBaseOctave = cfg.baseOctave ?? null;
         measure.leadSlotsPerBeat = slotsPerBeat;
+        measure.leadSlotsByBeat = slotsByBeat;
         measure.leadSlots = totalSlots;
         measure.leadInstrumentAbbr = cfg.instrumentAbbr || "";
         measure.leadInstrumentRanges = normalizeLeadInstrumentRanges(cfg.instrumentRanges, cfg.instrumentAbbr);
@@ -12093,8 +12599,9 @@
           leadBaseOctave: null,
           leadInstrumentAbbr: "",
           leadInstrumentRanges: [],
-          leadSlotsPerBeat: 4,
-          leadSlots: n * 4,
+          leadSlotsPerBeat: opts.isPreMeasure ? 6 : getDefaultLeadSlotsForBeatCount(n, false),
+          leadSlotsByBeat: Array.from({ length: n }, () => opts.isPreMeasure ? 6 : getDefaultLeadSlotsForBeatCount(n, false)),
+          leadSlots: n * (opts.isPreMeasure ? 6 : getDefaultLeadSlotsForBeatCount(n, false)),
           isEndingBar: false
         };
       }
@@ -12151,17 +12658,29 @@
           return normalized.beat;
         });
 
+        const isPreMeasure = !!measure.isPreMeasure;
+        const fallbackLeadSlots = getDefaultLeadSlotsForBeatCount(beats.length, isPreMeasure);
+        const rawSlotsByBeat = Array.isArray(measure.leadSlotsByBeat) ? measure.leadSlotsByBeat : [];
+        const normalizedSlotsByBeat = Array.from({ length: beats.length }, (_, idx) =>
+          normalizeLeadSlotValue(
+            rawSlotsByBeat[idx] ?? measure.leadSlotsPerBeat ?? measure.leadSlots,
+            fallbackLeadSlots,
+            isPreMeasure
+          )
+        );
+
         const normalizedMeasure = {
           beats,
           roll: !!measure.roll,
           forceUnderline: !!measure.forceUnderline,
-          isPreMeasure: !!measure.isPreMeasure,
+          isPreMeasure,
           leadEnabled: !!measure.leadEnabled,
           leadBaseOctave: Number.isFinite(Number(measure.leadBaseOctave)) ? Number(measure.leadBaseOctave) : null,
           leadInstrumentAbbr: String(measure.leadInstrumentAbbr || ""),
           leadInstrumentRanges: normalizeLeadInstrumentRanges(measure.leadInstrumentRanges, ""),
-          leadSlotsPerBeat: Number(measure.leadSlotsPerBeat) === 3 ? 3 : 4,
-          leadSlots: Math.max(0, Number(measure.leadSlots) || beats.length * 4),
+          leadSlotsPerBeat: normalizedSlotsByBeat[0] || fallbackLeadSlots,
+          leadSlotsByBeat: normalizedSlotsByBeat,
+          leadSlots: normalizedSlotsByBeat.reduce((sum, n) => sum + n, 0),
           isEndingBar: !!measure.isEndingBar
         };
         if (!Array.isArray(measure.beats) || !measure.beats.length) changed = true;
@@ -12173,11 +12692,32 @@
         const source = Array.isArray(sections) ? sections : [];
         const normalized = source
           .filter(section => section && typeof section === "object")
-          .map(section => {
-            const rawMeasures = Array.isArray(section.measures) && section.measures.length
+          .map((section, sIdx) => {
+            const rawMeasuresSource = Array.isArray(section.measures) && section.measures.length
               ? section.measures
               : [createMeasure()];
             if (!Array.isArray(section.measures) || !section.measures.length) changed = true;
+
+            let preMeasure = section.preMeasure && typeof section.preMeasure === "object"
+              ? section.preMeasure
+              : null;
+            let rawMeasures = rawMeasuresSource;
+            const migratedLegacyPreMeasure = !preMeasure && rawMeasures[0]?.isPreMeasure;
+            if (migratedLegacyPreMeasure) {
+              preMeasure = rawMeasures[0];
+              rawMeasures = rawMeasures.slice(1);
+              changed = true;
+            }
+            rawMeasures = rawMeasures.filter(measure => !measure?.isPreMeasure);
+            if (!rawMeasures.length) {
+              rawMeasures = [createMeasure()];
+              changed = true;
+            }
+
+            const normalizedPreMeasure = preMeasure
+              ? normalizeLoadedMeasure({ ...preMeasure, isPreMeasure: true, beats: Array.isArray(preMeasure.beats) ? preMeasure.beats.slice(0, 1) : [createEmptyBeat()] }, 1)
+              : null;
+            if (normalizedPreMeasure?.changed) changed = true;
 
             const measures = rawMeasures.map(measure => {
               const normalizedMeasure = normalizeLoadedMeasure(measure, state.beatsPerMeasure || 4);
@@ -12191,10 +12731,27 @@
               rowMeasureCounts: Array.isArray(section.rowMeasureCounts)
                 ? section.rowMeasureCounts.map(v => Number.isFinite(Number(v)) ? clampMeasuresPerRow(v) : null)
                 : [],
+              preMeasure: normalizedPreMeasure?.measure || null,
               measures
             };
             if (clean.measuresPerRow !== (Number.isFinite(Number(section.measuresPerRow)) ? clampMeasuresPerRow(section.measuresPerRow) : null)) {
               changed = true;
+            }
+            if (migratedLegacyPreMeasure && state.rowLead && typeof state.rowLead === "object") {
+              const nextRowLead = {};
+              Object.entries(state.rowLead).forEach(([key, cfg]) => {
+                const parsed = parseRowKey(key);
+                if (!parsed || parsed.sIdx !== sIdx) {
+                  nextRowLead[key] = cfg;
+                  return;
+                }
+                if (parsed.measureIdx === 0) {
+                  nextRowLead[getRowKey(parsed.sIdx, PRE_MEASURE_INDEX)] = cfg;
+                } else if (parsed.measureIdx > 0) {
+                  nextRowLead[getRowKey(parsed.sIdx, parsed.measureIdx - 1)] = cfg;
+                }
+              });
+              state.rowLead = nextRowLead;
             }
             refreshSectionEndingBars(clean);
             return clean;
@@ -12245,9 +12802,15 @@
         state.slurStart = null;
         state.currentSectionIdx = Math.max(0, Math.min(Number(state.currentSectionIdx) || 0, Math.max(0, state.sections.length - 1)));
         const section = state.sections[state.currentSectionIdx];
-        state.currentMeasureIdx = Math.max(0, Math.min(Number(state.currentMeasureIdx) || 0, Math.max(0, (section?.measures?.length || 1) - 1)));
+        const rawMeasureIdx = Number(state.currentMeasureIdx);
+        if (rawMeasureIdx === PRE_MEASURE_INDEX && sectionHasPreMeasure(section)) {
+          state.currentMeasureIdx = PRE_MEASURE_INDEX;
+        } else {
+          state.currentMeasureIdx = Math.max(0, Math.min(Number(state.currentMeasureIdx) || 0, Math.max(0, (section?.measures?.length || 1) - 1)));
+        }
         const measure = section?.measures?.[state.currentMeasureIdx];
-        state.currentBeatIdx = Math.max(0, Math.min(Number(state.currentBeatIdx) || 0, Math.max(0, getBeatCountForMeasure(measure) - 1)));
+        const activeMeasure = state.currentMeasureIdx === PRE_MEASURE_INDEX ? section?.preMeasure : measure;
+        state.currentBeatIdx = Math.max(0, Math.min(Number(state.currentBeatIdx) || 0, Math.max(0, getBeatCountForMeasure(activeMeasure) - 1)));
         state.lyricsSections = normalizeLyricsSections(state.lyricsSections || []);
         state.rowLead = state.rowLead && typeof state.rowLead === "object" ? state.rowLead : {};
         return repaired;
@@ -12268,7 +12831,9 @@
 
       function currentMeasure() {
         const section = currentSection();
-        return section ? section.measures[state.currentMeasureIdx] : null;
+        if (!section) return null;
+        if (state.currentMeasureIdx === PRE_MEASURE_INDEX) return section.preMeasure || null;
+        return section.measures[state.currentMeasureIdx] || null;
       }
 
       function currentBeat() {
@@ -12279,7 +12844,9 @@
       function getCurrentBeat() {
         const section = state.sections[state.currentSectionIdx];
         if (!section) return null;
-        const measure = section.measures[state.currentMeasureIdx];
+        const measure = state.currentMeasureIdx === PRE_MEASURE_INDEX
+          ? section.preMeasure
+          : section.measures[state.currentMeasureIdx];
         if (!measure) return null;
         return measure.beats[state.currentBeatIdx] || null;
       }
@@ -12516,6 +13083,13 @@
       }
 
       function insertMeasureAfterCurrent(beatCount = null) {
+        if (state.currentMeasureIdx === PRE_MEASURE_INDEX) {
+          state.currentMeasureIdx = 0;
+          state.currentBeatIdx = 0;
+          renderChart();
+          scrollActiveRowToEditorTop();
+          return false;
+        }
         const section = currentSection();
         const measure = currentMeasure();
         if (!section || !measure) return false;
@@ -12577,6 +13151,13 @@
       function moveRight() {
         const section = currentSection();
         const measure = currentMeasure();
+        if (section && state.currentMeasureIdx === PRE_MEASURE_INDEX) {
+          state.currentMeasureIdx = 0;
+          state.currentBeatIdx = 0;
+          renderChart();
+          scrollActiveRowToEditorTop();
+          return;
+        }
         if (section && measure) {
           const atLastBeat = state.currentBeatIdx >= getBeatCountForMeasure(measure) - 1;
           const atLastMeasure = state.currentMeasureIdx >= section.measures.length - 1;
@@ -12634,10 +13215,24 @@
       }
 
       function advanceMeasure() {
+        if (state.currentMeasureIdx === PRE_MEASURE_INDEX) {
+          state.currentMeasureIdx = 0;
+          state.currentBeatIdx = 0;
+          renderChart();
+          scrollActiveRowToEditorTop();
+          return;
+        }
         insertMeasureAfterCurrent();
       }
 
       function insertMeasureWithBeatCount(beatCount) {
+        if (state.currentMeasureIdx === PRE_MEASURE_INDEX) {
+          state.currentMeasureIdx = 0;
+          state.currentBeatIdx = 0;
+          renderChart();
+          scrollActiveRowToEditorTop();
+          return;
+        }
         const measure = currentMeasure();
         if (!measure) return;
         const maxBeats = getBeatCountForMeasure(measure);
@@ -12668,6 +13263,7 @@
       }
 
       function splitMeasureAtCurrentBeat() {
+        if (state.currentMeasureIdx === PRE_MEASURE_INDEX) return;
         const section = currentSection();
         const measure = currentMeasure();
         if (!section || !measure || !Array.isArray(measure.beats)) return;
@@ -12690,6 +13286,12 @@
       function moveToPreviousBeat() {
         if (state.currentBeatIdx > 0) {
           state.currentBeatIdx -= 1;
+          return true;
+        }
+
+        if (state.currentMeasureIdx === 0 && sectionHasPreMeasure(currentSection())) {
+          state.currentMeasureIdx = PRE_MEASURE_INDEX;
+          state.currentBeatIdx = 0;
           return true;
         }
 
@@ -12859,6 +13461,7 @@
         let b = state.currentBeatIdx;
         const getCount = (secIdx, measureIdx) => {
           const sec = state.sections[secIdx];
+          if (measureIdx === PRE_MEASURE_INDEX) return getBeatCountForMeasure(sec?.preMeasure);
           const measure = sec?.measures?.[measureIdx];
           return getBeatCountForMeasure(measure);
         };
@@ -12885,7 +13488,9 @@
         if (s >= state.sections.length) s = state.sections.length - 1;
 
         if (m < 0) {
-          if (s > 0) {
+          if (m === PRE_MEASURE_INDEX && sectionHasPreMeasure(state.sections[s])) {
+            b = 0;
+          } else if (s > 0) {
             s -= 1;
             m = state.sections[s].measures.length - 1;
             b = getCount(s, m) - 1;
@@ -14246,7 +14851,7 @@
           const preMeasureBtn = document.createElement("button");
           preMeasureBtn.type = "button";
           preMeasureBtn.className = "section-premeasure-control";
-          preMeasureBtn.title = "Toggle 2-beat pre-measure";
+          preMeasureBtn.title = "Toggle one-beat pre-section measure";
           if (sectionHasPreMeasure(section)) {
             preMeasureBtn.classList.add("active");
           }
@@ -14309,7 +14914,12 @@
 
             const lineHasRoll = rowMeasures.some(m => measureHasRoll(m));
 
-            const lineHasLead = rowMeasures.some(m =>
+            const preMeasure = rowInfo.rowIndex === 0 ? section.preMeasure : null;
+            const preMeasureHasLead = !!preMeasure && (
+              !!preMeasure?.leadEnabled ||
+              (Array.isArray(preMeasure?.rowLeadView) && preMeasure.rowLeadView.some(v => String(v || "").trim() !== ""))
+            );
+            const lineHasLead = preMeasureHasLead || rowMeasures.some(m =>
               !!m?.leadEnabled ||
               (Array.isArray(m?.rowLeadView) && m.rowLeadView.some(v => String(v || "").trim() !== ""))
             );
@@ -14334,6 +14944,130 @@
               baseTag.className = "lead-row-base-oct";
               baseTag.textContent = `[${Number(rowBaseOctave)}]`;
               line.appendChild(baseTag);
+            }
+
+            if (preMeasure) {
+              const measureEl = document.createElement("div");
+              measureEl.className = "measure pre-measure";
+              if (Array.isArray(preMeasure?.beats) && preMeasure.beats.some(beat => String(beat?.bass || "").trim())) {
+                measureEl.classList.add("has-bass-note");
+              }
+
+              const measureBeatCount = 1;
+              const leadSlotsByBeat = Array.isArray(preMeasure.leadSlotsByBeat) && preMeasure.leadSlotsByBeat.length
+                ? preMeasure.leadSlotsByBeat.map(v => normalizeLeadSlotValue(v, 6, true))
+                : [normalizeLeadSlotValue(preMeasure.leadSlotsPerBeat || preMeasure.leadSlots || 6, 6, true)];
+              const leadSlotsPerBeat = leadSlotsByBeat[0] || 6;
+              const leadTokens = Array.isArray(preMeasure?.rowLeadView)
+                ? preMeasure.rowLeadView
+                : Array.from({ length: leadSlotsPerBeat }, () => "");
+
+              if (lineHasLead) {
+                const leadRow = document.createElement("div");
+                leadRow.className = "lead-row";
+                const leadBeat = document.createElement("div");
+                leadBeat.className = "lead-beat";
+                leadBeat.dataset.sectionidx = String(sIdx);
+                leadBeat.dataset.measureidx = String(PRE_MEASURE_INDEX);
+                leadBeat.dataset.beatidx = "0";
+                leadBeat.style.gridTemplateColumns = `repeat(${leadSlotsPerBeat}, minmax(0, 1fr))`;
+
+                for (let slotIdx = 0; slotIdx < leadSlotsPerBeat; slotIdx++) {
+                  const leadSubSlot = document.createElement("div");
+                  leadSubSlot.className = "lead-subslot";
+                  const raw = String(leadTokens[slotIdx] || "").trim();
+                  if (raw) {
+                    const note = document.createElement("span");
+                    note.className = "lead-note";
+                    if (raw.startsWith("^")) {
+                      note.classList.add("oct-up");
+                      note.textContent = raw.slice(1);
+                    } else if (raw.startsWith("_")) {
+                      note.classList.add("oct-down");
+                      note.textContent = raw.slice(1);
+                    } else {
+                      note.textContent = raw;
+                    }
+                    leadSubSlot.appendChild(note);
+                  }
+                  leadBeat.appendChild(leadSubSlot);
+                }
+                if (leadBeat.querySelector(".lead-note")) leadBeat.classList.add("with-guides");
+                leadRow.appendChild(leadBeat);
+                measureEl.appendChild(leadRow);
+              }
+
+              const beatRow = document.createElement("div");
+              beatRow.className = "beat-row";
+              const beat = preMeasure.beats?.[0] || createEmptyBeat();
+              const beatEl = document.createElement("div");
+              beatEl.className = "beat";
+              beatEl.dataset.sectionidx = String(sIdx);
+              beatEl.dataset.measureidx = String(PRE_MEASURE_INDEX);
+              beatEl.dataset.beatidx = "0";
+              if (sIdx === state.currentSectionIdx && state.currentMeasureIdx === PRE_MEASURE_INDEX) {
+                beatEl.classList.add("active");
+              }
+              const manualX = Math.max(0, Math.min(4, Number(beat.xMarks) || 0));
+              const totalX = Math.min(5, manualX + (beat.dot ? 1 : 0));
+              const showUnderline = totalX > 0 || !!beat.bass || !!beat.manualUnderline;
+              if (showUnderline) beatEl.classList.add("underlined");
+              beatEl.addEventListener("mousedown", (e) => {
+                e.preventDefault();
+                state.currentSectionIdx = sIdx;
+                state.currentMeasureIdx = PRE_MEASURE_INDEX;
+                state.currentBeatIdx = 0;
+                renderChart();
+                scrollActiveRowToEditorTop();
+                const ft = document.getElementById("focus-trap");
+                ft && ft.focus();
+              });
+
+              const chordWrap = document.createElement("div");
+              chordWrap.className = "chord-wrap";
+              renderChord(chordWrap, beat.chordState || {});
+              if (beat.circle) chordWrap.classList.add("has-circle");
+              beatEl.appendChild(chordWrap);
+
+              if (showUnderline) {
+                const underlineRow = document.createElement("div");
+                underlineRow.className = "beat-underline-row";
+                if (beat.dot) {
+                  underlineRow.classList.add("has-dot");
+                  const dot = document.createElement("span");
+                  dot.className = "beat-dot";
+                  dot.textContent = "\u2022";
+                  underlineRow.appendChild(dot);
+                }
+                const underlineLine = document.createElement("span");
+                underlineLine.className = "beat-underline-line";
+                underlineRow.appendChild(underlineLine);
+                beatEl.appendChild(underlineRow);
+              }
+
+              if (beat.bass) {
+                const bass = document.createElement("div");
+                bass.className = "bass-note";
+                bass.textContent = beat.bass;
+                beatEl.classList.add("has-bass");
+                beatEl.appendChild(bass);
+              }
+
+              if (totalX > 0) {
+                const xMarks = document.createElement("div");
+                xMarks.className = `x-marks count-${totalX}`;
+                for (let i = 0; i < totalX; i++) {
+                  const mark = document.createElement("span");
+                  mark.className = "x-mark";
+                  mark.textContent = "x";
+                  xMarks.appendChild(mark);
+                }
+                beatEl.appendChild(xMarks);
+              }
+
+              beatRow.appendChild(beatEl);
+              measureEl.appendChild(beatRow);
+              line.appendChild(measureEl);
             }
 
             rowMeasures.forEach((measure, rowOffset) => {
@@ -14362,11 +15096,17 @@
               if (measureRoll) {
                 measure.roll = true;
               }
-              const leadSlotsPerBeat = Math.max(
-                1,
-                Number(measure?.leadSlotsPerBeat) || getLeadSlotsPerBeat({ slots: measure?.leadSlots })
-              );
-              const leadTokenCount = measureBeatCount * leadSlotsPerBeat;
+              const leadSlotsByBeat = Array.isArray(measure?.leadSlotsByBeat) && measure.leadSlotsByBeat.length
+                ? Array.from({ length: measureBeatCount }, (_, idx) => normalizeLeadSlotValue(
+                    measure.leadSlotsByBeat[idx],
+                    getDefaultLeadSlotsForBeatCount(measureBeatCount, !!measure?.isPreMeasure),
+                    !!measure?.isPreMeasure
+                  ))
+                : Array.from({ length: measureBeatCount }, () => Math.max(
+                    1,
+                    Number(measure?.leadSlotsPerBeat) || getLeadSlotsPerBeat({ slots: measure?.leadSlots }, getRowKey(sIdx, mIdx))
+                  ));
+              const leadTokenCount = leadSlotsByBeat.reduce((sum, n) => sum + n, 0);
               const leadTokens = Array.isArray(measure?.rowLeadView)
                 ? measure.rowLeadView
                 : Array.from({ length: leadTokenCount }, () => "");
@@ -14375,7 +15115,9 @@
                 const leadRow = document.createElement("div");
                 leadRow.className = "lead-row";
 
+                let leadTokenCursor = 0;
                 for (let bIdx = 0; bIdx < measureBeatCount; bIdx++) {
+                  const leadSlotsPerBeat = leadSlotsByBeat[bIdx] || 4;
                   const leadBeat = document.createElement("div");
                   leadBeat.className = "lead-beat";
                   leadBeat.dataset.globalbeat = String(getGlobalBeatIndex(sIdx, mIdx, bIdx));
@@ -14384,7 +15126,7 @@
                   leadBeat.dataset.beatidx = String(bIdx);
                   leadBeat.style.gridTemplateColumns = `repeat(${leadSlotsPerBeat}, minmax(0, 1fr))`;
                   const beatHasAnyLead = Array.from({ length: leadSlotsPerBeat }, (_, slotIdx) => {
-                    const tokenIdx = (bIdx * leadSlotsPerBeat) + slotIdx;
+                    const tokenIdx = leadTokenCursor + slotIdx;
                     return String(leadTokens[tokenIdx] || "").trim() !== "";
                   }).some(Boolean);
                   if (beatHasAnyLead) {
@@ -14395,7 +15137,7 @@
                     const leadSubSlot = document.createElement("div");
                     leadSubSlot.className = "lead-subslot";
 
-                    const tokenIdx = (bIdx * leadSlotsPerBeat) + slotIdx;
+                    const tokenIdx = leadTokenCursor + slotIdx;
                     const raw = String(leadTokens[tokenIdx] || "").trim();
                     if (raw) {
                       const note = document.createElement("span");
@@ -14418,6 +15160,7 @@
                   }
 
                   leadRow.appendChild(leadBeat);
+                  leadTokenCursor += leadSlotsPerBeat;
                 }
 
                 measureEl.appendChild(leadRow);
@@ -14748,7 +15491,7 @@
         // ── resolve current beat ──
         const section = state.sections[state.currentSectionIdx];
         if (!section) return;
-        const measure = section.measures[state.currentMeasureIdx];
+        const measure = currentMeasure();
         if (!measure) return;
         const beat = measure.beats[state.currentBeatIdx];
         if (!beat) return;
@@ -15351,7 +16094,7 @@
           const perRow = Math.max(1, Number(line.dataset.perRow) || getMeasuresPerRow());
           line.style.gridTemplateColumns = `repeat(${perRow}, minmax(0, 1fr))`;
 
-          const allMeasures = Array.from(line.querySelectorAll(":scope > .measure"));
+          const allMeasures = Array.from(line.querySelectorAll(":scope > .measure:not(.pre-measure)"));
           const visibleMeasures = allMeasures.filter(measureEl => measureEl.style.visibility !== "hidden");
           if (!visibleMeasures.length) return;
           resetMeasureHeights(visibleMeasures);
@@ -15566,6 +16309,15 @@
         if (leadModal) {
           leadModal.addEventListener("keydown", handleGlobalKeydown);
         }
+
+        document.addEventListener("keydown", (e) => {
+          const overlay = document.getElementById("lead-modal-overlay");
+          if (!overlay?.classList.contains("open")) return;
+          if (e.defaultPrevented) return;
+          if (e.target?.closest?.("#lead-modal-overlay")) return;
+          handleLeadModalKeydown(e);
+          if (e.defaultPrevented) e.stopPropagation();
+        }, true);
 
         const lyricsSectionModal = document.getElementById("lyrics-section-modal-overlay");
         if (lyricsSectionModal) {
@@ -16768,7 +17520,7 @@
           guideSectionLettersDesc: "Inside the section modal, add Intro, Verse, Pre-Chorus, Chorus, Bridge, Solo, or Ending.",
           guideSectionEscDesc: "Close the section modal without adding a section.",
           guideInsertSectionDesc: "Click an insert line to add a new section at that location.",
-          guidePreMeasureDesc: "Toggle a 2-beat pre-measure for that section.",
+          guidePreMeasureDesc: "Toggle a one-beat pre-section measure in the left margin.",
           guideRowMeasureDesc: "Use the small up/down control at the right of a row to set that row's measure count independently.",
           guideLeadOpenDesc: "Open the lead melody modal for the current row.",
           guideLeadTab1Desc: "Choose the base octave. Press Enter to confirm and move to lead spacing.",
@@ -18308,7 +19060,8 @@
         // init beats selector UI
         const b4 = document.getElementById('time-4-4');
         const b3 = document.getElementById('time-3-4');
-        if (b4 && b3) {
+        const b6 = document.getElementById('time-6-8');
+        if (b4 && b3 && b6) {
           setBeatsPerMeasure(4, { render: false });
         }
 
@@ -18367,14 +19120,15 @@
         }
       }
 
-      // Set beats per measure (3 or 4). Existing measures keep their saved beat counts
+      // Set beats per measure (3, 4, or 6). Existing measures keep their saved beat counts
       // unless a caller explicitly asks to normalize them.
       function setBeatsPerMeasure(n, opts = {}) {
         n = Number(n) || 4;
-        if (n !== 3 && n !== 4) n = 4;
+        if (n !== 3 && n !== 4 && n !== 6) n = 4;
         state.beatsPerMeasure = n;
         document.getElementById('time-4-4')?.classList.toggle('selected', n === 4);
         document.getElementById('time-3-4')?.classList.toggle('selected', n === 3);
+        document.getElementById('time-6-8')?.classList.toggle('selected', n === 6);
 
         if (!state.rowDefaultExplicit) {
           state.defaultMeasuresPerRow = getAutoDefaultMeasuresPerRow();
@@ -18383,14 +19137,17 @@
 
         const normalizeExisting = opts.normalizeExisting === true;
         state.sections.forEach(section => {
+          if (section?.preMeasure) {
+            section.preMeasure.beats = Array.isArray(section.preMeasure.beats) && section.preMeasure.beats.length
+              ? [section.preMeasure.beats[0]]
+              : [createEmptyBeat()];
+            section.preMeasure.leadSlotsByBeat = [normalizeLeadSlotValue(section.preMeasure.leadSlotsByBeat?.[0] ?? section.preMeasure.leadSlotsPerBeat ?? 6, 6, true)];
+            section.preMeasure.leadSlotsPerBeat = section.preMeasure.leadSlotsByBeat[0];
+            section.preMeasure.leadSlots = section.preMeasure.leadSlotsByBeat[0];
+          }
           (section.measures || []).forEach(measure => {
             if (!Array.isArray(measure.beats) || !measure.beats.length) {
               measure.beats = createMeasure(n).beats;
-            }
-            if (measure.isPreMeasure) {
-              while (measure.beats.length < 2) measure.beats.push(createEmptyBeat());
-              while (measure.beats.length > 2) measure.beats.pop();
-              return;
             }
             if (normalizeExisting) {
               while (measure.beats.length < n) measure.beats.push(createEmptyBeat());

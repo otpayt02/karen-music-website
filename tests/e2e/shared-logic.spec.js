@@ -382,6 +382,79 @@ test.describe("shared editor logic", () => {
     });
   });
 
+  test("pre-section measure renders in the left margin without changing row measures", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const metrics = await page.evaluate(() => {
+      state.beatsPerMeasure = 4;
+      state.sections = [{
+        type: "Verse",
+        measures: Array.from({ length: 8 }, () => createMeasure(4))
+      }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      renderChart();
+      applyBeatCellLayout();
+
+      const firstBefore = document.querySelector("#chart-container .line .measure:not(.pre-measure)")?.getBoundingClientRect();
+      toggleSectionPreMeasure(0);
+      applyBeatCellLayout();
+
+      const chart = document.getElementById("chart-container").getBoundingClientRect();
+      const line = document.querySelector("#chart-container .line");
+      const pre = line?.querySelector(":scope > .measure.pre-measure")?.getBoundingClientRect();
+      const regularMeasures = Array.from(line?.querySelectorAll(":scope > .measure:not(.pre-measure)") || [])
+        .filter(el => el.style.visibility !== "hidden");
+      const firstAfter = regularMeasures[0]?.getBoundingClientRect();
+
+      return {
+        measureCount: state.sections[0].measures.length,
+        preBeatCount: state.sections[0].preMeasure?.beats?.length || 0,
+        rowCap: getSectionRowLayout(0)[0]?.cap,
+        normalDomCount: regularMeasures.length,
+        firstDelta: Math.abs((firstAfter?.left || 0) - (firstBefore?.left || 0)),
+        preInsideSheet: !!pre && pre.left >= chart.left && pre.right <= (firstAfter?.left || Infinity),
+        preIsActive: state.currentMeasureIdx === -1
+      };
+    });
+
+    expect(metrics).toMatchObject({
+      measureCount: 8,
+      preBeatCount: 1,
+      rowCap: 8,
+      normalDomCount: 8,
+      preInsideSheet: true,
+      preIsActive: true
+    });
+    expect(metrics.firstDelta).toBeLessThan(1);
+  });
+
+  test("6/8 uses six-beat measures with eight measures per row by default", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const result = await page.evaluate(() => {
+      setBeatsPerMeasure(6, { render: false });
+      state.sections = [{ type: "Verse", measures: [createMeasure()] }];
+      renderChart();
+      return {
+        beatsPerMeasure: state.beatsPerMeasure,
+        createdBeatCount: state.sections[0].measures[0].beats.length,
+        defaultMeasuresPerRow: getDefaultMeasuresPerRow(),
+        rowCap: getSectionRowLayout(0)[0]?.cap,
+        selected: document.getElementById("time-6-8")?.classList.contains("selected")
+      };
+    });
+
+    expect(result).toEqual({
+      beatsPerMeasure: 6,
+      createdBeatCount: 6,
+      defaultMeasuresPerRow: 8,
+      rowCap: 8,
+      selected: true
+    });
+  });
+
   test("lead modal highlights base octave before Enter advances", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
@@ -404,6 +477,79 @@ test.describe("shared editor logic", () => {
 
     await page.keyboard.press("Enter");
     await expect(page.locator("#lead-tab-2")).toBeVisible();
+  });
+
+  test("lead modal saves per-beat subdivisions and visual up/down offsets", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      setBeatsPerMeasure(6, { render: false });
+      state.sections = [{ type: "Verse", measures: [createMeasure(6)] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      state.rowLead = {};
+      renderChart();
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press("l");
+    await page.keyboard.press("4");
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#lead-tab-2 .lead-subdivision-beat")).toHaveCount(6);
+    await page.locator("#lead-slot-0-6").click();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#lead-tab-3")).toBeVisible();
+    await page.keyboard.press("1");
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("Enter");
+
+    const saved = await page.evaluate(() => ({
+      slotsByBeat: state.rowLead[getRowKey(0, 0)].slotsByBeat,
+      firstLead: state.sections[0].measures[0].rowLeadView[0]
+    }));
+
+    expect(saved.slotsByBeat[0]).toBe(6);
+    expect(saved.firstLead).toBe("^1");
+  });
+
+  test("pre-section lead modal allows one beat with up to six lead spaces", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      state.sections = [{ type: "Verse", measures: [createMeasure(4)] }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = 0;
+      state.currentBeatIdx = 0;
+      state.rowLead = {};
+      toggleSectionPreMeasure(0);
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press("l");
+    await page.keyboard.press("4");
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#lead-tab-2 .lead-subdivision-beat")).toHaveCount(1);
+    await page.locator("#lead-slot-0-5").click();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("1");
+    await page.keyboard.press("Enter");
+
+    const saved = await page.evaluate(() => ({
+      preBeatCount: state.sections[0].preMeasure.beats.length,
+      preSlots: state.sections[0].preMeasure.leadSlotsByBeat,
+      leadViewLength: state.sections[0].preMeasure.rowLeadView.length,
+      firstLead: state.sections[0].preMeasure.rowLeadView[0],
+      normalMeasures: state.sections[0].measures.length
+    }));
+
+    expect(saved).toEqual({
+      preBeatCount: 1,
+      preSlots: [5],
+      leadViewLength: 5,
+      firstLead: "1",
+      normalMeasures: 1
+    });
   });
 
   test("UI design and immersive keyboard settings update document state", async ({ page }) => {
