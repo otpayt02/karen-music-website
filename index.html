@@ -31,6 +31,18 @@
         --beat-active-outline: #bb86fc;
         --lead-row-bg: rgba(226, 232, 240, 0.3);
         --lead-row-border: #999;
+        --hover-section-bg: rgba(78, 120, 255, 0.075);
+        --hover-section-ring: rgba(78, 120, 255, 0.18);
+        --hover-row-bg: rgba(21, 139, 116, 0.105);
+        --hover-row-ring: rgba(21, 139, 116, 0.22);
+        --hover-measure-bg: rgba(216, 166, 87, 0.16);
+        --hover-measure-ring: rgba(216, 166, 87, 0.28);
+        --hover-beat-bg: rgba(187, 134, 252, 0.24);
+        --hover-beat-ring: rgba(187, 134, 252, 0.34);
+        --hover-lead-row-bg: rgba(37, 99, 235, 0.16);
+        --hover-lead-row-ring: rgba(37, 99, 235, 0.28);
+        --hover-lead-beat-bg: rgba(37, 99, 235, 0.25);
+        --hover-lead-beat-ring: rgba(37, 99, 235, 0.34);
         --font-chord: 1.12em;
         --font-bass: 0.88em;
         --font-xmarks: 0.58em;
@@ -1195,8 +1207,8 @@
       }
 
       .section:hover {
-        background: rgba(78, 120, 255, 0.035);
-        box-shadow: 0 0 0 1px rgba(78, 120, 255, 0.12) inset;
+        background: var(--hover-section-bg);
+        box-shadow: 0 0 0 1px var(--hover-section-ring) inset;
       }
 
       .section-header {
@@ -1467,8 +1479,8 @@
       }
 
       .line:hover {
-        background: rgba(21, 139, 116, 0.045);
-        box-shadow: 0 0 0 1px rgba(21, 139, 116, 0.12) inset;
+        background: var(--hover-row-bg);
+        box-shadow: 0 0 0 1px var(--hover-row-ring) inset;
       }
 
       .line.has-roll {
@@ -1520,8 +1532,8 @@
       }
 
       .measure:hover {
-        background: rgba(216, 166, 87, 0.075);
-        box-shadow: 0 0 0 1px rgba(216, 166, 87, 0.18) inset;
+        background: var(--hover-measure-bg);
+        box-shadow: 0 0 0 1px var(--hover-measure-ring) inset;
       }
 
       .measure.pre-measure {
@@ -1611,8 +1623,8 @@
       }
 
       .beat:hover {
-        background: rgba(187, 134, 252, 0.13);
-        box-shadow: 0 0 0 1px rgba(187, 134, 252, 0.22) inset;
+        background: var(--hover-beat-bg);
+        box-shadow: 0 0 0 1px var(--hover-beat-ring) inset;
       }
 
       .beat.active {
@@ -1645,14 +1657,14 @@
         top: -16px;
         background: var(--lead-row-bg);
         overflow: visible;
-        pointer-events: none;
+        pointer-events: auto;
         transition: background-color 0.5s ease, box-shadow 0.5s ease;
       }
 
       .measure:hover .lead-row,
       .lead-row:hover {
-        background: rgba(37, 99, 235, 0.12);
-        box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18) inset;
+        background: var(--hover-lead-row-bg);
+        box-shadow: 0 0 0 1px var(--hover-lead-row-ring) inset;
       }
 
       .lead-beat {
@@ -1663,11 +1675,16 @@
         position: relative;
         overflow: visible;
         border-bottom: none;
-        transition: background-color 0.5s ease;
+        transition: background-color 0.5s ease, box-shadow 0.5s ease;
       }
 
       .measure:hover .lead-beat {
-        background: rgba(37, 99, 235, 0.045);
+        background: rgba(37, 99, 235, 0.09);
+      }
+
+      .lead-beat:hover {
+        background: var(--hover-lead-beat-bg);
+        box-shadow: 0 0 0 1px var(--hover-lead-beat-ring) inset;
       }
 
       .lead-subslot {
@@ -2998,6 +3015,59 @@
         #print-batch .beat {
           background: transparent !important;
           box-shadow: none !important;
+        }
+
+        #print-batch .section[data-printtone="0"] {
+          --print-section-band: rgba(15, 118, 110, 0.055);
+          --print-row-even: rgba(15, 118, 110, 0.07);
+          --print-row-odd: rgba(15, 118, 110, 0.032);
+        }
+
+        #print-batch .section[data-printtone="1"] {
+          --print-section-band: rgba(216, 166, 87, 0.065);
+          --print-row-even: rgba(216, 166, 87, 0.08);
+          --print-row-odd: rgba(216, 166, 87, 0.036);
+        }
+
+        #print-batch .section[data-printtone="2"] {
+          --print-section-band: rgba(155, 49, 95, 0.052);
+          --print-row-even: rgba(155, 49, 95, 0.066);
+          --print-row-odd: rgba(155, 49, 95, 0.03);
+        }
+
+        #print-batch .section[data-printtone="3"] {
+          --print-section-band: rgba(48, 73, 42, 0.055);
+          --print-row-even: rgba(48, 73, 42, 0.07);
+          --print-row-odd: rgba(48, 73, 42, 0.032);
+        }
+
+        #print-batch .section[data-printtone="4"] {
+          --print-section-band: rgba(36, 95, 115, 0.055);
+          --print-row-even: rgba(36, 95, 115, 0.07);
+          --print-row-odd: rgba(36, 95, 115, 0.032);
+        }
+
+        #print-batch .section {
+          background: var(--print-section-band, rgba(15, 118, 110, 0.045)) !important;
+          padding: 2px 2px 3px !important;
+          border-radius: 5px !important;
+        }
+
+        #print-batch .line.print-row-even {
+          background: var(--print-row-even, rgba(15, 118, 110, 0.065)) !important;
+        }
+
+        #print-batch .line.print-row-odd {
+          background: var(--print-row-odd, rgba(15, 118, 110, 0.03)) !important;
+        }
+
+        #print-batch .line {
+          border-radius: 4px !important;
+        }
+
+        #print-batch .measure,
+        #print-batch .beat {
+          background: transparent !important;
         }
 
         #print-batch .paper-header {
@@ -7982,6 +8052,166 @@
       .lyrics-field-group {
         display: grid;
         gap: 7px;
+      }
+
+      .lyrics-timing-preview {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border-radius: 16px;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.44));
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,0.86),
+          0 12px 26px rgba(17, 40, 39, 0.05);
+      }
+
+      .lyrics-timing-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: rgba(17, 40, 39, 0.58);
+        font-family: var(--font-ui);
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .lyrics-timing-key {
+        opacity: 0.72;
+        text-align: right;
+      }
+
+      .lyrics-timing-empty {
+        padding: 18px 10px;
+        color: rgba(17, 40, 39, 0.44);
+        font-family: var(--font-ui);
+        font-size: 0.72rem;
+        font-weight: 850;
+        text-align: center;
+      }
+
+      .lyrics-timing-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 0;
+        row-gap: 10px;
+        min-width: 0;
+      }
+
+      .lyrics-measure-block {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(var(--lyrics-beat-count, 4), minmax(44px, auto));
+        align-items: stretch;
+        min-width: min(100%, 168px);
+        isolation: isolate;
+      }
+
+      .lyrics-measure-block + .lyrics-measure-block {
+        margin-left: 10px;
+      }
+
+      .lyrics-measure-block + .lyrics-measure-block::before,
+      .lyrics-measure-block + .lyrics-measure-block::after {
+        content: "";
+        position: absolute;
+        left: -7px;
+        width: 0;
+        border-left: 1px dotted rgba(17, 40, 39, 0.44);
+        pointer-events: none;
+      }
+
+      .lyrics-measure-block + .lyrics-measure-block::before {
+        top: 2px;
+        height: calc(50% - 17px);
+      }
+
+      .lyrics-measure-block + .lyrics-measure-block::after {
+        bottom: 2px;
+        height: calc(50% - 17px);
+      }
+
+      .lyrics-measure-number {
+        position: absolute;
+        top: -8px;
+        left: 2px;
+        z-index: 3;
+        color: rgba(17, 40, 39, 0.44);
+        font-family: var(--font-ui);
+        font-size: 0.58rem;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .lyrics-beat-cell {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 58px;
+        padding: 13px 8px 11px;
+        background: color-mix(in srgb, var(--beat-tint, rgba(15,118,110,0.08)) 100%, transparent);
+      }
+
+      .lyrics-beat-cell:nth-child(4n + 2) {
+        --beat-tint: rgba(15, 118, 110, 0.075);
+      }
+
+      .lyrics-beat-cell:nth-child(4n + 3) {
+        --beat-tint: rgba(216, 166, 87, 0.09);
+      }
+
+      .lyrics-beat-cell:nth-child(4n + 4) {
+        --beat-tint: rgba(155, 49, 95, 0.07);
+      }
+
+      .lyrics-beat-cell:nth-child(4n + 5) {
+        --beat-tint: rgba(48, 73, 42, 0.075);
+      }
+
+      .lyrics-beat-number {
+        position: absolute;
+        top: 4px;
+        left: 5px;
+        color: rgba(17, 40, 39, 0.42);
+        font-family: var(--font-ui);
+        font-size: 0.56rem;
+        font-weight: 950;
+        line-height: 1;
+      }
+
+      .lyrics-syllable-stack {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1px;
+        min-width: max-content;
+        line-height: 1.05;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .lyrics-syllable-stack + .lyrics-syllable-stack {
+        margin-left: 8px;
+      }
+
+      .lyrics-syllable-karen {
+        font-family: var(--font-karen), "Noto Sans Myanmar", serif;
+        font-size: 1.18rem;
+        font-weight: 850;
+        color: #102827;
+      }
+
+      .lyrics-syllable-roman {
+        font-family: var(--font-ui);
+        font-size: 0.68rem;
+        font-weight: 850;
+        color: rgba(17, 40, 39, 0.62);
       }
 
       .lyrics-field-label {
@@ -14426,6 +14656,153 @@
         renderChart();
       }
 
+      function tokenizeLyricTimingLine(line) {
+        return String(line || "")
+          .match(/\||\/|[^\s|/]+/g) || [];
+      }
+
+      function plainLyricTokens(line) {
+        return tokenizeLyricTimingLine(line).filter(token => token !== "|" && token !== "/");
+      }
+
+      function buildLyricTimingRows(section) {
+        const beatsPerMeasure = Math.max(1, Math.min(8, Number(state.beatsPerMeasure) || 4));
+        const karenLines = String(section?.karenText || "").split(/\r?\n/);
+        const romanLines = String(section?.romanization || "").split(/\r?\n/);
+        const rowCount = Math.max(karenLines.length, romanLines.length);
+        const rows = [];
+
+        for (let lineIdx = 0; lineIdx < rowCount; lineIdx++) {
+          const primary = tokenizeLyricTimingLine(karenLines[lineIdx] || romanLines[lineIdx] || "");
+          const romanTokens = plainLyricTokens(romanLines[lineIdx] || "");
+          if (!primary.length) continue;
+
+          const measures = [{ beats: Array.from({ length: beatsPerMeasure }, () => []) }];
+          let measureIdx = 0;
+          let beatIdx = 0;
+          let lyricIdx = 0;
+          const hasExplicitTiming = primary.some(token => token === "|" || token === "/");
+
+          const ensureMeasure = () => {
+            if (!measures[measureIdx]) {
+              measures[measureIdx] = { beats: Array.from({ length: beatsPerMeasure }, () => []) };
+            }
+          };
+          const advanceBeat = () => {
+            beatIdx += 1;
+            if (beatIdx >= beatsPerMeasure) {
+              measureIdx += 1;
+              beatIdx = 0;
+              ensureMeasure();
+            }
+          };
+          const advanceMeasure = () => {
+            measureIdx += 1;
+            beatIdx = 0;
+            ensureMeasure();
+          };
+
+          primary.forEach(token => {
+            if (token === "|") {
+              advanceMeasure();
+              return;
+            }
+            if (token === "/") {
+              advanceBeat();
+              return;
+            }
+
+            ensureMeasure();
+            const karen = karenLines[lineIdx] ? token : "";
+            const roman = romanTokens[lyricIdx] || (!karen ? token : "");
+            measures[measureIdx].beats[beatIdx].push({ karen, roman });
+            lyricIdx += 1;
+            if (!hasExplicitTiming) advanceBeat();
+          });
+
+          rows.push({
+            beatsPerMeasure,
+            measures: measures.filter(measure => measure.beats.some(beat => beat.length))
+          });
+        }
+
+        return rows.filter(row => row.measures.length);
+      }
+
+      function renderLyricsTimingPreview(sectionEl, section) {
+        const old = sectionEl.querySelector(".lyrics-timing-preview");
+        if (old) old.remove();
+
+        const preview = document.createElement("div");
+        preview.className = "lyrics-timing-preview";
+        preview.dataset.lyricsTimingPreview = "true";
+
+        const title = document.createElement("div");
+        title.className = "lyrics-timing-title";
+        const titleText = document.createElement("span");
+        titleText.textContent = "Singer timing map";
+        const key = document.createElement("span");
+        key.className = "lyrics-timing-key";
+        key.textContent = "| measure  / beat";
+        title.append(titleText, key);
+        preview.appendChild(title);
+
+        const rows = buildLyricTimingRows(section);
+        if (!rows.length) {
+          const empty = document.createElement("div");
+          empty.className = "lyrics-timing-empty";
+          empty.textContent = "Type lyrics to build the timing map.";
+          preview.appendChild(empty);
+        } else {
+          rows.forEach(row => {
+            const rowEl = document.createElement("div");
+            rowEl.className = "lyrics-timing-row";
+            row.measures.forEach((measure, measureIdx) => {
+              const measureEl = document.createElement("div");
+              measureEl.className = "lyrics-measure-block";
+              measureEl.style.setProperty("--lyrics-beat-count", String(row.beatsPerMeasure));
+              const measureNumber = document.createElement("span");
+              measureNumber.className = "lyrics-measure-number";
+              measureNumber.textContent = `M${measureIdx + 1}`;
+              measureEl.appendChild(measureNumber);
+
+              measure.beats.forEach((beat, beatIdx) => {
+                const beatEl = document.createElement("div");
+                beatEl.className = "lyrics-beat-cell";
+                beatEl.dataset.beat = String(beatIdx + 1);
+                const beatNumber = document.createElement("span");
+                beatNumber.className = "lyrics-beat-number";
+                beatNumber.textContent = String(beatIdx + 1);
+                beatEl.appendChild(beatNumber);
+
+                beat.forEach(pair => {
+                  const stack = document.createElement("span");
+                  stack.className = "lyrics-syllable-stack";
+                  const karen = document.createElement("span");
+                  karen.className = "lyrics-syllable-karen";
+                  karen.textContent = pair.karen || pair.roman || "";
+                  const roman = document.createElement("span");
+                  roman.className = "lyrics-syllable-roman";
+                  roman.textContent = pair.roman || "";
+                  stack.append(karen, roman);
+                  beatEl.appendChild(stack);
+                });
+                measureEl.appendChild(beatEl);
+              });
+              rowEl.appendChild(measureEl);
+            });
+            preview.appendChild(rowEl);
+          });
+        }
+
+        const top = sectionEl.querySelector(".lyrics-section-top");
+        if (top) {
+          top.insertAdjacentElement("afterend", preview);
+        } else {
+          sectionEl.prepend(preview);
+        }
+      }
+
       function renderLyricsField(sectionEl, section, field, labelText, className, placeholder) {
         const group = document.createElement("label");
         group.className = "lyrics-field-group";
@@ -14447,6 +14824,7 @@
         }
         textarea.addEventListener("input", () => {
           setLyricsSectionField(section.id, field, textarea.value);
+          renderLyricsTimingPreview(sectionEl, section);
           if (field === "karenText") updateKarenFocusPreview(textarea);
         });
         textarea.addEventListener("focus", () => {
@@ -14546,6 +14924,7 @@
           actions.append(romanToggle, translationToggle, removeBtn);
           top.append(titleInput, actions);
           sectionEl.appendChild(top);
+          renderLyricsTimingPreview(sectionEl, section);
 
           renderLyricsField(sectionEl, section, "karenText", "Karen text", "lyrics-karen-input", "Type Karen lyrics here...");
           if (section.showRomanization) {
@@ -15078,6 +15457,7 @@
           const sectionEl = document.createElement("div");
           sectionEl.className = "section";
           sectionEl.dataset.sectionidx = String(sIdx);
+          sectionEl.dataset.printtone = String(sIdx % 5);
           if (state.pendingSectionScrollIdx === sIdx) {
             pendingScrollTarget = sectionEl;
           }
@@ -15142,6 +15522,7 @@
 
             const line = document.createElement("div");
             line.className = "line";
+            line.classList.add(rowInfo.rowIndex % 2 === 0 ? "print-row-even" : "print-row-odd");
             line.dataset.perRow = String(perRow);
             line.dataset.sectionidx = String(sIdx);
             line.dataset.rowindex = String(rowInfo.rowIndex);

@@ -74,4 +74,49 @@ test.describe("lyrics editor", () => {
       }
     ]);
   });
+
+  test("renders a singer timing map from lyric beat and measure marks", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      state.lyricsSections = [
+        {
+          id: "timed-verse",
+          title: "Verse timing",
+          karenText: "ကညီ / သး | ဝံ / တၢ်",
+          romanization: "ka-nyaw / tha | wah / ta",
+          translation: "",
+          showRomanization: true,
+          showTranslation: false
+        }
+      ];
+      renderChart();
+    });
+
+    await page.locator(".paper-flap-lyrics").click();
+
+    await expect(page.locator(".lyrics-timing-preview")).toBeVisible();
+    await expect(page.locator(".lyrics-timing-title")).toContainText("Singer timing map");
+    await expect(page.locator(".lyrics-measure-block")).toHaveCount(2);
+    await expect(page.locator(".lyrics-measure-number")).toHaveText(["M1", "M2"]);
+    await expect(page.locator(".lyrics-beat-cell[data-beat='1']").first()).toContainText("ကညီ");
+    await expect(page.locator(".lyrics-beat-cell[data-beat='1']").first()).toContainText("ka-nyaw");
+    await expect(page.locator(".lyrics-beat-cell[data-beat='2']").first()).toContainText("သး");
+    await expect(page.locator(".lyrics-beat-cell[data-beat='1']").nth(1)).toContainText("ဝံ");
+    await expect(page.locator(".lyrics-syllable-stack")).toHaveCount(4);
+
+    const boundaryMetrics = await page.evaluate(() => {
+      const measures = Array.from(document.querySelectorAll(".lyrics-measure-block"));
+      const first = measures[0]?.getBoundingClientRect();
+      const second = measures[1]?.getBoundingClientRect();
+      const firstText = measures[0]?.querySelector(".lyrics-syllable-stack")?.getBoundingClientRect();
+      return {
+        hasSeparatedMeasures: !!first && !!second && second.left > first.right,
+        textHeight: firstText?.height || 0
+      };
+    });
+
+    expect(boundaryMetrics.hasSeparatedMeasures).toBe(true);
+    expect(boundaryMetrics.textHeight).toBeGreaterThan(12);
+  });
 });

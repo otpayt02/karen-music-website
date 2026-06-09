@@ -24,6 +24,51 @@ test.describe("print preview packets", () => {
     await expect.poll(() => page.evaluate(() => window.__printCalls || 0)).toBe(1);
   });
 
+  test("prints subtle section tones with alternating row bands", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      const makeMeasures = (count) => Array.from({ length: count }, (_, idx) => {
+        const measure = createMeasure();
+        measure.beats[0].chordState = { root: idx % 2 === 0 ? "G" : "C" };
+        return measure;
+      });
+
+      state.sections = [
+        { type: "Verse", measures: makeMeasures(8), rowMeasureCounts: [4, 4] },
+        { type: "Chorus", measures: makeMeasures(8), rowMeasureCounts: [4, 4] }
+      ];
+      renderChart();
+      buildPrintBatch();
+    });
+    await page.emulateMedia({ media: "print" });
+
+    const printBands = await page.evaluate(() => {
+      const sheet = document.querySelector("#print-batch .chart-container");
+      const sections = Array.from(sheet.querySelectorAll(".section"));
+      const rows = Array.from(sheet.querySelectorAll(".line"));
+      return {
+        tones: sections.map(section => section.dataset.printtone),
+        rowClasses: rows.map(row => ({
+          even: row.classList.contains("print-row-even"),
+          odd: row.classList.contains("print-row-odd")
+        })),
+        sectionColors: sections.map(section => getComputedStyle(section).backgroundColor),
+        rowColors: rows.slice(0, 2).map(row => getComputedStyle(row).backgroundColor)
+      };
+    });
+
+    expect(printBands.tones).toEqual(["0", "1"]);
+    expect(printBands.rowClasses).toEqual([
+      { even: true, odd: false },
+      { even: false, odd: true },
+      { even: true, odd: false },
+      { even: false, odd: true }
+    ]);
+    expect(printBands.sectionColors.every(color => color !== "rgba(0, 0, 0, 0)" && color !== "transparent")).toBe(true);
+    expect(printBands.rowColors[0]).not.toBe(printBands.rowColors[1]);
+  });
+
   test("prints lead melody notes only on their assigned instrument copy", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 
