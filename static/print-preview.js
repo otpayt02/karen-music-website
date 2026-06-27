@@ -554,6 +554,44 @@
     applyPrintSpecToLegacySheets();
   }
 
+  function hasInstrumentPrintBatch() {
+    const batch = document.getElementById('print-batch');
+    if (!batch || batch.querySelectorAll('.chart-container').length === 0) return false;
+    const style = window.getComputedStyle(batch);
+    return style.display !== 'none' && style.visibility !== 'hidden';
+  }
+
+  function ensureCtrlPrintHost() {
+    let host = document.getElementById('pp-print-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'pp-print-host';
+      host.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(host);
+    }
+    return host;
+  }
+
+  function preparePrintOutput() {
+    applyPrintSpecToLegacySheets();
+
+    // Instrument packets intentionally use #print-batch. Plain Ctrl+P does not,
+    // so build the same spec-compliant document used by Preview Print and make
+    // it the only printed content for the browser/desktop print dialog.
+    if (hasInstrumentPrintBatch()) {
+      document.body.classList.remove('pp-print-host-active');
+      return;
+    }
+
+    const host = ensureCtrlPrintHost();
+    host.innerHTML = buildPrintDoc(false);
+    document.body.classList.add('pp-print-host-active');
+  }
+
+  function cleanupPrintOutput() {
+    document.body.classList.remove('pp-print-host-active');
+  }
+
   /* ──────────────────────────────────────────────────────────
      INIT
   ────────────────────────────────────────────────────────── */
@@ -562,12 +600,14 @@
     injectUI();
     injectPrintRules();
     moveBpmToFooter();
-    window.addEventListener('beforeprint', applyPrintSpecToLegacySheets);
+    window.addEventListener('beforeprint', preparePrintOutput);
+    window.addEventListener('afterprint', cleanupPrintOutput);
 
     const events = ['song-loaded', 'songLoaded', 'chart-rendered', 'printReady'];
     events.forEach(evt => {
       document.addEventListener(evt, () => {
         applyPrintSpecToLegacySheets();
+        if (document.body.classList.contains('pp-print-host-active')) preparePrintOutput();
         // Refresh open preview if a song just loaded
         if (document.getElementById('print-preview-overlay')?.classList.contains('open')) {
           refreshPreview();
@@ -587,7 +627,7 @@
   ────────────────────────────────────────────────────────── */
   window.PrintPreview = {
     applyTemplate, openPreview, closePreview, refreshPreview,
-    renderTemplateSwitcher, moveBpmToFooter, applyPrintSpecToLegacySheets, buildPrintDoc,
+    renderTemplateSwitcher, moveBpmToFooter, applyPrintSpecToLegacySheets, preparePrintOutput, cleanupPrintOutput, buildPrintDoc,
     getSongData, getChordChartEl,
     getTemplates: () => TEMPLATES,
     getActive:    () => activeTemplate,

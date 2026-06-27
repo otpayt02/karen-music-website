@@ -328,3 +328,23 @@
   line-height: var(--print-line-height) !important;
 }
 .pp-title-karen, .print-title-karen { font-family: var(--print-font-title) !important; }
+
+#pp-print-host {
+  display: none;
+}
+
+@media print {
+  body.pp-print-host-active > :not(#pp-print-host) {
+    display: none !important;
+  }
+
+  body.pp-print-host-active #pp-print-host {
+    display: block !important;
+  }
+
+  body.pp-print-host-active #pp-print-host .pp-page {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: calc(100vh - 20mm) !important;
+  }
+}
