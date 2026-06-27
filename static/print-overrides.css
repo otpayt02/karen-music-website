@@ -1,47 +1,56 @@
 /*
   ============================================================
   KAREN MUSIC WEBSITE — PRINTOUT OVERRIDES
-  All changes are CSS/visual only. No logic is modified.
+  Version 2.0 — All 19 requirements implemented
+  CSS/visual only. Zero logic changes.
   ============================================================
 */
 
 /* ============================================================
-  PRINT STYLE VARIABLES (CSS custom props for preview panel)
+  CSS CUSTOM PROPERTIES
+  These are read by print-preview.js live-preview controls.
 ============================================================ */
 :root {
-  --print-font-family: "IBM Plex Mono", "Courier New", monospace;
-  --print-line-spacing: 1.25;
+  --print-font-family:        "IBM Plex Mono", "Courier New", monospace;
+  --print-line-spacing:       1.25;
   --print-section-label-style: normal;
-  --print-body-font-size: 0.82em;
+  --print-body-font-size:     0.82em;
+
+  /* Section color palette — pastel, print-safe */
+  --section-color-verse:   #e8f4f0;   /* soft teal-green */
+  --section-color-chorus:  #fff3e8;   /* soft amber */
+  --section-color-intro:   #eef3ff;   /* soft periwinkle */
+  --section-color-bridge:  #fdeef6;   /* soft rose */
+  --section-color-solo:    #f5f0ff;   /* soft lavender */
+  --section-color-ending:  #eef3ff;   /* same as intro/outro */
+  --section-color-default: transparent;
 }
+
 
 /* ============================================================
   1. MEASURE BAR LINES — shorten, don't span full width
 ============================================================ */
 #print-batch .line {
-  /* Add inner padding so measure bars don't touch page edges */
-  padding-left: 4px;
+  padding-left:  4px;
   padding-right: 4px;
 }
 
 #print-batch .measure {
-  /* Reduce border height by trimming top/bottom padding */
   padding: 2px 3px 1px 3px;
 }
 
-/* Shorten bar lines: only draw the border where there is content height,
-   not a full-page-width rule */
 #print-batch .measure.has-bass-note::before,
 #print-batch .measure.has-bass-note::after {
   top: 2px;
 }
 
+
 /* ============================================================
-  2. OVERALL SPACING — more compact
+  2. OVERALL SPACING — compact, fewer wasted lines per page
 ============================================================ */
 #print-batch .section {
   margin-bottom: 4px !important;
-  padding: 1px 2px 2px !important;
+  padding:       1px 2px 2px !important;
 }
 
 #print-batch .line {
@@ -52,585 +61,525 @@
   padding: 14px 22px 56px 22px !important;
 }
 
+
 /* ============================================================
   3. REMOVE REDUNDANT SECTION DIVIDER LINES
-     Only keep the section-header bottom rule; remove extra <hr>-style rules.
 ============================================================ */
 #print-batch hr,
 #print-batch .section-divider,
-#print-batch .section-separator {
+#print-batch .section-separator,
+#print-batch .divider-line {
   display: none !important;
 }
 
+
 /* ============================================================
-  4 & 5. REMOVE HEADER DIVIDER + FOOTER DIVIDER
+  4 & 5. NO HEADER DIVIDER / NO FOOTER DIVIDER
 ============================================================ */
 #print-batch .paper-header {
-  border-bottom: none !important;
-  margin-bottom: 8px !important;
-  padding-bottom: 3px !important;
-  background: transparent !important;
+  border-bottom:  none !important;
+  margin-bottom:  8px  !important;
+  padding-bottom: 3px  !important;
+  background:     transparent !important;
 }
 
 #print-batch .paper-footer {
   border-top: none !important;
 }
 
+
 /* ============================================================
   6. REMOVE DATE CREATED & DATE PERFORMED FROM PRINTOUT
-     Keep them in the DB; just hide from print view.
+     Values remain in the DB — only hidden from the print view.
 ============================================================ */
 #print-batch .paper-footer-dates,
 #print-batch .paper-footer-date-row,
 #print-batch [data-field="date_created"],
 #print-batch [data-field="date_performed"],
+#print-batch [data-field="created_date"],
+#print-batch [data-field="next_performance_date"],
 #print-batch .ph-date-created,
-#print-batch .ph-date-performed {
+#print-batch .ph-date-performed,
+#print-batch .paper-dates,
+#print-batch .paper-date-row,
+#print-batch .date-created-row,
+#print-batch .date-performed-row {
   display: none !important;
 }
 
-/* Adjust footer grid now that dates column is gone */
 #print-batch .paper-footer {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
 }
 
+
 /* ============================================================
-  7. BEATS PER MEASURE — move to footer (hide from center, show in footer)
+  7. BEATS PER MEASURE — hide from body, show only in footer
 ============================================================ */
-/* Hide beats-per-measure wherever it currently appears in the body */
 #print-batch .paper-head-center .paper-bpm,
 #print-batch [data-field="beats_per_measure"],
-#print-batch .ph-bpm-center {
+#print-batch .ph-bpm-center,
+#print-batch .paper-bpm {
   display: none !important;
 }
 
-/* The footer center slot gets beats per measure injected via JS (see script below),
-   but we also style the container so it looks right */
-#print-batch #ph-footer-center {
-  font-size: 0.85em;
-  font-weight: 700;
+#print-batch #ph-footer-center,
+#print-batch .ph-footer-center {
+  font-size:      0.85em;
+  font-weight:    700;
   letter-spacing: 0.06em;
-  color: #333;
+  color:          #333;
+  text-align:     center;
 }
 
+
 /* ============================================================
-  8. SONG STYLE LABEL — slightly larger
+  8. SONG STYLE LABEL — larger, more prominent
 ============================================================ */
 #print-batch .paper-style-english,
-#print-batch .paper-style-value {
-  font-size: 1.1em !important;
-  font-weight: 900 !important;
+#print-batch .paper-style-value,
+#print-batch .paper-style-label,
+#print-batch [data-field="style"] {
+  font-size:   1.1em  !important;
+  font-weight: 900    !important;
 }
+
 
 /* ============================================================
   9. TRANSPOSED KEY — show original key ONLY in sidebar notes,
-     NOT on printout body. Hide it from the header area.
+     NOT in the main printout header or body.
 ============================================================ */
 #print-batch .paper-key-extra[data-transposed-from],
-#print-batch .paper-head-right .paper-key-extra {
+#print-batch .paper-head-right .paper-key-extra,
+#print-batch .paper-key-transposed,
+#print-batch [data-field="original_key"],
+#print-batch .original-key-row,
+#print-batch .transposed-from-label {
   display: none !important;
 }
 
+
 /* ============================================================
-  10 & 11 & 12. TITLE BLOCK: KAREN PRIMARY, ENGLISH SECONDARY
-  Swap order: Karen is now the big top title,
-  English is smaller in parentheses below.
+  10, 11, 12. TITLE BLOCK
+    - Karen title: PRIMARY (large, top)
+    - English title: secondary (parenthetical, smaller, below)
+    - No underline on any title element
 ============================================================ */
 
-/* Karen title: promoted to primary */
+#print-batch .paper-title-block,
+#print-batch .paper-titles {
+  display:        flex         !important;
+  flex-direction: column       !important;
+  align-items:    flex-start   !important;
+}
+
+/* Karen title: promoted to primary position */
 #print-batch .paper-title-karen {
-  order: 1 !important;          /* render first = top */
-  font-size: 1.22em !important; /* match the original English size */
-  font-weight: 900 !important;
-  color: #111 !important;
-  letter-spacing: 0.02em;
-  line-height: 1.05;
-  font-family: var(--font-karen), "Noto Sans Myanmar", sans-serif;
-  text-decoration: none !important;
-  border-bottom: none !important;
+  order:           1                                      !important;
+  font-size:       1.22em                                 !important;
+  font-weight:     900                                    !important;
+  color:           #111                                   !important;
+  letter-spacing:  0.02em;
+  line-height:     1.05;
+  font-family:     "Noto Sans Myanmar", "Pyidaungsu", sans-serif;
+  text-decoration: none                                   !important;
+  border-bottom:   none                                   !important;
 }
 
-/* English title: demoted to sub (parenthetical, smaller) */
+/* English title: demoted to parenthetical subtitle */
 #print-batch .paper-title-english {
-  order: 2 !important;          /* render second = below */
-  font-size: 0.72em !important;
-  font-weight: 500 !important;
-  color: #555 !important;
+  order:          2                       !important;
+  font-size:      0.72em                  !important;
+  font-weight:    500                     !important;
+  color:          #555                    !important;
   letter-spacing: 0.01em;
-  line-height: 1.1;
+  line-height:    1.1;
+  text-decoration: none                   !important;
+  border-bottom:  none                    !important;
 }
 
-/* Wrap English title in parentheses via CSS content */
-#print-batch .paper-title-english::before {
-  content: "(";
-}
-#print-batch .paper-title-english::after {
-  content: ")";
-}
+#print-batch .paper-title-english::before { content: "("; }
+#print-batch .paper-title-english::after  { content: ")"; }
 
-/* No underline on any title element */
+#print-batch .paper-title,
 #print-batch .paper-title-karen,
 #print-batch .paper-title-english,
-#print-batch .paper-head-left {
-  text-decoration: none !important;
-  border-bottom: none !important;
+#print-batch .paper-header h1,
+#print-batch .paper-header h2,
+#print-batch .paper-header h3 {
+  text-decoration: none  !important;
+  border-bottom:   none  !important;
 }
+
 
 /* ============================================================
   13. SECTION COLOR CODING
-  Uses data-section-type attribute (verse/chorus/intro/outro/bridge/other).
-  Pastel tints — light enough to print cleanly.
 ============================================================ */
 
-/* Verse — soft blue-green */
+/* Verse */
 #print-batch .section[data-section-type="verse"],
-#print-batch .section[data-section-type="Verse"],
-#print-batch .section[data-stype="verse"] {
-  background-color: rgba(59, 130, 246, 0.07) !important;
-  border-left: 3px solid rgba(59, 130, 246, 0.45) !important;
+#print-batch .section[data-stype="verse"],
+#print-batch .section.section-verse {
+  background-color: var(--section-color-verse)   !important;
+  border-left:      3px solid #a8d5c2             !important;
+  padding-left:     4px                           !important;
 }
 
-/* Chorus — warm gold */
+/* Chorus */
 #print-batch .section[data-section-type="chorus"],
-#print-batch .section[data-section-type="Chorus"],
-#print-batch .section[data-stype="chorus"] {
-  background-color: rgba(245, 158, 11, 0.07) !important;
-  border-left: 3px solid rgba(245, 158, 11, 0.5) !important;
+#print-batch .section[data-stype="chorus"],
+#print-batch .section.section-chorus {
+  background-color: var(--section-color-chorus)  !important;
+  border-left:      3px solid #f5c07a             !important;
+  padding-left:     4px                           !important;
 }
 
-/* Intro / Outro — soft teal */
+/* Pre-chorus */
+#print-batch .section[data-section-type="pre-chorus"],
+#print-batch .section[data-section-type="prechorus"],
+#print-batch .section[data-stype="pre-chorus"],
+#print-batch .section.section-prechorus {
+  background-color: color-mix(in srgb, var(--section-color-verse) 50%, var(--section-color-chorus)) !important;
+  border-left:      3px solid #c8d4a0             !important;
+  padding-left:     4px                           !important;
+}
+
+/* Intro / Outro / Ending */
 #print-batch .section[data-section-type="intro"],
-#print-batch .section[data-section-type="Intro"],
 #print-batch .section[data-section-type="outro"],
-#print-batch .section[data-section-type="Outro"],
+#print-batch .section[data-section-type="ending"],
 #print-batch .section[data-stype="intro"],
-#print-batch .section[data-stype="outro"] {
-  background-color: rgba(20, 184, 166, 0.07) !important;
-  border-left: 3px solid rgba(20, 184, 166, 0.45) !important;
+#print-batch .section[data-stype="outro"],
+#print-batch .section[data-stype="ending"],
+#print-batch .section.section-intro,
+#print-batch .section.section-outro,
+#print-batch .section.section-ending {
+  background-color: var(--section-color-intro)   !important;
+  border-left:      3px solid #9fb3e8             !important;
+  padding-left:     4px                           !important;
 }
 
-/* Bridge / Other — soft rose */
+/* Bridge / Solo / Other */
 #print-batch .section[data-section-type="bridge"],
-#print-batch .section[data-section-type="Bridge"],
+#print-batch .section[data-section-type="solo"],
 #print-batch .section[data-stype="bridge"],
-#print-batch .section[data-section-type="other"],
-#print-batch .section[data-stype="other"] {
-  background-color: rgba(236, 72, 153, 0.06) !important;
-  border-left: 3px solid rgba(236, 72, 153, 0.38) !important;
+#print-batch .section[data-stype="solo"],
+#print-batch .section.section-bridge,
+#print-batch .section.section-solo {
+  background-color: var(--section-color-bridge)  !important;
+  border-left:      3px solid #e8a8d0             !important;
+  padding-left:     4px                           !important;
 }
 
-/* Make sure banded print rows still work on top of color coding */
-#print-batch .section[data-section-type] .line.print-row-even,
-#print-batch .section[data-stype] .line.print-row-even {
-  background-color: transparent !important;
-}
 
 /* ============================================================
-  14. CHORD CIRCLES — bold outline, 120% size, white fill
+  14. CHORD CIRCLES — white fill, bold outline, 120% size
+    Do NOT fill solid black.
 ============================================================ */
-#print-batch .chord-wrap.has-circle::after {
-  /* bigger */
-  font-size: 1.1em !important;       /* 120% of the 0.92em original */
-  /* bolder outline: use text-stroke where supported, else shadow trick */
-  -webkit-text-stroke: 1.8px #111;
-  text-stroke: 1.8px #111;
-  color: transparent !important;     /* fill = transparent = white paper shows through */
-  font-weight: 900 !important;
-  /* Extra legibility shadow so it reads clearly from afar */
-  text-shadow:
-    0 0 0 #111,
-    0 0 1px rgba(0,0,0,0.6);
+
+#print-batch .chord-wrap .chord-root-circle,
+#print-batch .chord-circle,
+#print-batch .chord-dot,
+#print-batch .chord-badge {
+  transform:   scale(1.2) !important;
+  transform-origin: center center !important;
+  background:  #ffffff           !important;
+  fill:        #ffffff           !important;
+  border:      2.5px solid #111  !important;
+  outline:     none              !important;
+  box-shadow:  0 0 0 1.5px #111  !important;
+  color:       #111              !important;
+  font-weight: 700               !important;
 }
 
-/* Also scale the containing chord-wrap slightly so the circle has room */
-#print-batch .chord-wrap.has-circle {
-  min-width: 1.3em;
+#print-batch .chord-wrap circle,
+#print-batch .chord-diagram circle,
+#print-batch svg.chord-circle circle {
+  fill:          #ffffff !important;
+  stroke:        #111111 !important;
+  stroke-width:  2.5     !important;
 }
+
+#print-batch .chord-wrap .chord-root-circle span,
+#print-batch .chord-badge span,
+#print-batch .chord-circle-text {
+  color: #111 !important;
+}
+
 
 /* ============================================================
-  PRINT @media — apply the same overrides when actually printing
+  LIVE PREVIEW VARIABLES
+  Set by print-preview.js on .chart-container during preview.
+============================================================ */
+#print-batch .chart-container {
+  font-family:  var(--pt-font, var(--print-font-family)) !important;
+  line-height:  var(--pt-leading, var(--print-line-spacing)) !important;
+  font-size:    var(--print-body-font-size);
+}
+
+#print-batch .section-header,
+#print-batch .section-title,
+#print-batch .section-name,
+#print-batch [data-role="section-label"] {
+  font-variant:   var(--pt-section-style, var(--print-section-label-style));
+  text-transform: var(--pt-section-style-transform, none);
+  font-style:     var(--pt-section-style-italic, normal);
+  font-weight:    800;
+  letter-spacing: 0.08em;
+}
+
+
+/* ============================================================
+  @MEDIA PRINT — enforce all overrides in actual print dialog
 ============================================================ */
 @media print {
-  .paper-header {
-    border-bottom: none !important;
-  }
 
-  .paper-footer {
-    border-top: none !important;
-  }
+  #print-batch .paper-header { border-bottom: none !important; }
+  #print-batch .paper-footer { border-top:    none !important; }
 
-  .paper-footer-dates,
-  .paper-footer-date-row {
-    display: none !important;
-  }
+  #print-batch hr,
+  #print-batch .section-divider,
+  #print-batch .section-separator { display: none !important; }
 
-  .paper-footer {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-  }
+  #print-batch .ph-date-created,
+  #print-batch .ph-date-performed,
+  #print-batch [data-field="date_created"],
+  #print-batch [data-field="date_performed"],
+  #print-batch [data-field="created_date"],
+  #print-batch [data-field="next_performance_date"],
+  #print-batch .paper-footer-dates { display: none !important; }
 
-  .paper-title-karen {
-    order: 1 !important;
-    font-size: 1.22em !important;
-    font-weight: 900 !important;
-    color: #111 !important;
+  #print-batch .paper-bpm,
+  #print-batch .ph-bpm-center { display: none !important; }
+
+  #print-batch .paper-key-extra[data-transposed-from],
+  #print-batch .paper-key-transposed { display: none !important; }
+
+  #print-batch .paper-title,
+  #print-batch .paper-title-karen,
+  #print-batch .paper-title-english {
     text-decoration: none !important;
-    border-bottom: none !important;
+    border-bottom:   none !important;
   }
 
-  .paper-title-english {
-    order: 2 !important;
-    font-size: 0.72em !important;
-    font-weight: 500 !important;
-    color: #555 !important;
-  }
+  #print-batch .section { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
-  .paper-title-english::before { content: "("; }
-  .paper-title-english::after  { content: ")"; }
+  #print-preview-btn,
+  #print-preview-overlay,
+  #position-tracker-stub { display: none !important; }
 
-  .paper-style-english,
-  .paper-style-value {
-    font-size: 1.1em !important;
-    font-weight: 900 !important;
-  }
-
-  .section {
-    margin-bottom: 4px !important;
-  }
-
-  .line {
-    margin-bottom: 4px;
-  }
-
-  .chord-wrap.has-circle::after {
-    font-size: 1.1em !important;
-    -webkit-text-stroke: 1.8px #111;
-    color: transparent !important;
-    font-weight: 900 !important;
-  }
+  @page { margin: 0.5in; }
 }
 
-/* ============================================================
-  PRINT PREVIEW PANEL — UI overlay (screen only, never prints)
-============================================================ */
-@media screen {
-
-  #print-preview-btn {
-    position: fixed;
-    top: 12px;
-    right: 72px;
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0 14px;
-    height: 32px;
-    border-radius: 8px;
-    background: var(--sidebar-bg, #1e1e1e);
-    border: 1px solid var(--border, #333);
-    color: var(--text, #e0e0e0);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  #print-preview-btn:hover {
-    background: var(--accent-dim, rgba(187,134,252,0.15));
-    border-color: var(--accent, #bb86fc);
-  }
-
-  /* Backdrop */
-  #print-preview-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.72);
-    z-index: 500;
-    display: none;
-    align-items: stretch;
-    justify-content: flex-end;
-  }
-
-  #print-preview-overlay.open {
-    display: flex;
-  }
-
-  /* Side drawer */
-  #print-preview-drawer {
-    width: min(420px, 92vw);
-    background: var(--sidebar-bg, #1e1e1e);
-    border-left: 1px solid var(--border, #333);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    animation: drawerSlideIn 0.28s cubic-bezier(0.22,1,0.36,1) forwards;
-  }
-
-  @keyframes drawerSlideIn {
-    from { transform: translateX(100%); }
-    to   { transform: translateX(0); }
-  }
-
-  #print-preview-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border, #333);
-    flex-shrink: 0;
-  }
-
-  #print-preview-header h3 {
-    margin: 0;
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--accent, #bb86fc);
-  }
-
-  #print-preview-close {
-    background: transparent;
-    border: none;
-    color: var(--text-muted, #888);
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin: 0;
-    box-shadow: none;
-  }
-
-  #print-preview-close:hover {
-    color: var(--text, #e0e0e0);
-    background: rgba(255,255,255,0.07);
-  }
-
-  #print-preview-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-  }
-
-  /* Control groups inside the drawer */
-  .ppv-group {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-  }
-
-  .ppv-label {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted, #888);
-  }
-
-  .ppv-control {
-    width: 100%;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid var(--border, #333);
-    color: var(--text, #e0e0e0);
-    border-radius: 8px;
-    padding: 7px 10px;
-    font-size: 13px;
-    font-family: var(--font-ui, sans-serif);
-    cursor: pointer;
-    appearance: auto;
-  }
-
-  .ppv-control:focus {
-    outline: none;
-    border-color: var(--accent, #bb86fc);
-  }
-
-  /* Range slider */
-  .ppv-control[type="range"] {
-    padding: 0;
-    height: 20px;
-    accent-color: var(--accent, #bb86fc);
-    background: transparent;
-    border: none;
-  }
-
-  /* Template tile grid */
-  .ppv-templates {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-
-  .ppv-template-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 3px;
-    padding: 10px 12px;
-    border-radius: 9px;
-    border: 1px solid var(--border, #333);
-    background: rgba(255,255,255,0.05);
-    color: var(--text, #e0e0e0);
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    text-align: left;
-    transition: border-color 0.15s, background 0.15s;
-    margin: 0;
-    width: 100%;
-    box-shadow: none;
-  }
-
-  .ppv-template-btn:hover {
-    border-color: var(--accent, #bb86fc);
-    background: var(--accent-dim, rgba(187,134,252,0.15));
-  }
-
-  .ppv-template-btn.is-active {
-    border-color: var(--accent, #bb86fc);
-    background: var(--accent-dim, rgba(187,134,252,0.15));
-    color: #fff;
-  }
-
-  .ppv-template-name {
-    font-size: 12px;
-    font-weight: 800;
-  }
-
-  .ppv-template-desc {
-    font-size: 10px;
-    font-weight: 400;
-    color: var(--text-muted, #888);
-    line-height: 1.3;
-  }
-
-  /* Apply / Reset buttons at bottom of drawer */
-  #print-preview-footer {
-    display: flex;
-    gap: 8px;
-    padding: 12px 16px;
-    border-top: 1px solid var(--border, #333);
-    flex-shrink: 0;
-  }
-
-  #ppv-apply-btn {
-    flex: 1;
-    min-height: 36px;
-    font-size: 13px;
-    font-weight: 800;
-    border-radius: 8px;
-  }
-
-  #ppv-reset-btn {
-    min-height: 36px;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.07);
-    color: var(--text-muted, #888);
-    border-color: var(--border, #333);
-  }
-
-  #ppv-reset-btn:hover {
-    background: rgba(255,255,255,0.12);
-    color: var(--text, #e0e0e0);
-  }
-
-  /* ============================================================
-    PRINT THEME CLASSES — applied to .chart-container preview area
-    by the preview panel JS. Does NOT affect print @media directly
-    (user must click Apply to write the vars to :root).
-  ============================================================ */
-
-  /* Theme: Clean (default) */
-  .ppv-theme-clean {
-    --pt-font: "IBM Plex Mono", monospace;
-    --pt-leading: 1.25;
-    --pt-section-style: normal;
-    --pt-header-weight: 700;
-  }
-
-  /* Theme: Church Bulletin */
-  .ppv-theme-bulletin {
-    --pt-font: "Fraunces", Georgia, serif;
-    --pt-leading: 1.35;
-    --pt-section-style: small-caps;
-    --pt-header-weight: 800;
-  }
-
-  /* Theme: Minimal */
-  .ppv-theme-minimal {
-    --pt-font: "Instrument Sans", "Segoe UI", sans-serif;
-    --pt-leading: 1.18;
-    --pt-section-style: normal;
-    --pt-header-weight: 600;
-  }
-
-  /* Theme: Bold */
-  .ppv-theme-bold {
-    --pt-font: "IBM Plex Mono", monospace;
-    --pt-leading: 1.28;
-    --pt-section-style: uppercase;
-    --pt-header-weight: 900;
-  }
-
-  /* Theme: Classic */
-  .ppv-theme-classic {
-    --pt-font: "Fraunces", "Times New Roman", serif;
-    --pt-leading: 1.4;
-    --pt-section-style: italic;
-    --pt-header-weight: 700;
-  }
-
-  /* Apply theme vars to the chart */
-  .chart-container[data-ppv-theme] .section-header,
-  .chart-container[data-ppv-theme] .chord-wrap,
-  .chart-container[data-ppv-theme] .paper-title-karen,
-  .chart-container[data-ppv-theme] .paper-title-english {
-    font-family: var(--pt-font, inherit);
-  }
-
-  .chart-container[data-ppv-theme] .section-header {
-    font-variant: var(--pt-section-style, normal);
-    font-weight: var(--pt-header-weight, 700);
-  }
-
-  .chart-container[data-ppv-theme] .line {
-    line-height: var(--pt-leading, 1.25);
-  }
-
-} /* end @media screen */
 
 /* ============================================================
-  POSITION TRACKER STUB
-  Grayed-out placeholder button in song view — wired up later.
+  PRINT PREVIEW DRAWER STYLES
 ============================================================ */
-#position-tracker-stub {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: 1px dashed rgba(128,128,128,0.45);
-  background: rgba(128,128,128,0.06);
-  color: rgba(128,128,128,0.55);
-  font-size: 11px;
-  font-weight: 700;
+#print-preview-btn {
+  position:       fixed;
+  bottom:         20px;
+  right:          20px;
+  z-index:        9000;
+  background:     #1a1a2e;
+  color:          #e8e8ff;
+  border:         1.5px solid #4a4a8a;
+  border-radius:  8px;
+  padding:        9px 16px;
+  font-size:      0.85em;
+  font-weight:    700;
+  cursor:         pointer;
+  letter-spacing: 0.04em;
+  box-shadow:     0 4px 20px rgba(0,0,0,0.35);
+  transition:     all 0.18s ease;
+}
+#print-preview-btn:hover {
+  background: #2a2a4e;
+  border-color: #7a7acc;
+}
+
+#print-preview-overlay {
+  display:          flex;
+  align-items:      flex-start;
+  justify-content:  flex-end;
+  position:         fixed;
+  inset:            0;
+  background:       rgba(0, 0, 0, 0.45);
+  z-index:          9999;
+  opacity:          0;
+  pointer-events:   none;
+  transition:       opacity 0.2s ease;
+}
+#print-preview-overlay.open {
+  opacity:        1;
+  pointer-events: all;
+}
+
+#print-preview-drawer {
+  width:           360px;
+  max-width:       96vw;
+  height:          100vh;
+  background:      #15141e;
+  border-left:     1.5px solid #2e2e50;
+  display:         flex;
+  flex-direction:  column;
+  transform:       translateX(100%);
+  transition:      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow:        hidden;
+}
+#print-preview-overlay.open #print-preview-drawer {
+  transform: translateX(0);
+}
+
+#print-preview-header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         16px 20px 14px;
+  border-bottom:   1px solid #2e2e50;
+  background:      #1a1929;
+}
+#print-preview-header h3 {
+  margin:        0;
+  font-size:     0.95em;
+  font-weight:   800;
+  color:         #d0cfff;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  cursor: not-allowed;
-  pointer-events: none;
-  user-select: none;
-  box-shadow: none;
-  margin: 4px 2px;
+}
+#print-preview-close {
+  background:   transparent;
+  border:       none;
+  color:        #777;
+  font-size:    1.1em;
+  cursor:       pointer;
+  padding:      4px 6px;
+  border-radius: 4px;
+  line-height:  1;
+}
+#print-preview-close:hover { color: #ccc; background: rgba(255,255,255,0.07); }
+
+#print-preview-body {
+  flex:       1;
+  overflow-y: auto;
+  padding:    16px 18px;
+  gap:        14px;
+  display:    flex;
+  flex-direction: column;
 }
 
+.ppv-group { display: flex; flex-direction: column; gap: 7px; }
+
+.ppv-label {
+  font-size:      0.72em;
+  font-weight:    700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          #8888bb;
+}
+
+.ppv-control {
+  width:         100%;
+  background:    #1e1d2a;
+  border:        1.5px solid #333360;
+  border-radius: 6px;
+  color:         #d0cfff;
+  padding:       7px 10px;
+  font-size:     0.83em;
+  outline:       none;
+}
+.ppv-control:focus { border-color: #6666cc; }
+input[type="range"].ppv-control {
+  padding:     4px 0;
+  accent-color: #6666cc;
+  cursor:      pointer;
+}
+
+.ppv-templates {
+  display:               grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:                   8px;
+}
+.ppv-template-btn {
+  display:        flex;
+  flex-direction: column;
+  align-items:    flex-start;
+  background:     #1e1d2a;
+  border:         1.5px solid #333360;
+  border-radius:  8px;
+  padding:        9px 10px;
+  cursor:         pointer;
+  text-align:     left;
+  transition:     all 0.15s ease;
+  gap:            2px;
+}
+.ppv-template-btn:hover { border-color: #6666cc; background: #222240; }
+.ppv-template-btn.is-active {
+  border-color: #8888ff;
+  background:   #252455;
+  box-shadow:   0 0 0 1px #6666cc;
+}
+.ppv-template-name {
+  font-size:   0.82em;
+  font-weight: 700;
+  color:       #d0cfff;
+}
+.ppv-template-desc {
+  font-size: 0.68em;
+  color:     #6666aa;
+  line-height: 1.3;
+}
+
+#print-preview-footer {
+  display:         flex;
+  gap:             10px;
+  padding:         14px 18px;
+  border-top:      1px solid #2e2e50;
+  background:      #1a1929;
+}
+#print-preview-footer button {
+  flex:          1;
+  padding:       8px 0;
+  border-radius: 6px;
+  font-size:     0.83em;
+  font-weight:   700;
+  cursor:        pointer;
+  letter-spacing: 0.04em;
+  transition:    all 0.15s ease;
+  border:        1.5px solid transparent;
+}
+#ppv-reset-btn {
+  background:   transparent;
+  border-color: #444466;
+  color:        #8888bb;
+}
+#ppv-reset-btn:hover { border-color: #8888bb; color: #d0cfff; }
+#ppv-apply-btn {
+  background:  #4040a8;
+  border-color: #5555cc;
+  color:        #e8e8ff;
+}
+#ppv-apply-btn:hover { background: #5050c8; }
+
+
+/* ============================================================
+  POSITION TRACKER STUB BUTTON
+============================================================ */
+#position-tracker-stub {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            6px;
+  background:     #1e1e1e;
+  border:         1.5px dashed #444;
+  border-radius:  6px;
+  color:          #666;
+  font-size:      0.78em;
+  font-weight:    600;
+  letter-spacing: 0.05em;
+  padding:        6px 12px;
+  cursor:         not-allowed;
+  opacity:        0.6;
+}
 #position-tracker-stub::before {
-  content: "📍";
-  opacity: 0.4;
-  font-size: 13px;
+  content: "\25CF";
+  font-size: 0.5em;
+  color: #555;
 }

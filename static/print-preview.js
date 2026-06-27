@@ -1,290 +1,508 @@
 /*
   ============================================================
-  KAREN MUSIC WEBSITE — PRINT PREVIEW PANEL
-  Injects the preview button + drawer into the page.
-  No application logic is changed.
+  KAREN MUSIC WEBSITE — PRINT PREVIEW (print-preview.js)
+  Version 2.0 — All visual-only. Zero logic/data changes.
+  ============================================================
+  Injects:
+    · #print-preview-btn  (fixed "Print Preview" button)
+    · #print-preview-overlay  (backdrop)
+    · #print-preview-drawer   (side panel with controls)
+    · #position-tracker-stub  (stub for a future feature)
+
+  Reads BPM from the song chart and moves it to the footer.
+  Applies CSS variable overrides to .chart-container for live preview.
   ============================================================
 */
 
 (function () {
   'use strict';
 
-  /* ── 1. Inject "Preview Print Style" button into top bar ── */
-  function injectPreviewButton() {
-    if (document.getElementById('print-preview-btn')) return;
-    const btn = document.createElement('button');
-    btn.id = 'print-preview-btn';
-    btn.setAttribute('title', 'Preview print layout & style');
-    btn.innerHTML = '🖨 Preview';
-    btn.addEventListener('click', openPreviewDrawer);
-    document.body.appendChild(btn);
-  }
-
-  /* ── 2. Build the drawer HTML ── */
+  /* -----------------------------------------------------------
+     TEMPLATES (Items 15-16)
+     5 distinct layout/style templates.
+  ----------------------------------------------------------- */
   const TEMPLATES = [
-    { id: 'clean',    name: 'Clean',          desc: 'Monospace, compact, tight spacing' },
-    { id: 'bulletin', name: 'Church Bulletin', desc: 'Serif, small-caps sections, classic feel' },
-    { id: 'minimal',  name: 'Minimal',         desc: 'Sans-serif, light weight, airy' },
-    { id: 'bold',     name: 'Bold',            desc: 'Heavy mono, uppercase labels, dense' },
-    { id: 'classic',  name: 'Classic',         desc: 'Traditional serif, italic sections' },
+    {
+      id:   'clean',
+      name: 'Clean',
+      desc: 'Sans-serif, tight',
+      vars: {
+        '--pt-font':                   '"Instrument Sans", "Helvetica Neue", Arial, sans-serif',
+        '--pt-leading':                '1.2',
+        '--pt-section-style':          'normal',
+        '--pt-section-style-transform':'uppercase',
+        '--pt-section-style-italic':   'normal',
+        '--pt-size':                   '0.82em',
+      },
+    },
+    {
+      id:   'church-bulletin',
+      name: 'Church Bulletin',
+      desc: 'Serif, classic spacing',
+      vars: {
+        '--pt-font':                   '"Fraunces", "Georgia", "Times New Roman", serif',
+        '--pt-leading':                '1.35',
+        '--pt-section-style':          'small-caps',
+        '--pt-section-style-transform':'none',
+        '--pt-section-style-italic':   'normal',
+        '--pt-size':                   '0.84em',
+      },
+    },
+    {
+      id:   'minimal',
+      name: 'Minimal',
+      desc: 'Mono, very compact',
+      vars: {
+        '--pt-font':                   '"IBM Plex Mono", "Courier New", Courier, monospace',
+        '--pt-leading':                '1.1',
+        '--pt-section-style':          'normal',
+        '--pt-section-style-transform':'uppercase',
+        '--pt-section-style-italic':   'normal',
+        '--pt-size':                   '0.78em',
+      },
+    },
+    {
+      id:   'bold',
+      name: 'Bold',
+      desc: 'High contrast, airy',
+      vars: {
+        '--pt-font':                   '"Instrument Sans", "Helvetica Neue", Arial, sans-serif',
+        '--pt-leading':                '1.45',
+        '--pt-section-style':          'normal',
+        '--pt-section-style-transform':'uppercase',
+        '--pt-section-style-italic':   'normal',
+        '--pt-size':                   '0.88em',
+      },
+    },
+    {
+      id:   'classic',
+      name: 'Classic',
+      desc: 'Fraunces, wide leading',
+      vars: {
+        '--pt-font':                   '"Fraunces", "Palatino Linotype", "Book Antiqua", Palatino, serif',
+        '--pt-leading':                '1.5',
+        '--pt-section-style':          'small-caps',
+        '--pt-section-style-transform':'none',
+        '--pt-section-style-italic':   'italic',
+        '--pt-size':                   '0.85em',
+      },
+    },
   ];
 
-  const FONTS = [
-    { value: '"IBM Plex Mono", monospace',              label: 'IBM Plex Mono (default)' },
-    { value: '"Fraunces", Georgia, serif',               label: 'Fraunces (Serif)' },
-    { value: '"Instrument Sans", "Segoe UI", sans-serif',label: 'Instrument Sans' },
-    { value: '"Noto Sans Myanmar", sans-serif',          label: 'Noto Myanmar' },
-    { value: '"Courier New", Courier, monospace',        label: 'Courier New' },
-  ];
+  /* -----------------------------------------------------------
+     STATE
+  ----------------------------------------------------------- */
+  const state = {
+    activeTemplate: null,
+    font:    null,
+    leading: null,
+    sectionStyle: null,
+    committed: {},
+  };
 
-  const SECTION_STYLES = [
-    { value: 'normal',     label: 'Normal' },
-    { value: 'uppercase',  label: 'UPPERCASE' },
-    { value: 'small-caps', label: 'Small Caps' },
-    { value: 'italic',     label: 'Italic' },
-  ];
-
-  function buildDrawer() {
-    const overlay = document.createElement('div');
-    overlay.id = 'print-preview-overlay';
-
-    overlay.innerHTML = `
-      <div id="print-preview-drawer">
-        <div id="print-preview-header">
-          <h3>Print Style Preview</h3>
-          <button id="print-preview-close" title="Close">✕</button>
-        </div>
-
-        <div id="print-preview-body">
-
-          <!-- Template tiles -->
-          <div class="ppv-group">
-            <div class="ppv-label">Theme Templates</div>
-            <div class="ppv-templates" id="ppv-template-grid"></div>
-          </div>
-
-          <!-- Font selector -->
-          <div class="ppv-group">
-            <div class="ppv-label">Font Family</div>
-            <select class="ppv-control" id="ppv-font">
-              ${FONTS.map(f => `<option value="${f.value}">${f.label}</option>`).join('')}
-            </select>
-          </div>
-
-          <!-- Line spacing -->
-          <div class="ppv-group">
-            <div class="ppv-label">Line Spacing — <span id="ppv-leading-val">1.25</span></div>
-            <input type="range" class="ppv-control" id="ppv-leading"
-              min="1.0" max="1.8" step="0.05" value="1.25">
-          </div>
-
-          <!-- Section label style -->
-          <div class="ppv-group">
-            <div class="ppv-label">Section Label Style</div>
-            <select class="ppv-control" id="ppv-section-style">
-              ${SECTION_STYLES.map(s => `<option value="${s.value}">${s.label}</option>`).join('')}
-            </select>
-          </div>
-
-        </div><!-- /body -->
-
-        <div id="print-preview-footer">
-          <button id="ppv-reset-btn">Reset</button>
-          <button id="ppv-apply-btn">Apply &amp; Close</button>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    /* Populate template tiles */
-    const grid = document.getElementById('ppv-template-grid');
-    TEMPLATES.forEach(t => {
-      const btn = document.createElement('button');
-      btn.className = 'ppv-template-btn';
-      btn.dataset.tplId = t.id;
-      btn.innerHTML = `<span class="ppv-template-name">${t.name}</span><span class="ppv-template-desc">${t.desc}</span>`;
-      btn.addEventListener('click', () => applyTemplate(t.id));
-      grid.appendChild(btn);
-    });
-
-    /* Wire close */
-    document.getElementById('print-preview-close').addEventListener('click', closePreviewDrawer);
-    overlay.addEventListener('click', e => { if (e.target === overlay) closePreviewDrawer(); });
-
-    /* Wire controls → live preview */
-    document.getElementById('ppv-font').addEventListener('change', livePreview);
-    document.getElementById('ppv-section-style').addEventListener('change', livePreview);
-    document.getElementById('ppv-leading').addEventListener('input', function () {
-      document.getElementById('ppv-leading-val').textContent = this.value;
-      livePreview();
-    });
-
-    /* Apply & Reset */
-    document.getElementById('ppv-apply-btn').addEventListener('click', applyAndClose);
-    document.getElementById('ppv-reset-btn').addEventListener('click', resetStyles);
+  /* -----------------------------------------------------------
+     HELPERS
+  ----------------------------------------------------------- */
+  function getChartContainer() {
+    return document.querySelector('#print-batch .chart-container') ||
+           document.querySelector('.chart-container') ||
+           document.querySelector('#print-batch');
   }
 
-  /* ── 3. Open / Close ── */
-  function openPreviewDrawer() {
-    if (!document.getElementById('print-preview-overlay')) buildDrawer();
-    document.getElementById('print-preview-overlay').classList.add('open');
+  function applyVars(vars) {
+    const el = getChartContainer();
+    if (!el) return;
+    Object.entries(vars).forEach(([k, v]) => el.style.setProperty(k, v));
   }
 
-  function closePreviewDrawer() {
-    const overlay = document.getElementById('print-preview-overlay');
-    if (overlay) overlay.classList.remove('open');
-    clearLivePreview();
+  function clearAllVars() {
+    const el = getChartContainer();
+    if (!el) return;
+    const allKeys = TEMPLATES.flatMap(t => Object.keys(t.vars));
+    const dedupe = [...new Set(allKeys)];
+    dedupe.forEach(k => el.style.removeProperty(k));
   }
 
-  /* ── 4. Template application ── */
-  function applyTemplate(id) {
-    /* Update active tile */
-    document.querySelectorAll('.ppv-template-btn').forEach(b => {
-      b.classList.toggle('is-active', b.dataset.tplId === id);
-    });
-
-    /* Map template → control values */
-    const maps = {
-      clean:    { font: FONTS[0].value, leading: '1.25', sectionStyle: 'normal' },
-      bulletin: { font: FONTS[1].value, leading: '1.35', sectionStyle: 'small-caps' },
-      minimal:  { font: FONTS[2].value, leading: '1.18', sectionStyle: 'normal' },
-      bold:     { font: FONTS[0].value, leading: '1.28', sectionStyle: 'uppercase' },
-      classic:  { font: FONTS[1].value, leading: '1.40', sectionStyle: 'italic' },
-    };
-    const m = maps[id];
-    if (!m) return;
-
-    document.getElementById('ppv-font').value = m.font;
-    document.getElementById('ppv-leading').value = m.leading;
-    document.getElementById('ppv-leading-val').textContent = m.leading;
-    document.getElementById('ppv-section-style').value = m.sectionStyle;
-
-    livePreview();
-  }
-
-  /* ── 5. Live preview — applies vars to chart containers (screen only) ── */
-  function livePreview() {
-    const font   = document.getElementById('ppv-font').value;
-    const lead   = document.getElementById('ppv-leading').value;
-    const sStyle = document.getElementById('ppv-section-style').value;
-
-    document.querySelectorAll('.chart-container').forEach(el => {
-      el.style.setProperty('--pt-font', font);
-      el.style.setProperty('--pt-leading', lead);
-      el.style.setProperty('--pt-section-style', sStyle);
-      el.dataset.ppvTheme = 'preview';
-    });
-  }
-
-  function clearLivePreview() {
-    document.querySelectorAll('.chart-container[data-ppv-theme]').forEach(el => {
-      el.style.removeProperty('--pt-font');
-      el.style.removeProperty('--pt-leading');
-      el.style.removeProperty('--pt-section-style');
-      delete el.dataset.ppvTheme;
-    });
-  }
-
-  /* ── 6. Apply — write chosen vars to :root so they survive close ── */
-  function applyAndClose() {
-    const font   = document.getElementById('ppv-font').value;
-    const lead   = document.getElementById('ppv-leading').value;
-    const sStyle = document.getElementById('ppv-section-style').value;
-
-    document.documentElement.style.setProperty('--print-font-family', font);
-    document.documentElement.style.setProperty('--print-line-spacing', lead);
-    document.documentElement.style.setProperty('--print-section-label-style', sStyle);
-
-    /* Persist to localStorage so it survives reload */
-    try {
-      localStorage.setItem('ppv_font', font);
-      localStorage.setItem('ppv_leading', lead);
-      localStorage.setItem('ppv_section_style', sStyle);
-    } catch (_) {}
-
-    closePreviewDrawer();
-  }
-
-  /* ── 7. Reset ── */
-  function resetStyles() {
-    document.documentElement.style.removeProperty('--print-font-family');
-    document.documentElement.style.removeProperty('--print-line-spacing');
-    document.documentElement.style.removeProperty('--print-section-label-style');
-
-    try {
-      localStorage.removeItem('ppv_font');
-      localStorage.removeItem('ppv_leading');
-      localStorage.removeItem('ppv_section_style');
-    } catch (_) {}
-
-    /* Reset controls to defaults */
-    if (document.getElementById('ppv-font')) {
-      document.getElementById('ppv-font').value = FONTS[0].value;
-      document.getElementById('ppv-leading').value = '1.25';
-      document.getElementById('ppv-leading-val').textContent = '1.25';
-      document.getElementById('ppv-section-style').value = 'normal';
+  /* -----------------------------------------------------------
+     BPM -> FOOTER (Item 7)
+     Reads beats-per-measure value and injects into footer center.
+  ----------------------------------------------------------- */
+  function moveBpmToFooter() {
+    const bpmSources = [
+      '[data-field="beats_per_measure"]',
+      '.paper-bpm',
+      '.ph-bpm-center',
+      '[data-bpm]',
+    ];
+    let bpmText = '';
+    for (const sel of bpmSources) {
+      const el = document.querySelector('#print-batch ' + sel);
+      if (el) {
+        bpmText = (el.dataset.bpm || el.textContent || '').trim();
+        if (bpmText) break;
+      }
     }
 
-    clearLivePreview();
+    const batch = document.querySelector('#print-batch');
+    if (!bpmText && batch) {
+      bpmText = batch.dataset.bpm || batch.dataset.beatsPerMeasure || '';
+    }
 
-    document.querySelectorAll('.ppv-template-btn').forEach(b => b.classList.remove('is-active'));
-  }
+    if (!bpmText) return;
 
-  /* ── 8. Restore saved prefs on load ── */
-  function restoreSavedPrefs() {
-    try {
-      const font   = localStorage.getItem('ppv_font');
-      const lead   = localStorage.getItem('ppv_leading');
-      const sStyle = localStorage.getItem('ppv_section_style');
-      if (font)   document.documentElement.style.setProperty('--print-font-family', font);
-      if (lead)   document.documentElement.style.setProperty('--print-line-spacing', lead);
-      if (sStyle) document.documentElement.style.setProperty('--print-section-label-style', sStyle);
-    } catch (_) {}
-  }
+    const footer = document.querySelector('#print-batch .paper-footer');
+    if (!footer) return;
 
-  /* ── 9. Inject Position Tracker stub ── */
-  function injectPositionTrackerStub() {
-    if (document.getElementById('position-tracker-stub')) return;
-    /* Wait for the sidebar / main action area to be present */
-    const target = document.querySelector('.action-grid') || document.querySelector('#sidebar');
-    if (!target) return;
-    const stub = document.createElement('button');
-    stub.id = 'position-tracker-stub';
-    stub.setAttribute('disabled', 'disabled');
-    stub.setAttribute('aria-disabled', 'true');
-    stub.setAttribute('title', 'Coming soon');
-    stub.textContent = 'Position Tracker — Coming Soon';
-    target.appendChild(stub);
-  }
-
-  /* ── 10. Move BPM to footer center (screen & print preview) ── */
-  function moveBpmToFooter() {
-    // Find all chart containers in print-batch
-    document.querySelectorAll('#print-batch .chart-container').forEach(chart => {
-      const footerCenter = chart.querySelector('#ph-footer-center');
-      if (!footerCenter) return;
-      // Look for a BPM element in the header
-      const bpmEl = chart.querySelector('.paper-bpm, [data-field="beats_per_measure"], .ph-bpm-center');
-      if (bpmEl && footerCenter.dataset.bpmMoved !== '1') {
-        footerCenter.textContent = bpmEl.textContent || footerCenter.textContent;
-        footerCenter.dataset.bpmMoved = '1';
+    let slot = footer.querySelector('#ph-footer-center');
+    if (!slot) {
+      slot = document.createElement('div');
+      slot.id = 'ph-footer-center';
+      slot.className = 'ph-footer-center';
+      const children = footer.children;
+      if (children.length >= 2) {
+        footer.insertBefore(slot, children[1]);
+      } else {
+        footer.appendChild(slot);
       }
+    }
+    slot.textContent = '\u2669 = ' + bpmText + ' beats/measure';
+  }
+
+  /* -----------------------------------------------------------
+     SECTION COLOR DATA ATTRIBUTE INJECTION (Item 13)
+     Infers section type from label text if not already set.
+  ----------------------------------------------------------- */
+  function injectSectionTypes() {
+    const sections = document.querySelectorAll('#print-batch .section');
+    sections.forEach(sec => {
+      if (sec.dataset.sectionType) return;
+      const label = sec.querySelector('.section-header, .section-title, .section-name, [data-role="section-label"]');
+      if (!label) return;
+      const text = label.textContent.trim().toLowerCase().replace(/[^a-z\s]/g, '').trim();
+      let type = 'default';
+      if (/verse/.test(text))                          type = 'verse';
+      else if (/chorus/.test(text))                    type = 'chorus';
+      else if (/pre.?chorus|prechorus/.test(text))     type = 'pre-chorus';
+      else if (/intro/.test(text))                     type = 'intro';
+      else if (/outro/.test(text))                     type = 'outro';
+      else if (/ending/.test(text))                    type = 'ending';
+      else if (/bridge/.test(text))                    type = 'bridge';
+      else if (/solo/.test(text))                      type = 'solo';
+      sec.setAttribute('data-section-type', type);
+      sec.setAttribute('data-stype', type);
     });
   }
 
-  /* ── Init ── */
-  function init() {
-    restoreSavedPrefs();
-    injectPreviewButton();
-    injectPositionTrackerStub();
+  /* -----------------------------------------------------------
+     POSITION TRACKER STUB (Item 19)
+  ----------------------------------------------------------- */
+  function injectPositionTrackerStub() {
+    if (document.getElementById('position-tracker-stub')) return;
+    const toolbar = document.querySelector('.song-actions, .print-actions, .action-bar, .toolbar');
+    const stub = document.createElement('button');
+    stub.id = 'position-tracker-stub';
+    stub.disabled = true;
+    stub.title = 'Coming soon \u2014 track instrument positions on stage';
+    stub.textContent = 'Position Tracker \u2014 Coming Soon';
+    if (toolbar) {
+      toolbar.appendChild(stub);
+    } else {
+      stub.style.cssText = 'position:fixed;bottom:20px;left:20px;z-index:8000;';
+      document.body.appendChild(stub);
+    }
+  }
+
+  /* -----------------------------------------------------------
+     DRAWER HTML (Items 15-18)
+  ----------------------------------------------------------- */
+  function buildDrawer() {
+    const FONT_OPTIONS = [
+      { value: '"IBM Plex Mono","Courier New",monospace',             label: 'Monospace (default)' },
+      { value: '"Instrument Sans","Helvetica Neue",Arial,sans-serif', label: 'Instrument Sans' },
+      { value: '"Fraunces","Georgia","Times New Roman",serif',        label: 'Fraunces (Serif)' },
+      { value: '"Fraunces","Palatino Linotype","Book Antiqua",serif', label: 'Classic Serif' },
+      { value: '"Noto Sans Myanmar",sans-serif',                      label: 'Noto Myanmar' },
+    ];
+
+    const SECTION_STYLE_OPTIONS = [
+      { value: 'normal',      label: 'Normal' },
+      { value: 'small-caps',  label: 'Small Caps' },
+      { value: 'uppercase',   label: 'ALL CAPS' },
+      { value: 'italic',      label: 'Italic' },
+    ];
+
+    const templateGrid = TEMPLATES.map(t =>
+      '<button class="ppv-template-btn" data-template="' + t.id + '" aria-label="Template: ' + t.name + '">' +
+      '<span class="ppv-template-name">' + t.name + '</span>' +
+      '<span class="ppv-template-desc">' + t.desc + '</span>' +
+      '</button>'
+    ).join('');
+
+    const fontOptions = FONT_OPTIONS.map(o =>
+      '<option value="' + o.value + '">' + o.label + '</option>'
+    ).join('');
+
+    const sectionOptions = SECTION_STYLE_OPTIONS.map(o =>
+      '<option value="' + o.value + '">' + o.label + '</option>'
+    ).join('');
+
+    return [
+      '<div id="print-preview-overlay" role="dialog" aria-modal="true" aria-label="Print Preview Panel">',
+      '  <div id="print-preview-drawer">',
+      '    <div id="print-preview-header">',
+      '      <h3>\uD83D\uDDA8 Print Preview</h3>',
+      '      <button id="print-preview-close" aria-label="Close preview panel">\u2715</button>',
+      '    </div>',
+      '    <div id="print-preview-body">',
+      '      <div class="ppv-group">',
+      '        <span class="ppv-label">Templates</span>',
+      '        <div class="ppv-templates">' + templateGrid + '</div>',
+      '      </div>',
+      '      <div class="ppv-group">',
+      '        <label class="ppv-label" for="ppv-font">Font Family</label>',
+      '        <select id="ppv-font" class="ppv-control">' + fontOptions + '</select>',
+      '      </div>',
+      '      <div class="ppv-group">',
+      '        <label class="ppv-label" for="ppv-leading">',
+      '          Line Spacing <span id="ppv-leading-val" style="float:right;color:#9999cc">1.25</span>',
+      '        </label>',
+      '        <input id="ppv-leading" class="ppv-control" type="range" min="1.0" max="2.0" step="0.05" value="1.25">',
+      '      </div>',
+      '      <div class="ppv-group">',
+      '        <label class="ppv-label" for="ppv-section-style">Section Label Style</label>',
+      '        <select id="ppv-section-style" class="ppv-control">' + sectionOptions + '</select>',
+      '      </div>',
+      '    </div>',
+      '    <div id="print-preview-footer">',
+      '      <button id="ppv-reset-btn" type="button">Reset</button>',
+      '      <button id="ppv-apply-btn" type="button">Apply to Print</button>',
+      '    </div>',
+      '  </div>',
+      '</div>'
+    ].join('\n');
+  }
+
+  /* -----------------------------------------------------------
+     TRIGGER BUTTON
+  ----------------------------------------------------------- */
+  function buildBtn() {
+    const btn = document.createElement('button');
+    btn.id = 'print-preview-btn';
+    btn.setAttribute('aria-label', 'Open print preview panel');
+    btn.textContent = '\uD83D\uDDA8 Preview';
+    return btn;
+  }
+
+  /* -----------------------------------------------------------
+     LIVE-PREVIEW APPLIER
+  ----------------------------------------------------------- */
+  function applyLive() {
+    const el = getChartContainer();
+    if (!el) return;
+
+    const fontSel = document.getElementById('ppv-font');
+    if (fontSel && fontSel.value)
+      el.style.setProperty('--pt-font', fontSel.value);
+
+    const leadingInput = document.getElementById('ppv-leading');
+    if (leadingInput)
+      el.style.setProperty('--pt-leading', leadingInput.value);
+
+    const styleSel = document.getElementById('ppv-section-style');
+    if (styleSel) {
+      const val = styleSel.value;
+      if (val === 'uppercase') {
+        el.style.setProperty('--pt-section-style', 'normal');
+        el.style.setProperty('--pt-section-style-transform', 'uppercase');
+        el.style.setProperty('--pt-section-style-italic', 'normal');
+      } else if (val === 'italic') {
+        el.style.setProperty('--pt-section-style', 'normal');
+        el.style.setProperty('--pt-section-style-transform', 'none');
+        el.style.setProperty('--pt-section-style-italic', 'italic');
+      } else {
+        el.style.setProperty('--pt-section-style', val);
+        el.style.setProperty('--pt-section-style-transform', 'none');
+        el.style.setProperty('--pt-section-style-italic', 'normal');
+      }
+    }
+  }
+
+  /* -----------------------------------------------------------
+     APPLY TEMPLATE
+  ----------------------------------------------------------- */
+  function applyTemplate(id) {
+    const t = TEMPLATES.find(t => t.id === id);
+    if (!t) return;
+    applyVars(t.vars);
+    state.activeTemplate = id;
+
+    const fontSel = document.getElementById('ppv-font');
+    if (fontSel && t.vars['--pt-font']) fontSel.value = t.vars['--pt-font'];
+
+    const leadingInput = document.getElementById('ppv-leading');
+    const leadingVal   = document.getElementById('ppv-leading-val');
+    if (leadingInput && t.vars['--pt-leading']) {
+      leadingInput.value = t.vars['--pt-leading'];
+      if (leadingVal) leadingVal.textContent = t.vars['--pt-leading'];
+    }
+
+    const styleSel = document.getElementById('ppv-section-style');
+    if (styleSel) {
+      if (t.vars['--pt-section-style-transform'] === 'uppercase') styleSel.value = 'uppercase';
+      else if (t.vars['--pt-section-style-italic'] === 'italic') styleSel.value = 'italic';
+      else styleSel.value = t.vars['--pt-section-style'] || 'normal';
+    }
+
+    document.querySelectorAll('.ppv-template-btn').forEach(btn => {
+      btn.classList.toggle('is-active', btn.dataset.template === id);
+    });
+  }
+
+  /* -----------------------------------------------------------
+     RESET
+  ----------------------------------------------------------- */
+  function resetAll() {
+    clearAllVars();
+    state.activeTemplate = null;
+    document.querySelectorAll('.ppv-template-btn').forEach(b => b.classList.remove('is-active'));
+    const leadingInput = document.getElementById('ppv-leading');
+    const leadingVal   = document.getElementById('ppv-leading-val');
+    if (leadingInput) { leadingInput.value = '1.25'; }
+    if (leadingVal)   { leadingVal.textContent = '1.25'; }
+    const fontSel = document.getElementById('ppv-font');
+    if (fontSel) fontSel.selectedIndex = 0;
+    const styleSel = document.getElementById('ppv-section-style');
+    if (styleSel) styleSel.selectedIndex = 0;
+  }
+
+  /* -----------------------------------------------------------
+     COMMIT APPLIED STYLES
+  ----------------------------------------------------------- */
+  function commitStyles() {
+    const el = getChartContainer();
+    if (!el) return;
+    const vars = {};
+    ['--pt-font','--pt-leading','--pt-section-style',
+     '--pt-section-style-transform','--pt-section-style-italic','--pt-size'
+    ].forEach(k => {
+      const v = el.style.getPropertyValue(k);
+      if (v) vars[k] = v;
+    });
+
+    state.committed = vars;
+
+    let styleTag = document.getElementById('ppv-committed-styles');
+    if (!styleTag) {
+      styleTag = document.createElement('style');
+      styleTag.id = 'ppv-committed-styles';
+      document.head.appendChild(styleTag);
+    }
+    const rules = Object.entries(vars).map(([k, v]) => k + ': ' + v + ';').join('\n  ');
+    styleTag.textContent = rules
+      ? '#print-batch .chart-container,\n.chart-container {\n  ' + rules + '\n}'
+      : '';
+  }
+
+  /* -----------------------------------------------------------
+     DRAWER OPEN / CLOSE
+  ----------------------------------------------------------- */
+  function openDrawer() {
+    const overlay = document.getElementById('print-preview-overlay');
+    if (overlay) overlay.classList.add('open');
+    injectSectionTypes();
     moveBpmToFooter();
   }
 
+  function closeDrawer() {
+    const overlay = document.getElementById('print-preview-overlay');
+    if (overlay) overlay.classList.remove('open');
+  }
+
+  /* -----------------------------------------------------------
+     WIRE UP EVENT LISTENERS
+  ----------------------------------------------------------- */
+  function wireEvents() {
+    const btn = document.getElementById('print-preview-btn');
+    if (btn) btn.addEventListener('click', openDrawer);
+
+    const closeBtn = document.getElementById('print-preview-close');
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+
+    const overlay = document.getElementById('print-preview-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', e => {
+        if (e.target === overlay) closeDrawer();
+      });
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    document.querySelectorAll('.ppv-template-btn').forEach(btn => {
+      btn.addEventListener('click', () => applyTemplate(btn.dataset.template));
+    });
+
+    const fontSel = document.getElementById('ppv-font');
+    if (fontSel) fontSel.addEventListener('change', applyLive);
+
+    const leadingInput = document.getElementById('ppv-leading');
+    const leadingVal   = document.getElementById('ppv-leading-val');
+    if (leadingInput) {
+      leadingInput.addEventListener('input', () => {
+        if (leadingVal) leadingVal.textContent = leadingInput.value;
+        applyLive();
+      });
+    }
+
+    const styleSel = document.getElementById('ppv-section-style');
+    if (styleSel) styleSel.addEventListener('change', applyLive);
+
+    const resetBtn = document.getElementById('ppv-reset-btn');
+    if (resetBtn) resetBtn.addEventListener('click', resetAll);
+
+    const applyBtn = document.getElementById('ppv-apply-btn');
+    if (applyBtn) applyBtn.addEventListener('click', () => {
+      commitStyles();
+      closeDrawer();
+    });
+  }
+
+  /* -----------------------------------------------------------
+     INIT
+  ----------------------------------------------------------- */
+  function init() {
+    if (document.getElementById('print-preview-btn')) return;
+
+    document.body.appendChild(buildBtn());
+
+    const drawerWrapper = document.createElement('div');
+    drawerWrapper.innerHTML = buildDrawer();
+    document.body.appendChild(drawerWrapper.firstElementChild);
+
+    injectPositionTrackerStub();
+    wireEvents();
+
+    setTimeout(() => {
+      moveBpmToFooter();
+      injectSectionTypes();
+    }, 800);
+
+    const observer = new MutationObserver(() => {
+      moveBpmToFooter();
+      injectSectionTypes();
+    });
+    const batch = document.getElementById('print-batch') || document.body;
+    observer.observe(batch, { childList: true, subtree: true });
+  }
+
+  /* -----------------------------------------------------------
+     BOOTSTRAP
+  ----------------------------------------------------------- */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
-    init();
+    setTimeout(init, 0);
   }
 
 })();
