@@ -1,7 +1,8 @@
 param(
     [string]$AppName = "KarenMusicDirector",
     [string]$IconPath = "",
-    [switch]$InstallBuildDeps
+    [switch]$InstallBuildDeps,
+    [switch]$SkipStoppingRunningApp
 )
 
 $ErrorActionPreference = "Stop"
@@ -12,6 +13,15 @@ Set-Location $ProjectRoot
 
 if (-not $IconPath) {
     $IconPath = Join-Path $ScriptDir "app.ico"
+}
+
+if (-not $SkipStoppingRunningApp) {
+    $runningApps = @(Get-Process -Name $AppName -ErrorAction SilentlyContinue)
+    if ($runningApps.Count -gt 0) {
+        Write-Host "Stopping running $AppName process(es) so PyInstaller can replace dist files..."
+        $runningApps | Stop-Process -Force
+        Start-Sleep -Seconds 2
+    }
 }
 
 if ($InstallBuildDeps) {
