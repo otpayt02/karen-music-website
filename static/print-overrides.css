@@ -1,585 +1,419 @@
 /*
-  ============================================================
-  KAREN MUSIC WEBSITE — PRINTOUT OVERRIDES
-  Version 2.0 — All 19 requirements implemented
-  CSS/visual only. Zero logic changes.
-  ============================================================
+  print-overrides.css
+  Karen Music Director — Printout Format Spec (June 2026)
+  --------------------------------------------------------
+  ALL changes are @media print only — screen UI is untouched.
+  Covers: §1 Spacing, §2 Header, §3 Footer, §4 Chord Circles
 */
 
 /* ============================================================
-  CSS CUSTOM PROPERTIES
-  These are read by print-preview.js live-preview controls.
-============================================================ */
-:root {
-  --print-font-family:        "IBM Plex Mono", "Courier New", monospace;
-  --print-line-spacing:       1.25;
-  --print-section-label-style: normal;
-  --print-body-font-size:     0.82em;
-
-  /* Section color palette — pastel, print-safe */
-  --section-color-verse:   #e8f4f0;   /* soft teal-green */
-  --section-color-chorus:  #fff3e8;   /* soft amber */
-  --section-color-intro:   #eef3ff;   /* soft periwinkle */
-  --section-color-bridge:  #fdeef6;   /* soft rose */
-  --section-color-solo:    #f5f0ff;   /* soft lavender */
-  --section-color-ending:  #eef3ff;   /* same as intro/outro */
-  --section-color-default: transparent;
-}
-
-
-/* ============================================================
-  1. MEASURE BAR LINES — shorten, don't span full width
-============================================================ */
-#print-batch .line {
-  padding-left:  4px;
-  padding-right: 4px;
-}
-
-#print-batch .measure {
-  padding: 2px 3px 1px 3px;
-}
-
-#print-batch .measure.has-bass-note::before,
-#print-batch .measure.has-bass-note::after {
-  top: 2px;
-}
-
-
-/* ============================================================
-  2. OVERALL SPACING — compact, fewer wasted lines per page
-============================================================ */
-#print-batch .section {
-  margin-bottom: 4px !important;
-  padding:       1px 2px 2px !important;
-}
-
-#print-batch .line {
-  margin-bottom: 4px;
-}
-
-#print-batch .chart-container {
-  padding: 14px 22px 56px 22px !important;
-}
-
-
-/* ============================================================
-  3. REMOVE REDUNDANT SECTION DIVIDER LINES
-============================================================ */
-#print-batch hr,
-#print-batch .section-divider,
-#print-batch .section-separator,
-#print-batch .divider-line {
-  display: none !important;
-}
-
-
-/* ============================================================
-  4 & 5. NO HEADER DIVIDER / NO FOOTER DIVIDER
-============================================================ */
-#print-batch .paper-header {
-  border-bottom:  none !important;
-  margin-bottom:  8px  !important;
-  padding-bottom: 3px  !important;
-  background:     transparent !important;
-}
-
-#print-batch .paper-footer {
-  border-top: none !important;
-}
-
-
-/* ============================================================
-  6. REMOVE DATE CREATED & DATE PERFORMED FROM PRINTOUT
-     Values remain in the DB — only hidden from the print view.
-============================================================ */
-#print-batch .paper-footer-dates,
-#print-batch .paper-footer-date-row,
-#print-batch [data-field="date_created"],
-#print-batch [data-field="date_performed"],
-#print-batch [data-field="created_date"],
-#print-batch [data-field="next_performance_date"],
-#print-batch .ph-date-created,
-#print-batch .ph-date-performed,
-#print-batch .paper-dates,
-#print-batch .paper-date-row,
-#print-batch .date-created-row,
-#print-batch .date-performed-row {
-  display: none !important;
-}
-
-#print-batch .paper-footer {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-}
-
-
-/* ============================================================
-  7. BEATS PER MEASURE — hide from body, show only in footer
-============================================================ */
-#print-batch .paper-head-center .paper-bpm,
-#print-batch [data-field="beats_per_measure"],
-#print-batch .ph-bpm-center,
-#print-batch .paper-bpm {
-  display: none !important;
-}
-
-#print-batch #ph-footer-center,
-#print-batch .ph-footer-center {
-  font-size:      0.85em;
-  font-weight:    700;
-  letter-spacing: 0.06em;
-  color:          #333;
-  text-align:     center;
-}
-
-
-/* ============================================================
-  8. SONG STYLE LABEL — larger, more prominent
-============================================================ */
-#print-batch .paper-style-english,
-#print-batch .paper-style-value,
-#print-batch .paper-style-label,
-#print-batch [data-field="style"] {
-  font-size:   1.1em  !important;
-  font-weight: 900    !important;
-}
-
-
-/* ============================================================
-  9. TRANSPOSED KEY — show original key ONLY in sidebar notes,
-     NOT in the main printout header or body.
-============================================================ */
-#print-batch .paper-key-extra[data-transposed-from],
-#print-batch .paper-head-right .paper-key-extra,
-#print-batch .paper-key-transposed,
-#print-batch [data-field="original_key"],
-#print-batch .original-key-row,
-#print-batch .transposed-from-label {
-  display: none !important;
-}
-
-
-/* ============================================================
-  10, 11, 12. TITLE BLOCK
-    - Karen title: PRIMARY (large, top)
-    - English title: secondary (parenthetical, smaller, below)
-    - No underline on any title element
-============================================================ */
-
-#print-batch .paper-title-block,
-#print-batch .paper-titles {
-  display:        flex         !important;
-  flex-direction: column       !important;
-  align-items:    flex-start   !important;
-}
-
-/* Karen title: promoted to primary position */
-#print-batch .paper-title-karen {
-  order:           1                                      !important;
-  font-size:       1.22em                                 !important;
-  font-weight:     900                                    !important;
-  color:           #111                                   !important;
-  letter-spacing:  0.02em;
-  line-height:     1.05;
-  font-family:     "Noto Sans Myanmar", "Pyidaungsu", sans-serif;
-  text-decoration: none                                   !important;
-  border-bottom:   none                                   !important;
-}
-
-/* English title: demoted to parenthetical subtitle */
-#print-batch .paper-title-english {
-  order:          2                       !important;
-  font-size:      0.72em                  !important;
-  font-weight:    500                     !important;
-  color:          #555                    !important;
-  letter-spacing: 0.01em;
-  line-height:    1.1;
-  text-decoration: none                   !important;
-  border-bottom:  none                    !important;
-}
-
-#print-batch .paper-title-english::before { content: "("; }
-#print-batch .paper-title-english::after  { content: ")"; }
-
-#print-batch .paper-title,
-#print-batch .paper-title-karen,
-#print-batch .paper-title-english,
-#print-batch .paper-header h1,
-#print-batch .paper-header h2,
-#print-batch .paper-header h3 {
-  text-decoration: none  !important;
-  border-bottom:   none  !important;
-}
-
-
-/* ============================================================
-  13. SECTION COLOR CODING
-============================================================ */
-
-/* Verse */
-#print-batch .section[data-section-type="verse"],
-#print-batch .section[data-stype="verse"],
-#print-batch .section.section-verse {
-  background-color: var(--section-color-verse)   !important;
-  border-left:      3px solid #a8d5c2             !important;
-  padding-left:     4px                           !important;
-}
-
-/* Chorus */
-#print-batch .section[data-section-type="chorus"],
-#print-batch .section[data-stype="chorus"],
-#print-batch .section.section-chorus {
-  background-color: var(--section-color-chorus)  !important;
-  border-left:      3px solid #f5c07a             !important;
-  padding-left:     4px                           !important;
-}
-
-/* Pre-chorus */
-#print-batch .section[data-section-type="pre-chorus"],
-#print-batch .section[data-section-type="prechorus"],
-#print-batch .section[data-stype="pre-chorus"],
-#print-batch .section.section-prechorus {
-  background-color: color-mix(in srgb, var(--section-color-verse) 50%, var(--section-color-chorus)) !important;
-  border-left:      3px solid #c8d4a0             !important;
-  padding-left:     4px                           !important;
-}
-
-/* Intro / Outro / Ending */
-#print-batch .section[data-section-type="intro"],
-#print-batch .section[data-section-type="outro"],
-#print-batch .section[data-section-type="ending"],
-#print-batch .section[data-stype="intro"],
-#print-batch .section[data-stype="outro"],
-#print-batch .section[data-stype="ending"],
-#print-batch .section.section-intro,
-#print-batch .section.section-outro,
-#print-batch .section.section-ending {
-  background-color: var(--section-color-intro)   !important;
-  border-left:      3px solid #9fb3e8             !important;
-  padding-left:     4px                           !important;
-}
-
-/* Bridge / Solo / Other */
-#print-batch .section[data-section-type="bridge"],
-#print-batch .section[data-section-type="solo"],
-#print-batch .section[data-stype="bridge"],
-#print-batch .section[data-stype="solo"],
-#print-batch .section.section-bridge,
-#print-batch .section.section-solo {
-  background-color: var(--section-color-bridge)  !important;
-  border-left:      3px solid #e8a8d0             !important;
-  padding-left:     4px                           !important;
-}
-
-
-/* ============================================================
-  14. CHORD CIRCLES — white fill, bold outline, 120% size
-    Do NOT fill solid black.
-============================================================ */
-
-#print-batch .chord-wrap .chord-root-circle,
-#print-batch .chord-circle,
-#print-batch .chord-dot,
-#print-batch .chord-badge {
-  transform:   scale(1.2) !important;
-  transform-origin: center center !important;
-  background:  #ffffff           !important;
-  fill:        #ffffff           !important;
-  border:      2.5px solid #111  !important;
-  outline:     none              !important;
-  box-shadow:  0 0 0 1.5px #111  !important;
-  color:       #111              !important;
-  font-weight: 700               !important;
-}
-
-#print-batch .chord-wrap circle,
-#print-batch .chord-diagram circle,
-#print-batch svg.chord-circle circle {
-  fill:          #ffffff !important;
-  stroke:        #111111 !important;
-  stroke-width:  2.5     !important;
-}
-
-#print-batch .chord-wrap .chord-root-circle span,
-#print-batch .chord-badge span,
-#print-batch .chord-circle-text {
-  color: #111 !important;
-}
-
-
-/* ============================================================
-  LIVE PREVIEW VARIABLES
-  Set by print-preview.js on .chart-container during preview.
-============================================================ */
-#print-batch .chart-container {
-  font-family:  var(--pt-font, var(--print-font-family)) !important;
-  line-height:  var(--pt-leading, var(--print-line-spacing)) !important;
-  font-size:    var(--print-body-font-size);
-}
-
-#print-batch .section-header,
-#print-batch .section-title,
-#print-batch .section-name,
-#print-batch [data-role="section-label"] {
-  font-variant:   var(--pt-section-style, var(--print-section-label-style));
-  text-transform: var(--pt-section-style-transform, none);
-  font-style:     var(--pt-section-style-italic, normal);
-  font-weight:    800;
-  letter-spacing: 0.08em;
-}
-
-
-/* ============================================================
-  @MEDIA PRINT — enforce all overrides in actual print dialog
-============================================================ */
+   §1  SPACING & COMPACTNESS
+   ============================================================ */
 @media print {
 
-  #print-batch .paper-header { border-bottom: none !important; }
-  #print-batch .paper-footer { border-top:    none !important; }
-
-  #print-batch hr,
-  #print-batch .section-divider,
-  #print-batch .section-separator { display: none !important; }
-
-  #print-batch .ph-date-created,
-  #print-batch .ph-date-performed,
-  #print-batch [data-field="date_created"],
-  #print-batch [data-field="date_performed"],
-  #print-batch [data-field="created_date"],
-  #print-batch [data-field="next_performance_date"],
-  #print-batch .paper-footer-dates { display: none !important; }
-
-  #print-batch .paper-bpm,
-  #print-batch .ph-bpm-center { display: none !important; }
-
-  #print-batch .paper-key-extra[data-transposed-from],
-  #print-batch .paper-key-transposed { display: none !important; }
-
-  #print-batch .paper-title,
-  #print-batch .paper-title-karen,
-  #print-batch .paper-title-english {
-    text-decoration: none !important;
-    border-bottom:   none !important;
+  /* §1.1 — Overall compact density */
+  .print-area,
+  #print-area,
+  .chart-print-wrapper {
+    font-size: 9.5pt !important;
+    line-height: 1.25 !important;
   }
 
-  #print-batch .section { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* §1.2 — Shorter measure bar lines: constrain measure row width */
+  .measure-row,
+  .chart-row,
+  .row-measures {
+    gap: 2pt !important;
+    margin-bottom: 3pt !important;
+  }
 
-  #print-preview-btn,
-  #print-preview-overlay,
-  #position-tracker-stub { display: none !important; }
+  .measure,
+  .measure-cell,
+  .chart-measure {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    padding: 2pt 4pt !important;
+    border-width: 1px !important;
+  }
 
-  @page { margin: 0.5in; }
+  /* §1.3 — Reduce section dividers: no heavy lines */
+  .section-divider,
+  .section-header-line,
+  .chart-section-header {
+    border-top: none !important;
+    border-bottom: none !important;
+    padding-top: 2pt !important;
+    padding-bottom: 1pt !important;
+    margin-top: 4pt !important;
+    margin-bottom: 2pt !important;
+  }
+
+  /* §1.4 — More breathing room beside chord symbols */
+  .chord-cell,
+  .chord-label,
+  .chord-name {
+    padding-left: 6pt !important;
+    padding-right: 6pt !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  /* §1.5 — Remove header-body divider line */
+  .print-header,
+  #print-header,
+  .song-print-header {
+    border-bottom: none !important;
+    box-shadow: none !important;
+    padding-bottom: 3pt !important;
+    margin-bottom: 4pt !important;
+  }
+
+  /* §1.6 — Remove footer-body divider line */
+  .print-footer,
+  #print-footer,
+  .song-print-footer {
+    border-top: none !important;
+    box-shadow: none !important;
+    padding-top: 3pt !important;
+    margin-top: 4pt !important;
+  }
+
+
+  /* ============================================================
+     §2  HEADER CHANGES
+     ============================================================ */
+
+  /* §2.1 + §2.2 — Korean title on top, large (same as current English title size) */
+  .print-title-karen,
+  .song-title-karen-print {
+    display: block !important;
+    font-size: 18pt !important;
+    font-weight: 800 !important;
+    font-family: 'Noto Sans Myanmar', 'Fraunces', serif !important;
+    line-height: 1.1 !important;
+    order: 1 !important;
+    margin-bottom: 1pt !important;
+  }
+
+  /* §2.3 — English title: small parenthetical below Korean */
+  .print-title-english,
+  .song-title-english-print,
+  .print-title,
+  .song-print-title {
+    display: block !important;
+    font-size: 9pt !important;
+    font-weight: 400 !important;
+    color: #444 !important;
+    order: 2 !important;
+    margin-bottom: 2pt !important;
+  }
+
+  /* Wrap print title fields so we can use flexbox order */
+  .print-title-block,
+  .song-print-title-block {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* §2.4 — Song style text: bigger, same size as Korean title */
+  .print-style,
+  .song-print-style,
+  .print-song-style {
+    font-size: 18pt !important;
+    font-weight: 700 !important;
+    display: block !important;
+  }
+
+  /* §2.5 — Hide BPM from header center (moved to footer in §3.1) */
+  .print-bpm-header,
+  .print-tempo-header,
+  .header-bpm,
+  .header-tempo {
+    display: none !important;
+  }
+
+  /* §2.6 + §2.7 — Hide date created / date performed from printout */
+  .print-date-created,
+  .print-date-performed,
+  .song-print-date-created,
+  .song-print-date-performed,
+  [data-print-field="date_created"],
+  [data-print-field="date_performed"],
+  [data-print-field="created_date"],
+  [data-print-field="next_performance_date"] {
+    display: none !important;
+  }
+
+  /* §2.8 — Hide original key note from printout */
+  .print-original-key,
+  .song-print-original-key,
+  .print-key-transposition,
+  [data-print-field="original_key"] {
+    display: none !important;
+  }
+
+
+  /* ============================================================
+     §3  FOOTER CHANGES
+     ============================================================ */
+
+  /* §3.1 — BPM in footer */
+  .print-footer,
+  #print-footer,
+  .song-print-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 8pt !important;
+    color: #555 !important;
+    padding: 2pt 0 !important;
+  }
+
+  .print-bpm-footer,
+  .print-tempo-footer,
+  .footer-bpm {
+    display: inline-block !important;
+    font-size: 8pt !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  /* §3.2 — footer-body divider already handled in §1.6 */
+
+
+  /* ============================================================
+     §4  CHORD CIRCLE VISUAL STYLE
+     ============================================================ */
+
+  /* §4.1 — Darker, bolder outline */
+  .chord-circle,
+  .chord-dot,
+  .chord-symbol-circle {
+    border: 2.5px solid #111 !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* §4.2 — ~20% larger chord circles */
+  .chord-circle,
+  .chord-dot,
+  .chord-symbol-circle {
+    width:  calc(var(--chord-circle-size, 20px) * 1.2) !important;
+    height: calc(var(--chord-circle-size, 20px) * 1.2) !important;
+    font-size: calc(var(--chord-circle-font, 9px) * 1.2) !important;
+    line-height: calc(var(--chord-circle-size, 20px) * 1.2) !important;
+  }
+
+  /* §4.3 — Keep fill WHITE (do NOT fill black) */
+  .chord-circle,
+  .chord-dot,
+  .chord-symbol-circle {
+    background: #ffffff !important;
+    color: #111 !important;
+    fill: #ffffff !important;
+  }
+
+
+  /* ============================================================
+     §5  SECTION COLOR CODING  (chorus / verse / intro+outro)
+     ============================================================ */
+
+  /* Intro / Outro — subtle blue tint */
+  .section-intro .measure,
+  .section-intro .chord-cell,
+  .section-outro .measure,
+  .section-outro .chord-cell,
+  [data-section="intro"] .measure,
+  [data-section="intro"] .chord-cell,
+  [data-section="outro"] .measure,
+  [data-section="outro"] .chord-cell,
+  [data-section="ending"] .measure,
+  [data-section="ending"] .chord-cell {
+    background-color: #e8f0fb !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .section-intro .chart-section-header,
+  .section-outro .chart-section-header,
+  [data-section="intro"] .chart-section-header,
+  [data-section="outro"] .chart-section-header,
+  [data-section="ending"] .chart-section-header {
+    color: #1a4a9e !important;
+  }
+
+  /* Verse — subtle warm cream */
+  .section-verse .measure,
+  .section-verse .chord-cell,
+  [data-section="verse"] .measure,
+  [data-section="verse"] .chord-cell {
+    background-color: #fdf6e3 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .section-verse .chart-section-header,
+  [data-section="verse"] .chart-section-header {
+    color: #7a4f00 !important;
+  }
+
+  /* Pre-Chorus — subtle lavender */
+  .section-pre-chorus .measure,
+  .section-prechorus .measure,
+  [data-section="pre-chorus"] .measure,
+  [data-section="prechorus"] .measure {
+    background-color: #f3eeff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Chorus — subtle green mint */
+  .section-chorus .measure,
+  .section-chorus .chord-cell,
+  [data-section="chorus"] .measure,
+  [data-section="chorus"] .chord-cell {
+    background-color: #e6f7ee !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .section-chorus .chart-section-header,
+  [data-section="chorus"] .chart-section-header {
+    color: #1a6b3a !important;
+  }
+
+  /* Bridge — subtle rose */
+  .section-bridge .measure,
+  .section-bridge .chord-cell,
+  [data-section="bridge"] .measure,
+  [data-section="bridge"] .chord-cell {
+    background-color: #fde8ec !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .section-bridge .chart-section-header,
+  [data-section="bridge"] .chart-section-header {
+    color: #8b1a2e !important;
+  }
+
+  /* Solo — subtle gold */
+  .section-solo .measure,
+  [data-section="solo"] .measure {
+    background-color: #fef9e3 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+
+  /* ============================================================
+     GENERAL PRINT CLEANUP
+     ============================================================ */
+
+  /* Hide anything not needed for performance */
+  .no-print,
+  .editor-toolbar,
+  .sidebar,
+  .print-preview-panel,
+  .template-switcher,
+  nav,
+  button:not(.print-keep),
+  .tooltip,
+  .modal,
+  .overlay {
+    display: none !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 10mm 12mm 10mm 12mm;
+  }
+
+  /* Avoid breaking a section across pages */
+  .chart-section,
+  .section-block {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Avoid page break right after a section header */
+  .chart-section-header,
+  .section-intro .chart-section-header,
+  .section-chorus .chart-section-header {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
 }
+/* END @media print */
 
 
 /* ============================================================
-  PRINT PREVIEW DRAWER STYLES
-============================================================ */
-#print-preview-btn {
-  position:       fixed;
-  bottom:         20px;
-  right:          20px;
-  z-index:        9000;
-  background:     #1a1a2e;
-  color:          #e8e8ff;
-  border:         1.5px solid #4a4a8a;
-  border-radius:  8px;
-  padding:        9px 16px;
-  font-size:      0.85em;
-  font-weight:    700;
-  cursor:         pointer;
-  letter-spacing: 0.04em;
-  box-shadow:     0 4px 20px rgba(0,0,0,0.35);
-  transition:     all 0.18s ease;
-}
-#print-preview-btn:hover {
-  background: #2a2a4e;
-  border-color: #7a7acc;
+   TEMPLATE CSS VARIABLES
+   Applied by print-preview.js when a template is selected.
+   These work both on-screen (preview) and at print time.
+   ============================================================ */
+
+:root {
+  --print-font-body:   'Instrument Sans', 'Noto Sans Myanmar', sans-serif;
+  --print-font-title:  'Fraunces', Georgia, serif;
+  --print-font-mono:   'IBM Plex Mono', 'Courier New', monospace;
+  --print-font-size:   9.5pt;
+  --print-line-height: 1.25;
+  --chord-circle-size: 20px;
+  --chord-circle-font: 9px;
 }
 
-#print-preview-overlay {
-  display:          flex;
-  align-items:      flex-start;
-  justify-content:  flex-end;
-  position:         fixed;
-  inset:            0;
-  background:       rgba(0, 0, 0, 0.45);
-  z-index:          9999;
-  opacity:          0;
-  pointer-events:   none;
-  transition:       opacity 0.2s ease;
-}
-#print-preview-overlay.open {
-  opacity:        1;
-  pointer-events: all;
+/* Template: Classic (default) */
+[data-print-template="classic"] {
+  --print-font-body:   'Instrument Sans', sans-serif;
+  --print-font-title:  'Fraunces', Georgia, serif;
+  --print-font-size:   9.5pt;
+  --print-line-height: 1.25;
 }
 
-#print-preview-drawer {
-  width:           360px;
-  max-width:       96vw;
-  height:          100vh;
-  background:      #15141e;
-  border-left:     1.5px solid #2e2e50;
-  display:         flex;
-  flex-direction:  column;
-  transform:       translateX(100%);
-  transition:      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow:        hidden;
-}
-#print-preview-overlay.open #print-preview-drawer {
-  transform: translateX(0);
+/* Template: Clean Sans */
+[data-print-template="clean-sans"] {
+  --print-font-body:   'Instrument Sans', Arial, sans-serif;
+  --print-font-title:  'Instrument Sans', Arial, sans-serif;
+  --print-font-size:   9pt;
+  --print-line-height: 1.2;
 }
 
-#print-preview-header {
-  display:         flex;
-  align-items:     center;
-  justify-content: space-between;
-  padding:         16px 20px 14px;
-  border-bottom:   1px solid #2e2e50;
-  background:      #1a1929;
-}
-#print-preview-header h3 {
-  margin:        0;
-  font-size:     0.95em;
-  font-weight:   800;
-  color:         #d0cfff;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-#print-preview-close {
-  background:   transparent;
-  border:       none;
-  color:        #777;
-  font-size:    1.1em;
-  cursor:       pointer;
-  padding:      4px 6px;
-  border-radius: 4px;
-  line-height:  1;
-}
-#print-preview-close:hover { color: #ccc; background: rgba(255,255,255,0.07); }
-
-#print-preview-body {
-  flex:       1;
-  overflow-y: auto;
-  padding:    16px 18px;
-  gap:        14px;
-  display:    flex;
-  flex-direction: column;
+/* Template: Mono Compact */
+[data-print-template="mono-compact"] {
+  --print-font-body:   'IBM Plex Mono', 'Courier New', monospace;
+  --print-font-title:  'IBM Plex Mono', monospace;
+  --print-font-size:   8.5pt;
+  --print-line-height: 1.15;
 }
 
-.ppv-group { display: flex; flex-direction: column; gap: 7px; }
-
-.ppv-label {
-  font-size:      0.72em;
-  font-weight:    700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color:          #8888bb;
+/* Template: Airy (more breathing room) */
+[data-print-template="airy"] {
+  --print-font-body:   'Instrument Sans', sans-serif;
+  --print-font-title:  'Fraunces', serif;
+  --print-font-size:   10pt;
+  --print-line-height: 1.4;
 }
 
-.ppv-control {
-  width:         100%;
-  background:    #1e1d2a;
-  border:        1.5px solid #333360;
-  border-radius: 6px;
-  color:         #d0cfff;
-  padding:       7px 10px;
-  font-size:     0.83em;
-  outline:       none;
-}
-.ppv-control:focus { border-color: #6666cc; }
-input[type="range"].ppv-control {
-  padding:     4px 0;
-  accent-color: #6666cc;
-  cursor:      pointer;
+/* Template: Myanmar Focus (Karen-first large text) */
+[data-print-template="myanmar-focus"] {
+  --print-font-body:   'Noto Sans Myanmar', 'Instrument Sans', sans-serif;
+  --print-font-title:  'Noto Sans Myanmar', serif;
+  --print-font-size:   10pt;
+  --print-line-height: 1.3;
 }
 
-.ppv-templates {
-  display:               grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:                   8px;
-}
-.ppv-template-btn {
-  display:        flex;
-  flex-direction: column;
-  align-items:    flex-start;
-  background:     #1e1d2a;
-  border:         1.5px solid #333360;
-  border-radius:  8px;
-  padding:        9px 10px;
-  cursor:         pointer;
-  text-align:     left;
-  transition:     all 0.15s ease;
-  gap:            2px;
-}
-.ppv-template-btn:hover { border-color: #6666cc; background: #222240; }
-.ppv-template-btn.is-active {
-  border-color: #8888ff;
-  background:   #252455;
-  box-shadow:   0 0 0 1px #6666cc;
-}
-.ppv-template-name {
-  font-size:   0.82em;
-  font-weight: 700;
-  color:       #d0cfff;
-}
-.ppv-template-desc {
-  font-size: 0.68em;
-  color:     #6666aa;
-  line-height: 1.3;
+/* Apply font variables to the print area */
+.print-area,
+#print-area,
+.chart-print-wrapper {
+  font-family: var(--print-font-body) !important;
+  font-size:   var(--print-font-size) !important;
+  line-height: var(--print-line-height) !important;
 }
 
-#print-preview-footer {
-  display:         flex;
-  gap:             10px;
-  padding:         14px 18px;
-  border-top:      1px solid #2e2e50;
-  background:      #1a1929;
-}
-#print-preview-footer button {
-  flex:          1;
-  padding:       8px 0;
-  border-radius: 6px;
-  font-size:     0.83em;
-  font-weight:   700;
-  cursor:        pointer;
-  letter-spacing: 0.04em;
-  transition:    all 0.15s ease;
-  border:        1.5px solid transparent;
-}
-#ppv-reset-btn {
-  background:   transparent;
-  border-color: #444466;
-  color:        #8888bb;
-}
-#ppv-reset-btn:hover { border-color: #8888bb; color: #d0cfff; }
-#ppv-apply-btn {
-  background:  #4040a8;
-  border-color: #5555cc;
-  color:        #e8e8ff;
-}
-#ppv-apply-btn:hover { background: #5050c8; }
-
-
-/* ============================================================
-  POSITION TRACKER STUB BUTTON
-============================================================ */
-#position-tracker-stub {
-  display:        inline-flex;
-  align-items:    center;
-  gap:            6px;
-  background:     #1e1e1e;
-  border:         1.5px dashed #444;
-  border-radius:  6px;
-  color:          #666;
-  font-size:      0.78em;
-  font-weight:    600;
-  letter-spacing: 0.05em;
-  padding:        6px 12px;
-  cursor:         not-allowed;
-  opacity:        0.6;
-}
-#position-tracker-stub::before {
-  content: "\25CF";
-  font-size: 0.5em;
-  color: #555;
+.print-title-karen,
+.song-title-karen-print {
+  font-family: var(--print-font-title) !important;
 }

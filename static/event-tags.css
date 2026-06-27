@@ -1,392 +1,291 @@
 /*
-  ============================================================
-  KAREN MUSIC WEBSITE — EVENT / HOLIDAY TAG SYSTEM
-  Pure CSS — no logic changes.
-  ============================================================
+  event-tags.css
+  Karen Music Director — Section Color Coding & Event Tag Styles
+  ---------------------------------------------------------------
+  Screen styles for section labels / event tags used in the editor.
+  Print color-coding is handled in print-overrides.css §5.
 */
 
 /* ============================================================
-  TAG PALETTE
-  Each tag gets a --tag-* color pair (bg + text).
-  All colors are pastel-safe for printing.
-============================================================ */
-:root {
-  /* —— Holiday tags —— */
-  --tag-christmas-bg:      #fde8e8;
-  --tag-christmas-text:    #b91c1c;
-  --tag-christmas-border:  #f87171;
+   SECTION TAG PILLS  (screen view)
+   ============================================================ */
 
-  --tag-easter-bg:         #f0fdf4;
-  --tag-easter-text:       #15803d;
-  --tag-easter-border:     #4ade80;
-
-  --tag-newyear-bg:        #fef9c3;
-  --tag-newyear-text:      #a16207;
-  --tag-newyear-border:    #facc15;
-
-  --tag-thanksgiving-bg:   #fff7ed;
-  --tag-thanksgiving-text: #c2410c;
-  --tag-thanksgiving-border:#fb923c;
-
-  --tag-karennewyrear-bg:  #f5f3ff;
-  --tag-karennewyrear-text:#6d28d9;
-  --tag-karennewyrear-border:#a78bfa;
-
-  /* —— Special event tags —— */
-  --tag-communion-bg:      #fff1f2;
-  --tag-communion-text:    #be123c;
-  --tag-communion-border:  #fb7185;
-
-  --tag-baptism-bg:        #eff6ff;
-  --tag-baptism-text:      #1d4ed8;
-  --tag-baptism-border:    #60a5fa;
-
-  --tag-wedding-bg:        #fdf4ff;
-  --tag-wedding-text:      #7e22ce;
-  --tag-wedding-border:    #c084fc;
-
-  --tag-funeral-bg:        #f8fafc;
-  --tag-funeral-text:      #475569;
-  --tag-funeral-border:    #94a3b8;
-
-  --tag-dedication-bg:     #ecfeff;
-  --tag-dedication-text:   #0e7490;
-  --tag-dedication-border: #22d3ee;
-
-  --tag-revival-bg:        #fff7ed;
-  --tag-revival-text:      #ea580c;
-  --tag-revival-border:    #fb923c;
-
-  --tag-youth-bg:          #f0fdf4;
-  --tag-youth-text:        #166534;
-  --tag-youth-border:      #86efac;
-
-  --tag-general-bg:        #f1f5f9;
-  --tag-general-text:      #334155;
-  --tag-general-border:    #94a3b8;
-}
-
-/* ============================================================
-  BASE PILL STYLE
-============================================================ */
+.section-tag,
 .event-tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 9px 2px 7px;
+  padding: 2px 8px;
   border-radius: 999px;
-  border: 1px solid var(--tag-general-border);
-  background: var(--tag-general-bg);
-  color: var(--tag-general-text);
-  font-family: var(--font-ui, "Instrument Sans", sans-serif);
-  font-size: 10.5px;
+  font-size: 0.72em;
   font-weight: 700;
   letter-spacing: 0.04em;
-  line-height: 1;
+  text-transform: uppercase;
   white-space: nowrap;
   cursor: default;
   user-select: none;
-  transition: opacity 0.15s, transform 0.12s;
+  line-height: 1.6;
 }
 
-.event-tag .tag-icon {
-  font-size: 11px;
-  line-height: 1;
-  flex-shrink: 0;
+/* Intro */
+.tag-intro,
+.section-tag[data-section="intro"] {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
 }
 
-/* Removable tag (x button inside) */
-.event-tag .tag-remove {
-  display: inline-flex;
+/* Verse */
+.tag-verse,
+.section-tag[data-section="verse"] {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+/* Pre-Chorus */
+.tag-prechorus,
+.tag-pre-chorus,
+.section-tag[data-section="prechorus"],
+.section-tag[data-section="pre-chorus"] {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+/* Chorus */
+.tag-chorus,
+.section-tag[data-section="chorus"] {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+/* Bridge */
+.tag-bridge,
+.section-tag[data-section="bridge"] {
+  background: #fce7f3;
+  color: #831843;
+  border: 1px solid #fbcfe8;
+}
+
+/* Solo */
+.tag-solo,
+.section-tag[data-section="solo"] {
+  background: #fef9c3;
+  color: #713f12;
+  border: 1px solid #fef08a;
+}
+
+/* Ending / Outro */
+.tag-ending,
+.tag-outro,
+.section-tag[data-section="ending"],
+.section-tag[data-section="outro"] {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+
+/* ============================================================
+   SECTION BLOCK WRAPPERS  (editor rows tinted by section)
+   Applied by event-tags.js — keeps editor readable at a glance
+   ============================================================ */
+
+.section-intro    { border-left: 3px solid #3b82f6; }
+.section-verse    { border-left: 3px solid #f59e0b; }
+.section-prechorus,
+.section-pre-chorus { border-left: 3px solid #8b5cf6; }
+.section-chorus   { border-left: 3px solid #10b981; }
+.section-bridge   { border-left: 3px solid #ec4899; }
+.section-solo     { border-left: 3px solid #eab308; }
+.section-ending,
+.section-outro    { border-left: 3px solid #0ea5e9; }
+
+
+/* ============================================================
+   POSITION / SECTION TRACKER BADGE  (screen only)
+   Shows current section name while scrolling the chart
+   ============================================================ */
+
+#section-position-tracker {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 9999;
+  display: none;         /* shown by JS when chart is open */
   align-items: center;
-  justify-content: center;
-  width: 13px;
-  height: 13px;
-  margin-left: 2px;
+  gap: 6px;
+  padding: 5px 12px;
   border-radius: 999px;
-  border: none;
-  background: rgba(0,0,0,0.12);
-  color: inherit;
-  font-size: 8px;
-  font-weight: 900;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
-  box-shadow: none;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+#section-position-tracker.hidden {
+  opacity: 0;
+}
+
+#section-position-tracker .tracker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
   flex-shrink: 0;
-  opacity: 0.7;
-  transition: opacity 0.12s, background 0.12s;
 }
 
-.event-tag .tag-remove:hover {
-  opacity: 1;
-  background: rgba(0,0,0,0.22);
-}
 
 /* ============================================================
-  PER-TAG COLOR VARIANTS
-============================================================ */
-.event-tag[data-tag="christmas"]     { background: var(--tag-christmas-bg);     color: var(--tag-christmas-text);     border-color: var(--tag-christmas-border); }
-.event-tag[data-tag="easter"]        { background: var(--tag-easter-bg);        color: var(--tag-easter-text);        border-color: var(--tag-easter-border); }
-.event-tag[data-tag="newyear"]       { background: var(--tag-newyear-bg);       color: var(--tag-newyear-text);       border-color: var(--tag-newyear-border); }
-.event-tag[data-tag="thanksgiving"]  { background: var(--tag-thanksgiving-bg);  color: var(--tag-thanksgiving-text);  border-color: var(--tag-thanksgiving-border); }
-.event-tag[data-tag="karennewyr"]    { background: var(--tag-karennewyrear-bg); color: var(--tag-karennewyrear-text); border-color: var(--tag-karennewyrear-border); }
-.event-tag[data-tag="communion"]     { background: var(--tag-communion-bg);     color: var(--tag-communion-text);     border-color: var(--tag-communion-border); }
-.event-tag[data-tag="baptism"]       { background: var(--tag-baptism-bg);       color: var(--tag-baptism-text);       border-color: var(--tag-baptism-border); }
-.event-tag[data-tag="wedding"]       { background: var(--tag-wedding-bg);       color: var(--tag-wedding-text);       border-color: var(--tag-wedding-border); }
-.event-tag[data-tag="funeral"]       { background: var(--tag-funeral-bg);       color: var(--tag-funeral-text);       border-color: var(--tag-funeral-border); }
-.event-tag[data-tag="dedication"]    { background: var(--tag-dedication-bg);    color: var(--tag-dedication-text);    border-color: var(--tag-dedication-border); }
-.event-tag[data-tag="revival"]       { background: var(--tag-revival-bg);       color: var(--tag-revival-text);       border-color: var(--tag-revival-border); }
-.event-tag[data-tag="youth"]         { background: var(--tag-youth-bg);         color: var(--tag-youth-text);         border-color: var(--tag-youth-border); }
+   PRINT TEMPLATE SWITCHER PANEL  (screen only, no-print)
+   ============================================================ */
 
-/* ============================================================
-  TAG CLUSTER (row of pills on a song item)
-============================================================ */
-.tag-cluster {
+.print-template-panel {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 4px;
-  min-height: 0;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  min-width: 200px;
 }
 
-/* ============================================================
-  TAG PICKER DROPDOWN
-  Appears when clicking “Add tag” button.
-============================================================ */
-.tag-picker {
-  position: absolute;
-  z-index: 600;
-  background: #1a1a1a;
-  border: 1px solid #3a3a3a;
-  border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 12px 36px rgba(0,0,0,0.72);
-  display: none;
+.print-template-panel h4 {
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+  margin: 0 0 4px;
+}
+
+.template-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #2a2a2a;
+  color: #ccc;
+  font-size: 0.82em;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+
+.template-option:hover {
+  border-color: #bb86fc;
+  color: #fff;
+  background: #333;
+}
+
+.template-option.active {
+  border-color: #bb86fc;
+  background: rgba(187, 134, 252, 0.12);
+  color: #bb86fc;
+  font-weight: 700;
+}
+
+.template-option .template-thumb {
+  width: 28px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid #444;
+  background: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 200px;
-  max-height: 300px;
+  gap: 2px;
+  padding: 3px;
+}
+
+.template-thumb .t-line {
+  height: 2px;
+  border-radius: 1px;
+  background: #555;
+}
+
+.template-thumb .t-line:first-child {
+  background: #222;
+  width: 80%;
+}
+
+.template-thumb .t-line:nth-child(2) { width: 60%; }
+.template-thumb .t-line:nth-child(3) { width: 75%; }
+
+
+/* ============================================================
+   PRINT PREVIEW OVERLAY  (screen only)
+   ============================================================ */
+
+#print-preview-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
   overflow-y: auto;
 }
 
-.tag-picker.open {
+#print-preview-overlay.open {
   display: flex;
 }
 
-.tag-picker-section-label {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #666;
-  padding: 4px 4px 2px;
-  margin-top: 4px;
+#print-preview-inner {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  width: 210mm;       /* A4 width */
+  min-height: 297mm;
+  padding: 10mm 12mm;
+  position: relative;
+  color: #000;
+  font-size: 9.5pt;
+  line-height: 1.25;
 }
 
-.tag-picker-section-label:first-child {
-  margin-top: 0;
-}
-
-.tag-picker-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  padding: 2px 2px;
-}
-
-.tag-picker-option {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  border: 1px solid #555;
-  background: #262626;
-  color: #ccc;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-  margin: 0;
-  box-shadow: none;
-}
-
-.tag-picker-option:hover {
-  background: #333;
-  border-color: #999;
-  color: #fff;
-}
-
-.tag-picker-option.is-applied {
-  opacity: 0.45;
-  cursor: default;
-}
-
-/* ============================================================
-  ADD TAG BUTTON (small, inline with tag cluster)
-============================================================ */
-.tag-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px dashed rgba(187,134,252,0.45);
-  background: transparent;
-  color: rgba(187,134,252,0.7);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  box-shadow: none;
-  transition: border-color 0.12s, color 0.12s, background 0.12s;
-  margin: 0;
-}
-
-.tag-add-btn:hover {
-  border-color: var(--accent, #bb86fc);
-  color: var(--accent, #bb86fc);
-  background: rgba(187,134,252,0.08);
-}
-
-/* ============================================================
-  FILTER BAR — shown above the song list in the sidebar
-============================================================ */
-#event-filter-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-#event-filter-bar .filter-bar-label {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-muted, #888);
-}
-
-#event-filter-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.filter-tag-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  border: 1px solid #3a3a3a;
-  background: #1e1e1e;
-  color: #999;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  cursor: pointer;
-  box-shadow: none;
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-  margin: 0;
-}
-
-.filter-tag-btn:hover {
-  background: #2a2a2a;
-  border-color: #666;
-  color: #ddd;
-}
-
-.filter-tag-btn.is-active {
-  background: var(--accent-dim, rgba(187,134,252,0.15));
-  border-color: var(--accent, #bb86fc);
-  color: #fff;
-}
-
-/* "Clear filters" link */
-#filter-clear-btn {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted, #888);
-  background: none;
+#preview-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #eee;
   border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1em;
   cursor: pointer;
-  padding: 0 2px;
-  box-shadow: none;
-  text-decoration: underline;
-  margin: 0;
-  align-self: flex-start;
-}
-
-#filter-clear-btn:hover {
-  color: var(--text, #e0e0e0);
-}
-
-/* Song items hidden by filter */
-.song-item.tag-filtered-out {
-  display: none !important;
-}
-
-/* ============================================================
-  SECTION TAG — small pill shown inside a section header
-============================================================ */
-.section-tag-cluster {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 3px;
-  margin-left: 6px;
-}
-
-.section-event-tag {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 2px;
-  padding: 1px 6px;
-  border-radius: 999px;
-  border: 1px solid #ccc;
-  background: #f5f5f5;
-  color: #555;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  line-height: 1.2;
+  justify-content: center;
+  color: #333;
 }
 
-/* ============================================================
-  PRINT — tags show as subtle pills on the chart
-============================================================ */
+#preview-close-btn:hover {
+  background: #ddd;
+}
+
 @media print {
-  .tag-add-btn,
-  .tag-remove,
-  .tag-picker,
-  #event-filter-bar {
+  .print-template-panel,
+  #print-preview-overlay,
+  #section-position-tracker,
+  .template-switcher {
     display: none !important;
   }
-
-  .event-tag {
-    font-size: 8px;
-    padding: 1px 6px;
-    border-width: 1px;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  .tag-cluster {
-    margin-top: 2px;
-    gap: 3px;
-  }
-}
-
-/* ============================================================
-  SONG ITEM — ensure tag cluster inside list items looks right
-============================================================ */
-.song-item .tag-cluster {
-  margin-top: 3px;
-}
-
-.song-item .event-tag {
-  font-size: 9.5px;
-  padding: 1px 7px 1px 5px;
 }

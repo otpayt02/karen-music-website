@@ -1,322 +1,227 @@
-/*
-  ============================================================
-  KAREN MUSIC WEBSITE — EVENT / HOLIDAY TAG SYSTEM
-  Adds tag picker, filter bar, and section tag support.
-  No application logic, DB schema, or data flow is changed.
-  Tags are stored in localStorage keyed by song id.
-  ============================================================
-*/
+/**
+ * event-tags.js
+ * Karen Music Director — Section Position Tracker & Color Coding
+ * --------------------------------------------------------------
+ * Spec §5: Adds data-section attributes to chart section blocks
+ * so CSS in print-overrides.css can apply color coding.
+ * Also drives the on-screen section tracker badge (§5.2).
+ *
+ * Does NOT change any chord logic, editor state, or save/load.
+ */
 
 (function () {
   'use strict';
 
-  /* ───────────────────────────────────────
-    TAG REGISTRY
-    Each tag: { id, label, icon, group }
-  ─────────────────────────────────────── */
-  const TAG_REGISTRY = [
-    /* Holidays */
-    { id: 'christmas',    label: 'Christmas',       icon: '🎄', group: 'Holidays' },
-    { id: 'easter',       label: 'Easter',          icon: '✝️',  group: 'Holidays' },
-    { id: 'newyear',      label: 'New Year',        icon: '🎆', group: 'Holidays' },
-    { id: 'thanksgiving', label: 'Thanksgiving',    icon: '🥎', group: 'Holidays' },
-    { id: 'karennewyr',   label: 'Karen New Year',  icon: '🌺', group: 'Holidays' },
-    /* Special Events */
-    { id: 'communion',    label: 'Communion',       icon: '🍞', group: 'Special Events' },
-    { id: 'baptism',      label: 'Baptism',         icon: '💧', group: 'Special Events' },
-    { id: 'wedding',      label: 'Wedding',         icon: '💍', group: 'Special Events' },
-    { id: 'funeral',      label: 'Funeral',         icon: '🕊️',  group: 'Special Events' },
-    { id: 'dedication',   label: 'Dedication',      icon: '📖', group: 'Special Events' },
-    { id: 'revival',      label: 'Revival',         icon: '🔥', group: 'Special Events' },
-    { id: 'youth',        label: 'Youth',           icon: '🌟', group: 'Special Events' },
-  ];
+  /* ----------------------------------------------------------
+     SECTION NAME → CSS slug mapping
+     Normalizes any label variation to a consistent slug.
+  ---------------------------------------------------------- */
+  const SECTION_SLUGS = {
+    'intro':       'intro',
+    'introduction':'intro',
+    'verse':       'verse',
+    'v':           'verse',
+    'pre-chorus':  'pre-chorus',
+    'prechorus':   'pre-chorus',
+    'pre chorus':  'pre-chorus',
+    'chorus':      'chorus',
+    'ch':          'chorus',
+    'refrain':     'chorus',
+    'bridge':      'bridge',
+    'br':          'bridge',
+    'solo':        'solo',
+    'interlude':   'solo',
+    'ending':      'ending',
+    'outro':       'ending',
+    'tag':         'ending',
+    'coda':        'ending',
+  };
 
-  const TAG_GROUPS = [...new Set(TAG_REGISTRY.map(t => t.group))];
+  const SECTION_COLORS = {
+    'intro':      '#3b82f6',
+    'verse':      '#f59e0b',
+    'pre-chorus': '#8b5cf6',
+    'chorus':     '#10b981',
+    'bridge':     '#ec4899',
+    'solo':       '#eab308',
+    'ending':     '#0ea5e9',
+  };
 
-  /* -------------------------------------------------------
-    STORAGE helpers (keyed by song id from data-song-id)
-  ------------------------------------------------------- */
-  function storageKey(songId) {
-    return `evt_tags_song_${songId}`;
+  function slugify(label) {
+    if (!label) return '';
+    const clean = label.toLowerCase().replace(/[^a-z\-\s]/g, '').trim();
+    return SECTION_SLUGS[clean] || clean.replace(/\s+/g, '-');
   }
 
-  function getTagsForSong(songId) {
-    try {
-      return JSON.parse(localStorage.getItem(storageKey(songId)) || '[]');
-    } catch (_) { return []; }
-  }
+  /* ----------------------------------------------------------
+     TAG SECTION BLOCKS
+     Finds section header elements, reads their label, and:
+     1. Sets data-section on the parent block
+     2. Adds section-{slug} class to parent block
+     3. Injects a colour-coded .section-tag pill beside the label
+  ---------------------------------------------------------- */
+  function tagSectionBlocks() {
+    const headerSelectors = [
+      '.chart-section-header',
+      '.section-header',
+      '.section-label',
+      '.row-section-label',
+      '[data-role="section-header"]',
+    ];
 
-  function saveTagsForSong(songId, tags) {
-    try {
-      localStorage.setItem(storageKey(songId), JSON.stringify([...new Set(tags)]));
-    } catch (_) {}
-  }
+    const headers = document.querySelectorAll(headerSelectors.join(','));
 
-  function addTagToSong(songId, tagId) {
-    const current = getTagsForSong(songId);
-    if (!current.includes(tagId)) {
-      saveTagsForSong(songId, [...current, tagId]);
-    }
-  }
+    headers.forEach(header => {
+      const rawLabel = (header.dataset.section || header.textContent || '').trim();
+      const slug = slugify(rawLabel);
+      if (!slug) return;
 
-  function removeTagFromSong(songId, tagId) {
-    saveTagsForSong(songId, getTagsForSong(songId).filter(t => t !== tagId));
-  }
+      // Find the parent section block
+      const block = (
+        header.closest('.chart-section') ||
+        header.closest('.section-block') ||
+        header.closest('.section-row') ||
+        header.parentElement
+      );
 
-  /* -------------------------------------------------------
-    BUILD a pill element
-  ------------------------------------------------------- */
-  function buildPill(tagId, removable, onRemove) {
-    const def = TAG_REGISTRY.find(t => t.id === tagId);
-    if (!def) return null;
-    const pill = document.createElement('span');
-    pill.className = 'event-tag';
-    pill.dataset.tag = tagId;
-    pill.innerHTML = `<span class="tag-icon">${def.icon}</span>${def.label}`;
-    if (removable) {
-      const rm = document.createElement('button');
-      rm.className = 'tag-remove';
-      rm.setAttribute('title', 'Remove tag');
-      rm.setAttribute('aria-label', `Remove ${def.label} tag`);
-      rm.textContent = '×';
-      rm.addEventListener('click', e => {
-        e.stopPropagation();
-        onRemove(tagId);
-      });
-      pill.appendChild(rm);
-    }
-    return pill;
-  }
-
-  /* -------------------------------------------------------
-    RENDER tags into a .tag-cluster element
-  ------------------------------------------------------- */
-  function renderTagCluster(clusterEl, songId) {
-    clusterEl.innerHTML = '';
-    const tags = getTagsForSong(songId);
-    tags.forEach(tagId => {
-      const pill = buildPill(tagId, true, (id) => {
-        removeTagFromSong(songId, id);
-        renderTagCluster(clusterEl, songId);
-        refreshFilterBar();
-        applyFilters();
-      });
-      if (pill) clusterEl.appendChild(pill);
-    });
-    /* Add-tag button */
-    const addBtn = document.createElement('button');
-    addBtn.className = 'tag-add-btn';
-    addBtn.setAttribute('title', 'Add event / holiday tag');
-    addBtn.innerHTML = '+ Tag';
-    addBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      openTagPicker(addBtn, songId, clusterEl);
-    });
-    clusterEl.appendChild(addBtn);
-  }
-
-  /* -------------------------------------------------------
-    TAG PICKER
-  ------------------------------------------------------- */
-  let _activePicker = null;
-
-  function closeActivePicker() {
-    if (_activePicker) {
-      _activePicker.remove();
-      _activePicker = null;
-    }
-  }
-
-  document.addEventListener('click', e => {
-    if (_activePicker && !_activePicker.contains(e.target)) {
-      closeActivePicker();
-    }
-  });
-
-  function openTagPicker(anchorBtn, songId, clusterEl) {
-    closeActivePicker();
-    const picker = document.createElement('div');
-    picker.className = 'tag-picker open';
-    _activePicker = picker;
-
-    const applied = getTagsForSong(songId);
-
-    TAG_GROUPS.forEach(group => {
-      const groupLabel = document.createElement('div');
-      groupLabel.className = 'tag-picker-section-label';
-      groupLabel.textContent = group;
-      picker.appendChild(groupLabel);
-
-      const row = document.createElement('div');
-      row.className = 'tag-picker-row';
-
-      TAG_REGISTRY.filter(t => t.group === group).forEach(def => {
-        const opt = document.createElement('button');
-        opt.className = 'tag-picker-option' + (applied.includes(def.id) ? ' is-applied' : '');
-        opt.dataset.tag = def.id;
-        opt.innerHTML = `${def.icon} ${def.label}`;
-        if (!applied.includes(def.id)) {
-          opt.addEventListener('click', e => {
-            e.stopPropagation();
-            addTagToSong(songId, def.id);
-            closeActivePicker();
-            renderTagCluster(clusterEl, songId);
-            refreshFilterBar();
-            applyFilters();
-          });
+      if (block) {
+        block.setAttribute('data-section', slug);
+        // Remove any previously set section-* classes, then add new one
+        block.className = block.className
+          .split(' ')
+          .filter(c => !c.startsWith('section-'))
+          .join(' ');
+        block.classList.add(`section-${slug.replace('-', '')}`);
+        // Also keep hyphenated version for pre-chorus
+        if (slug.includes('-')) {
+          block.classList.add(`section-${slug}`);
         }
-        row.appendChild(opt);
-      });
-      picker.appendChild(row);
-    });
-
-    /* Position below the anchor button */
-    anchorBtn.style.position = 'relative';
-    anchorBtn.appendChild(picker);
-  }
-
-  /* -------------------------------------------------------
-    FILTER STATE
-  ------------------------------------------------------- */
-  let _activeFilters = new Set();
-
-  function applyFilters() {
-    document.querySelectorAll('.song-item[data-song-id]').forEach(item => {
-      if (_activeFilters.size === 0) {
-        item.classList.remove('tag-filtered-out');
-        return;
       }
-      const tags = getTagsForSong(item.dataset.songId);
-      const matches = [..._activeFilters].every(f => tags.includes(f));
-      item.classList.toggle('tag-filtered-out', !matches);
+
+      // Inject tag pill if not already present
+      if (!header.querySelector('.section-tag')) {
+        const tag = document.createElement('span');
+        tag.className = `section-tag tag-${slug.replace('-', '')} tag-${slug}`;
+        tag.dataset.section = slug;
+        tag.textContent = rawLabel;
+        tag.style.cssText = [
+          `background:${hexToAlpha(SECTION_COLORS[slug] || '#888', 0.15)}`,
+          `color:${SECTION_COLORS[slug] || '#555'}`,
+          `border:1px solid ${hexToAlpha(SECTION_COLORS[slug] || '#888', 0.35)}`,
+        ].join(';');
+        // Insert at beginning of header
+        header.insertBefore(tag, header.firstChild);
+      }
     });
   }
 
-  /* -------------------------------------------------------
-    FILTER BAR — injected above the song list
-  ------------------------------------------------------- */
-  function buildFilterBar() {
-    if (document.getElementById('event-filter-bar')) return;
-
-    /* Find the song list container */
-    const songList =
-      document.getElementById('song-list') ||
-      document.querySelector('.song-list') ||
-      document.querySelector('#sidebar .song-item')?.parentElement;
-
-    if (!songList) return;
-
-    const bar = document.createElement('div');
-    bar.id = 'event-filter-bar';
-    bar.innerHTML = `
-      <div class="filter-bar-label">Filter by Tag</div>
-      <div id="event-filter-tags"></div>
-      <button id="filter-clear-btn" style="display:none">Clear filters</button>
-    `;
-    songList.parentElement.insertBefore(bar, songList);
-
-    document.getElementById('filter-clear-btn').addEventListener('click', () => {
-      _activeFilters.clear();
-      refreshFilterBar();
-      applyFilters();
-    });
-
-    refreshFilterBar();
+  /* Simple hex → rgba helper */
+  function hexToAlpha(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
   }
 
-  function refreshFilterBar() {
-    const container = document.getElementById('event-filter-tags');
-    if (!container) return;
-    container.innerHTML = '';
+  /* ----------------------------------------------------------
+     SECTION POSITION TRACKER
+     A fixed badge that shows the current section name as the
+     musician scrolls through the chart on screen.
+  ---------------------------------------------------------- */
+  let trackerEl = null;
+  let trackerTimeout = null;
 
-    /* Collect all tags currently in use across all songs */
-    const usedTagIds = new Set();
-    document.querySelectorAll('.song-item[data-song-id]').forEach(item => {
-      getTagsForSong(item.dataset.songId).forEach(t => usedTagIds.add(t));
-    });
-
-    if (usedTagIds.size === 0) {
-      container.innerHTML = '<span style="font-size:10px;color:#555;font-style:italic">No tags yet</span>';
-      const clearBtn = document.getElementById('filter-clear-btn');
-      if (clearBtn) clearBtn.style.display = 'none';
+  function buildTracker() {
+    if (document.getElementById('section-position-tracker')) {
+      trackerEl = document.getElementById('section-position-tracker');
       return;
     }
+    trackerEl = document.createElement('div');
+    trackerEl.id = 'section-position-tracker';
+    trackerEl.setAttribute('aria-live', 'polite');
+    trackerEl.setAttribute('aria-atomic', 'true');
+    trackerEl.innerHTML = '<span class="tracker-dot"></span><span class="tracker-label"></span>';
+    document.body.appendChild(trackerEl);
+  }
 
-    TAG_REGISTRY.filter(t => usedTagIds.has(t.id)).forEach(def => {
-      const btn = document.createElement('button');
-      btn.className = 'filter-tag-btn' + (_activeFilters.has(def.id) ? ' is-active' : '');
-      btn.dataset.filterTag = def.id;
-      btn.innerHTML = `${def.icon} ${def.label}`;
-      btn.addEventListener('click', () => {
-        if (_activeFilters.has(def.id)) {
-          _activeFilters.delete(def.id);
-        } else {
-          _activeFilters.add(def.id);
-        }
-        refreshFilterBar();
-        applyFilters();
+  function showTracker(sectionSlug, labelText) {
+    if (!trackerEl) return;
+    const dot   = trackerEl.querySelector('.tracker-dot');
+    const label = trackerEl.querySelector('.tracker-label');
+    if (label)  label.textContent = labelText || sectionSlug;
+    if (dot)    dot.style.color   = SECTION_COLORS[sectionSlug] || '#fff';
+    trackerEl.style.display = 'flex';
+    trackerEl.classList.remove('hidden');
+
+    clearTimeout(trackerTimeout);
+    trackerTimeout = setTimeout(() => {
+      if (trackerEl) trackerEl.classList.add('hidden');
+    }, 2200);
+  }
+
+  /* Intersection Observer: watch section headers scroll into view */
+  function initTracker() {
+    buildTracker();
+
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -60% 0px',  // fires when header is near top of viewport
+      threshold: 0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const header = entry.target;
+        const rawLabel = (header.dataset.section || header.textContent || '').trim();
+        const slug = slugify(rawLabel);
+        if (slug) showTracker(slug, rawLabel);
       });
-      container.appendChild(btn);
+    }, observerOptions);
+
+    const sectionHeaders = document.querySelectorAll(
+      '.chart-section-header, .section-header, .section-label, [data-role="section-header"]'
+    );
+    sectionHeaders.forEach(el => observer.observe(el));
+  }
+
+  /* ----------------------------------------------------------
+     MUTATION OBSERVER
+     Re-tags when the chart is re-rendered (song load / key change)
+  ---------------------------------------------------------- */
+  function watchForChartChanges() {
+    const target = (
+      document.querySelector('.print-area') ||
+      document.getElementById('print-area') ||
+      document.querySelector('.chart-print-wrapper') ||
+      document.querySelector('.chart-container') ||
+      document.body
+    );
+
+    const mo = new MutationObserver(() => {
+      tagSectionBlocks();
+      initTracker();
     });
 
-    const clearBtn = document.getElementById('filter-clear-btn');
-    if (clearBtn) {
-      clearBtn.style.display = _activeFilters.size > 0 ? 'inline-block' : 'none';
-    }
+    mo.observe(target, { childList: true, subtree: true });
   }
 
-  /* -------------------------------------------------------
-    INJECT tag clusters into every .song-item
-  ------------------------------------------------------- */
-  function decorateSongItems() {
-    document.querySelectorAll('.song-item').forEach(item => {
-      /* Assign a stable ID if missing: use index or existing data attr */
-      if (!item.dataset.songId) {
-        /* Try to read an existing id attribute */
-        const candidate =
-          item.dataset.id ||
-          item.getAttribute('data-id') ||
-          item.id ||
-          null;
-        if (candidate) {
-          item.dataset.songId = candidate;
-        } else {
-          /* Fallback: use text content hash */
-          item.dataset.songId = 'song_' + btoa(encodeURIComponent((item.textContent || '').trim().slice(0, 40))).replace(/=/g, '').slice(0, 16);
-        }
-      }
-
-      if (item.querySelector('.tag-cluster')) return; /* already decorated */
-
-      const cluster = document.createElement('div');
-      cluster.className = 'tag-cluster';
-      item.appendChild(cluster);
-      renderTagCluster(cluster, item.dataset.songId);
-    });
-  }
-
-  /* -------------------------------------------------------
-    OBSERVE for dynamically added song items (song list loads async)
-  ------------------------------------------------------- */
-  const _songObserver = new MutationObserver(() => {
-    decorateSongItems();
-    buildFilterBar();
-    refreshFilterBar();
-    applyFilters();
-  });
-
-  function startObserving() {
-    const sidebar = document.getElementById('sidebar') || document.body;
-    _songObserver.observe(sidebar, { childList: true, subtree: true });
-  }
-
-  /* -------------------------------------------------------
-    INIT
-  ------------------------------------------------------- */
+  /* ----------------------------------------------------------
+     INIT
+  ---------------------------------------------------------- */
   function init() {
-    decorateSongItems();
-    buildFilterBar();
-    startObserving();
+    tagSectionBlocks();
+    initTracker();
+    watchForChartChanges();
+
+    // Also re-run on custom song-loaded events
+    const events = ['song-loaded', 'songLoaded', 'chart-rendered', 'printReady'];
+    events.forEach(evt => {
+      document.addEventListener(evt, () => {
+        tagSectionBlocks();
+        initTracker();
+      });
+    });
   }
 
   if (document.readyState === 'loading') {
@@ -325,4 +230,15 @@
     init();
   }
 
-})();
+  /* ----------------------------------------------------------
+     PUBLIC API  (window.EventTags)
+  ---------------------------------------------------------- */
+  window.EventTags = {
+    tagSectionBlocks,
+    slugify,
+    showTracker,
+    getSectionColors: () => ({ ...SECTION_COLORS }),
+    getSectionSlugs:  () => ({ ...SECTION_SLUGS }),
+  };
+
+}());
