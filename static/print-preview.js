@@ -485,30 +485,111 @@
      MOVE BPM TO FOOTER  (for legacy print markup that doesn't
      use the pp-* classes)
   ────────────────────────────────────────────────────────── */
+  function normalizeBpmText(value) {
+    const text = String(value || '').trim();
+    if (!text) return '';
+    return /bpm/i.test(text) ? text : `${text} BPM`;
+  }
+
+  function getLegacyPrintSheets() {
+    return Array.from(document.querySelectorAll('#print-batch .chart-container, #chart-container'))
+      .filter((sheet, index, all) => all.indexOf(sheet) === index);
+  }
+
+  function setTextIfDifferent(el, text) {
+    if (!el || !text) return;
+    if (el.textContent.trim() !== text) el.textContent = text;
+  }
+
+  function applySpecToLegacySheet(sheet) {
+    const song = getSongData();
+    const karenTitle = song.titleKaren || '';
+    const englishTitle = song.titleEnglish ? `(${song.titleEnglish})` : '';
+    const tempo = normalizeBpmText(song.tempo);
+    const rightFooter = [song.category, song.instruments].filter(Boolean).join(' · ');
+
+    const karenEl = sheet.querySelector('#ph-title-karen, .print-title-karen, .song-title-karen-print');
+    const englishEl = sheet.querySelector('#ph-title-english, .print-title-english, .song-title-english-print, .print-title, .song-print-title');
+    setTextIfDifferent(karenEl, karenTitle);
+    setTextIfDifferent(englishEl, englishTitle);
+    karenEl?.classList.add('print-spec-title-karen');
+    englishEl?.classList.add('print-spec-title-english');
+
+    const styleEl = sheet.querySelector('#ph-style-english, .print-style, .song-print-style');
+    if (styleEl) {
+      styleEl.classList.add('print-spec-style');
+      if (song.style) setTextIfDifferent(styleEl, song.style);
+    }
+
+    const headerTempo = sheet.querySelector('.paper-head-tempo, .header-bpm, .header-tempo, .print-bpm-header, .print-tempo-header');
+    headerTempo?.classList.add('print-spec-header-tempo');
+
+    const footer = sheet.querySelector('.paper-footer, .print-footer, #print-footer, .song-print-footer');
+    if (footer) {
+      let left = footer.querySelector('#ph-footer-left, .footer-bpm, .print-bpm-footer, .print-tempo-footer');
+      if (!left) {
+        left = document.createElement('span');
+        left.id = 'ph-footer-left';
+        left.className = 'footer-bpm print-bpm-footer';
+        footer.prepend(left);
+      }
+      setTextIfDifferent(left, tempo);
+
+      let right = footer.querySelector('#ph-footer-right, .footer-category, .print-category-footer');
+      if (!right) {
+        right = document.createElement('span');
+        right.id = 'ph-footer-right';
+        right.className = 'footer-category print-category-footer';
+        footer.appendChild(right);
+      }
+      setTextIfDifferent(right, rightFooter);
+    }
+  }
+
+  function applyPrintSpecToLegacySheets() {
+    getLegacyPrintSheets().forEach(applySpecToLegacySheet);
+  }
+
   function moveBpmToFooter() {
-    const footer = (
-      document.querySelector('.print-footer') ||
-      document.getElementById('print-footer') ||
-      document.querySelector('.song-print-footer')
-    );
-    if (!footer) return;
-    if (footer.querySelector('.footer-bpm')) return;
+    applyPrintSpecToLegacySheets();
+  }
 
-    const headerBpm = (
-      document.querySelector('.header-bpm') ||
-      document.querySelector('.header-tempo') ||
-      document.querySelector('.print-bpm-header') ||
-      document.querySelector('[data-print-field="tempo"]')
-    );
-    const bpmText = headerBpm
-      ? headerBpm.textContent.trim()
-      : (window._currentSong?.tempo ? window._currentSong.tempo + ' BPM' : '');
-    if (!bpmText) return;
+  function hasInstrumentPrintBatch() {
+    const batch = document.getElementById('print-batch');
+    if (!batch || batch.querySelectorAll('.chart-container').length === 0) return false;
+    const style = window.getComputedStyle(batch);
+    return style.display !== 'none' && style.visibility !== 'hidden';
+  }
 
-    const span = document.createElement('span');
-    span.className = 'footer-bpm print-bpm-footer';
-    span.textContent = bpmText;
-    footer.prepend(span); // LEFT side
+  function ensureCtrlPrintHost() {
+    let host = document.getElementById('pp-print-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'pp-print-host';
+      host.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(host);
+    }
+    return host;
+  }
+
+  function preparePrintOutput() {
+    applyPrintSpecToLegacySheets();
+
+    // Instrument packets intentionally use #print-batch. Plain Ctrl+P does not,
+    // so build the same spec-compliant document used by Preview Print and make
+    // it the only printed content for the browser/desktop print dialog.
+    if (hasInstrumentPrintBatch()) {
+      document.body.classList.remove('pp-print-host-active');
+      return;
+    }
+
+    const host = ensureCtrlPrintHost();
+    host.innerHTML = buildPrintDoc(false);
+    document.body.classList.add('pp-print-host-active');
+  }
+
+  function cleanupPrintOutput() {
+    document.body.classList.remove('pp-print-host-active');
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -519,11 +600,14 @@
     injectUI();
     injectPrintRules();
     moveBpmToFooter();
+    window.addEventListener('beforeprint', preparePrintOutput);
+    window.addEventListener('afterprint', cleanupPrintOutput);
 
     const events = ['song-loaded', 'songLoaded', 'chart-rendered', 'printReady'];
     events.forEach(evt => {
       document.addEventListener(evt, () => {
-        moveBpmToFooter();
+        applyPrintSpecToLegacySheets();
+        if (document.body.classList.contains('pp-print-host-active')) preparePrintOutput();
         // Refresh open preview if a song just loaded
         if (document.getElementById('print-preview-overlay')?.classList.contains('open')) {
           refreshPreview();
@@ -543,7 +627,7 @@
   ────────────────────────────────────────────────────────── */
   window.PrintPreview = {
     applyTemplate, openPreview, closePreview, refreshPreview,
-    renderTemplateSwitcher, moveBpmToFooter, buildPrintDoc,
+    renderTemplateSwitcher, moveBpmToFooter, applyPrintSpecToLegacySheets, preparePrintOutput, cleanupPrintOutput, buildPrintDoc,
     getSongData, getChordChartEl,
     getTemplates: () => TEMPLATES,
     getActive:    () => activeTemplate,

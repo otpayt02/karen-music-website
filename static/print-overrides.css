@@ -13,6 +13,7 @@
 
   /* §1.1 — Overall compact density */
   body, .print-area, #print-area, .chart-print-wrapper,
+  #print-batch .chart-container, #chart-container,
   .pp-page, .pp-body {
     font-size: 9.5pt !important;
     line-height: 1.25 !important;
@@ -49,6 +50,7 @@
 
   /* §1.5 — Remove header-body divider */
   .print-header, #print-header, .song-print-header,
+  .paper-header, #paper-header,
   .pp-header {
     border-bottom: none !important;
     box-shadow: none !important;
@@ -58,6 +60,7 @@
 
   /* §1.6 — Remove footer-body divider */
   .print-footer, #print-footer, .song-print-footer,
+  .paper-footer,
   .pp-footer {
     border-top: none !important;
     box-shadow: none !important;
@@ -73,7 +76,9 @@
   /* §2.1–2.2 — Karen (Corinne) title: TOP, large, bold */
   .pp-title-karen,
   .print-title-karen,
-  .song-title-karen-print {
+  .song-title-karen-print,
+  #ph-title-karen,
+  .print-spec-title-karen {
     display: block !important;
     font-size: 18pt !important;
     font-weight: 800 !important;
@@ -85,6 +90,8 @@
 
   /* §2.3 — English title: small parenthetical BELOW Karen */
   .pp-title-english,
+  #ph-title-english,
+  .print-spec-title-english,
   .print-title-english,
   .song-title-english-print,
   .print-title,
@@ -98,8 +105,10 @@
 
   /* §2.4 — Song style: same big size as Karen title */
   .pp-style,
+  #ph-style-english,
   .print-style,
-  .song-print-style {
+  .song-print-style,
+  .print-spec-style {
     font-size: 18pt !important;
     font-weight: 700 !important;
     display: block !important;
@@ -107,12 +116,14 @@
 
   /* §2.5 — Hide BPM from header (moved to footer left) */
   .print-bpm-header, .print-tempo-header,
-  .header-bpm, .header-tempo {
+  .header-bpm, .header-tempo,
+  .paper-head-tempo {
     display: none !important;
   }
 
   /* §2.6–2.7 — Hide dates from printout → sidebar only */
   .print-date-created, .print-date-performed,
+  #ph-footer-next, .print-spec-date,
   .song-print-date-created, .song-print-date-performed,
   [data-print-field="date_created"], [data-print-field="date_performed"],
   [data-print-field="created_date"], [data-print-field="next_performance_date"] {
@@ -143,7 +154,8 @@
 
   /* §3.1 — BPM on the LEFT, category/instruments on the RIGHT */
   .pp-footer,
-  .print-footer, #print-footer, .song-print-footer {
+  .print-footer, #print-footer, .song-print-footer,
+  .paper-footer {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
@@ -152,6 +164,7 @@
   }
 
   .pp-footer-left,
+  #ph-footer-left,
   .footer-bpm, .print-bpm-footer, .print-tempo-footer {
     font-weight: 700 !important;
     font-size: 8pt !important;
@@ -160,6 +173,7 @@
   }
 
   .pp-footer-right,
+  #ph-footer-right,
   .footer-category, .print-category-footer {
     font-size: 8pt !important;
     color: #555 !important;
@@ -172,14 +186,16 @@
      ============================================================ */
 
   /* §4.1 — Darker, bolder outline */
-  .chord-circle, .chord-dot, .chord-symbol-circle {
+  .chord-circle, .chord-dot, .chord-symbol-circle,
+  .beat.circle, .beat-dot {
     border: 2.5px solid #111 !important;
     outline: none !important;
     box-shadow: none !important;
   }
 
   /* §4.2 — ~20% larger */
-  .chord-circle, .chord-dot, .chord-symbol-circle {
+  .chord-circle, .chord-dot, .chord-symbol-circle,
+  .beat.circle, .beat-dot {
     width:  calc(var(--chord-circle-size, 20px) * 1.2) !important;
     height: calc(var(--chord-circle-size, 20px) * 1.2) !important;
     font-size: calc(var(--chord-circle-font, 9px) * 1.2) !important;
@@ -187,7 +203,8 @@
   }
 
   /* §4.3 — White fill, NEVER black */
-  .chord-circle, .chord-dot, .chord-symbol-circle {
+  .chord-circle, .chord-dot, .chord-symbol-circle,
+  .beat.circle, .beat-dot {
     background: #ffffff !important;
     color: #111 !important;
     fill: #ffffff !important;
@@ -311,3 +328,23 @@
   line-height: var(--print-line-height) !important;
 }
 .pp-title-karen, .print-title-karen { font-family: var(--print-font-title) !important; }
+
+#pp-print-host {
+  display: none;
+}
+
+@media print {
+  body.pp-print-host-active > :not(#pp-print-host) {
+    display: none !important;
+  }
+
+  body.pp-print-host-active #pp-print-host {
+    display: block !important;
+  }
+
+  body.pp-print-host-active #pp-print-host .pp-page {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: calc(100vh - 20mm) !important;
+  }
+}
