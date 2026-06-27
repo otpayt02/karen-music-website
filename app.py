@@ -14,6 +14,9 @@ from werkzeug.utils import secure_filename
 print("CWD AT STARTUP:", os.getcwd())
 
 app = Flask(__name__)
+# Desktop WebView2 is aggressive about caching static assets between builds.
+# Disable Flask static caching so rebuilt EXEs and local runs pick up print CSS/JS changes.
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 IS_FROZEN    = getattr(sys, "frozen", False)
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
