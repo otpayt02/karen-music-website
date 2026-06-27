@@ -1,0 +1,291 @@
+/*
+  event-tags.css
+  Karen Music Director — Section Color Coding & Event Tag Styles
+  ---------------------------------------------------------------
+  Screen styles for section labels / event tags used in the editor.
+  Print color-coding is handled in print-overrides.css §5.
+*/
+
+/* ============================================================
+   SECTION TAG PILLS  (screen view)
+   ============================================================ */
+
+.section-tag,
+.event-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+  line-height: 1.6;
+}
+
+/* Intro */
+.tag-intro,
+.section-tag[data-section="intro"] {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+/* Verse */
+.tag-verse,
+.section-tag[data-section="verse"] {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+/* Pre-Chorus */
+.tag-prechorus,
+.tag-pre-chorus,
+.section-tag[data-section="prechorus"],
+.section-tag[data-section="pre-chorus"] {
+  background: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+/* Chorus */
+.tag-chorus,
+.section-tag[data-section="chorus"] {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+/* Bridge */
+.tag-bridge,
+.section-tag[data-section="bridge"] {
+  background: #fce7f3;
+  color: #831843;
+  border: 1px solid #fbcfe8;
+}
+
+/* Solo */
+.tag-solo,
+.section-tag[data-section="solo"] {
+  background: #fef9c3;
+  color: #713f12;
+  border: 1px solid #fef08a;
+}
+
+/* Ending / Outro */
+.tag-ending,
+.tag-outro,
+.section-tag[data-section="ending"],
+.section-tag[data-section="outro"] {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+
+/* ============================================================
+   SECTION BLOCK WRAPPERS  (editor rows tinted by section)
+   Applied by event-tags.js — keeps editor readable at a glance
+   ============================================================ */
+
+.section-intro    { border-left: 3px solid #3b82f6; }
+.section-verse    { border-left: 3px solid #f59e0b; }
+.section-prechorus,
+.section-pre-chorus { border-left: 3px solid #8b5cf6; }
+.section-chorus   { border-left: 3px solid #10b981; }
+.section-bridge   { border-left: 3px solid #ec4899; }
+.section-solo     { border-left: 3px solid #eab308; }
+.section-ending,
+.section-outro    { border-left: 3px solid #0ea5e9; }
+
+
+/* ============================================================
+   POSITION / SECTION TRACKER BADGE  (screen only)
+   Shows current section name while scrolling the chart
+   ============================================================ */
+
+#section-position-tracker {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 9999;
+  display: none;         /* shown by JS when chart is open */
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+#section-position-tracker.hidden {
+  opacity: 0;
+}
+
+#section-position-tracker .tracker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+
+/* ============================================================
+   PRINT TEMPLATE SWITCHER PANEL  (screen only, no-print)
+   ============================================================ */
+
+.print-template-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  min-width: 200px;
+}
+
+.print-template-panel h4 {
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+  margin: 0 0 4px;
+}
+
+.template-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #2a2a2a;
+  color: #ccc;
+  font-size: 0.82em;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  width: 100%;
+}
+
+.template-option:hover {
+  border-color: #bb86fc;
+  color: #fff;
+  background: #333;
+}
+
+.template-option.active {
+  border-color: #bb86fc;
+  background: rgba(187, 134, 252, 0.12);
+  color: #bb86fc;
+  font-weight: 700;
+}
+
+.template-option .template-thumb {
+  width: 28px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid #444;
+  background: #fff;
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 3px;
+}
+
+.template-thumb .t-line {
+  height: 2px;
+  border-radius: 1px;
+  background: #555;
+}
+
+.template-thumb .t-line:first-child {
+  background: #222;
+  width: 80%;
+}
+
+.template-thumb .t-line:nth-child(2) { width: 60%; }
+.template-thumb .t-line:nth-child(3) { width: 75%; }
+
+
+/* ============================================================
+   PRINT PREVIEW OVERLAY  (screen only)
+   ============================================================ */
+
+#print-preview-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+#print-preview-overlay.open {
+  display: flex;
+}
+
+#print-preview-inner {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+  width: 210mm;       /* A4 width */
+  min-height: 297mm;
+  padding: 10mm 12mm;
+  position: relative;
+  color: #000;
+  font-size: 9.5pt;
+  line-height: 1.25;
+}
+
+#preview-close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #eee;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
+#preview-close-btn:hover {
+  background: #ddd;
+}
+
+@media print {
+  .print-template-panel,
+  #print-preview-overlay,
+  #section-position-tracker,
+  .template-switcher {
+    display: none !important;
+  }
+}

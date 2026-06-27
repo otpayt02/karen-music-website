@@ -1,0 +1,313 @@
+/*
+  print-overrides.css  v2
+  Karen Music Director — Printout Format Spec (June 2026)
+  --------------------------------------------------------
+  @media print rules only — screen UI is completely untouched.
+  Works alongside the pp-* classes built by print-preview.js.
+*/
+
+/* ============================================================
+   §1  SPACING & COMPACTNESS
+   ============================================================ */
+@media print {
+
+  /* §1.1 — Overall compact density */
+  body, .print-area, #print-area, .chart-print-wrapper,
+  .pp-page, .pp-body {
+    font-size: 9.5pt !important;
+    line-height: 1.25 !important;
+  }
+
+  /* §1.2 — Shorter measure bar lines */
+  .measure-row, .chart-row, .row-measures {
+    gap: 2pt !important;
+    margin-bottom: 3pt !important;
+  }
+  .measure, .measure-cell, .chart-measure {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    padding: 2pt 4pt !important;
+    border-width: 1px !important;
+  }
+
+  /* §1.3 — Minimal section dividers */
+  .section-divider, .section-header-line, .chart-section-header {
+    border-top: none !important;
+    border-bottom: none !important;
+    padding-top: 2pt !important;
+    padding-bottom: 1pt !important;
+    margin-top: 4pt !important;
+    margin-bottom: 2pt !important;
+  }
+
+  /* §1.4 — More breathing room beside chords */
+  .chord-cell, .chord-label, .chord-name {
+    padding-left: 6pt !important;
+    padding-right: 6pt !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  /* §1.5 — Remove header-body divider */
+  .print-header, #print-header, .song-print-header,
+  .pp-header {
+    border-bottom: none !important;
+    box-shadow: none !important;
+    padding-bottom: 3pt !important;
+    margin-bottom: 4pt !important;
+  }
+
+  /* §1.6 — Remove footer-body divider */
+  .print-footer, #print-footer, .song-print-footer,
+  .pp-footer {
+    border-top: none !important;
+    box-shadow: none !important;
+    padding-top: 3pt !important;
+    margin-top: 4pt !important;
+  }
+
+
+  /* ============================================================
+     §2  HEADER
+     ============================================================ */
+
+  /* §2.1–2.2 — Karen (Corinne) title: TOP, large, bold */
+  .pp-title-karen,
+  .print-title-karen,
+  .song-title-karen-print {
+    display: block !important;
+    font-size: 18pt !important;
+    font-weight: 800 !important;
+    font-family: 'Noto Sans Myanmar', 'Fraunces', serif !important;
+    line-height: 1.1 !important;
+    color: #000 !important;
+    margin-bottom: 1pt !important;
+  }
+
+  /* §2.3 — English title: small parenthetical BELOW Karen */
+  .pp-title-english,
+  .print-title-english,
+  .song-title-english-print,
+  .print-title,
+  .song-print-title {
+    display: block !important;
+    font-size: 9pt !important;
+    font-weight: 400 !important;
+    color: #444 !important;
+    margin-bottom: 2pt !important;
+  }
+
+  /* §2.4 — Song style: same big size as Karen title */
+  .pp-style,
+  .print-style,
+  .song-print-style {
+    font-size: 18pt !important;
+    font-weight: 700 !important;
+    display: block !important;
+  }
+
+  /* §2.5 — Hide BPM from header (moved to footer left) */
+  .print-bpm-header, .print-tempo-header,
+  .header-bpm, .header-tempo {
+    display: none !important;
+  }
+
+  /* §2.6–2.7 — Hide dates from printout → sidebar only */
+  .print-date-created, .print-date-performed,
+  .song-print-date-created, .song-print-date-performed,
+  [data-print-field="date_created"], [data-print-field="date_performed"],
+  [data-print-field="created_date"], [data-print-field="next_performance_date"] {
+    display: none !important;
+  }
+
+  /* §2.8 — Hide original key from printout → sidebar only */
+  .print-original-key, .song-print-original-key,
+  .print-key-transposition,
+  [data-print-field="original_key"] {
+    display: none !important;
+  }
+
+  /* NO Karen translations in body except the song title */
+  .karen-translation-row,
+  .translation-row,
+  [data-role="translation"],
+  .chord-translation,
+  .lyrics-karen,
+  .lyric-karen {
+    display: none !important;
+  }
+
+
+  /* ============================================================
+     §3  FOOTER
+     ============================================================ */
+
+  /* §3.1 — BPM on the LEFT, category/instruments on the RIGHT */
+  .pp-footer,
+  .print-footer, #print-footer, .song-print-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 8pt !important;
+    color: #333 !important;
+  }
+
+  .pp-footer-left,
+  .footer-bpm, .print-bpm-footer, .print-tempo-footer {
+    font-weight: 700 !important;
+    font-size: 8pt !important;
+    letter-spacing: 0.05em !important;
+    color: #111 !important;
+  }
+
+  .pp-footer-right,
+  .footer-category, .print-category-footer {
+    font-size: 8pt !important;
+    color: #555 !important;
+    text-align: right !important;
+  }
+
+
+  /* ============================================================
+     §4  CHORD CIRCLES
+     ============================================================ */
+
+  /* §4.1 — Darker, bolder outline */
+  .chord-circle, .chord-dot, .chord-symbol-circle {
+    border: 2.5px solid #111 !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* §4.2 — ~20% larger */
+  .chord-circle, .chord-dot, .chord-symbol-circle {
+    width:  calc(var(--chord-circle-size, 20px) * 1.2) !important;
+    height: calc(var(--chord-circle-size, 20px) * 1.2) !important;
+    font-size: calc(var(--chord-circle-font, 9px) * 1.2) !important;
+    line-height: calc(var(--chord-circle-size, 20px) * 1.2) !important;
+  }
+
+  /* §4.3 — White fill, NEVER black */
+  .chord-circle, .chord-dot, .chord-symbol-circle {
+    background: #ffffff !important;
+    color: #111 !important;
+    fill: #ffffff !important;
+  }
+
+
+  /* ============================================================
+     §5  SECTION COLOR CODING
+     ============================================================ */
+
+  /* Force browser to print background colors */
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  /* Intro / Outro / Ending — blue */
+  .section-intro .measure, .section-intro .chord-cell,
+  .section-outro .measure, .section-outro .chord-cell,
+  .section-ending .measure, .section-ending .chord-cell,
+  [data-section="intro"] .measure, [data-section="intro"] .chord-cell,
+  [data-section="outro"] .measure, [data-section="outro"] .chord-cell,
+  [data-section="ending"] .measure, [data-section="ending"] .chord-cell {
+    background-color: #e8f0fb !important;
+  }
+  .section-intro .chart-section-header, .section-outro .chart-section-header, .section-ending .chart-section-header,
+  [data-section="intro"] .chart-section-header, [data-section="outro"] .chart-section-header, [data-section="ending"] .chart-section-header {
+    color: #1a4a9e !important;
+  }
+
+  /* Verse — warm cream */
+  .section-verse .measure, .section-verse .chord-cell,
+  [data-section="verse"] .measure, [data-section="verse"] .chord-cell {
+    background-color: #fdf6e3 !important;
+  }
+  .section-verse .chart-section-header, [data-section="verse"] .chart-section-header { color: #7a4f00 !important; }
+
+  /* Pre-Chorus — lavender */
+  .section-pre-chorus .measure, .section-prechorus .measure,
+  [data-section="pre-chorus"] .measure, [data-section="prechorus"] .measure {
+    background-color: #f3eeff !important;
+  }
+
+  /* Chorus — mint green */
+  .section-chorus .measure, .section-chorus .chord-cell,
+  [data-section="chorus"] .measure, [data-section="chorus"] .chord-cell {
+    background-color: #e6f7ee !important;
+  }
+  .section-chorus .chart-section-header, [data-section="chorus"] .chart-section-header { color: #1a6b3a !important; }
+
+  /* Bridge — rose */
+  .section-bridge .measure, .section-bridge .chord-cell,
+  [data-section="bridge"] .measure, [data-section="bridge"] .chord-cell {
+    background-color: #fde8ec !important;
+  }
+  .section-bridge .chart-section-header, [data-section="bridge"] .chart-section-header { color: #8b1a2e !important; }
+
+  /* Solo — gold */
+  .section-solo .measure, [data-section="solo"] .measure {
+    background-color: #fef9e3 !important;
+  }
+
+
+  /* ============================================================
+     GENERAL PRINT CLEANUP
+     ============================================================ */
+
+  .no-print, .editor-toolbar, .sidebar, .print-preview-panel,
+  .template-switcher, #print-template-switcher, #print-preview-btn,
+  #section-position-tracker, nav,
+  button:not(.print-keep), .tooltip, .modal, .overlay {
+    display: none !important;
+  }
+
+  @page { margin: 10mm 12mm 10mm 12mm; }
+
+  .chart-section, .section-block {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .chart-section-header, .pp-header {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Repeat header + footer on every printed page */
+  .pp-header {
+    position: running(header);
+  }
+  .pp-footer {
+    position: running(footer);
+  }
+  @page {
+    @top-center { content: element(header); }
+    @bottom-center { content: element(footer); }
+  }
+
+}
+/* END @media print */
+
+
+/* ============================================================
+   TEMPLATE CSS VARIABLES  (screen + print)
+   ============================================================ */
+:root {
+  --print-font-body:   'Instrument Sans', 'Noto Sans Myanmar', sans-serif;
+  --print-font-title:  'Fraunces', Georgia, serif;
+  --print-font-mono:   'IBM Plex Mono', 'Courier New', monospace;
+  --print-font-size:   9.5pt;
+  --print-line-height: 1.25;
+  --chord-circle-size: 20px;
+  --chord-circle-font: 9px;
+}
+
+[data-print-template="classic"]       { --print-font-body:'Instrument Sans',sans-serif; --print-font-title:'Fraunces',serif;          --print-font-size:9.5pt; --print-line-height:1.25; }
+[data-print-template="clean-sans"]    { --print-font-body:'Instrument Sans',sans-serif; --print-font-title:'Instrument Sans',sans-serif;--print-font-size:9pt;   --print-line-height:1.2;  }
+[data-print-template="mono-compact"]  { --print-font-body:'IBM Plex Mono',monospace;   --print-font-title:'IBM Plex Mono',monospace;  --print-font-size:8.5pt; --print-line-height:1.15; }
+[data-print-template="airy"]          { --print-font-body:'Instrument Sans',sans-serif; --print-font-title:'Fraunces',serif;          --print-font-size:10pt;  --print-line-height:1.4;  }
+[data-print-template="myanmar-focus"] { --print-font-body:'Noto Sans Myanmar',sans-serif;--print-font-title:'Noto Sans Myanmar',serif; --print-font-size:10pt;  --print-line-height:1.3;  }
+
+.print-area, #print-area, .chart-print-wrapper, .pp-page {
+  font-family: var(--print-font-body) !important;
+  font-size:   var(--print-font-size) !important;
+  line-height: var(--print-line-height) !important;
+}
+.pp-title-karen, .print-title-karen { font-family: var(--print-font-title) !important; }

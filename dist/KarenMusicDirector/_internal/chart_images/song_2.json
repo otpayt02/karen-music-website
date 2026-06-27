@@ -19,7 +19,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -38,7 +39,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -55,7 +57,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -74,7 +77,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -92,7 +96,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -104,7 +115,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -124,7 +136,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -141,7 +154,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -161,7 +175,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -179,7 +194,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -191,7 +213,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -210,7 +233,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -227,7 +251,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -246,7 +271,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -264,7 +290,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -276,7 +309,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -295,7 +329,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -312,7 +347,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 1,
@@ -332,7 +368,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -350,14 +387,22 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": true
           }
         ],
-        "measuresPerRow": 1,
+        "measuresPerRow": null,
         "rowMeasureCounts": [],
-        "type": "Intro"
+        "type": "Intro",
+        "preMeasure": null
       },
       {
         "measures": [
@@ -369,7 +414,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -388,7 +434,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -405,7 +452,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -424,7 +472,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -442,7 +491,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -454,7 +510,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -474,7 +531,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -491,7 +549,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -508,7 +567,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -526,7 +586,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -538,7 +605,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -557,7 +625,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -574,7 +643,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -593,7 +663,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -611,7 +682,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -623,7 +701,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -642,7 +721,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -659,7 +739,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -676,7 +757,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -694,7 +776,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -706,7 +795,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -725,7 +815,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -745,7 +836,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -765,7 +857,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -783,7 +876,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -795,7 +895,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -815,7 +916,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -835,7 +937,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -855,7 +958,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -873,7 +977,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -885,7 +996,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -905,7 +1017,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -922,7 +1035,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -941,7 +1055,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -959,7 +1074,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -971,7 +1093,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -990,7 +1113,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1007,7 +1131,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1024,7 +1149,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1042,7 +1168,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1054,7 +1187,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1073,7 +1207,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1090,7 +1225,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1109,7 +1245,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1127,7 +1264,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1139,7 +1283,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1159,7 +1304,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1176,7 +1322,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1193,7 +1340,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1211,7 +1359,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1223,7 +1378,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1242,7 +1398,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1259,7 +1416,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1278,7 +1436,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1296,7 +1455,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1308,7 +1474,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1327,7 +1494,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1344,7 +1512,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1361,7 +1530,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1379,7 +1549,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1391,7 +1568,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1410,7 +1588,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1427,7 +1606,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1447,7 +1627,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1465,7 +1646,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1477,7 +1665,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1497,7 +1686,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1514,7 +1704,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1534,7 +1725,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1552,7 +1744,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1564,7 +1763,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1584,7 +1784,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1601,7 +1802,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1620,7 +1822,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1638,7 +1841,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1650,7 +1860,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1669,7 +1880,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1686,7 +1898,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1703,7 +1916,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1721,14 +1935,22 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": true
           }
         ],
-        "measuresPerRow": 1,
+        "measuresPerRow": null,
         "rowMeasureCounts": [],
-        "type": "Verse"
+        "type": "Verse",
+        "preMeasure": null
       },
       {
         "measures": [
@@ -1740,7 +1962,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1759,7 +1982,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1776,7 +2000,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1793,7 +2018,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1811,7 +2037,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1823,7 +2056,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1843,7 +2077,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1860,7 +2095,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1877,7 +2113,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1895,7 +2132,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1907,7 +2151,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1926,7 +2171,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1945,7 +2191,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1964,7 +2211,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -1982,7 +2230,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -1994,7 +2249,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2013,7 +2269,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2030,7 +2287,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2049,7 +2307,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2069,7 +2328,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -2081,7 +2347,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2100,7 +2367,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2117,7 +2385,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2134,7 +2403,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2152,7 +2422,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -2164,7 +2441,8 @@
                   "flat": false,
                   "minor": true,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2184,7 +2462,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2201,7 +2480,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2218,7 +2498,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2236,7 +2517,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -2248,7 +2536,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2267,7 +2556,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2284,7 +2574,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2303,7 +2594,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2321,7 +2613,14 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": false
           },
@@ -2333,7 +2632,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2352,7 +2652,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2371,7 +2672,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2388,7 +2690,8 @@
                   "flat": false,
                   "minor": false,
                   "triangle": false,
-                  "seven": false
+                  "seven": false,
+                  "quality": ""
                 },
                 "bass": "",
                 "xMarks": 0,
@@ -2406,14 +2709,22 @@
             "leadEnabled": false,
             "leadBaseOctave": 0,
             "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
             "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
             "leadSlots": 16,
             "isEndingBar": true
           }
         ],
-        "measuresPerRow": 1,
+        "measuresPerRow": null,
         "rowMeasureCounts": [],
-        "type": "Chorus"
+        "type": "Chorus",
+        "preMeasure": null
       }
     ],
     "onlySpans": [],
@@ -2431,7 +2742,7 @@
   "raw_editor_text": "",
   "chart_image_path": null,
   "created_at": null,
-  "updated_at": "2026-05-27 13:32:57",
+  "updated_at": "2026-06-21 15:44:21",
   "notes": "",
   "row_lead_json": {},
   "current_key": "C",

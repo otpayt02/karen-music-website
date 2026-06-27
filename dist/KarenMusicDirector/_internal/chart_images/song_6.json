@@ -774,11 +774,11 @@
           }
         ],
         "measuresPerRow": null,
+        "preMeasure": null,
         "rowMeasureCounts": [
           8
         ],
-        "type": "Intro",
-        "preMeasure": null
+        "type": "Intro"
       },
       {
         "measures": [
@@ -2303,12 +2303,12 @@
           }
         ],
         "measuresPerRow": null,
+        "preMeasure": null,
         "rowMeasureCounts": [
           8,
           8
         ],
-        "type": "Verse",
-        "preMeasure": null
+        "type": "Verse"
       },
       {
         "measures": [
@@ -3836,12 +3836,12 @@
           }
         ],
         "measuresPerRow": null,
+        "preMeasure": null,
         "rowMeasureCounts": [
           8,
           8
         ],
-        "type": "Chorus",
-        "preMeasure": null
+        "type": "Chorus"
       },
       {
         "measures": [
@@ -5370,12 +5370,12 @@
           }
         ],
         "measuresPerRow": null,
+        "preMeasure": null,
         "rowMeasureCounts": [
           8,
           8
         ],
-        "type": "Solo",
-        "preMeasure": null
+        "type": "Solo"
       },
       {
         "measures": [
@@ -6903,12 +6903,12 @@
           }
         ],
         "measuresPerRow": null,
+        "preMeasure": null,
         "rowMeasureCounts": [
           8,
           8
         ],
-        "type": "Verse",
-        "preMeasure": null
+        "type": "Verse"
       },
       {
         "measures": [
@@ -9964,14 +9964,14 @@
           }
         ],
         "measuresPerRow": null,
+        "preMeasure": null,
         "rowMeasureCounts": [
           8,
           8,
           8,
           8
         ],
-        "type": "Chorus",
-        "preMeasure": null
+        "type": "Chorus"
       },
       {
         "measures": [
@@ -11791,13 +11791,13 @@
           }
         ],
         "measuresPerRow": null,
+        "preMeasure": null,
         "rowMeasureCounts": [
           8,
           8,
           8
         ],
-        "type": "Ending",
-        "preMeasure": null
+        "type": "Ending"
       }
     ],
     "onlySpans": [],
@@ -11815,7 +11815,7 @@
   "raw_editor_text": "",
   "chart_image_path": "C:\\Users\\olive\\AppData\\Local\\Karen Music Director\\chart_images\\song_6_20260527_101638.png",
   "created_at": null,
-  "updated_at": "2026-06-09 11:24:43",
+  "updated_at": "2026-06-25 02:03:23",
   "notes": "",
   "row_lead_json": {},
   "current_key": "B",
