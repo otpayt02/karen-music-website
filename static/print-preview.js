@@ -23,14 +23,25 @@
      TEMPLATES
   ────────────────────────────────────────────────────────── */
   const TEMPLATES = [
-    { id: 'classic',       label: 'Classic',       fontTitle: 'Fraunces',         fontBody: 'Instrument Sans',  fontSize: '9.5pt', lineHeight: '1.25' },
-    { id: 'clean-sans',    label: 'Clean Sans',    fontTitle: 'Instrument Sans',  fontBody: 'Instrument Sans',  fontSize: '9pt',   lineHeight: '1.2'  },
-    { id: 'mono-compact',  label: 'Mono Compact',  fontTitle: 'IBM Plex Mono',    fontBody: 'IBM Plex Mono',    fontSize: '8.5pt', lineHeight: '1.15' },
-    { id: 'airy',          label: 'Airy',          fontTitle: 'Fraunces',         fontBody: 'Instrument Sans',  fontSize: '10pt',  lineHeight: '1.4'  },
-    { id: 'myanmar-focus', label: 'Myanmar Focus', fontTitle: 'Noto Sans Myanmar',fontBody: 'Noto Sans Myanmar',fontSize: '10pt',  lineHeight: '1.3'  },
-  ];
+    ['clean-mono','Clean Mono','IBM Plex Mono','Instrument Sans','8.8pt','1.18'],
+    ['church-bulletin','Church Bulletin','Fraunces','Instrument Sans','9.5pt','1.28'],
+    ['minimal','Minimal','Instrument Sans','Instrument Sans','9pt','1.24'],
+    ['bold-impact','Bold Impact','Instrument Sans','IBM Plex Mono','9.6pt','1.16'],
+    ['handwritten','Handwritten Feel','Fraunces','Instrument Sans','9.8pt','1.32'],
+    ['newspaper','Newspaper','Fraunces','IBM Plex Mono','8.8pt','1.2'],
+    ['jazz-club','Jazz Club','Fraunces','Instrument Sans','9.4pt','1.3'],
+    ['kids-youth','Kids / Youth','Instrument Sans','Instrument Sans','10pt','1.34'],
+    ['rehearsal','Rehearsal Sheet','IBM Plex Mono','IBM Plex Mono','8.5pt','1.14'],
+    ['modern-worship','Modern Worship','Instrument Sans','Instrument Sans','9.6pt','1.3'],
+    ['hymnal','Hymnal Classic','Fraunces','Noto Sans Myanmar','9.3pt','1.26'],
+    ['lofi-draft','Lo-Fi Draft','IBM Plex Mono','IBM Plex Mono','8.7pt','1.2'],
+    ['score-sheet','Score Sheet','Fraunces','IBM Plex Mono','8.8pt','1.16'],
+    ['presentation','Presentation','Instrument Sans','Instrument Sans','11pt','1.42'],
+    ['night-session','Night Session','Instrument Sans','IBM Plex Mono','9.2pt','1.25'],
+    ['archive','Archive','Fraunces','Instrument Sans','9pt','1.2'],
+  ].map(([id,label,fontTitle,fontBody,fontSize,lineHeight]) => ({id,label,fontTitle,fontBody,fontSize,lineHeight}));
 
-  let activeTemplate = 'classic';
+  let activeTemplate = localStorage.getItem('karenMusicPrintTheme') || 'clean-mono';
 
   /* ──────────────────────────────────────────────────────────
      TEMPLATE APPLICATION
@@ -47,6 +58,7 @@
     document.querySelectorAll('.template-option').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.templateId === tpl.id);
     });
+    localStorage.setItem('karenMusicPrintTheme', tpl.id);
     try { window._printTemplate = tpl.id; } catch(e) {}
   }
 
@@ -73,39 +85,39 @@
     const cs = window._currentSong || window.currentSong || {};
 
     const titleKaren = readField([
-      '#title_karen', '#titleKaren', '[name="title_karen"]',
+      '#songTitleKaren', '#title_karen', '#titleKaren', '[name="title_karen"]',
       '.title-karen-input', '.karen-title-field',
       '#song-title-karen', '.song-title-karen',
     ]) || cs.title_karen || cs.titleKaren || '';
 
     const titleEnglish = readField([
-      '#title', '#song-title', '[name="title"]',
+      '#songTitle', '#title', '#song-title', '[name="title"]',
       '.title-input', '.english-title-field',
       '#song-title-english', '.song-title-english',
     ]) || cs.title || '';
 
     const style = readField([
-      '#style', '[name="style"]', '.style-select', '.song-style',
+      '#songStyle', '#style', '[name="style"]', '.style-select', '.song-style',
       '#song-style', 'select[name="style"]',
     ]) || cs.style || '';
 
     const tempo = readField([
-      '#tempo', '[name="tempo"]', '.tempo-input', '.bpm-input',
+      '#songTempo', '#tempo', '[name="tempo"]', '.tempo-input', '.bpm-input',
       '#bpm', '.song-tempo',
     ]) || cs.tempo || '';
 
     const key = readField([
-      '#key', '#current_key', '[name="key"]', '[name="current_key"]',
+      '#songKey', '#key', '#current_key', '[name="key"]', '[name="current_key"]',
       '.key-select', '.key-input', '#song-key',
     ]) || cs.current_key || cs.key || '';
 
     const category = readField([
-      '#category', '[name="category"]', '.category-select',
+      '#songCategory', '#category', '[name="category"]', '.category-select',
       '#song-category', 'select[name="category"]',
     ]) || cs.category || '';
 
     const instruments = readField([
-      '#instruments', '[name="instruments"]', '.instruments-input',
+      '#songInstruments', '#instruments', '[name="instruments"]', '.instruments-input',
       '#song-instruments', '.song-instruments',
     ]) || cs.instruments || '';
 
@@ -232,8 +244,10 @@
         // Also strip any inline BPM/tempo in the chart header — it goes to footer
         '.header-bpm', '.header-tempo', '.print-bpm-header', '.print-tempo-header',
       ].join(',')).forEach(el => el.remove());
-
-      chartHtml = clone.outerHTML;
+      clone.id = '';
+      clone.classList.add('pp-page');
+      clone.querySelectorAll('.paper-footer-dates').forEach(el => el.remove());
+      return clone.outerHTML;
     } else {
       chartHtml = '<p class="pp-no-chart">No chord chart loaded. Open a song first, then click Preview Print.</p>';
     }
@@ -458,6 +472,14 @@
     }
   }
 
+  function toggleThemeDrawer(force) {
+    const switcher = document.getElementById('print-template-switcher');
+    if (!switcher) return;
+    const shouldOpen = typeof force === 'boolean' ? force : !switcher.classList.contains('is-open');
+    switcher.classList.toggle('is-open', shouldOpen);
+    switcher.style.display = shouldOpen ? 'grid' : 'none';
+  }
+
   /* ──────────────────────────────────────────────────────────
      INJECT @MEDIA PRINT RULES for the pp-* classes
      So the real Ctrl+P output also uses the same layout.
@@ -485,30 +507,111 @@
      MOVE BPM TO FOOTER  (for legacy print markup that doesn't
      use the pp-* classes)
   ────────────────────────────────────────────────────────── */
+  function normalizeBpmText(value) {
+    const text = String(value || '').trim();
+    if (!text) return '';
+    return /bpm/i.test(text) ? text : `${text} BPM`;
+  }
+
+  function getLegacyPrintSheets() {
+    return Array.from(document.querySelectorAll('#print-batch .chart-container, #chart-container'))
+      .filter((sheet, index, all) => all.indexOf(sheet) === index);
+  }
+
+  function setTextIfDifferent(el, text) {
+    if (!el || !text) return;
+    if (el.textContent.trim() !== text) el.textContent = text;
+  }
+
+  function applySpecToLegacySheet(sheet) {
+    const song = getSongData();
+    const karenTitle = song.titleKaren || '';
+    const englishTitle = song.titleEnglish ? `(${song.titleEnglish})` : '';
+    const tempo = normalizeBpmText(song.tempo);
+    const rightFooter = [song.category, song.instruments].filter(Boolean).join(' · ');
+
+    const karenEl = sheet.querySelector('#ph-title-karen, .print-title-karen, .song-title-karen-print');
+    const englishEl = sheet.querySelector('#ph-title-english, .print-title-english, .song-title-english-print, .print-title, .song-print-title');
+    setTextIfDifferent(karenEl, karenTitle);
+    setTextIfDifferent(englishEl, englishTitle);
+    karenEl?.classList.add('print-spec-title-karen');
+    englishEl?.classList.add('print-spec-title-english');
+
+    const styleEl = sheet.querySelector('#ph-style-english, .print-style, .song-print-style');
+    if (styleEl) {
+      styleEl.classList.add('print-spec-style');
+      if (song.style) setTextIfDifferent(styleEl, song.style);
+    }
+
+    const headerTempo = sheet.querySelector('.paper-head-tempo, .header-bpm, .header-tempo, .print-bpm-header, .print-tempo-header');
+    headerTempo?.classList.add('print-spec-header-tempo');
+
+    const footer = sheet.querySelector('.paper-footer, .print-footer, #print-footer, .song-print-footer');
+    if (footer) {
+      let left = footer.querySelector('#ph-footer-left, .footer-bpm, .print-bpm-footer, .print-tempo-footer');
+      if (!left) {
+        left = document.createElement('span');
+        left.id = 'ph-footer-left';
+        left.className = 'footer-bpm print-bpm-footer';
+        footer.prepend(left);
+      }
+      setTextIfDifferent(left, tempo);
+
+      let right = footer.querySelector('#ph-footer-right, .footer-category, .print-category-footer');
+      if (!right) {
+        right = document.createElement('span');
+        right.id = 'ph-footer-right';
+        right.className = 'footer-category print-category-footer';
+        footer.appendChild(right);
+      }
+      setTextIfDifferent(right, rightFooter);
+    }
+  }
+
+  function applyPrintSpecToLegacySheets() {
+    getLegacyPrintSheets().forEach(applySpecToLegacySheet);
+  }
+
   function moveBpmToFooter() {
-    const footer = (
-      document.querySelector('.print-footer') ||
-      document.getElementById('print-footer') ||
-      document.querySelector('.song-print-footer')
-    );
-    if (!footer) return;
-    if (footer.querySelector('.footer-bpm')) return;
+    applyPrintSpecToLegacySheets();
+  }
 
-    const headerBpm = (
-      document.querySelector('.header-bpm') ||
-      document.querySelector('.header-tempo') ||
-      document.querySelector('.print-bpm-header') ||
-      document.querySelector('[data-print-field="tempo"]')
-    );
-    const bpmText = headerBpm
-      ? headerBpm.textContent.trim()
-      : (window._currentSong?.tempo ? window._currentSong.tempo + ' BPM' : '');
-    if (!bpmText) return;
+  function hasInstrumentPrintBatch() {
+    const batch = document.getElementById('print-batch');
+    if (!batch || batch.querySelectorAll('.chart-container').length === 0) return false;
+    const style = window.getComputedStyle(batch);
+    return style.display !== 'none' && style.visibility !== 'hidden';
+  }
 
-    const span = document.createElement('span');
-    span.className = 'footer-bpm print-bpm-footer';
-    span.textContent = bpmText;
-    footer.prepend(span); // LEFT side
+  function ensureCtrlPrintHost() {
+    let host = document.getElementById('pp-print-host');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'pp-print-host';
+      host.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(host);
+    }
+    return host;
+  }
+
+  function preparePrintOutput() {
+    applyPrintSpecToLegacySheets();
+
+    // Instrument packets intentionally use #print-batch. Plain Ctrl+P does not,
+    // so build the same spec-compliant document used by Preview Print and make
+    // it the only printed content for the browser/desktop print dialog.
+    if (hasInstrumentPrintBatch()) {
+      document.body.classList.remove('pp-print-host-active');
+      return;
+    }
+
+    const host = ensureCtrlPrintHost();
+    host.innerHTML = buildPrintDoc(false);
+    document.body.classList.add('pp-print-host-active');
+  }
+
+  function cleanupPrintOutput() {
+    document.body.classList.remove('pp-print-host-active');
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -519,11 +622,14 @@
     injectUI();
     injectPrintRules();
     moveBpmToFooter();
+    window.addEventListener('beforeprint', preparePrintOutput);
+    window.addEventListener('afterprint', cleanupPrintOutput);
 
     const events = ['song-loaded', 'songLoaded', 'chart-rendered', 'printReady'];
     events.forEach(evt => {
       document.addEventListener(evt, () => {
-        moveBpmToFooter();
+        applyPrintSpecToLegacySheets();
+        if (document.body.classList.contains('pp-print-host-active')) preparePrintOutput();
         // Refresh open preview if a song just loaded
         if (document.getElementById('print-preview-overlay')?.classList.contains('open')) {
           refreshPreview();
@@ -543,7 +649,7 @@
   ────────────────────────────────────────────────────────── */
   window.PrintPreview = {
     applyTemplate, openPreview, closePreview, refreshPreview,
-    renderTemplateSwitcher, moveBpmToFooter, buildPrintDoc,
+    renderTemplateSwitcher, toggleThemeDrawer, moveBpmToFooter, applyPrintSpecToLegacySheets, preparePrintOutput, cleanupPrintOutput, buildPrintDoc,
     getSongData, getChordChartEl,
     getTemplates: () => TEMPLATES,
     getActive:    () => activeTemplate,
