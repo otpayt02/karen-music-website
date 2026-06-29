@@ -10,10 +10,14 @@ from datetime import datetime
 from uuid import uuid4
 from flask import Flask, request, jsonify, send_file, send_from_directory, render_template_string, make_response
 from werkzeug.utils import secure_filename
+from import_service import interpret_chart_upload
 
 print("CWD AT STARTUP:", os.getcwd())
 
 app = Flask(__name__)
+# Desktop WebView2 is aggressive about caching static assets between builds.
+# Disable Flask static caching so rebuilt EXEs and local runs pick up print CSS/JS changes.
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 IS_FROZEN    = getattr(sys, "frozen", False)
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
@@ -37,6 +41,8 @@ FILE_UPLOAD_NAME   = 'song_files'
 LOCAL_IMAGE_DIR    = os.path.join(DATA_DIR, LOCAL_IMAGE_NAME) if IS_FROZEN else LOCAL_IMAGE_NAME
 FILE_UPLOAD_DIR    = os.path.join(DATA_DIR, FILE_UPLOAD_NAME) if IS_FROZEN else FILE_UPLOAD_NAME
 SETTINGS_PATH      = os.path.join(DATA_DIR, 'app_settings.json') if IS_FROZEN else 'app_settings.json'
+CHART_CODE_DIR     = os.path.join(DATA_DIR, 'chart_code') if IS_FROZEN else os.path.join(BASE_DIR, 'chart_code')
+EXPORT_DIR         = os.path.join(DATA_DIR, 'exports') if IS_FROZEN else os.path.join(BASE_DIR, 'exports')
 INDEX_PATH         = os.path.join(RESOURCE_DIR, "index.html")
 TRANSLATION_FILE_CANDIDATES = (
     "translations_updated.txt",
@@ -123,6 +129,8 @@ def prepare_runtime_storage():
     os.makedirs(DATA_DIR, exist_ok=True)
     os.makedirs(LOCAL_IMAGE_DIR, exist_ok=True)
     os.makedirs(FILE_UPLOAD_DIR, exist_ok=True)
+    os.makedirs(CHART_CODE_DIR, exist_ok=True)
+    os.makedirs(EXPORT_DIR, exist_ok=True)
 
     if not IS_FROZEN:
         return
@@ -822,6 +830,148 @@ def song_row_to_dict(row, full=False):
     return d
 
 
+def mirror_song_to_chart_code(song_id):
+    """Keep one readable JSON source file for every saved editor state."""
+    conn = get_db()
+    row = conn.execute("SELECT * FROM songs WHERE id = ?", (song_id,)).fetchone()
+    conn.close()
+    if not row:
+        return None
+    os.makedirs(CHART_CODE_DIR, exist_ok=True)
+    out_path = os.path.join(CHART_CODE_DIR, f"song_{song_id}.json")
+    with open(out_path, "w", encoding="utf-8") as handle:
+        json.dump(song_row_to_dict(row, full=True), handle, ensure_ascii=False, indent=2)
+    return out_path
+
+
+def insert_song_payload(data, preferred_id=None, chart_image_path=None):
+    """Insert one normalized song payload and optionally preserve a legacy numeric ID."""
+    normalized = normalize_song_payload(data)
+    conn = get_db()
+    cur = conn.cursor()
+    columns = (
+        "title_karen, title, category, key, current_key, original_key, style, tempo, "
+        "created_date, next_performance_date, date_performed, performed_dates_json, "
+        "reference_media_json, file_metadata_json, instruments, chart_json, row_lead_json, "
+        "raw_editor_text, chart_image_path, notes"
+    )
+    values = (
+        normalized.get("title_karen"), normalized.get("title"), normalized.get("category"),
+        normalized.get("key"), normalized.get("current_key"), normalized.get("original_key"),
+        normalized.get("style"), normalized.get("tempo"),
+        normalized.get("created_date") or datetime.now().strftime("%Y-%m-%d"),
+        normalized.get("next_performance_date"), normalized.get("date_performed"),
+        json.dumps(normalized.get("performed_dates", []), ensure_ascii=False),
+        json.dumps(normalized.get("reference_media", {}), ensure_ascii=False),
+        json.dumps(normalized.get("file_metadata", []), ensure_ascii=False),
+        normalized.get("instruments"), json.dumps(normalized.get("chart_json"), ensure_ascii=False),
+        json.dumps(normalized.get("row_lead_json"), ensure_ascii=False),
+        normalized.get("raw_editor_text"), chart_image_path, normalized.get("notes"),
+    )
+    if preferred_id is not None:
+        cur.execute(f"INSERT INTO songs (id, {columns}) VALUES ({','.join(['?'] * 21)})", (preferred_id, *values))
+        song_id = preferred_id
+    else:
+        cur.execute(f"INSERT INTO songs ({columns}) VALUES ({','.join(['?'] * 20)})", values)
+        song_id = cur.lastrowid
+    conn.commit()
+    conn.close()
+    mirror_song_to_chart_code(song_id)
+    mirror_song_to_alt_dir(song_id)
+    return song_id
+
+
+def recover_song_json_library():
+    """Recover missing database rows from chart-code JSON without duplicating existing IDs."""
+    candidates = {}
+    for directory in (CHART_CODE_DIR, LOCAL_IMAGE_DIR):
+        if not os.path.isdir(directory):
+            continue
+        for filename in sorted(os.listdir(directory)):
+            match = re.fullmatch(r"song_(\d+)\.json", filename, flags=re.IGNORECASE)
+            if match:
+                candidates.setdefault(int(match.group(1)), os.path.join(directory, filename))
+
+    conn = get_db()
+    existing_ids = {row[0] for row in conn.execute("SELECT id FROM songs").fetchall()}
+    conn.close()
+    recovered = []
+    errors = []
+    for song_id, path in sorted(candidates.items()):
+        if song_id in existing_ids:
+            continue
+        try:
+            with open(path, "r", encoding="utf-8-sig") as handle:
+                payload = json.load(handle)
+            insert_song_payload(payload, preferred_id=song_id, chart_image_path=payload.get("chart_image_path"))
+            recovered.append(song_id)
+            existing_ids.add(song_id)
+        except Exception as exc:
+            errors.append({"file": path, "error": str(exc)})
+    return {"recovered_ids": recovered, "recovered_count": len(recovered), "errors": errors}
+
+
+def sync_chart_image_library():
+    """Create one database entry for every legacy PDF or image in chart_images."""
+    if not os.path.isdir(LOCAL_IMAGE_DIR):
+        return {"added_count": 0, "added_files": []}
+
+    supported_extensions = {".pdf", ".png", ".jpg", ".jpeg", ".webp"}
+    conn = get_db()
+    existing_names = {
+        os.path.basename(str(row[0] or "")).casefold()
+        for row in conn.execute("SELECT chart_image_path FROM songs").fetchall()
+        if row[0]
+    }
+    added_files = []
+    for filename in sorted(os.listdir(LOCAL_IMAGE_DIR), key=str.casefold):
+        extension = os.path.splitext(filename)[1].lower()
+        if extension not in supported_extensions or filename.casefold() in existing_names:
+            continue
+
+        source_path = os.path.abspath(os.path.join(LOCAL_IMAGE_DIR, filename))
+        title = re.sub(r"[_-]+", " ", os.path.splitext(filename)[0]).strip().title()
+        created_date = datetime.fromtimestamp(os.path.getmtime(source_path)).strftime("%Y-%m-%d")
+        file_metadata = [{
+            "id": uuid4().hex,
+            "name": filename,
+            "kind": "PDF" if extension == ".pdf" else "Image",
+            "path": source_path,
+            "url": "",
+            "notes": "Recovered from chart_images.",
+            "stored_filename": "",
+            "original_filename": filename,
+            "uploaded": False,
+            "size": os.path.getsize(source_path),
+            "added_at": datetime.now().isoformat(timespec="seconds"),
+        }]
+        conn.execute(
+            """
+            INSERT INTO songs
+                (title, created_date, file_metadata_json, chart_image_path, notes)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                title or filename,
+                created_date,
+                json.dumps(file_metadata, ensure_ascii=False),
+                source_path,
+                "Recovered from chart_images; open the attached source file for the original chart.",
+            ),
+        )
+        existing_names.add(filename.casefold())
+        added_files.append(filename)
+
+    conn.commit()
+    conn.close()
+    return {"added_count": len(added_files), "added_files": added_files}
+
+
+# Run idempotent recovery once at startup so legacy chart files appear in the Database tab.
+LIBRARY_RECOVERY_RESULT = recover_song_json_library()
+CHART_IMAGE_SYNC_RESULT = sync_chart_image_library()
+
+
 # ============================================================
 # ROUTES — pages
 # ============================================================
@@ -1056,45 +1206,56 @@ def get_song(song_id):
     return jsonify({'error': 'Song not found'}), 404
 
 
+@app.route('/api/import/json', methods=['POST'])
+def import_song_json():
+    """Validate an exported song JSON file and return a normalized editor payload."""
+    upload = request.files.get('file')
+    if not upload or not upload.filename:
+        return jsonify({'error': 'Choose a song JSON file.'}), 400
+    try:
+        payload = json.loads(upload.read().decode('utf-8-sig'))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        return jsonify({'error': f'Invalid JSON file: {exc}'}), 400
+    if isinstance(payload, list):
+        if len(payload) != 1:
+            return jsonify({'error': 'Import one song at a time, not a whole-library JSON array.'}), 400
+        payload = payload[0]
+    if not isinstance(payload, dict):
+        return jsonify({'error': 'The JSON root must be a song object.'}), 400
+    normalized = normalize_song_payload(payload)
+    normalized['chart_json'] = normalized.get('chart_json') or {}
+    normalized['row_lead_json'] = normalized.get('row_lead_json') or {}
+    normalized['import_source'] = upload.filename
+    return jsonify(normalized)
+
+
+@app.route('/api/import/vision', methods=['POST'])
+def import_song_vision():
+    """Use multimodal OCR to draft editor state from a chart image or PDF."""
+    upload = request.files.get('file')
+    if not upload or not upload.filename:
+        return jsonify({'error': 'Choose a PNG, JPG, WEBP, or PDF chord chart.'}), 400
+    try:
+        result = interpret_chart_upload(upload.filename, upload.mimetype, upload.read())
+        result['import_source'] = upload.filename
+        return jsonify(result)
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except RuntimeError as exc:
+        return jsonify({'error': str(exc)}), 502
+
+
+@app.route('/api/recover-library', methods=['POST'])
+def recover_library():
+    """Restore missing song rows from existing chart-code JSON files."""
+    return jsonify(recover_song_json_library())
+
+
 @app.route('/api/songs', methods=['POST'])
 def create_song():
     data             = normalize_song_payload(request.json or {})
     chart_image_path = save_image(data.get('chart_png_data_url'))
-    conn             = get_db()
-    cur              = conn.cursor()
-    cur.execute('''
-        INSERT INTO songs
-            (title_karen, title, category, key, current_key, original_key, style, tempo,
-             created_date, next_performance_date, date_performed, performed_dates_json,
-             reference_media_json, file_metadata_json, instruments, chart_json, row_lead_json, raw_editor_text,
-             chart_image_path, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        data.get('title_karen'),
-        data.get('title'),
-        data.get('category'),
-        data.get('key'),
-        data.get('current_key'),
-        data.get('original_key'),
-        data.get('style'),
-        data.get('tempo'),
-        data.get('created_date') or datetime.now().strftime('%Y-%m-%d'),
-        data.get('next_performance_date'),
-        data.get('date_performed'),
-        json.dumps(data.get('performed_dates', []), ensure_ascii=False),
-        json.dumps(data.get('reference_media', {}), ensure_ascii=False),
-        json.dumps(data.get('file_metadata', []), ensure_ascii=False),
-        data.get('instruments'),
-        json.dumps(data.get('chart_json')),
-        json.dumps(data.get('row_lead_json')),
-        data.get('raw_editor_text'),
-        chart_image_path,
-        data.get('notes'),
-    ))
-    song_id = cur.lastrowid
-    conn.commit()
-    conn.close()
-    mirror_song_to_alt_dir(song_id)
+    song_id = insert_song_payload(data, chart_image_path=chart_image_path)
     return jsonify({'id': song_id})
 
 
@@ -1137,6 +1298,7 @@ def update_song(song_id):
     ))
     conn.commit()
     conn.close()
+    mirror_song_to_chart_code(song_id)
     mirror_song_to_alt_dir(song_id)
     return jsonify({'success': True})
 
@@ -1260,6 +1422,24 @@ def export_json():
     )
     response.headers['Content-Disposition'] = 'attachment; filename=karen_music_songs.json'
     return response
+
+
+@app.route('/api/export-song/<int:song_id>')
+def export_song(song_id):
+    """Save and download one portable song JSON outside chart_images/chart_code."""
+    conn = get_db()
+    row = conn.execute('SELECT * FROM songs WHERE id = ?', (song_id,)).fetchone()
+    conn.close()
+    if not row:
+        return jsonify({'error': 'Song not found'}), 404
+    payload = song_row_to_dict(row, full=True)
+    title_slug = secure_filename(payload.get('title') or payload.get('title_karen') or f'song-{song_id}')
+    filename = f"{title_slug or f'song-{song_id}'}.json"
+    os.makedirs(EXPORT_DIR, exist_ok=True)
+    export_path = os.path.join(EXPORT_DIR, filename)
+    with open(export_path, 'w', encoding='utf-8') as handle:
+        json.dump(payload, handle, ensure_ascii=False, indent=2)
+    return send_file(export_path, as_attachment=True, download_name=filename, mimetype='application/json')
 
 
 @app.route('/print/<int:song_id>')

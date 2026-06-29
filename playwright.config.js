@@ -7,6 +7,8 @@ const chromeCandidates = [
   `${process.env.LOCALAPPDATA || ""}\\Google\\Chrome\\Application\\chrome.exe`
 ];
 const hasSystemChrome = chromeCandidates.some(p => p && fs.existsSync(p));
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:5000";
+const serverPort = new URL(baseURL).port || "5000";
 
 module.exports = defineConfig({
   testDir: "./tests/e2e",
@@ -18,14 +20,14 @@ module.exports = defineConfig({
   retries: 1,
   reporter: [["list"], ["html", { open: "never" }]],
   use: {
-    baseURL: "http://127.0.0.1:5000",
+    baseURL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure"
   },
   webServer: {
-    command: "python -m flask --app app run --host 127.0.0.1 --port 5000 --no-debugger --no-reload",
-    url: "http://127.0.0.1:5000",
+    command: `python -m flask --app app run --host 127.0.0.1 --port ${serverPort} --no-debugger --no-reload`,
+    url: baseURL,
     timeout: 120_000,
     reuseExistingServer: true
   },

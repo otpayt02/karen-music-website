@@ -1,7 +1,8 @@
 param(
     [string]$AppName = "KarenMusicDirector",
     [string]$IconPath = "",
-    [switch]$InstallBuildDeps
+    [switch]$InstallBuildDeps,
+    [switch]$SkipStoppingRunningApp
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,11 +15,31 @@ if (-not $IconPath) {
     $IconPath = Join-Path $ScriptDir "app.ico"
 }
 
+if (-not $SkipStoppingRunningApp) {
+    $runningApps = @(Get-Process -Name $AppName -ErrorAction SilentlyContinue)
+    if ($runningApps.Count -gt 0) {
+        Write-Host "Stopping running $AppName process(es) so PyInstaller can replace dist files..."
+        $runningApps | Stop-Process -Force
+        Start-Sleep -Seconds 2
+    }
+}
+
 if ($InstallBuildDeps) {
     python -m pip install -r requirements.txt -r requirements-build.txt
     if ($LASTEXITCODE -ne 0) {
         throw "Dependency installation failed."
     }
+}
+
+$PathlibBackportInstalled = python -c "import importlib.metadata as m; import sys; sys.exit(0 if any(d.metadata['Name'].lower() == 'pathlib' for d in m.distributions()) else 1)"
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Removing obsolete pathlib backport because it is incompatible with PyInstaller on Python 3..."
+    python -m pip uninstall -y pathlib
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to uninstall obsolete pathlib backport. Run: python -m pip uninstall pathlib"
+    }
+} elseif ($LASTEXITCODE -ne 1) {
+    throw "Failed to inspect installed Python packages for obsolete pathlib backport."
 }
 
 if (-not (Test-Path $IconPath)) {

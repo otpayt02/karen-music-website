@@ -9450,14 +9450,6 @@
         SIDEBAR TOGGLE BUTTON (always visible top-left)
     ============================================================ -->
     <button id="sidebar-toggle" title="Toggle sidebar">☰</button>
-    <nav class="action-rail no-print" aria-label="Song actions">
-      <button type="button" onclick="printInstrumentPackets()" title="Print or export PDF">PDF</button>
-      <button type="button" onclick="saveSong()" title="Save song">Save</button>
-      <button type="button" onclick="newSong()" title="Create new song">New</button>
-      <button type="button" onclick="exportDb()" title="Export song file">File</button>
-      <button type="button" onclick="window.PrintPreview?.toggleThemeDrawer()" title="Choose chart theme">Theme</button>
-      <button type="button" onclick="document.getElementById('sidebar-toggle')?.click()" title="Toggle sidebar">Panel</button>
-    </nav>
 
     <!-- Language toggle (visible after initial language pick) -->
     <button id="lang-toggle" title="Switch language" style="display:none;">EN</button>
@@ -9787,16 +9779,6 @@
             </div>
             <div id="sections-container"></div>
             <div class="paper-footer">
-              <div class="paper-footer-dates">
-                <span class="paper-footer-date-row" id="ph-footer-created">
-                  <span class="print-ka" id="ph-footer-created-karen"></span>
-                  <span class="print-en" id="ph-footer-created-english"></span>
-                </span>
-                <span class="paper-footer-date-row" id="ph-footer-next">
-                  <span class="print-ka" id="ph-footer-performed-karen"></span>
-                  <span class="print-en" id="ph-footer-performed-english"></span>
-                </span>
-              </div>
               <span class="paper-footer-stack" id="ph-footer-center"></span>
               <span class="paper-footer-stack" id="ph-footer-right"></span>
             </div>

@@ -2,6 +2,32 @@ const { test, expect } = require("@playwright/test");
 const { chooseLanguageAndEnterEditor, openSidebar, stubWindowPrint } = require("./helpers");
 
 test.describe("print preview packets", () => {
+  test("opens the PDF-spec preview with performance-only metadata", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+    await openSidebar(page);
+
+    await page.evaluate(() => {
+      document.getElementById("songTitle").value = "Performance Ready";
+      document.getElementById("songTitleKaren").value = "Karen Performance Title";
+      document.getElementById("songStyle").value = "Worship Ballad";
+      document.getElementById("songTempo").value = "96";
+      document.getElementById("songDateCreated").value = "2026-06-28";
+      document.getElementById("songNextPerformance").value = "2026-07-05";
+      renderChart();
+    });
+
+    await page.locator("#print-preview-btn").click();
+
+    const overlay = page.locator("#print-preview-overlay");
+    await expect(overlay).toHaveClass(/open/);
+    await expect(overlay.locator(".pp-title-karen")).toHaveText("Karen Performance Title");
+    await expect(overlay.locator(".pp-title-english")).toHaveText("(Performance Ready)");
+    await expect(overlay.locator(".pp-style")).toHaveText("Worship Ballad");
+    await expect(overlay.locator(".pp-footer-left")).toHaveText("96 BPM");
+    await expect(overlay).not.toContainText("2026-06-28");
+    await expect(overlay).not.toContainText("2026-07-05");
+  });
+
   test("creates one copy per instrument plus one Reference copy", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
     await openSidebar(page);
