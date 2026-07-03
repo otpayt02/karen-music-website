@@ -8,7 +8,6 @@ const chromeCandidates = [
 ];
 const hasSystemChrome = chromeCandidates.some(p => p && fs.existsSync(p));
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:5000";
-const serverPort = new URL(baseURL).port || "5000";
 
 module.exports = defineConfig({
   testDir: "./tests/e2e",
@@ -26,7 +25,7 @@ module.exports = defineConfig({
     video: "retain-on-failure"
   },
   webServer: {
-    command: `python app.py`,
+    command: "python app.py",
     url: baseURL,
     timeout: 120_000,
     reuseExistingServer: true
