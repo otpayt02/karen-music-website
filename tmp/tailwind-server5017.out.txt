@@ -1,0 +1,16 @@
+INFO:     127.0.0.1:52051 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52150 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52150 - "GET /assets/index-oUK7ENv5.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /assets/startup-language-image-DQhfIRZS.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57467 - "GET /static/print-preview.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64509 - "GET /static/event-tags.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /api/translations/latest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /assets/favicon-gOkl2e3P.svg HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /api/translations/latest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /api/translations/latest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /api/translations/latest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /api/translations/latest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /api/translations/latest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /api/translations/latest HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50521 - "GET /api/translations/latest HTTP/1.1" 200 OK

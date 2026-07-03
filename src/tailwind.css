@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .tw-focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-karen-purple focus-visible:ring-offset-2 focus-visible:ring-offset-app-dark;
+  }
+}

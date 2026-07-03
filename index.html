@@ -12,6 +12,9 @@
       background: #121212;
       color: #e0e0e0;
     }
+    body:not(.app-ready) {
+      visibility: hidden;
+    }
     body:not(.app-ready) #lang-picker-overlay,
     body:not(.app-ready) #wizard-overlay {
       visibility: hidden !important;
@@ -26,6 +29,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..800&family=IBM+Plex+Mono:wght@400;600;700&family=Instrument+Sans:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/print-overrides.css">
   <link rel="stylesheet" href="/static/event-tags.css">
+  <link rel="stylesheet" href="/src/tailwind.css">
   <script src="/static/print-preview.js" defer></script>
   <script src="/static/event-tags.js" defer></script>
 
