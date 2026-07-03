@@ -2644,9 +2644,9 @@
 
       .paper-header {
         display: grid;
-        grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr) minmax(0, 0.72fr) minmax(0, 0.54fr);
+        grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.95fr) minmax(0, 0.9fr);
         align-items: end;
-        column-gap: 12px;
+        column-gap: 18px;
         border-bottom: 2px solid #000;
         padding-bottom: 5px;
         margin-bottom: 12px;
@@ -2655,7 +2655,7 @@
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 3px;
       }
       .paper-head-left {
         align-items: flex-start;
@@ -2663,20 +2663,21 @@
       .paper-title-karen {
         font-family: var(--font-karen);
         order: 2;
-        font-size: 0.72em;
-        font-weight: 400;
+        font-size: var(--paper-header-primary-size, 1.18em);
+        font-weight: 600;
         letter-spacing: 0.02em;
-        line-height: 1.08;
-        color: #444;
+        line-height: 1;
+        color: #111;
       }
       .paper-title-english {
         font-family: var(--font-display);
         order: 1;
-        font-size: 1.22em;
+        font-size: var(--paper-header-secondary-size, 0.66em);
         font-weight: 900;
         letter-spacing: 0.02em;
         color: #111;
-        line-height: 1.05;
+        line-height: 1;
+        margin-top: 2px;
       }
       .paper-head-center {
         align-items: flex-start;
@@ -2684,8 +2685,8 @@
         justify-content: center;
       }
       .paper-head-right {
-        align-items: center;
-        text-align: center;
+        align-items: flex-end;
+        text-align: right;
         justify-content: center;
       }
       .paper-head-tempo {
@@ -2709,20 +2710,21 @@
       .paper-style-value {
         font-family: var(--font-display);
         order: 2;
-        font-size: 0.72em;
-        font-weight: 600;
-        color: #444;
+        font-size: var(--paper-header-primary-size, 1.18em);
+        font-weight: 700;
+        color: #111;
         line-height: 1;
         white-space: nowrap;
       }
       .paper-style-english {
         font-family: var(--font-ui);
         order: 1;
-        font-size: 1.22em;
+        font-size: var(--paper-header-secondary-size, 0.66em);
         font-weight: 900;
         color: #111;
         line-height: 1;
         white-space: nowrap;
+        margin-top: 2px;
       }
       .paper-tempo-line {
         display: flex;
@@ -2750,7 +2752,7 @@
       }
       .paper-key-value {
         font-family: var(--font-display);
-        font-size: 1.18em;
+        font-size: var(--paper-header-primary-size, 1.18em);
         font-weight: 900;
         color: #111;
         line-height: 1;
@@ -2770,15 +2772,15 @@
         left: 30px;
         right: 30px;
         display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr) minmax(0, 0.85fr);
-        column-gap: 8px;
-        align-items: center;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 0.9fr);
+        column-gap: 10px;
+        align-items: end;
         font-family: var(--font-ui);
         font-size: 0.62em;
         color: #666;
         border-top: 1px solid #ccc;
         padding-top: 5px;
-        min-height: 34px;
+        min-height: 38px;
         z-index: 20;
         background: rgba(255,255,255,0.92);
       }
@@ -2805,7 +2807,7 @@
       #ph-footer-center {
         text-align: center;
         font-weight: 800;
-        font-size: 1.05em;
+        font-size: 1em;
         letter-spacing: 0.04em;
       }
       #ph-footer-right {
@@ -2814,8 +2816,24 @@
       .paper-footer-stack {
         display: flex;
         flex-direction: column;
-        gap: 1px;
-        line-height: 1.08;
+        gap: 2px;
+        line-height: 1.05;
+        min-width: 0;
+      }
+      .paper-footer-stack .footer-line {
+        display: block;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .paper-footer-stack .footer-line-secondary {
+        font-size: 0.88em;
+        opacity: 0.92;
+      }
+      .paper-footer-stack .footer-line-primary {
+        font-size: 1.02em;
+        font-weight: 800;
       }
       .print-ka {
         font-family: var(--font-karen), var(--font-ui);
@@ -2836,6 +2854,21 @@
         display: inline-flex !important;
         font-size: 1.12em;
         font-weight: 800;
+      }
+      .paper-category-badge {
+        font-family: var(--font-ui);
+        font-size: 0.64em;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-align: right;
+        align-self: end;
+        max-width: 100%;
+        white-space: normal;
+        line-height: 1.05;
+      }
+      .paper-head-right .paper-category-badge {
+        margin-top: 3px;
       }
 
       .instrument-summary {
@@ -6795,6 +6828,21 @@
         align-items: center;
       }
 
+      #settings-panel {
+        width: min(390px, calc(100vw - 24px));
+      }
+
+      .settings-row {
+        gap: 10px;
+      }
+
+      .settings-label,
+      .wizard-label {
+        min-width: 0;
+        white-space: normal;
+        line-height: 1.2;
+      }
+
       .settings-label,
       label,
       .sub-label,
@@ -6889,6 +6937,90 @@
       .swatch-graphite { background: linear-gradient(120deg, #2f6f88, #d8a657, #23272d); }
       .swatch-bloom { background: linear-gradient(120deg, #ad3b72, #0e9f9a, #3c2b6f); }
       .swatch-kawthoolei { background: linear-gradient(120deg, #1f6f4a 0 34%, #d9a744 34% 66%, #c7382f 66%); }
+
+      #shortcut-panel {
+        width: min(680px, calc(100vw - 32px)) !important;
+        max-height: min(800px, calc(100vh - 76px)) !important;
+        right: 18px !important;
+      }
+
+      .shortcut-panel-header {
+        gap: 12px;
+        padding: 14px 16px !important;
+      }
+
+      .shortcut-panel-title {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .shortcut-panel-title strong {
+        font-family: var(--font-display);
+        font-size: 1.02rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--text) 78%, var(--accent) 22%);
+      }
+
+      .shortcut-panel-title span {
+        font-size: 0.72rem;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        color: var(--text-muted);
+        white-space: normal;
+      }
+
+      .shortcut-panel-body li {
+        align-items: flex-start;
+      }
+
+      .shortcut-panel-body li strong {
+        min-width: 104px;
+      }
+
+      .guide-grid dt,
+      .guide-grid dd {
+        min-width: 0;
+        word-break: break-word;
+      }
+
+      .guide-grid dd {
+        margin: 0;
+      }
+
+      .guide-note {
+        white-space: normal;
+      }
+
+      .database-song-row {
+        min-height: 86px;
+      }
+
+      .database-song-title,
+      .database-song-meta,
+      .database-song-snippet {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .database-song-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
+      .database-song-snippet {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+
+      .database-meta-pill,
+      .database-file-item {
+        min-width: 0;
+      }
 
       .karen-music-mark {
         position: relative;
@@ -9430,7 +9562,28 @@
 
       #print-batch .paper-title-karen,
       #print-batch .paper-style-value {
-        font-size: 0.72em !important;
+        font-size: var(--paper-header-primary-size, 1.18em) !important;
+      }
+      #print-batch .paper-key-value {
+        font-size: var(--paper-header-primary-size, 1.18em) !important;
+      }
+      #print-batch .chart-container {
+        --paper-body-scale: 1;
+        --paper-body-tracking: 0.01em;
+      }
+      #print-batch .section-title-en {
+        font-size: calc(1.02em * var(--paper-body-scale, 1));
+        letter-spacing: var(--paper-body-tracking, 0.01em);
+      }
+      #print-batch .section-title-ka {
+        font-size: calc(0.74em * var(--paper-body-scale, 1));
+      }
+      #print-batch .beat {
+        font-size: calc(1em * var(--paper-body-scale, 1));
+      }
+      #print-batch .section-rowcap-value {
+        transform: scale(var(--paper-body-scale, 1));
+        transform-origin: center;
       }
 
       @media screen {
@@ -10972,6 +11125,46 @@
         };
       }
 
+      function derivePrintStylePreset(style) {
+        const normalized = String(style || "").trim().toLowerCase();
+        if (!normalized) {
+          return { layout: "default", primary: "1.18em", secondary: "0.66em", bodyScale: 1, bodyTracking: "0.01em" };
+        }
+        if (/(worship|praise|chorus|anthem|hymn)/.test(normalized)) {
+          return { layout: "worship", primary: "1.24em", secondary: "0.70em", bodyScale: 1.03, bodyTracking: "0.015em" };
+        }
+        if (/(ballad|soft|slow|gentle|meditation)/.test(normalized)) {
+          return { layout: "ballad", primary: "1.12em", secondary: "0.64em", bodyScale: 0.96, bodyTracking: "0.008em" };
+        }
+        if (/(march|anthem|processional)/.test(normalized)) {
+          return { layout: "march", primary: "1.26em", secondary: "0.72em", bodyScale: 1.06, bodyTracking: "0.02em" };
+        }
+        if (/(dance|fast|upbeat|shout|celebration)/.test(normalized)) {
+          return { layout: "drive", primary: "1.28em", secondary: "0.74em", bodyScale: 1.08, bodyTracking: "0.024em" };
+        }
+        if (/(choir|choral|harmony|canon)/.test(normalized)) {
+          return { layout: "choral", primary: "1.2em", secondary: "0.68em", bodyScale: 0.98, bodyTracking: "0.012em" };
+        }
+        return {
+          layout: normalized.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 28) || "custom",
+          primary: "1.2em",
+          secondary: "0.68em",
+          bodyScale: 1,
+          bodyTracking: "0.012em"
+        };
+      }
+
+      function applyPrintStylePreset(style, root = document.getElementById("chart-container")) {
+        const host = root || document.getElementById("chart-container");
+        if (!host) return;
+        const preset = derivePrintStylePreset(style);
+        host.dataset.printStyle = preset.layout;
+        host.style.setProperty("--paper-header-primary-size", preset.primary);
+        host.style.setProperty("--paper-header-secondary-size", preset.secondary);
+        host.style.setProperty("--paper-body-scale", String(preset.bodyScale));
+        host.style.setProperty("--paper-body-tracking", preset.bodyTracking);
+      }
+
       function formatDateForPrint(dateValue) {
         const raw = String(dateValue || "").trim();
         const iso = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -11436,11 +11629,25 @@
             stripEditorOnlyPrintUi(clone);
 
             const footerCenter = clone.querySelector("#ph-footer-center");
-            setStackedBilingual(footerCenter, pageInfo.pair);
+            if (footerCenter) {
+              footerCenter.innerHTML = "";
+              const instrument = document.createElement("span");
+              instrument.className = "footer-line footer-line-primary print-ka";
+              instrument.textContent = maybeParenthesizeKaren(pageInfo.pair?.karen || pageInfo.pair?.english || "");
+              const label = document.createElement("span");
+              label.className = "footer-line footer-line-secondary print-en";
+              label.textContent = pageInfo.pair?.english || "";
+              footerCenter.appendChild(instrument);
+              footerCenter.appendChild(label);
+            }
             const footerCreated = clone.querySelector("#ph-footer-created");
             updateFooterDateRow(footerCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
             const footerPerformed = clone.querySelector("#ph-footer-next");
             updateFooterDateRow(footerPerformed, formatDatePair("datePerformedLabel", performedDate || "__/__/____"));
+            const footerRight = clone.querySelector("#ph-footer-right");
+            if (footerRight) {
+              setStackedBilingual(footerRight, getCategoryLabelPair(String(document.getElementById("songCategory")?.value || "")), { category: true, parenthesizeKaren: false });
+            }
             filterLeadRowsForPrintPage(clone, pageInfo);
 
             host.appendChild(clone);
@@ -15577,6 +15784,7 @@
         const titlePair = formatTitlePair(songTitleKaren, songTitleEnglish);
         if (phTitleKaren) phTitleKaren.textContent = titlePair.karen || titlePair.english || "";
         if (phTitleEnglish) phTitleEnglish.textContent = titlePair.english && titlePair.karen ? `(${titlePair.english})` : "";
+        applyPrintStylePreset(songStyle, document.getElementById("chart-container"));
 
         const styleTempoPair = formatStyleTempoPair(songStyle, songTempo);
         if (phStyleEnglish) phStyleEnglish.textContent = styleTempoPair.styleEnglish || styleTempoPair.styleKaren || "";
@@ -15595,13 +15803,17 @@
         updateFooterDateRow(phFooterNext, formatDatePair("datePerformedLabel", nextPerf || "__/__/____"));
         if (phFooterCenter) {
           const bpmText = `${state.beatsPerMeasure || 4}/4`;
-          const parts = [];
-          if (songInstr && songInstr !== "—") parts.push(songInstr);
-          parts.push(`Time ${bpmText}`);
-          phFooterCenter.textContent = parts.join("  •  ");
+          const bpmValue = songTempo ? `${songTempo} BPM` : "BPM";
+          phFooterCenter.innerHTML = "";
+          const top = document.createElement("span");
+          top.className = "footer-line footer-line-primary print-ka";
+          top.textContent = bpmText;
+          const bottom = document.createElement("span");
+          bottom.className = "footer-line footer-line-secondary print-en";
+          bottom.textContent = bpmValue;
+          phFooterCenter.appendChild(top);
+          phFooterCenter.appendChild(bottom);
         }
-        const firstInstrument = getPrintInstrumentList()[0] || songInstr.split(",").map(s => s.trim()).filter(Boolean)[0] || "";
-        setStackedBilingual(phFooterCenter, firstInstrument ? getInstrumentLabelPair(firstInstrument) : { karen: "", english: "" });
         setStackedBilingual(phFooterR, getCategoryLabelPair(songCat), { category: true, parenthesizeKaren: false });
 
         const viewTitle = document.getElementById("view-title");

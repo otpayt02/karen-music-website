@@ -2,6 +2,7 @@ import io
 import json
 
 import app as app_module
+import import_service
 from import_service import normalize_vision_song
 
 
@@ -119,3 +120,39 @@ def test_vision_import_route_returns_reviewable_draft(monkeypatch, tmp_path):
     assert response.status_code == 200
     assert response.get_json()["title"] == "OCR Song"
     assert response.get_json()["confidence"] == 0.75
+
+
+def test_nvidia_vision_import_uses_openai_compatible_chat_endpoint(monkeypatch, tmp_path):
+    configure_temp_storage(monkeypatch, tmp_path)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setenv("NVIDIA_API_KEY", "nvapi-test-key")
+    monkeypatch.setenv("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1")
+    monkeypatch.setenv("NVIDIA_VISION_MODEL", "meta/llama-3.2-11b-vision-instruct")
+
+    class DummyResponse:
+        def read(self):
+            return json.dumps({
+                "choices": [{
+                    "message": {
+                        "content": json.dumps(sample_song("NVIDIA OCR Song"))
+                    }
+                }]
+            }).encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+    def fake_urlopen(request, timeout=120):
+        body = json.loads(request.data.decode("utf-8"))
+        assert request.full_url == "https://integrate.api.nvidia.com/v1/chat/completions"
+        assert request.headers["Authorization"] == "Bearer nvapi-test-key"
+        assert body["model"] == "meta/llama-3.2-11b-vision-instruct"
+        return DummyResponse()
+
+    monkeypatch.setattr(import_service.urllib.request, "urlopen", fake_urlopen)
+
+    result = app_module.interpret_chart_upload("chart.png", "image/png", b"fake image")
+    assert result["title"] == "NVIDIA OCR Song"

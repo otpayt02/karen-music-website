@@ -10,8 +10,10 @@ import urllib.request
 
 
 OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
+NVIDIA_CHAT_URL = "{base_url}/chat/completions"
 GEMINI_GENERATE_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
 DEFAULT_VISION_MODEL = "gemini-2.0-flash"
+DEFAULT_NVIDIA_MODEL = "meta/llama-3.2-11b-vision-instruct"
 MAX_IMPORT_BYTES = 20 * 1024 * 1024
 ALLOWED_IMPORT_TYPES = {"image/png", "image/jpeg", "image/webp", "application/pdf"}
 
@@ -104,6 +106,24 @@ def _extract_output_text(response):
         for content in item.get("content", []):
             if content.get("type") == "output_text" and isinstance(content.get("text"), str):
                 return content["text"]
+    raise ValueError("The vision response did not contain structured text.")
+
+
+def _extract_chat_text(response):
+    choices = response.get("choices", [])
+    if not choices:
+        raise ValueError("The vision response did not contain chat choices.")
+    message = choices[0].get("message", {})
+    content = message.get("content", "")
+    if isinstance(content, str) and content.strip():
+        return content
+    if isinstance(content, list):
+        parts = []
+        for part in content:
+            if isinstance(part, dict) and isinstance(part.get("text"), str):
+                parts.append(part["text"])
+        if parts:
+            return "".join(parts)
     raise ValueError("The vision response did not contain structured text.")
 
 
@@ -241,10 +261,13 @@ def interpret_chart_upload(filename, supplied_type, file_bytes, api_key=None):
     media_type = _media_type(filename, supplied_type)
     if media_type not in ALLOWED_IMPORT_TYPES:
         raise ValueError("Import a PNG, JPG, WEBP, or PDF chord chart.")
-    gemini_key = api_key or os.environ.get("GEMINI_API_KEY", "")
+    gemini_key = os.environ.get("GEMINI_API_KEY", "")
+    nvidia_key = os.environ.get("NVIDIA_API_KEY", "")
     openai_key = os.environ.get("OPENAI_API_KEY", "")
-    if not gemini_key and not openai_key:
-        raise RuntimeError("Configure GEMINI_API_KEY or OPENAI_API_KEY for image import.")
+    if api_key and not gemini_key and not nvidia_key and not openai_key:
+        openai_key = api_key
+    if not gemini_key and not nvidia_key and not openai_key:
+        raise RuntimeError("Configure GEMINI_API_KEY, NVIDIA_API_KEY, or OPENAI_API_KEY for image import.")
 
     if gemini_key:
         payload = {
@@ -298,6 +321,34 @@ def interpret_chart_upload(filename, supplied_type, file_bytes, api_key=None):
             if text:
                 break
         extracted = json.loads(text or "{}")
+    elif nvidia_key:
+        payload = {
+            "model": os.environ.get("NVIDIA_VISION_MODEL", DEFAULT_NVIDIA_MODEL),
+            "messages": [{
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": SYSTEM_PROMPT + "\nReturn only JSON."},
+                    _input_part(filename, media_type, file_bytes),
+                ],
+            }],
+            "temperature": 0.2,
+        }
+        nvidia_base_url = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1").rstrip("/")
+        request = urllib.request.Request(
+            NVIDIA_CHAT_URL.format(base_url=nvidia_base_url),
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Authorization": f"Bearer {nvidia_key}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                result = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"NVIDIA image import failed ({exc.code}): {detail[:500]}") from exc
+        except urllib.error.URLError as exc:
+            raise RuntimeError(f"NVIDIA image import could not connect: {exc.reason}") from exc
+        extracted = json.loads(_extract_chat_text(result))
     else:
         payload = {
             "model": os.environ.get("OPENAI_VISION_MODEL", DEFAULT_VISION_MODEL),

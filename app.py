@@ -40,6 +40,7 @@ CHART_CODE_DIR = DATA_DIR / "chart_code"
 EXPORT_DIR = DATA_DIR / "exports"
 ATTACHMENT_DIR = DATA_DIR / "attachments"
 IMPORT_DIR = DATA_DIR / "imports"
+LOCAL_IMAGE_DIR = DATA_DIR / "chart_images"
 SETTINGS_PATH = DATA_DIR / "app_settings.json"
 INDEX_PATH = BASE_DIR / "index.html"
 
@@ -53,7 +54,7 @@ def utc_now() -> str:
 
 def ensure_dirs() -> None:
     for path in (DATA_DIR, CHART_CODE_DIR, EXPORT_DIR, ATTACHMENT_DIR, IMPORT_DIR):
-        path.mkdir(parents=True, exist_ok=True)
+        Path(path).mkdir(parents=True, exist_ok=True)
     if IS_FROZEN:
         bundled_db = RESOURCE_DIR / "songs.db"
         if bundled_db.exists() and not DB_PATH.exists():
@@ -345,7 +346,8 @@ def save_song(song_id: int | None, payload: dict[str, Any]) -> dict[str, Any]:
 
 def recover_song_json_library() -> dict[str, Any]:
     recovered = []
-    for folder in (DATA_DIR / "chart_images", DATA_DIR / "chart_code", BASE_DIR / "chart_code"):
+    for folder in (LOCAL_IMAGE_DIR, DATA_DIR / "chart_code", BASE_DIR / "chart_code"):
+        folder = Path(folder)
         if not folder.exists():
             continue
         for path in folder.glob("song_*.json"):
