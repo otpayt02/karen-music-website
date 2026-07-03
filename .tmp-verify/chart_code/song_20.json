@@ -1,0 +1,85 @@
+{
+  "id": 20,
+  "title": "Portable Library 1779299203484",
+  "category": "Choir",
+  "key": "G",
+  "style": "",
+  "tempo": 120,
+  "date_performed": "",
+  "instruments": "Piano 1",
+  "chart_json": {
+    "sections": [
+      {
+        "measures": [
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": true,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4
+            ],
+            "leadSlots": 4,
+            "isEndingBar": true
+          }
+        ],
+        "measuresPerRow": null,
+        "name": "Verse",
+        "preMeasure": null,
+        "rowMeasureCounts": [],
+        "type": "Verse"
+      }
+    ],
+    "onlySpans": [],
+    "slurs": [],
+    "lyricsSections": [],
+    "beatsPerMeasure": 4,
+    "defaultMeasuresPerRow": 4,
+    "rowDefaultExplicit": true
+  },
+  "raw_editor_text": "",
+  "chart_image_path": null,
+  "created_at": null,
+  "updated_at": "2026-06-28 19:03:02",
+  "notes": "",
+  "row_lead_json": {},
+  "current_key": "G",
+  "original_key": "G",
+  "created_date": "2026-05-20",
+  "next_performance_date": "",
+  "performed_dates_json": "[]",
+  "reference_media_json": "{\"videos\": [], \"images\": [], \"info\": \"\"}",
+  "title_karen": "Portable Karen",
+  "file_metadata_json": "[]",
+  "performed_dates": [],
+  "reference_media": {
+    "videos": [],
+    "images": [],
+    "info": ""
+  },
+  "file_metadata": []
+}

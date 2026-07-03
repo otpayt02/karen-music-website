@@ -1,10 +1,23 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Karen Worship Music Editor</title>
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <style>
+    html { background: #121212; }
+    body {
+      margin: 0;
+      background: #121212;
+      color: #e0e0e0;
+    }
+    body:not(.app-ready) #lang-picker-overlay,
+    body:not(.app-ready) #wizard-overlay {
+      visibility: hidden !important;
+      opacity: 0 !important;
+    }
+  </style>
 
   <!-- html2canvas for PNG export -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -280,7 +293,7 @@
       ============================================================ */
       #main-editor {
         flex: 1;
-        padding: 24px 24px 56px 24px;
+        padding: 14px 24px 56px 24px;
         overflow: auto;
         background: #1a1a2e;
         position: relative;
@@ -481,10 +494,11 @@
 
       .editor-heading {
         position: relative;
-        width: min(760px, calc(100% - 168px));
-        min-height: 78px;
+        width: min(760px, calc(100% - 120px));
+        min-height: 44px;
         margin-inline: auto !important;
-        padding-inline: 28px !important;
+        padding-inline: 12px !important;
+        margin-bottom: 8px !important;
       }
 
       .editor-heading::before {
@@ -3235,7 +3249,8 @@
       }
 
       .lang-picker-buttons {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 14px;
         margin-top: 6px;
         width: 100%;
@@ -3256,6 +3271,7 @@
         transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
         min-width: 0;
         flex: 1 1 0;
+        overflow-wrap: anywhere;
       }
 
       .lang-btn:hover,
@@ -3304,6 +3320,9 @@
         letter-spacing: 0.09em;
         color: #d2dce8;
         text-transform: uppercase;
+        text-align: center;
+        line-height: 1.15;
+        white-space: normal;
       }
 
       .lang-btn:hover .lang-btn-label,
@@ -3333,6 +3352,82 @@
         opacity: 0.9;
       }
 
+      .lang-picker-sub,
+      .lang-picker-hint,
+      .lang-picker-hero-title {
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .lang-picker-title-row {
+        min-width: 0;
+      }
+
+      @media (max-width: 640px) {
+        .lang-picker-card {
+          width: min(94vw, 520px);
+          padding: 24px 20px 20px;
+        }
+        .lang-picker-hero {
+          height: auto;
+          min-height: 118px;
+        }
+        .lang-picker-buttons {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .lang-picker-card {
+          width: min(100vw - 14px, 520px);
+          max-height: calc(100svh - 14px);
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          padding: 14px 12px 12px;
+          gap: 12px;
+          box-sizing: border-box;
+        }
+        .lang-picker-hero {
+          height: auto;
+          min-height: 98px;
+        }
+        .lang-picker-hero-title {
+          padding: 8px 10px;
+          gap: 4px;
+        }
+        .lang-title-karen {
+          font-size: clamp(1.1rem, 6.4vw, 1.55rem);
+        }
+        .lang-title-english {
+          font-size: clamp(0.9rem, 4.1vw, 1.1rem);
+        }
+        .lang-picker-sub,
+        .lang-picker-hint {
+          font-size: 0.84em;
+          line-height: 1.25;
+        }
+        .lang-btn {
+          min-height: 78px;
+          padding: 12px 10px 10px;
+          gap: 5px;
+        }
+        .lang-btn-label {
+          font-size: 0.64em;
+          letter-spacing: 0.07em;
+        }
+        .lang-btn-arrow {
+          font-size: 1.9em;
+          margin-top: 0;
+        }
+        .lang-picker-buttons {
+          gap: 10px;
+        }
+        .lang-picker-hint {
+          margin-top: 0;
+        }
+      }
+
       /* ============================================================
         LANGUAGE TOGGLE (small button in top bar, post-picker)
       ============================================================ */
@@ -3360,6 +3455,31 @@
         line-height: 1;
         overflow: hidden;
         transition: background 0.15s;
+      }
+
+      @media (max-width: 700px) {
+        #sidebar-toggle {
+          left: 10px;
+        }
+
+        #shortcut-toggle {
+          right: 48px;
+          left: auto;
+        }
+
+        #lang-toggle {
+          right: 86px;
+          left: auto;
+        }
+
+        #settings-toggle {
+          right: 10px;
+          left: auto;
+        }
+
+        #theme-toggle {
+          display: none !important;
+        }
       }
 
       #lang-toggle:hover {
@@ -3392,8 +3512,8 @@
         display: flex;
         flex-direction: column;
         align-items: stretch;
-        gap: 16px;
-        padding: 30px 30px 24px;
+        gap: 12px;
+        padding: 24px 26px 20px;
         background:
           linear-gradient(170deg, rgba(255,255,255,0.11), rgba(255,255,255,0.03)),
           rgba(13, 20, 34, 0.86);
@@ -3404,6 +3524,7 @@
           0 26px 78px rgba(0,0,0,0.58),
           inset 0 1px 0 rgba(255,255,255,0.14);
         width: min(92vw, 860px);
+        max-height: min(88vh, 760px);
         animation: wizardIn 0.46s cubic-bezier(0.22, 1, 0.36, 1) forwards;
       }
 
@@ -3442,7 +3563,7 @@
         width: 100%;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        gap: 10px;
       }
 
       #wizard-quick .wizard-field-group:nth-child(1),
@@ -3459,7 +3580,7 @@
       .wizard-field-group {
         display: flex;
         flex-direction: column;
-        gap: 5px;
+        gap: 4px;
         width: 100%;
       }
 
@@ -3479,7 +3600,7 @@
         border: 1px solid rgba(198, 219, 247, 0.32);
         border-radius: 10px;
         color: #f8fbff;
-        padding: 10px 12px;
+        padding: 9px 11px;
         font-size: 0.93em;
         outline: none;
         transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
@@ -3493,8 +3614,8 @@
       }
 
       .wizard-input-big {
-        font-size: 1.08em;
-        padding: 12px 15px;
+        font-size: 1.02em;
+        padding: 11px 13px;
         border-radius: 12px;
         text-align: center;
         letter-spacing: 0.04em;
@@ -3536,7 +3657,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 9px;
         animation: stepSlideIn 0.32s ease forwards;
       }
 
@@ -3557,7 +3678,7 @@
       }
 
       .wizard-step-question {
-        font-size: 1.06em;
+        font-size: 0.98em;
         font-weight: 700;
         color: #edf3fb;
         text-align: center;
@@ -3571,7 +3692,7 @@
         align-items: center;
         justify-content: flex-end;
         width: 100%;
-        margin-top: 6px;
+        margin-top: 2px;
       }
 
       .wizard-btn-primary {
@@ -5488,8 +5609,8 @@
         background:
           linear-gradient(180deg, transparent, rgba(255,250,242,0.72) 44%, rgba(255,250,242,0.72) 56%, transparent);
         box-shadow: none;
-        scroll-snap-type: y mandatory;
-        scroll-padding-block: 58px;
+        scroll-snap-type: none;
+        scroll-padding-block: 0;
         overscroll-behavior: contain;
         -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 22%, black 78%, transparent 100%);
         mask-image: linear-gradient(180deg, transparent 0%, black 22%, black 78%, transparent 100%);
@@ -5519,7 +5640,7 @@
         width: 100%;
         margin: 0;
         padding: 0 48px 0 48px;
-        scroll-snap-align: center;
+        scroll-snap-align: none;
         border: 0;
         border-radius: 999px;
         background: transparent;
@@ -5530,9 +5651,7 @@
         letter-spacing: 0.02em;
         box-shadow: none;
         opacity: var(--wheel-opacity);
-        transform:
-          translateX(var(--wheel-x))
-          scale(var(--wheel-scale));
+        transform: translateX(var(--wheel-x));
         transform-origin: center;
         transition:
           opacity 0.18s ease,
@@ -5576,6 +5695,8 @@
         box-shadow:
           0 14px 30px rgba(58,46,31,0.13),
           inset 0 1px 0 rgba(255,255,255,0.9);
+        outline: 1px solid color-mix(in srgb, var(--accent) 68%, white 32%);
+        outline-offset: 1px;
       }
 
       .instr-choice:hover {
@@ -5740,6 +5861,7 @@
         transform: translate(0, 0);
         pointer-events: auto;
         filter: none;
+        border-top-left-radius: 0;
       }
 
       .paper-card.is-behind {
@@ -5753,6 +5875,7 @@
         box-shadow:
           0 20px 42px rgba(58,46,31,0.14),
           0 1px 0 rgba(255,255,255,0.8) inset;
+        border-top-left-radius: 16px;
       }
 
       .paper-card.is-behind::after {
@@ -5766,19 +5889,20 @@
 
       .paper-flaps {
         position: absolute;
-        top: -28px;
-        right: 18px;
+        top: -8px;
+        right: 14px;
         z-index: 8;
         display: flex;
         align-items: flex-end;
-        gap: 6px;
+        gap: 4px;
+        padding-left: 2px;
       }
 
       .paper-flap {
-        min-width: 86px;
-        height: 32px;
+        min-width: 76px;
+        height: 28px;
         margin: 0;
-        padding: 0 16px;
+        padding: 0 14px;
         border-radius: 10px 10px 0 0;
         border: 1px solid rgba(64, 51, 34, 0.16);
         border-bottom: 0;
@@ -5792,8 +5916,10 @@
         font-family: "Sora", var(--font-display);
         font-size: 0.72em;
         font-weight: 800;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
+        position: relative;
+        top: 1px;
       }
 
       .paper-flap:hover {
@@ -5801,16 +5927,48 @@
           linear-gradient(135deg, rgba(255,255,255,0.94), rgba(228,216,197,0.98)),
           #eadcc4;
         color: #184f5f;
-        transform: translateY(-2px);
+        transform: translateY(-1px);
       }
 
       .paper-flap.is-active {
-        height: 38px;
+        height: 34px;
         background:
           linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,242,0.98)),
           #fffaf2;
         color: #2b315e;
-        transform: translateY(1px);
+        transform: translateY(2px);
+        z-index: 3;
+        box-shadow:
+          0 -10px 22px rgba(58,46,31,0.12),
+          inset 0 1px 0 rgba(255,255,255,0.9);
+        border-color: rgba(64, 51, 34, 0.12);
+      }
+
+      .paper-stack {
+        position: relative;
+        transform: scale(var(--editor-zoom));
+        transform-origin: top center;
+        margin-bottom: calc(20px + var(--editor-zoom-extra-y, 0px));
+        padding-top: 10px;
+      }
+
+      .chart-container {
+        min-height: 1056px;
+      }
+
+      .database-container {
+        min-height: 1056px;
+      }
+
+      .paper-flaps::before {
+        content: "";
+        position: absolute;
+        left: -120vw;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: rgba(255,255,255,0.08);
+        pointer-events: none;
       }
 
       .lyrics-container {
@@ -7421,9 +7579,10 @@
         }
 
         .wizard-card {
-          width: min(430px, calc(100vw - 22px));
-          padding: 18px;
+          width: min(430px, calc(100vw - 18px));
+          padding: 16px 16px 14px;
           border-radius: 20px !important;
+          gap: 10px;
         }
 
         #wizard-quick .wizard-fields {
@@ -7436,7 +7595,7 @@
         }
 
         #wizard-step-panels {
-          min-height: 190px;
+          min-height: 0;
         }
 
         .wizard-actions {
@@ -7445,6 +7604,72 @@
 
         .wizard-btn-primary {
           flex: 1;
+        }
+      }
+
+      .chart-container {
+        min-height: 1056px;
+      }
+
+      .database-container {
+        min-height: 1056px;
+      }
+
+      .paper-card-chart,
+      .paper-card-lyrics,
+      .paper-card-database {
+        border-top-left-radius: 0;
+        margin-top: 0;
+      }
+
+      .paper-card.is-active {
+        box-shadow:
+          0 28px 54px rgba(58,46,31,0.14),
+          0 1px 0 rgba(255,255,255,0.75) inset;
+      }
+
+      .paper-card.is-behind {
+        border-top-left-radius: 16px;
+      }
+
+      @media (max-width: 760px) {
+        .paper-flaps {
+          left: 10px;
+          right: 10px;
+          top: -20px;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+        }
+
+        .paper-flap {
+          min-width: 68px;
+          height: 26px;
+          padding: 0 10px;
+          font-size: 0.66em;
+        }
+
+        .paper-flap.is-active {
+          height: 31px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .wizard-card {
+          max-height: 86vh;
+          overflow: hidden;
+        }
+        #wizard-step-panels {
+          max-height: 52vh;
+          overflow: auto;
+          padding-right: 2px;
+        }
+        .wizard-actions {
+          justify-content: stretch;
+        }
+        .wizard-actions .wizard-btn-primary,
+        .wizard-actions .wizard-btn-secondary,
+        .wizard-actions .wizard-btn-skip {
+          flex: 1 1 100%;
         }
       }
 
@@ -9097,17 +9322,20 @@
       }
 
       .editor-zoom-toolbar {
+        position: sticky;
+        top: 8px;
+        z-index: 10;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 5px;
         align-self: center;
-        margin: -4px auto 14px;
+        margin: 0 auto 10px;
         padding: 5px;
         border-radius: 999px;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.12);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.16);
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.14);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.16);
       }
 
       .editor-zoom-btn,
@@ -9221,6 +9449,7 @@
         box-shadow:
           0 0 0 4px color-mix(in srgb, var(--accent) 12%, transparent),
           inset 0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent);
+        scroll-snap-type: none !important;
       }
 
       .instr-checklist.scroll-locked .instr-choice.is-wheel-focus {
@@ -9737,9 +9966,9 @@
       </div>
 
       <div class="editor-zoom-toolbar" aria-label="Chart zoom controls">
-        <button type="button" id="editor-zoom-out" class="editor-zoom-btn" title="Zoom out" onclick="changeEditorZoom(-0.1)">−</button>
+        <button type="button" id="editor-zoom-out" class="editor-zoom-btn" title="Zoom out" onclick="changeEditorZoom(-0.01)">−</button>
         <span id="editor-zoom-label" class="editor-zoom-label">100%</span>
-        <button type="button" id="editor-zoom-in" class="editor-zoom-btn" title="Zoom in" onclick="changeEditorZoom(0.1)">+</button>
+        <button type="button" id="editor-zoom-in" class="editor-zoom-btn" title="Zoom in" onclick="changeEditorZoom(0.01)">+</button>
         <button type="button" id="editor-zoom-fit" class="editor-zoom-fit" title="Fit chart to editor width" onclick="fitEditorZoomToWidth()">Fit</button>
         <button type="button" id="editor-zoom-reset" class="editor-zoom-fit" title="Reset chart zoom" onclick="setEditorZoom(1)">100</button>
       </div>
@@ -10401,9 +10630,9 @@
           const distance = Math.abs(signedDistance);
           const t = Math.min(1, distance / maxDistance);
           const eased = t * t * (3 - 2 * t);
-          const scale = 1.11 - eased * 0.31;
-          const opacity = 1 - eased * 0.68;
-          const x = -Math.sign(signedDistance) * eased * 10;
+          const scale = 1.0 + (1 - eased) * 0.015;
+          const opacity = 0.88 + (1 - eased) * 0.12;
+          const x = -Math.sign(signedDistance) * eased * 2;
 
           btn.style.setProperty("--wheel-scale", scale.toFixed(3));
           btn.style.setProperty("--wheel-opacity", Math.max(0.28, opacity).toFixed(3));
@@ -10418,16 +10647,13 @@
         buttons.forEach(btn => btn.classList.toggle("is-wheel-focus", btn === closest));
       }
 
-      function centerInstrumentChoice(btn, behavior = "smooth") {
+      function centerInstrumentChoice(btn, behavior = "auto") {
         const group = btn?.closest?.(".instr-checklist");
         if (!group) return;
         const groupRect = group.getBoundingClientRect();
         const btnRect = btn.getBoundingClientRect();
         const delta = (btnRect.top + btnRect.height / 2) - (groupRect.top + groupRect.height / 2);
-        group.scrollTo({
-          top: group.scrollTop + delta,
-          behavior
-        });
+        group.scrollTo({ top: group.scrollTop + delta * 0.2, behavior });
       }
 
       function clampEditorZoom(value) {
@@ -10470,7 +10696,8 @@
       }
 
       function changeEditorZoom(delta) {
-        setEditorZoom(editorZoom + Number(delta || 0));
+        const step = Number(delta || 0) >= 0 ? 0.01 : -0.01;
+        setEditorZoom(editorZoom + step);
       }
 
       function fitEditorZoomToWidth() {
@@ -10493,7 +10720,7 @@
           editor.addEventListener("wheel", (event) => {
             if (!event.ctrlKey && !event.metaKey) return;
             event.preventDefault();
-            changeEditorZoom(event.deltaY < 0 ? 0.1 : -0.1);
+            changeEditorZoom(event.deltaY < 0 ? 1 : -1);
           }, { passive: false });
           editor.dataset.zoomWheelBound = "1";
         }
@@ -10509,6 +10736,10 @@
         group.classList.add("scroll-locked");
         group.setAttribute("aria-label", "Instrument choices, scroll active");
         updateInstrumentWheel(group);
+        requestAnimationFrame(() => {
+          group.scrollTop = Math.max(0, group.scrollTop);
+          updateInstrumentWheel(group);
+        });
       }
 
       function unlockInstrumentScrollGroup() {
@@ -10526,6 +10757,10 @@
           const group = event.target?.closest?.(".instr-checklist");
           if (!group && activeInstrumentScrollGroup) {
             unlockInstrumentScrollGroup();
+            return;
+          }
+          if (group && activeInstrumentScrollGroup !== group) {
+            lockInstrumentScrollGroup(group);
           }
         }, true);
 
@@ -10539,7 +10774,7 @@
           if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
 
           event.preventDefault();
-          group.scrollTop += event.deltaY;
+          group.scrollTop += event.deltaY * 0.6;
           updateInstrumentWheel(group);
         }, { passive: false, capture: true });
       }
@@ -15354,7 +15589,13 @@
         if (categoryBadge) categoryBadge.textContent = songCat || "";
         updateFooterDateRow(phFooterCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
         updateFooterDateRow(phFooterNext, formatDatePair("datePerformedLabel", nextPerf || "__/__/____"));
-        if (phFooterCenter) phFooterCenter.textContent = songInstr || "—";
+        if (phFooterCenter) {
+          const bpmText = `${state.beatsPerMeasure || 4}/4`;
+          const parts = [];
+          if (songInstr && songInstr !== "—") parts.push(songInstr);
+          parts.push(`Time ${bpmText}`);
+          phFooterCenter.textContent = parts.join("  •  ");
+        }
         const firstInstrument = getPrintInstrumentList()[0] || songInstr.split(",").map(s => s.trim()).filter(Boolean)[0] || "";
         setStackedBilingual(phFooterCenter, firstInstrument ? getInstrumentLabelPair(firstInstrument) : { karen: "", english: "" });
         setStackedBilingual(phFooterR, getCategoryLabelPair(songCat), { category: true, parenthesizeKaren: false });
@@ -19954,6 +20195,7 @@
         setupLangToggle();
         applyTranslations();
         startTranslationAutoReload();
+        document.body.classList.add("app-ready");
       }
 
       window.onload = () => {
@@ -19965,6 +20207,7 @@
           setupLangToggle();
           applyTranslations();
           startTranslationAutoReload();
+          document.body.classList.add("app-ready");
         });
       };
 

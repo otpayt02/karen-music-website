@@ -1,59 +1,39 @@
-export interface DictionaryEntry {
-  id: string;
-  karen: string;
-  definitions: string[];
-  page?: number;
-  flag?: boolean;
-  status?: 'correct' | 'needs_correction' | 'unsure';
-  _is_example_sentence?: boolean;
-  example_sentence?: string;
-  original_karen?: string;
-  part_of_speech?: string;
-  interchangeable_with?: string[];
-  etymology?: string;
-  ditto_of?: string;
-  related_headwords?: string[];
-  compound_entry?: string;
-  cross_reference?: string;
-  history?: {
-    timestamp: number;
-    karen: string;
-    definitions: string[];
-    agentCorrected?: boolean;
-    reason?: string;
-  }[];
-  timestamp: number;
-}
+export type Song = {
+  id?: number;
+  title: string;
+  title_karen: string;
+  category: string;
+  key: string;
+  current_key: string;
+  original_key: string;
+  style: string;
+  tempo: string;
+  notes: string;
+  chart_json: any;
+  lyrics_json: any[];
+  metadata_json: Record<string, any>;
+  tags_json: string[];
+  updated_at?: string;
+  version?: number;
+};
 
-export interface CorrectionRecord {
-  pattern: string;
-  replacement: string;
-  type: 'headword' | 'definition' | 'formatting';
-  timestamp: number;
-}
-
-export interface ProjectState {
-  lastProcessedPage: number;
-  totalEntries: number;
-  isAutoPilot: boolean;
-}
-
-export interface ProcessingResult {
-  entries: {
-    karen: string;
-    definitions: string[];
-    page?: number;
-    flag?: boolean;
-    status?: 'correct' | 'needs_correction' | 'unsure';
-    _is_example_sentence?: boolean;
-    example_sentence?: string;
-    original_karen?: string;
-    part_of_speech?: string;
-    interchangeable_with?: string[];
-    etymology?: string;
-    ditto_of?: string;
-    related_headwords?: string[];
-    compound_entry?: string;
-    cross_reference?: string;
-  }[];
-}
+export type ImportReview = {
+  title: string;
+  title_karen: string;
+  category: string;
+  key: string;
+  current_key?: string;
+  original_key?: string;
+  style: string;
+  tempo: string;
+  confidence: number;
+  warnings: string[];
+  sections: any[];
+  chart_json?: any;
+  lyrics_json?: any[];
+  metadata_json?: Record<string, any>;
+  tags_json?: string[];
+  import_id?: number;
+  source_filename?: string;
+  source_path?: string;
+};

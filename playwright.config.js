@@ -26,7 +26,7 @@ module.exports = defineConfig({
     video: "retain-on-failure"
   },
   webServer: {
-    command: `python -m flask --app app run --host 127.0.0.1 --port ${serverPort} --no-debugger --no-reload`,
+    command: `python app.py`,
     url: baseURL,
     timeout: 120_000,
     reuseExistingServer: true

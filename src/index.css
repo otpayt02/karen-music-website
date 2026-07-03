@@ -1,27 +1,21 @@
-@import "tailwindcss";
-
-@layer base {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #27272a;
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #3f3f46;
-  }
-
-  .KarenUnicode {
-    font-family: 'Noto Sans Myanmar', 'Inter', sans-serif;
-    line-height: 1.6;
-    letter-spacing: 0.05em;
-  }
-}
-
-@theme {
-  --font-serif: "Noto Serif Myanmar", "Georgia", serif;
-}
+body { margin: 0; font-family: Segoe UI, system-ui, sans-serif; background: linear-gradient(180deg, #0b1020, #111827 60%, #0f172a); color: #e5e7eb; }
+.app { min-height: 100vh; }
+header { display: flex; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.5rem; background: rgba(15,23,42,.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(148,163,184,.18); position: sticky; top: 0; }
+header h1 { margin: 0; font-size: 1.4rem; }
+header p { margin: .25rem 0 0; color: #94a3b8; }
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+main { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; padding: 1rem; }
+.panel, .review { background: rgba(15, 23, 42, .82); border: 1px solid rgba(148,163,184,.18); border-radius: 18px; padding: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,.25); }
+.panel h2, .review h3 { margin-top: 0; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+input, textarea, button { border-radius: 12px; border: 1px solid rgba(148,163,184,.24); background: #0f172a; color: inherit; padding: .75rem; }
+textarea { min-height: 140px; width: 100%; box-sizing: border-box; }
+.chart, .lyrics { min-height: 220px; }
+.preview { display: grid; gap: 1rem; }
+.list { display: grid; gap: .5rem; max-height: 72vh; overflow: auto; }
+.list-item { display: grid; gap: .25rem; text-align: left; }
+.list-item strong { font-size: 1rem; }
+.tag { display: inline-block; width: fit-content; padding: .15rem .5rem; border-radius: 999px; background: rgba(56,189,248,.15); color: #7dd3fc; }
+.muted { color: #94a3b8; font-size: .9rem; }
+.file { position: relative; overflow: hidden; }
+.file input { position: absolute; inset: 0; opacity: 0; }

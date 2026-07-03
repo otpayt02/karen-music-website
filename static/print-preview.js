@@ -41,6 +41,14 @@
     ['archive','Archive','Fraunces','Instrument Sans','9pt','1.2'],
   ].map(([id,label,fontTitle,fontBody,fontSize,lineHeight]) => ({id,label,fontTitle,fontBody,fontSize,lineHeight}));
 
+  const STYLE_PRESETS = [
+    { id: 'classic', label: 'Classic', template: 'clean-mono', fontBody: 'Instrument Sans', fontTitle: 'Fraunces', fontSize: '9.5pt', lineHeight: '1.25', sectionStyle: 'bold' },
+    { id: 'clean', label: 'Clean', template: 'clean-mono', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '9pt', lineHeight: '1.2', sectionStyle: 'caps' },
+    { id: 'church', label: 'Church Bulletin', template: 'church-bulletin', fontBody: 'Fraunces', fontTitle: 'Fraunces', fontSize: '9.6pt', lineHeight: '1.28', sectionStyle: 'italic' },
+    { id: 'minimal', label: 'Minimal', template: 'minimal', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '8.9pt', lineHeight: '1.16', sectionStyle: 'smallcaps' },
+    { id: 'bold', label: 'Bold', template: 'bold-impact', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '9.6pt', lineHeight: '1.16', sectionStyle: 'bold' },
+  ];
+
   let activeTemplate = localStorage.getItem('karenMusicPrintTheme') || 'clean-mono';
 
   /* ──────────────────────────────────────────────────────────
@@ -60,6 +68,16 @@
     });
     localStorage.setItem('karenMusicPrintTheme', tpl.id);
     try { window._printTemplate = tpl.id; } catch(e) {}
+  }
+
+  function applyLiveTypography(overrides = {}) {
+    const root = document.documentElement;
+    if (overrides.fontBody) root.style.setProperty('--print-font-body', `'${overrides.fontBody}', sans-serif`);
+    if (overrides.fontTitle) root.style.setProperty('--print-font-title', `'${overrides.fontTitle}', serif`);
+    if (overrides.fontSize) root.style.setProperty('--print-font-size', overrides.fontSize);
+    if (overrides.lineHeight) root.style.setProperty('--print-line-height', overrides.lineHeight);
+    if (overrides.sectionStyle) root.dataset.printSectionStyle = overrides.sectionStyle;
+    try { window._printTypography = { ...overrides }; } catch(e) {}
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -116,12 +134,19 @@
       '#song-category', 'select[name="category"]',
     ]) || cs.category || '';
 
+    const beatsPerMeasure = Number(
+      readField(['#songBeatsPerMeasure', '[name="beatsPerMeasure"]', '.beats-per-measure'])
+      || cs.beatsPerMeasure
+      || window.state?.beatsPerMeasure
+      || 4
+    ) || 4;
+
     const instruments = readField([
       '#songInstruments', '#instruments', '[name="instruments"]', '.instruments-input',
       '#song-instruments', '.song-instruments',
     ]) || cs.instruments || '';
 
-    return { titleKaren, titleEnglish, style, tempo, key, category, instruments };
+    return { titleKaren, titleEnglish, style, tempo, key, category, instruments, beatsPerMeasure };
   }
 
   /* ──────────────────────────────────────────────────────────
@@ -203,8 +228,14 @@
     // LEFT:  BPM
     // RIGHT: Category · Instruments
 
-    const bpmHtml = song.tempo
-      ? `<span class="pp-footer-bpm">${esc(song.tempo)} BPM</span>`
+    const bpmParts = [];
+    if (song.beatsPerMeasure) {
+      const meter = Number(song.beatsPerMeasure) === 6 ? '6/8' : `${Number(song.beatsPerMeasure) || 4}/4`;
+      bpmParts.push(esc(meter));
+    }
+    if (song.tempo) bpmParts.push(`${esc(song.tempo)} BPM`);
+    const bpmHtml = bpmParts.length
+      ? `<span class="pp-footer-bpm">${bpmParts.join(' • ')}</span>`
       : '';
 
     const categoryParts = [song.category, song.instruments].filter(Boolean);
@@ -268,7 +299,7 @@
     ${chartHtml}
   </div>
   <div class="pp-footer">
-    <div class="pp-footer-left">${bpmHtml}</div>
+      <div class="pp-footer-left">${bpmHtml}</div>
     <div class="pp-footer-right">${categoryHtml}</div>
   </div>
 </div>
@@ -300,6 +331,34 @@
           <button id="preview-print-now" title="Print now">🖨 Print</button>
           <button id="preview-close-btn" aria-label="Close preview">✕</button>
         </div>
+        <div id="preview-controls" class="preview-controls">
+          <label>
+            <span>Theme</span>
+            <select id="preview-theme-select"></select>
+          </label>
+          <label>
+            <span>Font family</span>
+            <select id="preview-font-select">
+              <option value="Instrument Sans">Instrument Sans</option>
+              <option value="Fraunces">Fraunces</option>
+              <option value="IBM Plex Mono">IBM Plex Mono</option>
+              <option value="Noto Sans Myanmar">Noto Sans Myanmar</option>
+            </select>
+          </label>
+          <label>
+            <span>Line spacing</span>
+            <input id="preview-line-spacing" type="range" min="1.05" max="1.5" step="0.01" value="1.25">
+          </label>
+          <label>
+            <span>Section labels</span>
+            <select id="preview-section-style">
+              <option value="bold">Bold</option>
+              <option value="italic">Italic</option>
+              <option value="smallcaps">Small caps</option>
+              <option value="caps">All caps</option>
+            </select>
+          </label>
+        </div>
         <div id="preview-content"></div>
       </div>
     `;
@@ -313,6 +372,33 @@
 
     // Render template buttons inside toolbar
     renderTemplateSwitcher(overlay.querySelector('#preview-toolbar-templates'));
+    const themeSelect = overlay.querySelector('#preview-theme-select');
+    const fontSelect = overlay.querySelector('#preview-font-select');
+    const lineSpacing = overlay.querySelector('#preview-line-spacing');
+    const sectionStyle = overlay.querySelector('#preview-section-style');
+    if (themeSelect) {
+      themeSelect.innerHTML = STYLE_PRESETS.map(p => `<option value="${p.id}">${p.label}</option>`).join('');
+      themeSelect.value = STYLE_PRESETS.find(p => p.template === activeTemplate)?.id || 'classic';
+      themeSelect.addEventListener('change', () => {
+        const preset = STYLE_PRESETS.find(p => p.id === themeSelect.value) || STYLE_PRESETS[0];
+        applyTemplate(preset.template);
+        applyLiveTypography(preset);
+        refreshPreview();
+      });
+    }
+    [fontSelect, lineSpacing, sectionStyle].forEach(el => {
+      if (!el) return;
+      el.addEventListener('input', () => {
+        applyLiveTypography({
+          fontBody: fontSelect?.value || 'Instrument Sans',
+          lineHeight: lineSpacing?.value || '1.25',
+          sectionStyle: sectionStyle?.value || 'bold',
+          fontTitle: fontSelect?.value || 'Fraunces',
+        });
+        refreshPreview();
+      });
+    });
+    applyLiveTypography(STYLE_PRESETS.find(p => p.template === activeTemplate) || STYLE_PRESETS[0]);
   }
 
   function refreshPreview() {
@@ -457,6 +543,22 @@
       } else {
         Object.assign(btn.style, { position:'fixed', bottom:'24px', right:'16px', zIndex:'9000' });
         document.body.appendChild(btn);
+      }
+    }
+
+    if (!document.getElementById('section-position-tracker')) {
+      const tracker = document.createElement('button');
+      tracker.id = 'section-position-tracker';
+      tracker.className = 'no-print';
+      tracker.type = 'button';
+      tracker.disabled = true;
+      tracker.textContent = 'Position Tracker — Coming Soon';
+      tracker.title = 'Coming soon';
+      tracker.style.cssText = 'margin-left:8px;opacity:.52;cursor:not-allowed;padding:6px 12px;border-radius:6px;border:1px solid #555;background:#1c1c1c;color:#888;font-size:0.82em;';
+      if (printBtn?.parentElement) {
+        printBtn.parentElement.insertBefore(tracker, printBtn.nextSibling);
+      } else {
+        document.body.appendChild(tracker);
       }
     }
 

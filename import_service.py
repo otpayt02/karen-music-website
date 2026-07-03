@@ -10,7 +10,8 @@ import urllib.request
 
 
 OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
-DEFAULT_VISION_MODEL = "gpt-4o-mini"
+GEMINI_GENERATE_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+DEFAULT_VISION_MODEL = "gemini-2.0-flash"
 MAX_IMPORT_BYTES = 20 * 1024 * 1024
 ALLOWED_IMPORT_TYPES = {"image/png", "image/jpeg", "image/webp", "application/pdf"}
 
@@ -187,6 +188,51 @@ def normalize_vision_song(extracted):
     }
 
 
+def parse_ocr_text(text):
+    lines = [line.strip() for line in re.split(r"[\r\n]+", text or "") if line.strip()]
+    title = lines[0] if lines else "Imported Chord Chart"
+    karen_title = ""
+    current_key = ""
+    original_key = ""
+    tempo = ""
+    category = ""
+    style = ""
+    warnings = []
+    sections = []
+    section = None
+    for line in lines[1:]:
+        header = re.match(r"^(intro|verse|pre[- ]?chorus|chorus|bridge|solo|ending)\b[:\-\s]*(.*)$", line, re.I)
+        if header:
+            if section:
+                sections.append(section)
+            section = {"type": header.group(1).title().replace("Pre Chorus", "Pre-Chorus"), "measures": [{"beats": [{"chord": "", "bass": "", "circle": False, "x_marks": 0, "dot": False} for _ in range(4)]}]}
+            continue
+        if "karen" in line.lower() and not karen_title:
+            karen_title = line
+        if key_match := re.search(r"\b(?:key|current key|original key)\s*[:=]\s*([A-G][b#]?)", line, re.I):
+            if "original" in line.lower():
+                original_key = key_match.group(1)
+            else:
+                current_key = key_match.group(1)
+        if tempo_match := re.search(r"\b(?:tempo|bpm)\s*[:=]\s*(\d{2,3})", line, re.I):
+            tempo = tempo_match.group(1)
+    if section:
+        sections.append(section)
+    return {
+        "title": title,
+        "title_karen": karen_title,
+        "category": category,
+        "key": current_key or original_key,
+        "current_key": current_key or original_key,
+        "original_key": original_key or current_key,
+        "style": style,
+        "tempo": tempo,
+        "confidence": 0.45,
+        "warnings": warnings or ["Text imported from OCR should be reviewed."],
+        "sections": sections or [{"type": "Verse", "measures": []}],
+    }
+
+
 def interpret_chart_upload(filename, supplied_type, file_bytes, api_key=None):
     if not file_bytes:
         raise ValueError("The selected import file is empty.")
@@ -195,46 +241,100 @@ def interpret_chart_upload(filename, supplied_type, file_bytes, api_key=None):
     media_type = _media_type(filename, supplied_type)
     if media_type not in ALLOWED_IMPORT_TYPES:
         raise ValueError("Import a PNG, JPG, WEBP, or PDF chord chart.")
-    key = api_key or os.environ.get("OPENAI_API_KEY", "")
-    if not key:
-        raise RuntimeError("OPENAI_API_KEY is not configured for image import.")
+    gemini_key = api_key or os.environ.get("GEMINI_API_KEY", "")
+    openai_key = os.environ.get("OPENAI_API_KEY", "")
+    if not gemini_key and not openai_key:
+        raise RuntimeError("Configure GEMINI_API_KEY or OPENAI_API_KEY for image import.")
 
-    payload = {
-        "model": os.environ.get("OPENAI_VISION_MODEL", DEFAULT_VISION_MODEL),
-        "input": [{
-            "role": "user",
-            "content": [
-                {"type": "input_text", "text": SYSTEM_PROMPT},
-                _input_part(filename, media_type, file_bytes),
-            ],
-        }],
-        "text": {
-            "format": {
-                "type": "json_schema",
-                "name": "chord_chart_import",
-                "strict": True,
-                "schema": VISION_SCHEMA,
-            }
-        },
-    }
-    request = urllib.request.Request(
-        OPENAI_RESPONSES_URL,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=120) as response:
-            result = json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")
-        if exc.code == 429 and "insufficient_quota" in detail:
-            raise RuntimeError(
-                "OCR is configured, but this OpenAI API project has no available credits or quota. "
-                "Add API billing or raise the project usage limit, then try Import again."
-            ) from exc
-        raise RuntimeError(f"OpenAI image import failed ({exc.code}): {detail[:500]}") from exc
-    except urllib.error.URLError as exc:
-        raise RuntimeError(f"OpenAI image import could not connect: {exc.reason}") from exc
-    extracted = json.loads(_extract_output_text(result))
+    if gemini_key:
+        payload = {
+            "contents": [{
+                "role": "user",
+                "parts": [
+                    {"text": SYSTEM_PROMPT + "\nReturn only JSON."},
+                    {"inlineData": {"mimeType": media_type, "data": base64.b64encode(file_bytes).decode("ascii")}},
+                ],
+            }],
+            "generationConfig": {
+                "responseMimeType": "application/json",
+                "responseSchema": {
+                    "type": "object",
+                    "required": ["title", "title_karen", "category", "key", "style", "tempo", "confidence", "warnings", "sections"],
+                    "properties": {
+                        "title": {"type": "string"},
+                        "title_karen": {"type": "string"},
+                        "category": {"type": "string"},
+                        "key": {"type": "string"},
+                        "style": {"type": "string"},
+                        "tempo": {"type": "string"},
+                        "confidence": {"type": "number"},
+                        "warnings": {"type": "array", "items": {"type": "string"}},
+                        "sections": {"type": "array"},
+                    },
+                },
+            },
+        }
+        request = urllib.request.Request(
+            GEMINI_GENERATE_URL.format(model=os.environ.get("GEMINI_VISION_MODEL", DEFAULT_VISION_MODEL), key=gemini_key),
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                result = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Gemini image import failed ({exc.code}): {detail[:500]}") from exc
+        except urllib.error.URLError as exc:
+            raise RuntimeError(f"Gemini image import could not connect: {exc.reason}") from exc
+        candidates = result.get("candidates", [])
+        text = ""
+        for candidate in candidates:
+            for part in candidate.get("content", {}).get("parts", []):
+                if isinstance(part.get("text"), str):
+                    text = part["text"]
+                    break
+            if text:
+                break
+        extracted = json.loads(text or "{}")
+    else:
+        payload = {
+            "model": os.environ.get("OPENAI_VISION_MODEL", DEFAULT_VISION_MODEL),
+            "input": [{
+                "role": "user",
+                "content": [
+                    {"type": "input_text", "text": SYSTEM_PROMPT},
+                    _input_part(filename, media_type, file_bytes),
+                ],
+            }],
+            "text": {
+                "format": {
+                    "type": "json_schema",
+                    "name": "chord_chart_import",
+                    "strict": True,
+                    "schema": VISION_SCHEMA,
+                }
+            },
+        }
+        request = urllib.request.Request(
+            OPENAI_RESPONSES_URL,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                result = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")
+            if exc.code == 429 and "insufficient_quota" in detail:
+                raise RuntimeError(
+                    "OCR is configured, but this OpenAI API project has no available credits or quota. "
+                    "Add API billing or raise the project usage limit, then try Import again."
+                ) from exc
+            raise RuntimeError(f"OpenAI image import failed ({exc.code}): {detail[:500]}") from exc
+        except urllib.error.URLError as exc:
+            raise RuntimeError(f"OpenAI image import could not connect: {exc.reason}") from exc
+        extracted = json.loads(_extract_output_text(result))
     return normalize_vision_song(extracted)

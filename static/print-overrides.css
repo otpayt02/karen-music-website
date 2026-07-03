@@ -350,6 +350,38 @@
   font-family: var(--sheet-title-font) !important;
 }
 
+html[data-print-section-style="italic"] .pp-page .section-header,
+html[data-print-section-style="italic"] #print-batch .section-header { font-style: italic !important; }
+html[data-print-section-style="smallcaps"] .pp-page .section-header,
+html[data-print-section-style="smallcaps"] #print-batch .section-header { font-variant: small-caps !important; letter-spacing: .12em !important; }
+html[data-print-section-style="caps"] .pp-page .section-header,
+html[data-print-section-style="caps"] #print-batch .section-header { text-transform: uppercase !important; letter-spacing: .14em !important; }
+html[data-print-section-style="bold"] .pp-page .section-header,
+html[data-print-section-style="bold"] #print-batch .section-header { font-weight: 800 !important; }
+
+.preview-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px 14px 4px;
+}
+.preview-controls label {
+  display: grid;
+  gap: 6px;
+  font-size: 11px;
+  color: #d3d9dd;
+}
+.preview-controls span {
+  opacity: .8;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 10px;
+}
+.preview-controls select,
+.preview-controls input[type="range"] {
+  width: 100%;
+}
+
 .pp-page .line,
 #print-batch .line { gap: var(--sheet-measure-gap) !important; }
 

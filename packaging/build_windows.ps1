@@ -31,6 +31,13 @@ if ($InstallBuildDeps) {
     }
 }
 
+if (-not (Test-Path (Join-Path $ProjectRoot "dist\index.html"))) {
+    npm.cmd install
+    if ($LASTEXITCODE -ne 0) { throw "npm install failed." }
+    npm.cmd run build
+    if ($LASTEXITCODE -ne 0) { throw "Vite build failed." }
+}
+
 $PathlibBackportInstalled = python -c "import importlib.metadata as m; import sys; sys.exit(0 if any(d.metadata['Name'].lower() == 'pathlib' for d in m.distributions()) else 1)"
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Removing obsolete pathlib backport because it is incompatible with PyInstaller on Python 3..."
@@ -62,14 +69,14 @@ $pyinstallerArgs = @(
     "--distpath", $DistPath,
     "--workpath", $WorkPath,
     "--specpath", $SpecPath,
-    "--add-data", "$ProjectRoot\index.html;.",
+    "--add-data", "$ProjectRoot\dist;dist",
     "--add-data", "$ProjectRoot\songs.db;.",
     "--add-data", "$ProjectRoot\static;static",
     "--add-data", "$ProjectRoot\chart_images;chart_images",
     "--add-data", "$IconPath;.",
-    "--hidden-import", "werkzeug.serving",
-    "--collect-submodules", "werkzeug",
-    "--collect-data", "werkzeug",
+    "--hidden-import", "fastapi",
+    "--hidden-import", "uvicorn",
+    "--hidden-import", "starlette",
     "--collect-submodules", "webview",
     "--collect-data", "webview",
     "karen_music_desktop.py"
