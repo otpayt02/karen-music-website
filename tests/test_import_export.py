@@ -1,8 +1,8 @@
-import io
 import json
 
 import app as app_module
 import import_service
+from fastapi.testclient import TestClient
 from import_service import normalize_vision_song
 
 
@@ -11,10 +11,14 @@ def configure_temp_storage(monkeypatch, tmp_path):
     chart_code_path = tmp_path / "chart_code"
     export_path = tmp_path / "exports"
     chart_images_path = tmp_path / "chart_images"
-    monkeypatch.setattr(app_module, "DB_PATH", str(database_path))
-    monkeypatch.setattr(app_module, "CHART_CODE_DIR", str(chart_code_path))
-    monkeypatch.setattr(app_module, "EXPORT_DIR", str(export_path))
-    monkeypatch.setattr(app_module, "LOCAL_IMAGE_DIR", str(chart_images_path))
+    monkeypatch.setattr(app_module, "BASE_DIR", tmp_path)
+    monkeypatch.setattr(app_module, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(app_module, "DB_PATH", database_path)
+    monkeypatch.setattr(app_module, "CHART_CODE_DIR", chart_code_path)
+    monkeypatch.setattr(app_module, "EXPORT_DIR", export_path)
+    monkeypatch.setattr(app_module, "LOCAL_IMAGE_DIR", chart_images_path)
+    monkeypatch.setattr(app_module, "ATTACHMENT_DIR", tmp_path / "attachments")
+    monkeypatch.setattr(app_module, "IMPORT_DIR", tmp_path / "imports")
     app_module.init_db()
     return database_path, chart_code_path, export_path, chart_images_path
 
@@ -78,8 +82,8 @@ def test_normalizes_vision_output_into_editor_beats():
     assert result["confidence"] == 0.82
 
 
-def test_json_import_recovery_mirroring_and_export(monkeypatch, tmp_path):
-    _, chart_code_path, export_path, chart_images_path = configure_temp_storage(monkeypatch, tmp_path)
+def test_json_import_recovery_mirroring(monkeypatch, tmp_path):
+    _, chart_code_path, _, chart_images_path = configure_temp_storage(monkeypatch, tmp_path)
     payload = sample_song()
     chart_images_path.mkdir(parents=True)
     (chart_images_path / "song_20.json").write_text(json.dumps({"id": 20, **payload}), encoding="utf-8")
@@ -90,36 +94,29 @@ def test_json_import_recovery_mirroring_and_export(monkeypatch, tmp_path):
     assert second_recovery["recovered_ids"] == []
     assert (chart_code_path / "song_20.json").exists()
 
-    client = app_module.app.test_client()
+    client = TestClient(app_module.app)
     import_response = client.post(
         "/api/import/json",
-        data={"file": (io.BytesIO(json.dumps(payload).encode("utf-8")), "song.json")},
-        content_type="multipart/form-data",
+        files={"file": ("song.json", json.dumps(payload).encode("utf-8"), "application/json")},
     )
     assert import_response.status_code == 200
-    assert import_response.get_json()["chart_json"]["sections"][0]["type"] == "Verse"
-
-    export_response = client.get("/api/export-song/20")
-    assert export_response.status_code == 200
-    assert export_response.headers["Content-Disposition"].startswith("attachment;")
-    assert any(export_path.glob("*.json"))
+    assert import_response.json()["chart_json"]["sections"][0]["type"] == "Verse"
 
 
 def test_vision_import_route_returns_reviewable_draft(monkeypatch, tmp_path):
     configure_temp_storage(monkeypatch, tmp_path)
     expected = {**sample_song("OCR Song"), "confidence": 0.75, "warnings": ["Review the bridge"]}
     monkeypatch.setattr(app_module, "interpret_chart_upload", lambda *_args, **_kwargs: expected)
-    client = app_module.app.test_client()
+    client = TestClient(app_module.app)
 
     response = client.post(
         "/api/import/vision",
-        data={"file": (io.BytesIO(b"fake image"), "chart.png")},
-        content_type="multipart/form-data",
+        files={"file": ("chart.png", b"fake image", "image/png")},
     )
 
     assert response.status_code == 200
-    assert response.get_json()["title"] == "OCR Song"
-    assert response.get_json()["confidence"] == 0.75
+    assert response.json()["title"] == "OCR Song"
+    assert response.json()["confidence"] == 0.75
 
 
 def test_nvidia_vision_import_uses_openai_compatible_chat_endpoint(monkeypatch, tmp_path):

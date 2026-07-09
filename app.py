@@ -42,7 +42,22 @@ ATTACHMENT_DIR = DATA_DIR / "attachments"
 IMPORT_DIR = DATA_DIR / "imports"
 LOCAL_IMAGE_DIR = DATA_DIR / "chart_images"
 SETTINGS_PATH = DATA_DIR / "app_settings.json"
-INDEX_PATH = BASE_DIR / "index.html"
+API_ORIGIN = os.environ.get("KAREN_MUSIC_API_ORIGIN", "").strip().rstrip("/")
+INDEX_CANDIDATES = (
+    RESOURCE_DIR / "dist" / "index.html",
+    BASE_DIR / "dist" / "index.html",
+    RESOURCE_DIR / "index.html",
+    BASE_DIR / "index.html",
+    BASE_DIR / "legacy-index.html",
+)
+STATIC_CANDIDATES = (
+    RESOURCE_DIR / "static",
+    BASE_DIR / "static",
+)
+DIST_ASSETS_CANDIDATES = (
+    RESOURCE_DIR / "dist" / "assets",
+    BASE_DIR / "dist" / "assets",
+)
 
 app = FastAPI(title="Karen Music Director")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -59,6 +74,13 @@ def ensure_dirs() -> None:
         bundled_db = RESOURCE_DIR / "songs.db"
         if bundled_db.exists() and not DB_PATH.exists():
             shutil.copy2(bundled_db, DB_PATH)
+
+
+def resolve_first_existing_path(candidates: Iterable[Path]) -> Path | None:
+    for path in candidates:
+        if path.exists():
+            return path
+    return None
 
 
 def db() -> sqlite3.Connection:
@@ -438,7 +460,14 @@ def delete_song(song_id: int) -> dict[str, Any]:
 
 
 @app.post("/api/songs/{song_id}/files")
-async def add_song_file(song_id: int, file: UploadFile = File(...)) -> dict[str, Any]:
+async def add_song_file(
+    song_id: int,
+    file: UploadFile = File(...),
+    name: str = Form(""),
+    kind: str = Form("Reference"),
+    role: str = Form(""),
+    notes: str = Form(""),
+) -> dict[str, Any]:
     song_dir = ATTACHMENT_DIR / f"song_{song_id}"
     song_dir.mkdir(parents=True, exist_ok=True)
     stored_name = Path(file.filename).name
@@ -446,7 +475,11 @@ async def add_song_file(song_id: int, file: UploadFile = File(...)) -> dict[str,
     target.write_bytes(await file.read())
     attachment = {
         "id": f"file-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+        "name": name.strip() or file.filename,
         "filename": file.filename,
+        "kind": kind.strip() or "Reference",
+        "role": role.strip(),
+        "notes": notes.strip(),
         "stored_filename": stored_name,
         "url": f"/api/songs/{song_id}/files/{stored_name}/download",
         "mime_type": file.content_type or "",
@@ -593,8 +626,16 @@ def backup_db() -> FileResponse:
 
 @app.get("/")
 def index() -> HTMLResponse:
-    if INDEX_PATH.exists():
-        return HTMLResponse(INDEX_PATH.read_text(encoding="utf-8"))
+    index_path = resolve_first_existing_path(INDEX_CANDIDATES)
+    if index_path:
+        html = index_path.read_text(encoding="utf-8")
+        origin = API_ORIGIN or ""
+        injection = f"<script>window.__KAREN_MUSIC_API_ORIGIN__ = {json.dumps(origin)};</script>"
+        if "</head>" in html:
+            html = html.replace("</head>", f"{injection}</head>", 1)
+        else:
+            html = f"{injection}{html}"
+        return HTMLResponse(html)
     return HTMLResponse("<!doctype html><html><body><div id='root'></div></body></html>")
 
 
@@ -603,8 +644,13 @@ def print_song(song_id: int) -> HTMLResponse:
     return HTMLResponse(f"<meta http-equiv='refresh' content='0; url=/?songId={song_id}&mode=print'>")
 
 
-if (BASE_DIR / "static").exists():
-    app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
+STATIC_PATH = resolve_first_existing_path(STATIC_CANDIDATES)
+if STATIC_PATH:
+    app.mount("/static", StaticFiles(directory=str(STATIC_PATH)), name="static")
+
+DIST_ASSETS_PATH = resolve_first_existing_path(DIST_ASSETS_CANDIDATES)
+if DIST_ASSETS_PATH:
+    app.mount("/assets", StaticFiles(directory=str(DIST_ASSETS_PATH)), name="assets")
 
 
 def main() -> None:

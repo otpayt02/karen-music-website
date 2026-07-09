@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Karen Worship Music Editor</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon-gOkl2e3P.svg">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <style>
     html { background: #121212; }
     body {
@@ -27,6 +27,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..800&family=IBM+Plex+Mono:wght@400;600;700&family=Instrument+Sans:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/print-overrides.css">
+  <link rel="stylesheet" href="/static/event-tags.css">
+  <link rel="stylesheet" href="/src/tailwind.css">
   <script src="/static/print-preview.js" defer></script>
   <script src="/static/event-tags.js" defer></script>
 
@@ -191,9 +194,7 @@
       }
 
       .instr-choice {
-        -webkit-appearance: none;
-           -moz-appearance: none;
-                appearance: none;
+        appearance: none;
         border: 1px solid #4a4a4a;
         background: #242424;
         color: #ddd;
@@ -414,9 +415,7 @@
         color: var(--text-muted);
         font-size: 11px;
         letter-spacing: 0.1em;
-        -webkit-user-select: none;
-           -moz-user-select: none;
-                user-select: none;
+        user-select: none;
       }
 
       #karen-flap-title {
@@ -519,6 +518,12 @@
 
       .editor-heading:hover::before {
         opacity: 1;
+      }
+
+      .editor-heading {
+        position: sticky;
+        top: 10px;
+        z-index: 38;
       }
 
       #print-batch {
@@ -897,7 +902,7 @@
       }
 
       html[data-design="design-3"] {
-        --design-concept: "Stage";
+        --design-concept: "Studio";
         --sidebar-width: 360px;
         --panel-radius: 28px;
         --control-radius: 18px;
@@ -1175,7 +1180,6 @@
           position: static;
           transform: none;
           margin: 0 auto 12px;
-          width: -moz-fit-content;
           width: fit-content;
           max-width: 100%;
           overflow-x: auto;
@@ -1210,14 +1214,12 @@
 
         #print-batch .chart-container {
           display: block !important;
-          -moz-column-break-after: page;
-               break-after: page;
+          break-after: page;
           page-break-after: always;
         }
 
         #print-batch .chart-container:last-child {
-          -moz-column-break-after: auto;
-               break-after: auto;
+          break-after: auto;
           page-break-after: auto;
         }
       }
@@ -1992,8 +1994,38 @@
 
       .lead-grid-scroll {
         width: 100%;
-        overflow-x: visible;
+        overflow-x: auto;
         padding-bottom: 2px;
+      }
+
+      .lead-measure-strip {
+        display: flex;
+        gap: 12px;
+        align-items: stretch;
+        min-width: max-content;
+      }
+
+      .lead-measure-card {
+        min-width: 280px;
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(0,0,0,0.18);
+        display: grid;
+        gap: 8px;
+      }
+
+      .lead-measure-card.active {
+        outline: 2px solid rgba(187,134,252,0.7);
+        background: rgba(187,134,252,0.1);
+      }
+
+      .lead-measure-card-title {
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #f0ebff;
       }
 
       .lead-grid-cell.active {
@@ -2648,10 +2680,9 @@
 
       .paper-header {
         display: grid;
-        grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.9fr) minmax(0, 0.72fr) minmax(0, 0.54fr);
+        grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 0.95fr);
         align-items: end;
-        -moz-column-gap: 12px;
-             column-gap: 12px;
+        column-gap: 18px;
         border-bottom: 2px solid #000;
         padding-bottom: 5px;
         margin-bottom: 12px;
@@ -2660,7 +2691,7 @@
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 3px;
       }
       .paper-head-left {
         align-items: flex-start;
@@ -2668,20 +2699,21 @@
       .paper-title-karen {
         font-family: var(--font-karen);
         order: 2;
-        font-size: 0.72em;
-        font-weight: 400;
+        font-size: var(--paper-header-primary-size, 1.22em);
+        font-weight: 800;
         letter-spacing: 0.02em;
-        line-height: 1.08;
-        color: #444;
+        line-height: 1;
+        color: #111;
       }
       .paper-title-english {
         font-family: var(--font-display);
         order: 1;
-        font-size: 1.22em;
+        font-size: var(--paper-header-secondary-size, 0.66em);
         font-weight: 900;
         letter-spacing: 0.02em;
         color: #111;
-        line-height: 1.05;
+        line-height: 1;
+        margin-top: 2px;
       }
       .paper-head-center {
         align-items: flex-start;
@@ -2689,8 +2721,8 @@
         justify-content: center;
       }
       .paper-head-right {
-        align-items: center;
-        text-align: center;
+        align-items: flex-end;
+        text-align: right;
         justify-content: center;
       }
       .paper-head-tempo {
@@ -2714,20 +2746,21 @@
       .paper-style-value {
         font-family: var(--font-display);
         order: 2;
-        font-size: 0.72em;
-        font-weight: 600;
-        color: #444;
+        font-size: var(--paper-header-primary-size, 1.22em);
+        font-weight: 800;
+        color: #111;
         line-height: 1;
         white-space: nowrap;
       }
       .paper-style-english {
         font-family: var(--font-ui);
         order: 1;
-        font-size: 1.22em;
+        font-size: var(--paper-header-secondary-size, 0.66em);
         font-weight: 900;
         color: #111;
         line-height: 1;
         white-space: nowrap;
+        margin-top: 2px;
       }
       .paper-tempo-line {
         display: flex;
@@ -2755,7 +2788,7 @@
       }
       .paper-key-value {
         font-family: var(--font-display);
-        font-size: 1.18em;
+        font-size: var(--paper-header-primary-size, 1.22em);
         font-weight: 900;
         color: #111;
         line-height: 1;
@@ -2775,16 +2808,15 @@
         left: 30px;
         right: 30px;
         display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr) minmax(0, 0.85fr);
-        -moz-column-gap: 8px;
-             column-gap: 8px;
-        align-items: center;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 0.9fr);
+        column-gap: 10px;
+        align-items: end;
         font-family: var(--font-ui);
         font-size: 0.62em;
         color: #666;
         border-top: 1px solid #ccc;
         padding-top: 5px;
-        min-height: 34px;
+        min-height: 38px;
         z-index: 20;
         background: rgba(255,255,255,0.92);
       }
@@ -2811,7 +2843,7 @@
       #ph-footer-center {
         text-align: center;
         font-weight: 800;
-        font-size: 1.05em;
+        font-size: 1em;
         letter-spacing: 0.04em;
       }
       #ph-footer-right {
@@ -2820,8 +2852,24 @@
       .paper-footer-stack {
         display: flex;
         flex-direction: column;
-        gap: 1px;
-        line-height: 1.08;
+        gap: 2px;
+        line-height: 1.05;
+        min-width: 0;
+      }
+      .paper-footer-stack .footer-line {
+        display: block;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .paper-footer-stack .footer-line-secondary {
+        font-size: 0.88em;
+        opacity: 0.92;
+      }
+      .paper-footer-stack .footer-line-primary {
+        font-size: 1.02em;
+        font-weight: 800;
       }
       .print-ka {
         font-family: var(--font-karen), var(--font-ui);
@@ -2842,6 +2890,21 @@
         display: inline-flex !important;
         font-size: 1.12em;
         font-weight: 800;
+      }
+      .paper-category-badge {
+        font-family: var(--font-ui);
+        font-size: 0.64em;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-align: right;
+        align-self: end;
+        max-width: 100%;
+        white-space: normal;
+        line-height: 1.05;
+      }
+      .paper-head-right .paper-category-badge {
+        margin-top: 3px;
       }
 
       .instrument-summary {
@@ -2960,8 +3023,7 @@
           padding: 24px 30px 64px 30px !important;
           box-shadow: none !important;
           overflow: hidden !important;
-          -moz-column-break-after: page;
-               break-after: page;
+          break-after: page;
           page-break-after: always;
         }
 
@@ -2976,8 +3038,7 @@
         }
 
         #print-batch .chart-container:last-child {
-          -moz-column-break-after: auto;
-               break-after: auto;
+          break-after: auto;
           page-break-after: auto;
         }
 
@@ -3102,8 +3163,7 @@
 
         #print-batch .paper-header {
           grid-template-columns: minmax(0, 1.55fr) minmax(0, 1.05fr) minmax(0, 0.88fr) !important;
-          -moz-column-gap: 10px !important;
-               column-gap: 10px !important;
+          column-gap: 10px !important;
           margin-bottom: 10px !important;
         }
 
@@ -3126,8 +3186,7 @@
         .section,
         .line,
         .measure {
-          -moz-column-break-inside: avoid;
-               break-inside: avoid;
+          break-inside: avoid;
           page-break-inside: avoid;
         }
       }
@@ -3182,7 +3241,7 @@
 
       .lang-picker-hero {
         width: 100%;
-        height: 132px;
+        height: 164px;
         border-radius: 16px;
         overflow: hidden;
         position: relative;
@@ -3191,6 +3250,8 @@
         justify-content: center;
         padding: 8px;
         background:
+          linear-gradient(180deg, rgba(5, 12, 18, 0.08), rgba(5, 12, 18, 0.0) 44%),
+          url("/static/startup-language-image.png") center / cover no-repeat,
           radial-gradient(circle at 20% 20%, rgba(255,255,255,0.25), transparent 45%),
           linear-gradient(135deg, #1d4ed8 0%, #0f766e 55%, #166534 100%);
         border: 1px solid rgba(255,255,255,0.24);
@@ -3202,11 +3263,10 @@
         inset: 0;
         width: 100%;
         height: 100%;
-        -o-object-fit: cover;
-           object-fit: cover;
+        object-fit: cover;
         display: block;
-        opacity: 0.15;
-        filter: saturate(0.8) brightness(0.9);
+        opacity: 0;
+        pointer-events: none;
       }
 
       .lang-picker-hero-title {
@@ -3237,37 +3297,39 @@
 
       .lang-title-karen {
         font-family: var(--font-karen);
-        font-size: clamp(1.45rem, 4.5vw, 2rem);
-        font-weight: 700;
-        color: #f6fff7;
+        font-size: clamp(1.8rem, 5vw, 2.35rem);
+        font-weight: 800;
+        color: #eef8ff;
         line-height: 1.15;
-        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
       }
 
       .lang-title-english {
         font-family: var(--font-display);
-        font-size: clamp(1.1rem, 3.5vw, 1.45rem);
-        font-weight: 800;
+        font-size: clamp(1.25rem, 3.8vw, 1.7rem);
+        font-weight: 900;
         letter-spacing: 0.08em;
-        color: #f6fff7;
+        color: #eef8ff;
         text-transform: uppercase;
         line-height: 1.1;
-        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
       }
 
       .lang-picker-sub {
-        font-size: 0.85em;
-        color: #c9d6e3;
+        font-size: 0.98em;
+        color: #ffffff;
         text-align: center;
         line-height: 1.4;
         letter-spacing: 0.03em;
+        font-weight: 900;
+        text-shadow: 0 1px 0 rgba(0,0,0,0.45);
       }
 
       .lang-picker-buttons {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 6px;
+        gap: 16px;
+        margin-top: 8px;
         width: 100%;
       }
 
@@ -3276,34 +3338,41 @@
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        gap: 7px;
-        padding: 16px 14px 12px;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.22);
-        border-radius: 14px;
+        gap: 9px;
+        padding: 24px 18px 18px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.24);
+        border-radius: 18px;
         color: #eaf0f7;
         cursor: pointer;
         transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
         min-width: 0;
+        min-height: 176px;
         flex: 1 1 0;
         overflow-wrap: anywhere;
       }
 
       .lang-btn:hover,
       .lang-btn.selected {
-        background: linear-gradient(145deg, rgba(85,136,199,0.28), rgba(58,85,126,0.2));
-        border-color: rgba(149, 197, 255, 0.68);
+        background: linear-gradient(145deg, rgba(56,120,210,0.42), rgba(22,74,145,0.32));
+        border-color: rgba(149, 197, 255, 0.76);
         color: #fff;
         box-shadow:
           0 0 0 2px rgba(156, 206, 255, 0.2),
           0 10px 24px rgba(0,0,0,0.24);
         transform: translateY(-3px);
       }
+      .lang-btn.selected {
+        background: linear-gradient(145deg, rgba(74,149,255,0.54), rgba(29,88,171,0.42));
+        box-shadow:
+          0 0 0 2px rgba(194, 227, 255, 0.38),
+          0 12px 28px rgba(0,0,0,0.32);
+      }
 
       .lang-btn-script {
         font-family: var(--font-ui);
-        font-size: 1.12em;
-        font-weight: 700;
+        font-size: 1.32em;
+        font-weight: 800;
         line-height: 1;
       }
 
@@ -3316,7 +3385,7 @@
       }
 
       .lang-btn-arrow {
-        font-size: 2.3em;
+        font-size: 2.6em;
         color: #f2f7ff;
         opacity: 0.97;
         display: block;
@@ -3331,8 +3400,8 @@
 
       .lang-btn-label {
         font-family: var(--font-display);
-        font-size: 0.72em;
-        letter-spacing: 0.09em;
+        font-size: 0.92em;
+        letter-spacing: 0.08em;
         color: #d2dce8;
         text-transform: uppercase;
         text-align: center;
@@ -3343,6 +3412,12 @@
       .lang-btn:hover .lang-btn-label,
       .lang-btn.selected .lang-btn-label {
         color: #f2f7ff;
+      }
+      .lang-btn.selected .lang-btn-arrow {
+        color: #f7fbff;
+      }
+      .lang-btn:hover:not(.selected) {
+        border-color: rgba(149, 197, 255, 0.48);
       }
 
       .lang-picker-hint {
@@ -3634,10 +3709,6 @@
         border-radius: 12px;
         text-align: center;
         letter-spacing: 0.04em;
-      }
-
-      .wizard-input-big::-moz-placeholder {
-        color: rgba(255,255,255,0.25);
       }
 
       .wizard-input-big::placeholder {
@@ -3932,6 +4003,86 @@
         display: block;
       }
 
+      .translation-queue-panel {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.12);
+      }
+
+      .translation-queue-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .translation-queue-title {
+        color: #e8edf7;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .translation-queue-badge {
+        min-width: 26px;
+        height: 20px;
+        padding: 0 8px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(96, 165, 250, 0.22);
+        color: #d7e9ff;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .translation-queue-note {
+        margin: 0 0 8px;
+        color: #94a3b8;
+        font-size: 10px;
+        line-height: 1.4;
+      }
+
+      .translation-queue-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 6px;
+        max-height: 180px;
+        overflow: auto;
+      }
+
+      .translation-queue-item {
+        border: 1px solid rgba(148,163,184,0.14);
+        border-radius: 8px;
+        padding: 6px 8px;
+        background: rgba(8, 12, 16, 0.68);
+        display: grid;
+        gap: 2px;
+      }
+
+      .translation-queue-item strong {
+        color: #eef4ff;
+        font-size: 11px;
+        line-height: 1.25;
+      }
+
+      .translation-queue-item span {
+        color: #9fb0c7;
+        font-size: 10px;
+        line-height: 1.3;
+      }
+
+      .translation-queue-empty {
+        color: #94a3b8;
+        font-size: 10px;
+        font-style: italic;
+      }
+
       .settings-row {
         display: flex;
         align-items: center;
@@ -4034,11 +4185,6 @@
       textarea,
       button {
         text-rendering: geometricPrecision;
-      }
-
-      ::-moz-selection {
-        background: rgba(216, 166, 87, 0.38);
-        color: #fff;
       }
 
       ::selection {
@@ -4175,10 +4321,6 @@
         border-radius: 10px;
         padding: 8px 10px;
         box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-      }
-
-      input::-moz-placeholder, textarea::-moz-placeholder {
-        color: rgba(238, 243, 239, 0.36);
       }
 
       input::placeholder,
@@ -4530,8 +4672,7 @@
         background:
           repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 72px),
           repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0 1px, transparent 1px 72px);
-        -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.92), rgba(0,0,0,0.36));
-                mask-image: linear-gradient(180deg, rgba(0,0,0,0.92), rgba(0,0,0,0.36));
+        mask-image: linear-gradient(180deg, rgba(0,0,0,0.92), rgba(0,0,0,0.36));
       }
 
       .modal,
@@ -4556,13 +4697,15 @@
         height: 158px;
         border-radius: 14px;
         background:
+          linear-gradient(180deg, rgba(5, 12, 18, 0.08), rgba(5, 12, 18, 0.0) 44%),
+          url("/static/startup-language-image.png") center / cover no-repeat,
           linear-gradient(135deg, rgba(216,166,87,0.22), rgba(79,179,164,0.18)),
           #17282d;
       }
 
       .lang-picker-photo {
-        opacity: 0.34;
-        filter: saturate(0.45) contrast(1.12) brightness(0.82);
+        opacity: 0;
+        filter: none;
       }
 
       .lang-picker-hero-title {
@@ -4938,10 +5081,6 @@
           0 6px 18px rgba(77, 61, 42, 0.06);
       }
 
-      input::-moz-placeholder, textarea::-moz-placeholder {
-        color: rgba(32, 35, 35, 0.42);
-      }
-
       input::placeholder,
       textarea::placeholder {
         color: rgba(32, 35, 35, 0.42);
@@ -5183,8 +5322,7 @@
         background:
           repeating-linear-gradient(90deg, rgba(36,41,41,0.035) 0 1px, transparent 1px 84px),
           repeating-linear-gradient(0deg, rgba(36,41,41,0.028) 0 1px, transparent 1px 84px);
-        -webkit-mask-image: none;
-                mask-image: none;
+        mask-image: none;
       }
 
       .modal,
@@ -5207,6 +5345,8 @@
       .lang-picker-hero {
         height: 166px;
         background:
+          linear-gradient(180deg, rgba(5, 12, 18, 0.08), rgba(5, 12, 18, 0.0) 44%),
+          url("/static/startup-language-image.png") center / cover no-repeat,
           linear-gradient(135deg, rgba(36,95,115,0.2), rgba(217,100,74,0.12)),
           #fffaf1;
         border: 1px solid rgba(36, 41, 41, 0.12);
@@ -5214,8 +5354,8 @@
       }
 
       .lang-picker-photo {
-        opacity: 0.42;
-        filter: saturate(0.2) contrast(1.1) brightness(1.08);
+        opacity: 0;
+        filter: none;
       }
 
       .lang-picker-hero-title {
@@ -5571,11 +5711,14 @@
         height: auto;
         min-height: 0;
         border-radius: 18px;
+        background:
+          linear-gradient(180deg, rgba(5, 12, 18, 0.08), rgba(5, 12, 18, 0.0) 44%),
+          url("/static/startup-language-image.png") center / cover no-repeat;
       }
 
       .lang-picker-photo {
-        opacity: 0.5;
-        filter: saturate(0.1) contrast(1.18) brightness(1.06);
+        opacity: 0;
+        filter: none;
       }
 
       .lang-picker-hero-title {
@@ -5809,6 +5952,9 @@
         .lang-picker-hero {
           grid-row: auto;
           min-height: 218px;
+          background:
+            linear-gradient(180deg, rgba(5, 12, 18, 0.08), rgba(5, 12, 18, 0.0) 44%),
+            url("/static/startup-language-image.png") center / cover no-repeat;
         }
 
         .lang-picker-sub,
@@ -5965,12 +6111,12 @@
       }
 
       .paper-flap.is-active {
-        height: 34px;
+        height: 28px;
         background:
           linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,250,242,0.98)),
           #fffaf2;
         color: #2b315e;
-        transform: translateY(2px);
+        transform: translateY(0);
         z-index: 3;
         box-shadow:
           0 -10px 22px rgba(58,46,31,0.12),
@@ -5984,6 +6130,49 @@
         transform-origin: top center;
         margin-bottom: calc(20px + var(--editor-zoom-extra-y, 0px));
         padding-top: 10px;
+      }
+
+      #main-editor {
+        position: relative;
+      }
+
+      .editor-shell-header {
+        position: sticky;
+        top: 10px;
+        z-index: 40;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 12px;
+        width: min(100%, 816px);
+        margin: 0 auto 12px;
+      }
+
+      .editor-shell-meta {
+        min-width: 0;
+      }
+
+      .editor-shell-meta .editor-heading {
+        margin-bottom: 8px !important;
+      }
+
+      .editor-shell-meta .editor-heading,
+      .editor-shell-meta .editor-zoom-toolbar {
+        position: static !important;
+        transform: none !important;
+      }
+
+      .editor-shell-meta .editor-heading {
+        width: 100%;
+      }
+
+      .editor-shell-meta .editor-zoom-toolbar {
+        justify-self: end;
+      }
+
+      .editor-shell-paper {
+        width: min(100%, 816px);
+        margin: 0 auto;
       }
 
       .chart-container {
@@ -6221,152 +6410,127 @@
         --ambient-3: rgba(43, 49, 94, 0.1);
       }
 
-      html[data-theme-effective="light"] {
+      html[data-theme-mode="light"] {
         color-scheme: light;
-        --bg-dark: #f7f2ea;
-        --sidebar-bg: rgba(255, 250, 242, 0.86);
-        --surface: rgba(255, 252, 246, 0.78);
-        --surface-2: rgba(232, 240, 238, 0.72);
-        --surface-3: rgba(241, 223, 213, 0.72);
-        --text: #1f2424;
-        --text-muted: #66706d;
-        --border: rgba(31, 36, 36, 0.08);
-        --app-bg: #f7f2ea;
-        --app-bg-soft: rgba(255, 250, 242, 0.78);
-        --panel-bg: rgba(255, 253, 248, 0.72);
-        --panel-bg-strong: rgba(255, 253, 248, 0.92);
-        --field-bg: rgba(255, 255, 255, 0.74);
-        --field-shadow: 0 11px 24px rgba(58, 46, 31, 0.075), inset 0 1px 0 rgba(255,255,255,0.9);
-        --floating-shadow: 0 26px 66px rgba(58, 46, 31, 0.2), inset 0 1px 0 rgba(255,255,255,0.75);
-        --deep-shadow: 0 36px 90px rgba(58, 46, 31, 0.22), inset 0 1px 0 rgba(255,255,255,0.74);
-        --glass-line: rgba(255, 255, 255, 0.42);
-        --chart-bg: #fffef9;
-        --chart-ink: #171717;
+        --bg-dark: #fbf7f0;
+        --sidebar-bg: rgba(255, 255, 255, 0.94);
+        --surface: rgba(255, 255, 255, 0.92);
+        --surface-2: rgba(244, 238, 230, 0.92);
+        --surface-3: rgba(234, 228, 220, 0.9);
+        --text: #171a1b;
+        --text-muted: #5d6765;
+        --border: rgba(23, 26, 27, 0.1);
+        --app-bg: #fbf7f0;
+        --app-bg-soft: rgba(255, 255, 255, 0.9);
+        --panel-bg: rgba(255, 255, 255, 0.9);
+        --panel-bg-strong: rgba(255, 255, 255, 0.98);
+        --field-bg: rgba(255, 255, 255, 0.92);
+        --field-shadow: 0 10px 22px rgba(58, 46, 31, 0.08), inset 0 1px 0 rgba(255,255,255,0.92);
+        --floating-shadow: 0 22px 56px rgba(58, 46, 31, 0.14), inset 0 1px 0 rgba(255,255,255,0.85);
+        --deep-shadow: 0 30px 74px rgba(58, 46, 31, 0.16), inset 0 1px 0 rgba(255,255,255,0.84);
+        --glass-line: rgba(255, 255, 255, 0.52);
+        --chart-bg: #fffdf9;
+        --chart-ink: #121212;
         --measure-border: #161616;
-        --beat-active-bg: rgba(223, 242, 241, 0.95);
+        --beat-active-bg: rgba(224, 238, 232, 0.98);
         --beat-active-outline: var(--accent);
         --lead-row-bg: color-mix(in srgb, var(--accent-2) 13%, transparent);
       }
 
-      html[data-theme-effective="dark"] {
+      html[data-theme-mode="dark"] {
         color-scheme: dark;
-        --bg-dark: #070a0f;
-        --sidebar-bg: rgba(13, 17, 24, 0.8);
-        --surface: rgba(18, 24, 33, 0.76);
-        --surface-2: rgba(27, 35, 48, 0.74);
-        --surface-3: rgba(39, 42, 55, 0.72);
-        --text: #eef3f2;
-        --text-muted: #9aa9ad;
-        --border: rgba(255, 255, 255, 0.08);
-        --app-bg: #070a0f;
-        --app-bg-soft: rgba(11, 15, 22, 0.8);
-        --panel-bg: rgba(15, 20, 28, 0.72);
-        --panel-bg-strong: rgba(17, 23, 32, 0.92);
-        --field-bg: rgba(255, 255, 255, 0.075);
-        --field-shadow: 0 12px 28px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255,255,255,0.08);
-        --floating-shadow: 0 28px 74px rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255,255,255,0.1);
-        --deep-shadow: 0 42px 100px rgba(0, 0, 0, 0.62), inset 0 1px 0 rgba(255,255,255,0.1);
+        --bg-dark: #05070b;
+        --sidebar-bg: rgba(8, 11, 16, 0.92);
+        --surface: rgba(16, 20, 28, 0.94);
+        --surface-2: rgba(22, 28, 39, 0.94);
+        --surface-3: rgba(31, 36, 49, 0.94);
+        --text: #f4f7f8;
+        --text-muted: #bcc7cc;
+        --border: rgba(255, 255, 255, 0.12);
+        --app-bg: #05070b;
+        --app-bg-soft: rgba(9, 12, 18, 0.96);
+        --panel-bg: rgba(11, 15, 22, 0.94);
+        --panel-bg-strong: rgba(15, 20, 29, 0.98);
+        --field-bg: rgba(255, 255, 255, 0.07);
+        --field-shadow: 0 12px 28px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255,255,255,0.08);
+        --floating-shadow: 0 30px 78px rgba(0, 0, 0, 0.56), inset 0 1px 0 rgba(255,255,255,0.08);
+        --deep-shadow: 0 44px 110px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255,255,255,0.08);
         --glass-line: rgba(255, 255, 255, 0.12);
-        --chart-bg: #fffdf7;
-        --chart-ink: #161616;
+        --chart-bg: #faf8f3;
+        --chart-ink: #121212;
         --measure-border: #161616;
-        --beat-active-bg: #eaf7f6;
+        --beat-active-bg: #f0f9f4;
         --beat-active-outline: var(--accent);
         --lead-row-bg: color-mix(in srgb, var(--accent-2) 16%, transparent);
       }
 
-      html[data-palette="ivory"] {
-        --palette-accent: #184f5f;
-        --palette-accent-2: #d45d45;
-        --palette-accent-3: #2b315e;
-        --accent: #184f5f;
-        --accent-2: #d45d45;
-        --accent-3: #2b315e;
-        --accent-dim: rgba(24, 79, 95, 0.14);
-        --ambient-1: rgba(24, 79, 95, 0.15);
-        --ambient-2: rgba(212, 93, 69, 0.12);
-        --ambient-3: rgba(43, 49, 94, 0.1);
-      }
-
-      html[data-palette="velvet"] {
-        --palette-accent: #8f6cff;
-        --palette-accent-2: #25d0b5;
-        --palette-accent-3: #ff7188;
-        --accent: #8f6cff;
-        --accent-2: #25d0b5;
-        --accent-3: #ff7188;
-        --accent-dim: rgba(143, 108, 255, 0.16);
-        --ambient-1: rgba(143, 108, 255, 0.19);
-        --ambient-2: rgba(37, 208, 181, 0.14);
-        --ambient-3: rgba(255, 113, 136, 0.12);
-      }
-
-      html[data-palette="aurora"] {
-        --palette-accent: #0f766e;
-        --palette-accent-2: #7c3aed;
-        --palette-accent-3: #f59e0b;
-        --accent: #0f766e;
-        --accent-2: #7c3aed;
-        --accent-3: #f59e0b;
-        --accent-dim: rgba(15, 118, 110, 0.16);
-        --ambient-1: rgba(15, 118, 110, 0.18);
-        --ambient-2: rgba(124, 58, 237, 0.13);
-        --ambient-3: rgba(245, 158, 11, 0.12);
-      }
-
-      html[data-palette="graphite"] {
-        --palette-accent: #2f6f88;
-        --palette-accent-2: #d8a657;
-        --palette-accent-3: #b94a48;
-        --accent: #2f6f88;
-        --accent-2: #d8a657;
-        --accent-3: #b94a48;
-        --accent-dim: rgba(47, 111, 136, 0.14);
-        --ambient-1: rgba(47, 111, 136, 0.17);
-        --ambient-2: rgba(216, 166, 87, 0.12);
-        --ambient-3: rgba(185, 74, 72, 0.11);
-      }
-
-      html[data-palette="bloom"] {
-        --palette-accent: #ad3b72;
-        --palette-accent-2: #0e9f9a;
-        --palette-accent-3: #3c2b6f;
-        --accent: #ad3b72;
-        --accent-2: #0e9f9a;
-        --accent-3: #3c2b6f;
-        --accent-dim: rgba(173, 59, 114, 0.14);
-        --ambient-1: rgba(173, 59, 114, 0.17);
-        --ambient-2: rgba(14, 159, 154, 0.13);
-        --ambient-3: rgba(60, 43, 111, 0.11);
-      }
-
-      html[data-palette="kawthoolei"] {
+      html[data-palette="moss-party"] {
         --palette-accent: #1f6f4a;
-        --palette-accent-2: #c7382f;
-        --palette-accent-3: #d9a744;
+        --palette-accent-2: #bfe36d;
+        --palette-accent-3: #244b33;
         --accent: #1f6f4a;
-        --accent-2: #c7382f;
-        --accent-3: #d9a744;
-        --accent-dim: rgba(31, 111, 74, 0.17);
-        --ambient-1: rgba(31, 111, 74, 0.23);
-        --ambient-2: rgba(199, 56, 47, 0.14);
-        --ambient-3: rgba(217, 167, 68, 0.17);
-        --chart-bg: #fffaf0;
-        --paper-texture:
-          repeating-linear-gradient(92deg, rgba(35, 86, 55, 0.045) 0 1px, transparent 1px 38px),
-          radial-gradient(760px 380px at 12% 0%, rgba(31, 111, 74, 0.13), transparent 72%),
-          radial-gradient(520px 300px at 92% 4%, rgba(217, 167, 68, 0.14), transparent 70%);
+        --accent-2: #bfe36d;
+        --accent-3: #244b33;
+        --accent-dim: rgba(31, 111, 74, 0.16);
+        --ambient-1: rgba(31, 111, 74, 0.22);
+        --ambient-2: rgba(191, 227, 109, 0.18);
+        --ambient-3: rgba(36, 75, 51, 0.14);
       }
 
-      html[data-palette="kawthoolei"] body::before {
-        background:
-          linear-gradient(135deg, rgba(31, 111, 74, 0.22), transparent 46%),
-          repeating-linear-gradient(115deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 16px),
-          radial-gradient(620px 440px at 88% 12%, rgba(199, 56, 47, 0.18), transparent 68%);
+      html[data-palette="neon-jam"] {
+        --palette-accent: #9a5cff;
+        --palette-accent-2: #15d7c5;
+        --palette-accent-3: #ff4f91;
+        --accent: #9a5cff;
+        --accent-2: #15d7c5;
+        --accent-3: #ff4f91;
+        --accent-dim: rgba(154, 92, 255, 0.18);
+        --ambient-1: rgba(154, 92, 255, 0.22);
+        --ambient-2: rgba(21, 215, 197, 0.18);
+        --ambient-3: rgba(255, 79, 145, 0.16);
+      }
+
+      html[data-palette="sunburst-soda"] {
+        --palette-accent: #f97316;
+        --palette-accent-2: #facc15;
+        --palette-accent-3: #7c2d12;
+        --accent: #f97316;
+        --accent-2: #facc15;
+        --accent-3: #7c2d12;
+        --accent-dim: rgba(249, 115, 22, 0.18);
+        --ambient-1: rgba(249, 115, 22, 0.24);
+        --ambient-2: rgba(250, 204, 21, 0.2);
+        --ambient-3: rgba(124, 45, 18, 0.16);
+      }
+
+      html[data-palette="ink-honey"] {
+        --palette-accent: #1e40af;
+        --palette-accent-2: #d8a657;
+        --palette-accent-3: #0f172a;
+        --accent: #1e40af;
+        --accent-2: #d8a657;
+        --accent-3: #0f172a;
+        --accent-dim: rgba(30, 64, 175, 0.16);
+        --ambient-1: rgba(30, 64, 175, 0.22);
+        --ambient-2: rgba(216, 166, 87, 0.16);
+        --ambient-3: rgba(15, 23, 42, 0.18);
+      }
+
+      html[data-palette="cherry-moss"] {
+        --palette-accent: #be185d;
+        --palette-accent-2: #0ea5a6;
+        --palette-accent-3: #4c1d95;
+        --accent: #be185d;
+        --accent-2: #0ea5a6;
+        --accent-3: #4c1d95;
+        --accent-dim: rgba(190, 24, 93, 0.16);
+        --ambient-1: rgba(190, 24, 93, 0.2);
+        --ambient-2: rgba(14, 165, 166, 0.18);
+        --ambient-3: rgba(76, 29, 149, 0.16);
       }
 
       html[data-design="design-1"] {
-        --design-name: "Camp";
+        --design-name: "Harbor";
         --panel-radius: 10px;
         --control-radius: 8px;
         --chart-bg: #fff0c7;
@@ -6376,7 +6540,7 @@
       }
 
       html[data-design="design-2"] {
-        --design-name: "Console";
+        --design-name: "Console Pro";
         --panel-radius: 6px;
         --control-radius: 4px;
         --accent: var(--palette-accent, #4fb3a4);
@@ -6410,7 +6574,7 @@
       }
 
       html[data-design="design-3"] {
-        --design-name: "Stage";
+        --design-name: "Studio";
         --panel-radius: 28px;
         --control-radius: 18px;
         --accent: var(--palette-accent, #e35b7f);
@@ -6799,7 +6963,6 @@
         }
 
         .guide-grid dt {
-          width: -moz-fit-content;
           width: fit-content;
           text-align: left;
         }
@@ -6826,6 +6989,21 @@
         align-items: center;
       }
 
+      #settings-panel {
+        width: min(390px, calc(100vw - 24px));
+      }
+
+      .settings-row {
+        gap: 10px;
+      }
+
+      .settings-label,
+      .wizard-label {
+        min-width: 0;
+        white-space: normal;
+        line-height: 1.2;
+      }
+
       .settings-label,
       label,
       .sub-label,
@@ -6841,7 +7019,7 @@
       }
 
       .segmented-control {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         padding: 4px;
         border-radius: var(--pill-radius);
         background: color-mix(in srgb, var(--text) 8%, transparent);
@@ -6914,12 +7092,95 @@
           inset 0 1px 0 rgba(255,255,255,0.4);
       }
 
-      .swatch-ivory { background: linear-gradient(120deg, #184f5f, #d45d45, #fffaf2); }
-      .swatch-velvet { background: linear-gradient(120deg, #8f6cff, #25d0b5, #ff7188); }
-      .swatch-aurora { background: linear-gradient(120deg, #0f766e, #7c3aed, #f59e0b); }
-      .swatch-graphite { background: linear-gradient(120deg, #2f6f88, #d8a657, #23272d); }
-      .swatch-bloom { background: linear-gradient(120deg, #ad3b72, #0e9f9a, #3c2b6f); }
-      .swatch-kawthoolei { background: linear-gradient(120deg, #1f6f4a 0 34%, #d9a744 34% 66%, #c7382f 66%); }
+      .swatch-moss-party { background: linear-gradient(120deg, #1f6f4a, #c7d96b, #f6f0d8); }
+      .swatch-neon-jam { background: linear-gradient(120deg, #8f6cff, #25d0b5, #ff7188); }
+      .swatch-sunburst-soda { background: linear-gradient(120deg, #f59e0b, #d45d45, #fff3bf); }
+      .swatch-ink-honey { background: linear-gradient(120deg, #2f6f88, #d8a657, #2b315e); }
+      .swatch-cherry-moss { background: linear-gradient(120deg, #ad3b72, #0e9f9a, #1f6f4a); }
+
+      #shortcut-panel {
+        width: min(680px, calc(100vw - 32px)) !important;
+        max-height: min(800px, calc(100vh - 76px)) !important;
+        right: 18px !important;
+      }
+
+      .shortcut-panel-header {
+        gap: 12px;
+        padding: 14px 16px !important;
+      }
+
+      .shortcut-panel-title {
+        display: grid;
+        gap: 2px;
+        min-width: 0;
+      }
+
+      .shortcut-panel-title strong {
+        font-family: var(--font-display);
+        font-size: 1.02rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: color-mix(in srgb, var(--text) 78%, var(--accent) 22%);
+      }
+
+      .shortcut-panel-title span {
+        font-size: 0.72rem;
+        letter-spacing: 0.04em;
+        text-transform: none;
+        color: var(--text-muted);
+        white-space: normal;
+      }
+
+      .shortcut-panel-body li {
+        align-items: flex-start;
+      }
+
+      .shortcut-panel-body li strong {
+        min-width: 104px;
+      }
+
+      .guide-grid dt,
+      .guide-grid dd {
+        min-width: 0;
+        word-break: break-word;
+      }
+
+      .guide-grid dd {
+        margin: 0;
+      }
+
+      .guide-note {
+        white-space: normal;
+      }
+
+      .database-song-row {
+        min-height: 86px;
+      }
+
+      .database-song-title,
+      .database-song-meta,
+      .database-song-snippet {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .database-song-title {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
+      .database-song-snippet {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+
+      .database-meta-pill,
+      .database-file-item {
+        min-width: 0;
+      }
 
       .karen-music-mark {
         position: relative;
@@ -6988,7 +7249,15 @@
       .sidebar-title {
         display: flex;
         align-items: center;
-        gap: 2px;
+        gap: 10px;
+      }
+
+      .sidebar-brand-logo {
+        width: 52px;
+        height: 52px;
+        flex: 0 0 auto;
+        display: block;
+        filter: drop-shadow(0 2px 8px rgba(0,0,0,0.26));
       }
 
       #sidebar .karen-music-mark {
@@ -7238,6 +7507,27 @@
         max-width: min(1120px, calc(100vw - 28px)) !important;
         max-height: min(820px, calc(100vh - 28px));
       }
+      .lead-modal-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .lead-modal-audio-tools {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .lead-modal-audio-btn {
+        border: 1px solid rgba(148,163,184,0.36);
+        background: rgba(15,23,42,0.82);
+        color: #e2e8f0;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 0.8em;
+        font-weight: 800;
+      }
 
       .modal::before,
       .wizard-card::before,
@@ -7293,13 +7583,12 @@
       }
 
       .wizard-card {
-        width: min(640px, calc(100vw - 28px));
+        width: min(980px, calc(100vw - 28px));
         max-height: calc(100vh - 28px);
-        overflow-y: auto;
-        gap: 14px;
-        padding: 24px;
+        overflow: hidden;
+        gap: 10px;
+        padding: 18px 18px 14px;
         animation: wizardInPro var(--motion-soft) var(--motion-flow) both;
-        scrollbar-width: thin;
       }
 
       @keyframes wizardInPro {
@@ -7325,22 +7614,24 @@
       }
 
       .wizard-fields {
-        gap: 10px;
+        gap: 8px;
       }
 
       #wizard-quick .wizard-fields {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        align-items: start;
       }
 
-      #wizard-quick .wizard-field-group:nth-child(1),
-      #wizard-quick .wizard-field-group:nth-child(3),
-      #wizard-quick .wizard-field-group:nth-child(4),
-      #wizard-quick .wizard-field-group:nth-child(5) {
+      #wizard-quick .wizard-fields > .wizard-inline-title {
         grid-column: 1 / -1;
       }
 
-      #wizard-quick .wizard-fields > div:nth-child(2) {
+      #wizard-quick .wizard-fields > .wizard-inline-row {
         grid-column: 1 / -1;
+      }
+
+      #wizard-quick .wizard-fields > .wizard-field-group:last-child {
+        grid-column: 1 / 8;
       }
 
       #wizard-step-panels {
@@ -7610,7 +7901,11 @@
         }
 
         .palette-grid {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        #settings-panel {
+          width: min(440px, calc(100vw - 24px));
         }
 
         .wizard-card {
@@ -7689,6 +7984,14 @@
       }
 
       @media (max-width: 480px) {
+        #settings-panel {
+          width: calc(100vw - 18px);
+        }
+
+        .palette-grid {
+          grid-template-columns: 1fr;
+        }
+
         .wizard-card {
           max-height: 86vh;
           overflow: hidden;
@@ -7723,19 +8026,6 @@
         --font-ui: "Instrument Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         --font-display: "Fraunces", "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
         --headline-balance: 1.03;
-      }
-
-      html[data-palette="velvet"] {
-        --palette-accent: #8f6cff;
-        --palette-accent-2: #25d0b5;
-        --palette-accent-3: #ff7188;
-        --accent: #8f6cff;
-        --accent-2: #25d0b5;
-        --accent-3: #ff7188;
-        --accent-dim: rgba(143, 108, 255, 0.2);
-        --ambient-1: rgba(143, 108, 255, 0.22);
-        --ambient-2: rgba(37, 208, 181, 0.16);
-        --ambient-3: rgba(255, 113, 136, 0.14);
       }
 
       *, *::before, *::after {
@@ -8066,14 +8356,15 @@
       .database-meta-pill {
         min-height: 54px;
         padding: 9px 10px;
-        border-radius: 14px;
-        background: rgba(255,255,255,0.48);
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.18);
+        box-shadow: none;
+        border: 1px solid rgba(255,255,255,0.14);
       }
 
       .database-meta-pill span {
         display: block;
-        color: rgba(17, 40, 39, 0.58);
+        color: rgba(17, 40, 39, 0.72);
         font-size: 0.68rem;
         font-weight: 900;
         text-transform: uppercase;
@@ -8083,7 +8374,7 @@
         display: block;
         margin-top: 3px;
         overflow-wrap: anywhere;
-        color: #112827;
+        color: #102524;
         font-size: 0.96rem;
       }
 
@@ -8454,7 +8745,6 @@
         align-items: center;
         justify-content: center;
         gap: 1px;
-        min-width: -moz-max-content;
         min-width: max-content;
         line-height: 1.05;
         text-align: center;
@@ -8720,6 +9010,23 @@
           0 30px 100px rgba(0,0,0,0.34),
           inset 0 1px 0 rgba(255,255,255,0.86);
         opacity: 0.96;
+      }
+
+      .karen-focus-lens .karen-input-backspace {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        width: 46px;
+        height: 46px;
+        transform: translateY(-50%);
+        border-radius: 16px;
+        border: 1px solid rgba(17, 40, 39, 0.16);
+        background: rgba(255,250,242,0.98);
+        color: #112827;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+        font-size: 1.15rem;
+        font-weight: 900;
+        pointer-events: auto;
       }
 
       .karen-focus-preview {
@@ -9001,10 +9308,9 @@
 
       .karen-zone {
         position: absolute !important;
-        width: -moz-max-content !important;
         width: max-content !important;
         display: grid !important;
-        gap: 7px;
+        gap: 10px;
         justify-items: start;
         pointer-events: none;
       }
@@ -9043,7 +9349,6 @@
         display: grid !important;
         grid-template-columns: repeat(5, var(--k-key-size)) !important;
         gap: var(--k-key-gap) !important;
-        width: -moz-max-content !important;
         width: max-content !important;
       }
 
@@ -9077,14 +9382,14 @@
 
       .karen-zone-extra {
         right: clamp(20px, 6vw, 96px) !important;
-        top: clamp(68px, 10vh, 106px) !important;
+        top: clamp(58px, 9vh, 98px) !important;
         opacity: 1 !important;
         --zone-delay: 0ms;
       }
 
       .karen-zone-commands {
         right: clamp(20px, 5vw, 76px) !important;
-        bottom: clamp(22px, 6vh, 58px) !important;
+        bottom: clamp(18px, 5vh, 44px) !important;
         --zone-delay: 1220ms;
       }
 
@@ -9112,6 +9417,14 @@
 
       .k-key.is-command {
         font-size: clamp(1.1rem, 2.4vmin, 1.45rem) !important;
+      }
+
+      .karen-zone-commands .karen-zone-keys {
+        grid-template-columns: repeat(2, var(--k-key-size)) !important;
+      }
+
+      .karen-zone-commands .k-key {
+        width: var(--k-key-size) !important;
       }
 
       #karen-flap.open:not(.closing) .k-key {
@@ -9342,14 +9655,12 @@
           max-height: 10.8in !important;
           margin: 0 !important;
           overflow: hidden !important;
-          -moz-column-break-after: page;
-               break-after: page;
+          break-after: page;
           page-break-after: always;
         }
 
         #print-batch > .chart-container:last-child {
-          -moz-column-break-after: auto;
-               break-after: auto;
+          break-after: auto;
           page-break-after: auto;
         }
 
@@ -9423,12 +9734,12 @@
       .paper-header .paper-style-value,
       .paper-header .paper-tempo.print-ka,
       .paper-header .paper-keymeta.print-ka {
-        font-weight: 500 !important;
-        color: #444 !important;
+        font-weight: 800 !important;
+        color: #111 !important;
       }
 
       .paper-header .paper-title-karen {
-        font-weight: 400 !important;
+        font-weight: 800 !important;
       }
 
       .paper-header .paper-keymeta {
@@ -9466,7 +9777,28 @@
 
       #print-batch .paper-title-karen,
       #print-batch .paper-style-value {
-        font-size: 0.72em !important;
+        font-size: var(--paper-header-primary-size, 1.22em) !important;
+      }
+      #print-batch .paper-key-value {
+        font-size: var(--paper-header-primary-size, 1.22em) !important;
+      }
+      #print-batch .chart-container {
+        --paper-body-scale: 1;
+        --paper-body-tracking: 0.01em;
+      }
+      #print-batch .section-title-en {
+        font-size: calc(1.02em * var(--paper-body-scale, 1));
+        letter-spacing: var(--paper-body-tracking, 0.01em);
+      }
+      #print-batch .section-title-ka {
+        font-size: calc(0.74em * var(--paper-body-scale, 1));
+      }
+      #print-batch .beat {
+        font-size: calc(1em * var(--paper-body-scale, 1));
+      }
+      #print-batch .section-rowcap-value {
+        transform: scale(var(--paper-body-scale, 1));
+        transform-origin: center;
       }
 
       @media screen {
@@ -9495,6 +9827,51 @@
       .instr-checklist.scroll-locked .instr-choice.is-wheel-focus {
         opacity: 1;
       }
+      .wizard-inline-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.75fr) minmax(0, 0.85fr) minmax(0, 0.72fr);
+        gap: 10px;
+        align-items: end;
+      }
+      .wizard-inline-row .wizard-field-group {
+        min-width: 0;
+      }
+      .wizard-inline-row .wizard-input,
+      .wizard-inline-row select {
+        width: 100%;
+      }
+      .wizard-scroll-select {
+        appearance: none;
+        padding-right: 34px !important;
+      }
+      .tempo-stepper {
+        display: grid;
+        grid-template-columns: 28px minmax(0, 1fr) 28px;
+        gap: 4px;
+        align-items: center;
+      }
+      .tempo-stepper .tempo-btn {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+      }
+      .tempo-stepper .tempo-input-small {
+        width: 100%;
+        min-width: 0;
+        text-align: center;
+        padding-inline: 8px;
+      }
+      .wizard-inline-title {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 12px;
+        align-items: end;
+      }
+      .wizard-inline-title .wizard-input {
+        width: 100%;
+      }
 
       @media print {
         .paper-stack {
@@ -9503,7 +9880,6 @@
         }
       }
     </style>
-    <link rel="stylesheet" crossorigin href="/assets/index-oUK7ENv5.css">
   </head>
   <body>
     <!-- ============================================================
@@ -9514,9 +9890,9 @@
     <div id="lang-picker-overlay" class="lang-picker-overlay">
       <div class="lang-picker-card">
         <div class="lang-picker-hero">
-          <img
+        <img
             class="lang-picker-photo"
-          src="/assets/startup-language-image-DQhfIRZS.png"
+          src="/static/startup-language-image.png"
             alt="Karen Music"
             onerror="this.style.display='none'; this.parentElement.classList.add('no-photo');"
           >
@@ -9566,39 +9942,75 @@
       <!-- MODE 1: Quick single form -->
       <div id="wizard-quick" class="wizard-card" style="display:none;">
         <div class="wizard-fields">
-          <div class="wizard-field-group">
-            <label class="wizard-label" id="wq-label-title">Song Title</label>
-            <input class="wizard-input" id="wq-songTitle" type="text" placeholder="Title" autocomplete="off">
+          <div class="wizard-inline-title">
+            <div class="wizard-field-group">
+              <label class="wizard-label" id="wq-label-title-en">English title</label>
+              <input class="wizard-input" id="wq-songTitle" type="text" placeholder="Title" autocomplete="off">
+            </div>
+            <div class="wizard-field-group">
+              <label class="wizard-label" id="wq-label-title-ka">ကညီကျိ</label>
+              <input class="wizard-input" id="wq-songTitleKaren" type="text" placeholder="တၢ်သးဝံၣ်ကညီ" autocomplete="off" data-karen-keyboard="true">
+            </div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="wizard-inline-row">
             <div class="wizard-field-group">
               <label class="wizard-label" id="wq-label-key">Key</label>
-              <input class="wizard-input" id="wq-songKey" type="text" placeholder="e.g. G" autocomplete="off">
+              <select class="wizard-input wizard-scroll-select" id="wq-songKey">
+                <option value="C">C</option>
+                <option value="Db">Db</option>
+                <option value="D">D</option>
+                <option value="Eb">Eb</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="Gb">Gb</option>
+                <option value="G" selected>G</option>
+                <option value="Ab">Ab</option>
+                <option value="A">A</option>
+                <option value="Bb">Bb</option>
+                <option value="B">B</option>
+              </select>
+            </div>
+            <div class="wizard-field-group">
+              <label class="wizard-label" id="wq-label-category">Category</label>
+              <select class="wizard-input wizard-scroll-select" id="wq-songCategory">
+                <option value="" selected>—</option>
+                <option value="Praise/Worship">Praise / Worship</option>
+                <option value="Choir">Choir</option>
+                <option value="Youth">Youth</option>
+                <option value="Solo">Solo</option>
+                <option value="Kids">Kids</option>
+              </select>
             </div>
             <div class="wizard-field-group">
               <label class="wizard-label" id="wq-label-tempo">Tempo</label>
-              <div class="tempo-control" data-target="wq-songTempo">
-                <button type="button" class="tempo-btn" onclick="changeTempo('wq-songTempo', -1)">&#9660;</button>
-                <input class="tempo-slider" data-target="wq-songTempo" type="range" min="20" max="300" value="120" aria-label="Quick tempo slider">
+              <div class="tempo-stepper" data-target="wq-songTempo">
+                <button type="button" class="tempo-btn" onclick="changeTempo('wq-songTempo', -1)">−</button>
                 <input class="wizard-input tempo-input-small" id="wq-songTempo" type="number" min="20" max="300" placeholder="120" autocomplete="off">
-                <button type="button" class="tempo-btn" onclick="changeTempo('wq-songTempo', 1)">&#9650;</button>
+                <button type="button" class="tempo-btn" onclick="changeTempo('wq-songTempo', 1)">+</button>
               </div>
+            </div>
+            <div class="wizard-field-group">
+              <label class="wizard-label" id="wq-label-time">Time signature</label>
+              <select class="wizard-input wizard-scroll-select" id="wq-timeSignature">
+                <option value="4" selected>4/4</option>
+                <option value="3">3/4</option>
+                <option value="6">6/8</option>
+              </select>
             </div>
           </div>
           <div class="wizard-field-group">
-            <label class="wizard-label" id="wq-label-category">Category</label>
-            <select class="wizard-input" id="wq-songCategory">
-              <option value="">—</option>
-              <option value="Praise/Worship">Praise / Worship</option>
-              <option value="Choir">Choir</option>
-              <option value="Youth">Youth</option>
-              <option value="Solo">Solo</option>
-              <option value="Kids">Kids</option>
-            </select>
-          </div>
-          <div class="wizard-field-group">
             <label class="wizard-label" id="wq-label-style">Style</label>
-            <input class="wizard-input" id="wq-songStyle" type="text" placeholder="e.g. Ballad" autocomplete="off">
+            <select class="wizard-input wizard-scroll-select" id="wq-songStyle">
+              <option value="" selected>Alter Rock</option>
+              <option value="Alter Rock">Alter Rock</option>
+              <option value="Ballad">Ballad</option>
+              <option value="Praise & Worship">Praise & Worship</option>
+              <option value="Choral">Choral</option>
+              <option value="March">March</option>
+              <option value="Worship">Worship</option>
+              <option value="Upbeat">Upbeat</option>
+              <option value="Acoustic">Acoustic</option>
+            </select>
           </div>
           <div class="wizard-field-group">
             <label class="wizard-label" id="wq-label-instruments">Instruments</label>
@@ -9616,7 +10028,6 @@
           </div>
         </div>
         <div class="wizard-actions">
-          <button class="wizard-btn-skip" onclick="skipWizard()">Skip →</button>
           <button class="wizard-btn-primary" onclick="commitQuickWizard()">
             Continue ↵
           </button>
@@ -9735,46 +10146,41 @@
       <div class="settings-row settings-row-block">
         <span class="settings-label" data-i18n="theme">Theme</span>
         <div class="segmented-control theme-mode-control" role="radiogroup" aria-label="Theme">
-          <button type="button" class="theme-mode-option" data-theme-mode="auto" data-i18n="autoTheme" onclick="setThemeMode('auto')">Auto</button>
           <button type="button" class="theme-mode-option" data-theme-mode="light" data-i18n="lightTheme" onclick="setThemeMode('light')">Light</button>
           <button type="button" class="theme-mode-option" data-theme-mode="dark" data-i18n="darkTheme" onclick="setThemeMode('dark')">Dark</button>
         </div>
       </div>
       <div class="settings-row settings-row-block">
-        <span class="settings-label" data-i18n="palette">Palette</span>
-        <div class="palette-grid" role="radiogroup" aria-label="Palette">
-          <button type="button" class="palette-option" data-theme-palette="ivory" onclick="setThemePalette('ivory')">
-            <span class="palette-swatch swatch-ivory"></span>
-            <span data-i18n="ivoryPalette">Ivory</span>
+        <span class="settings-label" data-i18n="palette">Accent palette</span>
+        <div class="palette-grid" role="radiogroup" aria-label="Accent palette">
+          <button type="button" class="palette-option" data-theme-palette="moss-party" onclick="setThemePalette('moss-party')">
+            <span class="palette-swatch swatch-moss-party"></span>
+            <span>Moss Party</span>
           </button>
-          <button type="button" class="palette-option" data-theme-palette="velvet" onclick="setThemePalette('velvet')">
-            <span class="palette-swatch swatch-velvet"></span>
-            <span data-i18n="velvetPalette">Velvet</span>
+          <button type="button" class="palette-option" data-theme-palette="neon-jam" onclick="setThemePalette('neon-jam')">
+            <span class="palette-swatch swatch-neon-jam"></span>
+            <span>Neon Jam</span>
           </button>
-          <button type="button" class="palette-option" data-theme-palette="aurora" onclick="setThemePalette('aurora')">
-            <span class="palette-swatch swatch-aurora"></span>
-            <span data-i18n="auroraPalette">Aurora</span>
+          <button type="button" class="palette-option" data-theme-palette="sunburst-soda" onclick="setThemePalette('sunburst-soda')">
+            <span class="palette-swatch swatch-sunburst-soda"></span>
+            <span>Sunburst Soda</span>
           </button>
-          <button type="button" class="palette-option" data-theme-palette="graphite" onclick="setThemePalette('graphite')">
-            <span class="palette-swatch swatch-graphite"></span>
-            <span data-i18n="graphitePalette">Graphite</span>
+          <button type="button" class="palette-option" data-theme-palette="ink-honey" onclick="setThemePalette('ink-honey')">
+            <span class="palette-swatch swatch-ink-honey"></span>
+            <span>Ink Honey</span>
           </button>
-          <button type="button" class="palette-option" data-theme-palette="bloom" onclick="setThemePalette('bloom')">
-            <span class="palette-swatch swatch-bloom"></span>
-            <span data-i18n="bloomPalette">Bloom</span>
-          </button>
-          <button type="button" class="palette-option" data-theme-palette="kawthoolei" onclick="setThemePalette('kawthoolei')">
-            <span class="palette-swatch swatch-kawthoolei"></span>
-            <span data-i18n="kawthooleiPalette">Kawthoolei</span>
+          <button type="button" class="palette-option" data-theme-palette="cherry-moss" onclick="setThemePalette('cherry-moss')">
+            <span class="palette-swatch swatch-cherry-moss"></span>
+            <span>Cherry Moss</span>
           </button>
         </div>
       </div>
       <div class="settings-row settings-row-block">
         <span class="settings-label" data-i18n="uiDesignDirection">UI Design Direction</span>
         <div class="segmented-control design-direction-control" role="radiogroup" aria-label="UI Design Direction">
-          <button type="button" class="design-option" data-ui-design="design-1" onclick="setUiDesign('design-1')" title="Karen Countryside">1 <span data-i18n="designDesk">Camp</span></button>
+          <button type="button" class="design-option" data-ui-design="design-1" onclick="setUiDesign('design-1')" title="Karen Harbor">1 <span data-i18n="designDesk">Harbor</span></button>
           <button type="button" class="design-option" data-ui-design="design-2" onclick="setUiDesign('design-2')" title="Control Console">2 <span data-i18n="designConsole">Console</span></button>
-          <button type="button" class="design-option" data-ui-design="design-3" onclick="setUiDesign('design-3')" title="Stage">3 <span data-i18n="designStage">Stage</span></button>
+          <button type="button" class="design-option" data-ui-design="design-3" onclick="setUiDesign('design-3')" title="Studio">3 <span data-i18n="designStage">Studio</span></button>
         </div>
       </div>
       <div class="settings-row settings-row-block settings-row-split">
@@ -9844,6 +10250,14 @@
           <button type="button" id="default-mpr-up" class="wizard-btn-secondary" style="padding:4px 8px;line-height:1;" onclick="changeDefaultMeasuresPerRow(1)">+</button>
         </div>
       </div>
+      <div class="translation-queue-panel" id="translation-queue-panel">
+        <div class="translation-queue-header">
+          <span class="translation-queue-title" data-i18n="translationQueueTitle">Translation Queue</span>
+          <span class="translation-queue-badge" id="translation-queue-count">0</span>
+        </div>
+        <p class="translation-queue-note" data-i18n="translationQueueNote">Front-facing labels still shown in English.</p>
+        <ul class="translation-queue-list" id="translation-queue-list"></ul>
+      </div>
     </div>
 
     <!-- ============================================================
@@ -9852,11 +10266,7 @@
     <div id="sidebar" class="collapsed">
 
       <h2 class="sidebar-title">
-        <span class="karen-music-mark" aria-hidden="true">
-          <span class="karen-music-mark-bars"></span>
-          <span class="karen-music-mark-text">ကညီ</span>
-          <span class="karen-music-mark-x">x</span>
-        </span>
+        <img class="sidebar-brand-logo" src="/static/startup-language-image.png" alt="" aria-hidden="true">
         <span class="sidebar-title-text">KAREN MUSIC</span>
       </h2>
 
@@ -10017,9 +10427,9 @@
       <!-- Stacked chart / lyrics paper containers -->
       <div class="paper-stack" id="paper-stack" data-active-paper="chart">
         <div class="paper-flaps" aria-label="Paper view tabs">
-          <button type="button" class="paper-flap paper-flap-chart is-active" onclick="setPaperView('chart')" aria-pressed="true">Chart</button>
-          <button type="button" class="paper-flap paper-flap-lyrics" onclick="setPaperView('lyrics')" aria-pressed="false">Lyrics</button>
-          <button type="button" class="paper-flap paper-flap-database" onclick="setPaperView('database')" aria-pressed="false">Database</button>
+          <button type="button" id="paper-flap-chart" class="paper-flap paper-flap-chart is-active" onclick="setPaperView('chart')" aria-pressed="true">Chart</button>
+          <button type="button" id="paper-flap-lyrics" class="paper-flap paper-flap-lyrics" onclick="setPaperView('lyrics')" aria-pressed="false">Lyrics</button>
+          <button type="button" id="paper-flap-database" class="paper-flap paper-flap-database" onclick="setPaperView('database')" aria-pressed="false">Database</button>
         </div>
 
         <div class="paper-stage">
@@ -10038,13 +10448,6 @@
                 <span class="paper-keymeta paper-keymeta-english print-en" id="ph-keymeta-english"></span>
                 <span class="paper-key-value" id="ph-key-value"></span>
                 <span class="paper-key-extra" id="ph-key-extra"></span>
-                <span class="paper-category-badge" id="ph-category-badge"></span>
-              </div>
-              <div class="paper-head-cell paper-head-tempo">
-                <span class="paper-tempo-line">
-                  <span class="paper-tempo print-ka" id="ph-tempo-karen"></span>
-                  <span class="paper-tempo paper-tempo-english print-en" id="ph-tempo-english"></span>
-                </span>
               </div>
             </div>
             <div id="sections-container"></div>
@@ -10069,8 +10472,7 @@
               <div class="lyrics-empty">Add a lyrics section to begin.</div>
             </div>
             <div class="lyrics-footer">
-              <span id="lyrics-footer-left">Karen Music</span>
-              <span id="lyrics-footer-right">Lyrics Sheet</span>
+              <span id="lyrics-footer-left">Lyrics Sheet</span>
             </div>
           </div>
 
@@ -10110,18 +10512,23 @@
 
                 <div class="database-file-area">
                   <div class="database-section-title">Files and References</div>
-                  <div class="database-file-grid">
+                <div class="database-file-grid">
                     <input id="db-file-name" type="text" placeholder="File title">
                     <select id="db-file-kind" aria-label="File type">
                       <option value="Lead Sheet">Lead Sheet</option>
                       <option value="Audio">Audio</option>
+                      <option value="Stem / Track">Stem / Track</option>
+                      <option value="WAV">WAV</option>
+                      <option value="MIDI">MIDI</option>
                       <option value="Video">Video</option>
                       <option value="PDF">PDF</option>
                       <option value="Image">Image</option>
                       <option value="Reference">Reference</option>
                     </select>
+                    <input id="db-file-role" type="text" placeholder="Instrument or stem name">
                     <input id="db-file-path" class="wide" type="text" placeholder="URL or local file path">
-                    <textarea id="db-file-notes" class="wide" rows="2" placeholder="Notes, source, arrangement details, permissions..."></textarea>
+                    <input id="db-file-music" class="wide" type="text" placeholder="Music stem, part, or WAV-to-MIDI source note">
+                    <textarea id="db-file-notes" class="wide" rows="2" placeholder="Notes, source, arrangement details, permissions, mix or chart context..."></textarea>
                   </div>
                   <div class="database-file-actions">
                     <input id="db-file-input" class="database-file-picker" type="file">
@@ -10293,7 +10700,7 @@
               <dt>Language</dt><dd>Switch between English and Karen UI labels.</dd>
               <dt>Theme</dt><dd>Use Auto, Light, or Dark modes when available.</dd>
               <dt>Palette</dt><dd>Change the interface color set without changing chart data.</dd>
-              <dt>UI Design</dt><dd>Switch among Desk, Console, and Stage layouts from the same shared app logic.</dd>
+              <dt>UI Design</dt><dd>Switch among Harbor, Console, and Studio layouts from the same shared app logic.</dd>
               <dt>Motion</dt><dd>Choose silky or calmer motion.</dd>
               <dt>Density</dt><dd>Choose compact or comfy control spacing.</dd>
               <dt>Karen Keyboard</dt><dd>Turn the immersive floating keyboard animation on or off. The same Karen text fields stay touch-ready either way.</dd>
@@ -10378,7 +10785,13 @@
     ============================================================ -->
     <div id="lead-modal-overlay" class="modal-overlay" style="display:none;" tabindex="0">
       <div class="modal lead-modal-card">
-        <h2 style="margin-bottom:12px;font-size:1.05em;color:var(--accent);">Lead Melody</h2>
+        <div class="lead-modal-title-row">
+          <h2 style="margin:0;font-size:1.05em;color:var(--accent);">Lead Melody</h2>
+          <div class="lead-modal-audio-tools">
+            <input id="lead-audio-import" type="file" accept=".wav,.mp3,.m4a,.aac,.flac,.ogg,audio/*" hidden>
+            <button type="button" class="lead-modal-audio-btn" onclick="document.getElementById('lead-audio-import')?.click()">Import Audio Stem</button>
+          </div>
+        </div>
         <div id="lead-tab-1" class="lead-tab-panel"></div>
         <div id="lead-tab-2" class="lead-tab-panel" style="display:none;"></div>
         <div id="lead-tab-3" class="lead-tab-panel" style="display:none;"></div>
@@ -10588,30 +11001,27 @@
           group.addEventListener("focusin", requestWheelUpdate);
           group.addEventListener("pointermove", requestWheelUpdate, { passive: true });
           group.addEventListener("wheel", (e) => {
-            if (activeInstrumentScrollGroup === group) return;
             if (e.ctrlKey || e.metaKey || e.shiftKey) return;
             if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
-            const fallbackScroller = group.closest("#sidebar, .wizard-card") || document.getElementById("main-editor");
-            if (!fallbackScroller) return;
-            const priorTop = group.scrollTop;
+            if (activeInstrumentScrollGroup !== group) {
+              lockInstrumentScrollGroup(group);
+            }
             e.preventDefault();
-            group.scrollTop = priorTop;
-            fallbackScroller.scrollTop += e.deltaY;
-            requestAnimationFrame(() => {
-              if (activeInstrumentScrollGroup !== group) {
-                group.scrollTop = priorTop;
-                updateInstrumentWheel(group);
-              }
-            });
+            group.scrollBy({ top: Math.max(-140, Math.min(140, e.deltaY * 1.6)), behavior: "smooth" });
+            requestWheelUpdate();
           }, { passive: false });
           group.addEventListener("pointerdown", (e) => {
             if (activeInstrumentScrollGroup === group) return;
-            e.preventDefault();
-            e.stopPropagation();
             group.dataset.scrollJustActivated = "1";
             lockInstrumentScrollGroup(group);
             group.focus({ preventScroll: true });
-          }, true);
+          }, { capture: true });
+          group.addEventListener("pointerup", () => {
+            delete group.dataset.scrollJustActivated;
+          });
+          group.addEventListener("pointerleave", () => {
+            delete group.dataset.scrollJustActivated;
+          });
           group.addEventListener("keydown", (e) => {
             const btn = e.target.closest?.(".instr-choice");
             if (!btn || !group.contains(btn)) return;
@@ -10737,7 +11147,7 @@
       }
 
       function changeEditorZoom(delta) {
-        const step = Number(delta || 0) >= 0 ? 0.01 : -0.01;
+        const step = Number(delta || 0) >= 0 ? 0.02 : -0.02;
         setEditorZoom(editorZoom + step);
       }
 
@@ -11007,6 +11417,46 @@
           tempoKaren: karenTempoText,
           tempoEnglish: englishTempoText
         };
+      }
+
+      function derivePrintStylePreset(style) {
+        const normalized = String(style || "").trim().toLowerCase();
+        if (!normalized) {
+          return { layout: "default", primary: "1.18em", secondary: "0.66em", bodyScale: 1, bodyTracking: "0.01em" };
+        }
+        if (/(worship|praise|chorus|anthem|hymn)/.test(normalized)) {
+          return { layout: "worship", primary: "1.24em", secondary: "0.70em", bodyScale: 1.03, bodyTracking: "0.015em" };
+        }
+        if (/(ballad|soft|slow|gentle|meditation)/.test(normalized)) {
+          return { layout: "ballad", primary: "1.12em", secondary: "0.64em", bodyScale: 0.96, bodyTracking: "0.008em" };
+        }
+        if (/(march|anthem|processional)/.test(normalized)) {
+          return { layout: "march", primary: "1.26em", secondary: "0.72em", bodyScale: 1.06, bodyTracking: "0.02em" };
+        }
+        if (/(dance|fast|upbeat|shout|celebration)/.test(normalized)) {
+          return { layout: "drive", primary: "1.28em", secondary: "0.74em", bodyScale: 1.08, bodyTracking: "0.024em" };
+        }
+        if (/(choir|choral|harmony|canon)/.test(normalized)) {
+          return { layout: "choral", primary: "1.2em", secondary: "0.68em", bodyScale: 0.98, bodyTracking: "0.012em" };
+        }
+        return {
+          layout: normalized.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 28) || "custom",
+          primary: "1.2em",
+          secondary: "0.68em",
+          bodyScale: 1,
+          bodyTracking: "0.012em"
+        };
+      }
+
+      function applyPrintStylePreset(style, root = document.getElementById("chart-container")) {
+        const host = root || document.getElementById("chart-container");
+        if (!host) return;
+        const preset = derivePrintStylePreset(style);
+        host.dataset.printStyle = preset.layout;
+        host.style.setProperty("--paper-header-primary-size", preset.primary);
+        host.style.setProperty("--paper-header-secondary-size", preset.secondary);
+        host.style.setProperty("--paper-body-scale", String(preset.bodyScale));
+        host.style.setProperty("--paper-body-tracking", preset.bodyTracking);
       }
 
       function formatDateForPrint(dateValue) {
@@ -11473,11 +11923,25 @@
             stripEditorOnlyPrintUi(clone);
 
             const footerCenter = clone.querySelector("#ph-footer-center");
-            setStackedBilingual(footerCenter, pageInfo.pair);
+            if (footerCenter) {
+              footerCenter.innerHTML = "";
+              const instrument = document.createElement("span");
+              instrument.className = "footer-line footer-line-primary print-ka";
+              instrument.textContent = maybeParenthesizeKaren(pageInfo.pair?.karen || pageInfo.pair?.english || "");
+              const label = document.createElement("span");
+              label.className = "footer-line footer-line-secondary print-en";
+              label.textContent = pageInfo.pair?.english || "";
+              footerCenter.appendChild(instrument);
+              footerCenter.appendChild(label);
+            }
             const footerCreated = clone.querySelector("#ph-footer-created");
             updateFooterDateRow(footerCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
             const footerPerformed = clone.querySelector("#ph-footer-next");
             updateFooterDateRow(footerPerformed, formatDatePair("datePerformedLabel", performedDate || "__/__/____"));
+            const footerRight = clone.querySelector("#ph-footer-right");
+            if (footerRight) {
+              setStackedBilingual(footerRight, getCategoryLabelPair(String(document.getElementById("songCategory")?.value || "")), { category: true, parenthesizeKaren: false });
+            }
             filterLeadRowsForPrintPage(clone, pageInfo);
 
             host.appendChild(clone);
@@ -11797,7 +12261,14 @@
           { key: "consonants", label: "Consonants", chars: KAREN_LAYOUT.slice(0, 25) },
           { key: "vowels", label: "Vowels", chars: KAREN_LAYOUT.slice(25, 35) },
           { key: "medials", label: "Medials", chars: KAREN_LAYOUT.slice(40, 45) },
-          { key: "commands", label: "Commands", chars: [{ label: "⌫", command: "backspace", title: "Backspace" }] }
+          {
+            key: "commands",
+            label: "Commands",
+            chars: [
+              { label: "⌫", command: "backspace", title: "Backspace" },
+              { label: "Esc", command: "escape", title: "Close keyboard" }
+            ]
+          }
         ];
 
         groups.forEach((group, zoneIndex) => {
@@ -11834,6 +12305,8 @@
               e.preventDefault();
               if (isCommand && item.command === "backspace") {
                 deleteLastKarenChange();
+              } else if (isCommand && item.command === "escape") {
+                closeKarenKeyboard();
               } else {
                 karenKeyInsert(char);
               }
@@ -12368,32 +12841,39 @@
         const host = document.getElementById("lead-tab-3");
         const lm = state.leadModalState;
         const cur = rowState.baseOctave ?? 4;
-        const slotsByBeat = normalizeLeadSlotsByBeat(lm.rowKey, rowState);
-        rowState.slotsByBeat = slotsByBeat;
-        rowState.slots = slotsByBeat[0] || getLeadSlotsPerBeat(rowState, lm.rowKey);
-        const totalCols = getLeadTotalColumns(lm.rowKey, rowState);
+        const parsed = parseRowKey(lm.rowKey);
+        const rowRange = parsed ? getRowMeasureRange(parsed.sIdx, parsed.measureIdx) : null;
+        const rowStart = rowRange?.start ?? (parsed?.measureIdx ?? 0);
+        const rowEnd = rowRange?.end ?? ((parsed?.measureIdx ?? 0) + 1);
+        const rowMeasures = Array.from({ length: Math.max(1, rowEnd - rowStart) }, (_, offset) => {
+          const measureIdx = rowStart + offset;
+          const measureKey = getRowKey(parsed?.sIdx ?? 0, measureIdx);
+          const measureCfg = ensureRowLead(measureKey);
+          const slotsByBeat = normalizeLeadSlotsByBeat(measureKey, measureCfg);
+          return {
+            measureIdx,
+            measureKey,
+            measureCfg,
+            slotsByBeat,
+            totalCols: getLeadTotalColumns(measureKey, measureCfg)
+          };
+        });
+        const totalCols = rowMeasures.reduce((sum, m) => sum + m.totalCols, 0);
         if (lm.cursorCol >= totalCols) lm.cursorCol = totalCols - 1;
         if (lm.cursorCol < 0) lm.cursorCol = 0;
         const measureNav = getLeadModalMeasureNavInfo();
-
-        let running = 0;
-        const headCells = slotsByBeat.flatMap((slots, beatIdx) => {
-          const cells = Array.from({ length: slots }, (_, slotIdx) => {
-            const col = running + slotIdx;
-            return `<div class="lead-grid-head${slotIdx === 0 ? " beat-start" : ""}" data-col="${col}">${beatIdx + 1}.${slotIdx + 1}</div>`;
-          });
-          running += slots;
-          return cells;
-        }).join("");
+        const rowLabel = rowRange
+          ? `Row ${((rowRange.rowIndex ?? 0) + 1)} · Measures ${rowStart + 1}-${rowEnd}`
+          : `Measure ${(parsed?.measureIdx ?? 0) + 1}`;
 
         host.innerHTML = `
           <div class="lead-modal-topbar">
             <button type="button" class="lead-measure-nav" ${measureNav.canPrev ? "" : "disabled"} onclick="shiftLeadModalMeasure(-1)">‹</button>
             <div class="lead-modal-title-block">
               <div class="wizard-step-question">Enter lead notes</div>
-              <div class="wizard-mode-hint">Numbers place notes. Up/Down nudges the active note. Ctrl+Up/Ctrl+Down changes base octave.</div>
+              <div class="wizard-mode-hint">Numbers place notes. Left/Right moves beats. Ctrl+Left/Ctrl+Right changes measures. Up/Down nudges octave. Ctrl+Up/Ctrl+Down changes base octave.</div>
             </div>
-            <div class="lead-measure-badge">${escapeHtml(measureNav.label)}</div>
+            <div class="lead-measure-badge">${escapeHtml(rowLabel)}</div>
             <button type="button" class="lead-measure-nav" ${measureNav.canNext ? "" : "disabled"} onclick="shiftLeadModalMeasure(1)">›</button>
           </div>
           <div class="lead-base-row">
@@ -12403,20 +12883,38 @@
             <button type="button" class="oct-wheel-btn" onclick="shiftLeadOctave(1,'t3')">Ctrl Up</button>
           </div>
           <div class="lead-grid-scroll">
-            <div class="lead-grid-row lead-grid-head-row" style="--lead-cols:${totalCols};">
-              ${headCells}
-            </div>
-            <div class="lead-grid-row lead-grid-single-row" id="lead-grid" style="--lead-cols:${totalCols};">
-              ${Array.from({ length: totalCols }, (_, i) => {
-                const cell = getLeadCellState(rowState, i);
-                const active = lm.cursorCol === i ? " active" : "";
+            <div class="lead-measure-strip">
+              ${rowMeasures.map((measure, measureOffset) => {
+                const measureStartCol = rowMeasures.slice(0, measureOffset).reduce((sum, m) => sum + m.totalCols, 0);
+                let running = 0;
+                const headCells = measure.slotsByBeat.flatMap((slots, beatIdx) => {
+                  const cells = Array.from({ length: slots }, (_, slotIdx) => {
+                    const col = measureStartCol + running + slotIdx;
+                    return `<div class="lead-grid-head${slotIdx === 0 ? " beat-start" : ""}" data-col="${col}" title="Measure ${measure.measureIdx + 1}, beat ${beatIdx + 1}, slot ${slotIdx + 1}">${beatIdx + 1}.${slotIdx + 1}</div>`;
+                  });
+                  running += slots;
+                  return cells;
+                }).join("");
+                const cells = Array.from({ length: measure.totalCols }, (_, i) => {
+                  const cell = getLeadCellState(measure.measureCfg, i);
+                  const globalCol = measureStartCol + i;
+                  const active = lm.cursorCol === globalCol ? " active" : "";
+                  return `
+                    <button
+                      type="button"
+                      class="lead-grid-cell${active}${cell.className}"
+                      title="Measure ${measure.measureIdx + 1}, beat ${getLeadBeatIndexForColumn(measure.measureKey, measure.measureCfg, i) + 1}"
+                      onclick="state.leadModalState.cursorCol=${globalCol}; state.leadModalState.cursorOct='${cell.oct}'; showLeadTab(3);"
+                      onkeydown="handleLeadGridCellButtonKeydown(event)"
+                    >${cell.value || "○"}</button>
+                  `;
+                }).join("");
                 return `
-                  <button
-                    type="button"
-                    class="lead-grid-cell${active}${cell.className}"
-                    onclick="state.leadModalState.cursorCol=${i}; state.leadModalState.cursorOct='${cell.oct}'; showLeadTab(3);"
-                    onkeydown="handleLeadGridCellButtonKeydown(event)"
-                  >${cell.value || "○"}</button>
+                  <section class="lead-measure-card${measureOffset === 0 ? " active" : ""}">
+                    <div class="lead-measure-card-title">Measure ${measure.measureIdx + 1}</div>
+                    <div class="lead-grid-row lead-grid-head-row" style="--lead-cols:${measure.totalCols};">${headCells}</div>
+                    <div class="lead-grid-row lead-grid-single-row" style="--lead-cols:${measure.totalCols};">${cells}</div>
+                  </section>
                 `;
               }).join("")}
             </div>
@@ -12479,11 +12977,7 @@
 
       function renderLeadTab4(rowState) {
         const host = document.getElementById("lead-tab-4");
-        const options = getInstrumentOptions().map(name => ({
-          name,
-          label: getInstrumentAbbreviation(name)
-        }));
-        const safeOptions = options.length ? options : [{ name: "Keyboard", label: "KB" }];
+        const safeOptions = getCueAbbreviationChoices();
         const ranges = normalizeLeadInstrumentRanges(rowState.instrumentRanges, rowState.instrumentAbbr);
         const activeIdx = Math.max(0, Math.min(1, Number(rowState.activeRangeIndex) || 0));
         const activeRange = ranges[activeIdx] || null;
@@ -12819,7 +13313,7 @@
           if ((!cfg.baseOctave || Number(cfg.baseOctave) < 1)) {
             cfg.baseOctave = 4;
           }
-          openLeadModal(measureKey, cfg.baseOctave ? (cfg.lastTab || 2) : 1);
+          openLeadModal(measureKey, cfg.baseOctave ? 3 : 1);
           return;
         }
         const rowRange = getRowMeasureRange(state.currentSectionIdx, state.currentMeasureIdx);
@@ -12841,11 +13335,11 @@
         if (!normalizeLeadInstrumentRanges(cfg.instrumentRanges, "").length && rowInstrumentRanges.length) {
           cfg.instrumentRanges = JSON.parse(JSON.stringify(rowInstrumentRanges));
         }
-        const startTab = cfg.baseOctave ? (cfg.lastTab || 2) : 1;
+        const startTab = cfg.baseOctave ? 3 : 1;
         openLeadModal(measureKey, startTab);
       }
 
-      function openLeadModal(rowKey, startTab = 1) {
+      function openLeadModal(rowKey, startTab = 3) {
         const lm = state.leadModalState;
         if (!lm) return;
 
@@ -12908,6 +13402,37 @@
 
         const ft = document.getElementById("focus-trap");
         ft && ft.focus();
+      }
+
+      async function importLeadAudioStem(file) {
+        if (!file) return;
+        if (!state.id) {
+          await saveSong({ quiet: true, skipCapture: true });
+        }
+        if (!state.id) {
+          showToast("Save the song before attaching a stem", "info");
+          return;
+        }
+        const form = new FormData();
+        form.append("file", file);
+        form.append("name", file.name || "Lead stem");
+        form.append("kind", "Audio");
+        form.append("role", "Lead stem");
+        form.append("notes", "Imported from lead modal as audio source for future MIDI conversion");
+        const res = await fetch(`/api/songs/${state.id}/files`, {
+          method: "POST",
+          body: form
+        });
+        const result = await res.json();
+        if (!res.ok) {
+          showToast(result.error || "Audio stem import failed", "error");
+          return;
+        }
+        state.fileMetadata = normalizeFileMetadataList(result.files || []);
+        await loadSongs(document.getElementById("database-search")?.value.trim() || "");
+        renderDatabaseSheet(songsCache);
+        renderChart();
+        showToast("Audio stem attached", "success");
       }
 
       function focusLeadModalControl(tabNum) {
@@ -13114,7 +13639,17 @@
         const lm = state.leadModalState;
         if (!lm?.working) return;
 
-        const total = getLeadTotalColumns(lm.rowKey, lm.working);
+        if (e.ctrlKey && e.key === "ArrowRight") {
+          e.preventDefault();
+          shiftLeadModalMeasure(1);
+          return;
+        }
+
+        if (e.ctrlKey && e.key === "ArrowLeft") {
+          e.preventDefault();
+          shiftLeadModalMeasure(-1);
+          return;
+        }
 
         if (e.key === "ArrowRight") {
           e.preventDefault();
@@ -13185,90 +13720,37 @@
           return;
         }
 
-        if (lm.tab === 1 && /^[1-8]$/.test(e.key)) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          closeLeadModal(true);
+          return;
+        }
+
+        if (e.key === "Tab") {
+          e.preventDefault();
+          closeLeadModal(true);
+          return;
+        }
+
+        if (lm.tab === 3) {
+          handleLeadGridKeydown(e);
+        } else if (lm.tab === 1 && /^[1-8]$/.test(e.key)) {
           e.preventDefault();
           chooseLeadBaseOctave(Number(e.key), true);
-          return;
-        }
-
-        if (lm.tab === 2 && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
-          e.preventDefault();
-          shiftLeadModalMeasure(e.key === "ArrowLeft" ? -1 : 1);
-          return;
-        }
-
-        if (lm.tab === 2 && e.ctrlKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
-          e.preventDefault();
-          shiftLeadOctave(e.key === "ArrowUp" ? 1 : -1, "t2");
-          return;
-        }
-
-        if (lm.tab === 2 && /^[1-6]$/.test(e.key)) {
+        } else if (lm.tab === 2 && /^[1-6]$/.test(e.key)) {
           if (!isPreMeasureKey(lm.rowKey) && !REGULAR_LEAD_SLOT_CHOICES.includes(Number(e.key))) return;
           e.preventDefault();
           setLeadSlotChoice(Number(e.key));
-          return;
-        }
-
-        if (lm.tab === 2 && /^[1-8]$/.test(e.key)) {
+        } else if (lm.tab === 2 && e.ctrlKey && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
           e.preventDefault();
-          chooseLeadBaseOctave(Number(e.key), true);
-          return;
-        }
-
-        if (lm.tab === 4 && /^[1-9]$/.test(e.key)) {
+          shiftLeadOctave(e.key === "ArrowUp" ? 1 : -1, "t2");
+        } else if (lm.tab === 4 && /^[1-9]$/.test(e.key)) {
           const options = getInstrumentOptions().map(name => getInstrumentAbbreviation(name));
           const picked = options[Number(e.key) - 1];
           if (picked) {
             e.preventDefault();
             setLeadInstrumentAbbr(picked);
           }
-          return;
-        }
-
-        if (e.key === "Enter") {
-          e.preventDefault();
-
-          if (lm.tab === 1 && lm.working?.baseOctave) {
-            leadModalGoTab(2);
-            return;
-          }
-
-          if (lm.tab === 2) {
-            commitLeadSlotChoice(true);
-            return;
-          }
-
-          if (lm.tab === 3) {
-            if (!lm.working?.baseOctave) {
-              leadModalGoTab(1);
-              return;
-            }
-            if (!normalizeLeadSlotsByBeat(lm.rowKey, lm.working).length) {
-              leadModalGoTab(2);
-              return;
-            }
-            closeLeadModal(true);
-            return;
-          }
-
-          if (lm.tab === 4) {
-            closeLeadModal(true);
-            return;
-          }
-        }
-
-        if (e.key === "Tab") {
-          e.preventDefault();
-          if (lm.tab === 1 && lm.working?.baseOctave) leadModalGoTab(2);
-          else if (lm.tab === 2 && normalizeLeadSlotsByBeat(lm.rowKey, lm.working).length) commitLeadSlotChoice(true);
-          else if (lm.tab === 3) leadModalGoTab(4);
-          else if (lm.tab === 4) leadModalGoTab(2);
-          return;
-        }
-
-        if (lm.tab === 3) {
-          handleLeadGridKeydown(e);
         }
       }
 
@@ -14269,6 +14751,8 @@
           "Piano 2": "KB2",
           "Electric Guitar": "GT",
           "Acoustic Guitar": "AGT",
+          "Rhythm": "RT",
+          "Rhythm Guitar": "RT",
           "Electric Bass": "BS",
           "Drums": "DRM",
           "Keytar": "KT"
@@ -14284,11 +14768,20 @@
         return words.map(w => w[0].toUpperCase()).join("").slice(0, 4);
       }
 
+      function getCueAbbreviationChoices() {
+        return [
+          { name: "Keyboard", label: "KB" },
+          { name: "Electric Guitar", label: "GT" },
+          { name: "Rhythm", label: "RT" },
+          { name: "Acoustic Guitar", label: "AGT" },
+          { name: "Bass", label: "BS" },
+          { name: "Drums", label: "DRM" },
+          { name: "Keytar", label: "KT" }
+        ];
+      }
+
       function openOnlyInstrumentModal(globalIdx) {
-        const instruments = getInstrumentOptions().map(name => ({
-          name,
-          label: getInstrumentAbbreviation(name)
-        }));
+        const instruments = getCueAbbreviationChoices();
         const overlay = document.createElement("div");
         overlay.className = "modal-overlay open";
         overlay.style.display = "flex";
@@ -14328,7 +14821,7 @@
           const joined = checked.length ? checked.join(" & ") : options[0].label;
           state.onlyStart = {
             globalBeatIndex: globalIdx,
-            label: `${joined} only`
+            label: joined
           };
           closeOverlay();
           renderChart();
@@ -14455,9 +14948,16 @@
         const onlyEnglish = tEnglish("onlyLabel") || "Only";
         const prefixRaw = raw.replace(/\s*only\s*$/i, "").trim();
         const cueAbbreviations = {
-          "piano 1": "KB1", "piano 2": "KB2", "electric guitar": "GT",
-          "acoustic guitar": "AGT", "electric bass": "BS", "bass": "BS",
-          "drums": "DRM", "keytar": "KT"
+          "keyboard": "KB",
+          "piano 1": "KB1", "piano 2": "KB2",
+          "electric guitar": "GT",
+          "acoustic guitar": "AGT",
+          "rhythm": "RT",
+          "rhythm guitar": "RT",
+          "electric bass": "BS",
+          "bass": "BS",
+          "drums": "DRM",
+          "keytar": "KT"
         };
         const prefix = cueAbbreviations[prefixRaw.toLowerCase()] || prefixRaw;
         if (!prefix || prefix.toLowerCase() === raw.toLowerCase()) {
@@ -14468,7 +14968,7 @@
 
       function renderOnlySpans(container = document.getElementById("chart-container")) {
         if (!container) return;
-        const old = container.querySelectorAll(".only-span-line, .only-span-line-2, .span-label, .span-label-2, .span-cue-line");
+        const old = container.querySelectorAll(".only-span-line, .only-span-line-2, .span-label, .span-label-2, .span-cue-line, .span-cue-row");
         old.forEach(n => n.remove());
 
         state.onlySpans.forEach(span => {
@@ -14524,8 +15024,35 @@
           const labelTop = beatTop + (hasLead ? 2 : 1);
           const cueTop = labelTop + 12;
 
-          // Both labels default to start at their beat-slot underline origin.
-          // If they collide, push them away from each other while cue lines stay fixed.
+          const beatEls = Array.from(container.querySelectorAll(".beat[data-globalbeat]"))
+            .map(el => ({ el, gb: Number(el.dataset.globalbeat) }))
+            .filter(item => Number.isFinite(item.gb) && item.gb >= span.startBeatIndex && item.gb <= span.endBeatIndex)
+            .sort((a, b) => a.gb - b.gb);
+          const rows = [];
+          beatEls.forEach(item => {
+            const line = item.el.closest(".line");
+            if (!line) return;
+            const last = rows[rows.length - 1];
+            if (!last || last.line !== line) rows.push({ line, beats: [item.el] });
+            else last.beats.push(item.el);
+          });
+
+          const makeRowCue = (line, startBeatEl, endBeatEl, edgeMode) => {
+            const lineRect = line.getBoundingClientRect();
+            const startRect = startBeatEl.getBoundingClientRect();
+            const endRect = endBeatEl.getBoundingClientRect();
+            const left = edgeMode === "start" ? (startRect.left - cRect.left + cueInset) : (lineRect.left - cRect.left + cueInset);
+            const right = edgeMode === "end"
+              ? (endRect.left - cRect.left + Math.max(14, endRect.width - (cueInset * 2)))
+              : (lineRect.right - cRect.left - cueInset);
+            const cue = document.createElement("div");
+            cue.className = "span-cue-line span-cue-row";
+            cue.style.left = `${left}px`;
+            cue.style.width = `${Math.max(14, right - left)}px`;
+            cue.style.top = `${(lineRect.top - cRect.top) + labelTop + 12}px`;
+            container.appendChild(cue);
+          };
+
           let label1Left = startCueLeft;
           let label2Left = endCueLeft;
           const minGap = ONLY_SPAN_TUNING.minGapPx;
@@ -14550,8 +15077,22 @@
 
           container.appendChild(label1);
           container.appendChild(label2);
-          appendCueLine(startCueLeft, startCueWidth, cueTop);
-          appendCueLine(endCueLeft, endCueWidth, cueTop);
+          if (rows.length <= 1) {
+            appendCueLine(startCueLeft, Math.max(startCueWidth, (eRect.left - sRect.left) + endRect.width), cueTop);
+          } else {
+            rows.forEach((row, idx) => {
+              const firstBeat = row.beats[0];
+              const lastBeat = row.beats[row.beats.length - 1];
+              if (!firstBeat || !lastBeat) return;
+              if (idx === 0) {
+                makeRowCue(row.line, firstBeat, lastBeat, "start");
+              } else if (idx === rows.length - 1) {
+                makeRowCue(row.line, firstBeat, lastBeat, "end");
+              } else {
+                makeRowCue(row.line, firstBeat, lastBeat, "full");
+              }
+            });
+          }
         });
       }
 
@@ -15231,6 +15772,7 @@
               id: String(file.id || `local-${Date.now()}-${Math.random().toString(16).slice(2)}`),
               name: name || "File",
               kind: String(file.kind || file.type || "Reference").trim() || "Reference",
+              role: String(file.role || file.instrument || file.stem || "").trim(),
               path: String(file.path || "").trim(),
               url: String(file.url || "").trim(),
               notes: String(file.notes || file.description || "").trim(),
@@ -15306,11 +15848,6 @@
           grid.innerHTML = "";
           [
             ["Karen Title", meta.titleKaren || "—"],
-            ["Category", meta.category || "—"],
-            ["Key", meta.key || "—"],
-            ["Style", meta.style || "—"],
-            ["Tempo", meta.tempo ? `${meta.tempo} BPM` : "—"],
-            ["Instruments", meta.instruments || "—"],
             ["Created", meta.created || "—"],
             ["Next", meta.nextPerformance || "—"],
             ["Performed", meta.performed || "—"],
@@ -15351,6 +15888,7 @@
               details.className = "database-file-meta";
               details.textContent = [
                 file.kind,
+                file.role ? `Stem: ${file.role}` : "",
                 readableFileSize(file.size),
                 file.added_at ? file.added_at.slice(0, 10) : ""
               ].filter(Boolean).join(" / ");
@@ -15466,7 +16004,7 @@
       }
 
       function clearDatabaseFileInputs() {
-        ["db-file-name", "db-file-path", "db-file-notes"].forEach(id => {
+        ["db-file-name", "db-file-role", "db-file-music", "db-file-path", "db-file-notes"].forEach(id => {
           const el = document.getElementById(id);
           if (el) el.value = "";
         });
@@ -15479,16 +16017,20 @@
       async function addDatabaseFile() {
         const nameInput = document.getElementById("db-file-name");
         const kindInput = document.getElementById("db-file-kind");
+        const roleInput = document.getElementById("db-file-role");
+        const musicInput = document.getElementById("db-file-music");
         const pathInput = document.getElementById("db-file-path");
         const notesInput = document.getElementById("db-file-notes");
         const fileInput = document.getElementById("db-file-input");
         const upload = fileInput?.files?.[0] || null;
         const name = String(nameInput?.value || "").trim();
         const kind = String(kindInput?.value || "Reference").trim() || "Reference";
+        const role = String(roleInput?.value || "").trim();
+        const music = String(musicInput?.value || "").trim();
         const path = String(pathInput?.value || "").trim();
         const notes = String(notesInput?.value || "").trim();
 
-        if (!upload && !name && !path && !notes) {
+        if (!upload && !name && !path && !notes && !music) {
           showToast("Add a file, link, path, or note first", "info");
           return;
         }
@@ -15508,6 +16050,8 @@
           form.append("file", upload);
           form.append("name", name || upload.name);
           form.append("kind", kind);
+          form.append("role", role);
+          form.append("music", music);
           form.append("notes", notes);
 
           const res = await fetch(`/api/songs/${state.id}/files`, {
@@ -15531,6 +16075,8 @@
           id: `local-${Date.now()}-${Math.random().toString(16).slice(2)}`,
           name: name || path || "Reference file",
           kind,
+          role,
+          stem: music,
           path,
           url: /^https?:\/\//i.test(path) ? path : "",
           notes,
@@ -15610,10 +16156,12 @@
         const phFooterNext = document.getElementById("ph-footer-next");
         const phFooterCenter = document.getElementById("ph-footer-center");
         const phFooterR = document.getElementById("ph-footer-right");
+        const phTempoCell = document.querySelector("#paper-header .paper-head-tempo");
 
         const titlePair = formatTitlePair(songTitleKaren, songTitleEnglish);
         if (phTitleKaren) phTitleKaren.textContent = titlePair.karen || titlePair.english || "";
         if (phTitleEnglish) phTitleEnglish.textContent = titlePair.english && titlePair.karen ? `(${titlePair.english})` : "";
+        applyPrintStylePreset(songStyle, document.getElementById("chart-container"));
 
         const styleTempoPair = formatStyleTempoPair(songStyle, songTempo);
         if (phStyleEnglish) phStyleEnglish.textContent = styleTempoPair.styleEnglish || styleTempoPair.styleKaren || "";
@@ -15627,18 +16175,26 @@
         if (phKeyValue) phKeyValue.textContent = keyPair.value || "";
         if (phKeyExtra) phKeyExtra.textContent = keyPair.extraEnglish ? `(${keyPair.extraEnglish})` : "";
         const categoryBadge = document.getElementById("ph-category-badge");
-        if (categoryBadge) categoryBadge.textContent = songCat || "";
+        if (categoryBadge) {
+          categoryBadge.textContent = "";
+          categoryBadge.style.display = "none";
+        }
+        if (phTempoCell) phTempoCell.style.display = "none";
         updateFooterDateRow(phFooterCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
         updateFooterDateRow(phFooterNext, formatDatePair("datePerformedLabel", nextPerf || "__/__/____"));
         if (phFooterCenter) {
           const bpmText = `${state.beatsPerMeasure || 4}/4`;
-          const parts = [];
-          if (songInstr && songInstr !== "—") parts.push(songInstr);
-          parts.push(`Time ${bpmText}`);
-          phFooterCenter.textContent = parts.join("  •  ");
+          const bpmValue = songTempo ? `${songTempo} BPM` : "BPM";
+          phFooterCenter.innerHTML = "";
+          const top = document.createElement("span");
+          top.className = "footer-line footer-line-primary print-ka";
+          top.textContent = bpmText;
+          const bottom = document.createElement("span");
+          bottom.className = "footer-line footer-line-secondary print-en";
+          bottom.textContent = bpmValue;
+          phFooterCenter.appendChild(top);
+          phFooterCenter.appendChild(bottom);
         }
-        const firstInstrument = getPrintInstrumentList()[0] || songInstr.split(",").map(s => s.trim()).filter(Boolean)[0] || "";
-        setStackedBilingual(phFooterCenter, firstInstrument ? getInstrumentLabelPair(firstInstrument) : { karen: "", english: "" });
         setStackedBilingual(phFooterR, getCategoryLabelPair(songCat), { category: true, parenthesizeKaren: false });
 
         const viewTitle = document.getElementById("view-title");
@@ -15649,8 +16205,7 @@
         if (viewMeta) {
           viewMeta.textContent = [
             currentKey ? `Key - ${currentKey}` : "",
-            songCat || "",
-            songStyle ? `${songStyle}${songTempo ? ` = ${songTempo} BPM` : ""}` : (songTempo ? `${songTempo} BPM` : "")
+            songStyle || ""
           ].filter(Boolean).join("  •  ");
         }
         if (viewInstr) viewInstr.textContent = "";
@@ -17634,10 +18189,10 @@
       async function importSongFile(file) {
         if (!file) return;
         const importBtn = document.getElementById("btn-import");
-        const originalText = importBtn?.textContent || "Import";
+        const originalText = importBtn?.textContent || uiText("import");
         if (importBtn) {
           importBtn.disabled = true;
-          importBtn.textContent = file.name.toLowerCase().endsWith(".json") ? "Reading JSON..." : "Reading chart...";
+          importBtn.textContent = file.name.toLowerCase().endsWith(".json") ? uiText("readingJson") : uiText("readingChart");
         }
         try {
           const form = new FormData();
@@ -17663,16 +18218,16 @@
             `Import ${file.name}?\n\nDetected ${sectionCount} section(s) and ${measureCount} measure(s).${confidence}${warnings}\n\nThe editor will be replaced with this draft. Review it before pressing Save.`
           );
           if (!approved) {
-            showToast("Import canceled; the editor was not changed", "success");
+            showToast(uiText("importCanceled"), "success");
             return;
           }
 
           await loadSong({ ...result, id: null });
           state.id = null;
           renderChart();
-          showToast("Import loaded. Review the chart, then press Save.", "success");
+          showToast(uiText("importLoaded"), "success");
         } catch (error) {
-          showToast(error.message || "Import failed", "error");
+          showToast(error.message || uiText("importFailed"), "error");
         } finally {
           if (importBtn) {
             importBtn.disabled = false;
@@ -18118,6 +18673,7 @@
         const flap = document.getElementById("karen-flap");
         if (!flap) return;
         window.clearTimeout(karenKeyboardCloseTimer);
+        document.querySelector(".karen-input-backspace")?.remove();
 
         if (options.instant || !flap.classList.contains("open")) {
           flap.classList.remove("open", "closing");
@@ -18142,6 +18698,20 @@
           window.clearTimeout(karenKeyboardCloseTimer);
           flap.classList.remove("closing");
           flap.classList.add("open");
+        }
+        const lens = document.querySelector(".karen-focus-lens");
+        if (lens && !lens.querySelector(".karen-input-backspace")) {
+          const backspace = document.createElement("button");
+          backspace.type = "button";
+          backspace.className = "karen-input-backspace";
+          backspace.title = "Backspace";
+          backspace.setAttribute("aria-label", "Backspace");
+          backspace.textContent = "⌫";
+          backspace.addEventListener("click", (e) => {
+            e.preventDefault();
+            deleteLastKarenChange();
+          });
+          lens.appendChild(backspace);
         }
       }
 
@@ -18432,6 +19002,12 @@
           save: "Save",
           exportDb: "Export",
           print: "Print",
+          import: "Import",
+          readingJson: "Reading JSON...",
+          readingChart: "Reading chart...",
+          importLoaded: "Import loaded. Review the chart, then press Save.",
+          importCanceled: "Import canceled; the editor was not changed",
+          importFailed: "Import failed",
           songTitle: "Song Title",
           songTitleEnglishLabel: "Song Title (English)",
           songTitleKarenLabel: "Song Title (Karen)",
@@ -18602,8 +19178,8 @@
           guideWizardModeDesc: "Choose quick song setup or guided step-by-step setup.",
           guideLanguageDesc: "Switch between English and Karen UI labels.",
           guideThemeDesc: "Use Auto, Light, or Dark modes.",
-          guidePaletteDesc: "Change the interface color set without changing chart data.",
-          guideUiDesignDesc: "Switch among Desk, Console, and Stage layouts from the same shared app logic.",
+          guidePaletteDesc: "Choose one of five accent palettes without changing chart data.",
+          guideUiDesignDesc: "Switch among Harbor, Console, and Studio layouts from the same shared app logic.",
           guideMotionDesc: "Animated uses longer eased movement; Steady uses shorter transitions and less motion.",
           guideDensityDesc: "Choose compact or comfy control spacing.",
           guideKeyboardSettingDesc: "Turn the immersive floating keyboard animation on or off.",
@@ -18628,18 +19204,17 @@
           browse: "Browse",
           timeSignature: "Time Signature",
           defaultMeasuresPerRow: "Default measures / row",
-          autoTheme: "Auto",
           lightTheme: "Light",
           darkTheme: "Dark",
-          ivoryPalette: "Ivory",
-          velvetPalette: "Velvet",
-          auroraPalette: "Aurora",
-          graphitePalette: "Graphite",
-          bloomPalette: "Bloom",
-          kawthooleiPalette: "Kawthoolei",
-          designDesk: "Camp",
+          ivoryPalette: "Moss Party",
+          velvetPalette: "Neon Jam",
+          auroraPalette: "Sunburst Soda",
+          graphitePalette: "Ink Honey",
+          bloomPalette: "Cherry Moss",
+          kawthooleiPalette: "Moss Party",
+          designDesk: "Harbor",
           designConsole: "Console",
-          designStage: "Stage",
+          designStage: "Studio",
           silkyMotion: "Animated",
           calmMotion: "Steady",
           compactDensity: "Compact",
@@ -18651,6 +19226,16 @@
           rollLabel: "Roll",
           exportStarted: "Export started",
           exportDownloadStarted: "Export started. Check your Downloads folder.",
+          translationQueueTitle: "Translation Queue",
+          translationQueueNote: "Front-facing labels still shown in English.",
+          settings: "Settings",
+          zoomOut: "Zoom out",
+          zoomIn: "Zoom in",
+          fitChartToEditorWidth: "Fit chart to editor width",
+          resetChartZoom: "Reset chart zoom",
+          chart: "Chart",
+          lyrics: "Lyrics",
+          database: "Database",
           apply: "Apply",
           instrumentPiano1Abbr: "KB1",
           instrumentPiano2Abbr: "KB2",
@@ -18674,6 +19259,12 @@
           save: "သိမ်ပာ်",
           exportDb: "နုၢ်လီ",
           print: "ဒိကတ်",
+          import: "ကူးယူ",
+          readingJson: "ဖတ် JSON...",
+          readingChart: "ဖတ် chart...",
+          importLoaded: "ကူးယူပြီး။ chart ကို စစ်ပြီး Save ကိုနှိပ်ပါ။",
+          importCanceled: "ကူးယူမလုပ်တော့ပါ; editor ကိုမပြောင်းပါ။",
+          importFailed: "ကူးယူမအောင်မြင်ပါ",
           songTitle: "တၢ်သးဝံၣ်ကညီအမံၤ",
           songTitleEnglishLabel: "တၢ်သးဝံၣ်ကီၢ်လးဝါအမံၤ",
           songTitleKarenLabel: "တၢ်သးဝံၣ်ကညီအမံၤ",
@@ -18791,7 +19382,6 @@
           browse: "",
           timeSignature: "",
           defaultMeasuresPerRow: "",
-          autoTheme: "",
           lightTheme: "",
           darkTheme: "",
           ivoryPalette: "",
@@ -18814,6 +19404,16 @@
           rollLabel: "",
           exportStarted: "",
           exportDownloadStarted: "",
+          translationQueueTitle: "ကညီကျိ တၢ်တီၣ်နုာ်",
+          translationQueueNote: "UI လီၤတူၢ်ပာ်တၢ်လၢအဆဲးပာ် English.",
+          settings: "တၢ်ဆဲးလီၤ",
+          zoomOut: "ချီလီၤ",
+          zoomIn: "ချီထီၣ်",
+          fitChartToEditorWidth: "Fit chart to editor width",
+          resetChartZoom: "Reset chart zoom",
+          chart: "Chart",
+          lyrics: "Lyrics",
+          database: "Database",
           apply: "",
           instrumentPiano1Abbr: "KB1",
           instrumentPiano2Abbr: "KB2",
@@ -18987,14 +19587,14 @@
         printKaren: "karenPrintShowKaren"
       };
 
-      const THEME_MODES = ["auto", "light", "dark"];
-      const THEME_PALETTES = ["ivory", "velvet", "aurora", "graphite", "bloom", "kawthoolei"];
+      const THEME_MODES = ["light", "dark"];
+      const THEME_PALETTES = ["moss-party", "neon-jam", "sunburst-soda", "ink-honey", "cherry-moss"];
       const THEME_MOTIONS = ["silky", "calm"];
       const THEME_DENSITIES = ["compact", "comfy"];
       const UI_DESIGNS = ["design-1", "design-2", "design-3"];
 
-      let themeMode = localStorage.getItem(THEME_STORAGE_KEYS.mode) || "auto";
-      let themePalette = localStorage.getItem(THEME_STORAGE_KEYS.palette) || "ivory";
+      let themeMode = localStorage.getItem(THEME_STORAGE_KEYS.mode) || "light";
+      let themePalette = localStorage.getItem(THEME_STORAGE_KEYS.palette) || "moss-party";
       let themeMotion = localStorage.getItem(THEME_STORAGE_KEYS.motion) || "silky";
       let themeDensity = localStorage.getItem(THEME_STORAGE_KEYS.density) || "compact";
       let uiDesign = localStorage.getItem(THEME_STORAGE_KEYS.design) || "design-2";
@@ -19009,16 +19609,12 @@
       }
 
       function resolveThemeMode() {
-        const mode = clampThemeChoice(themeMode, THEME_MODES, "auto");
-        if (mode !== "auto") return mode;
-        return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
+        return clampThemeChoice(themeMode, THEME_MODES, "light");
       }
 
       function applyThemePreferences() {
-        themeMode = clampThemeChoice(themeMode, THEME_MODES, "auto");
-        themePalette = clampThemeChoice(themePalette, THEME_PALETTES, "ivory");
+        themeMode = clampThemeChoice(themeMode, THEME_MODES, "light");
+        themePalette = clampThemeChoice(themePalette, THEME_PALETTES, "moss-party");
         themeMotion = clampThemeChoice(themeMotion, THEME_MOTIONS, "silky");
         themeDensity = clampThemeChoice(themeDensity, THEME_DENSITIES, "compact");
         uiDesign = clampThemeChoice(uiDesign, UI_DESIGNS, "design-1");
@@ -19073,19 +19669,19 @@
         const quickToggle = document.getElementById("theme-toggle");
         if (quickToggle) {
           quickToggle.textContent = effectiveTheme === "dark" ? "☾" : "☼";
-          quickToggle.title = `Theme: ${themeMode === "auto" ? "Auto" : effectiveTheme}`;
+          quickToggle.title = `Theme: ${effectiveTheme}`;
           quickToggle.setAttribute("aria-label", quickToggle.title);
         }
       }
 
       function setThemeMode(mode) {
-        themeMode = clampThemeChoice(mode, THEME_MODES, "auto");
+        themeMode = clampThemeChoice(mode, THEME_MODES, "light");
         localStorage.setItem(THEME_STORAGE_KEYS.mode, themeMode);
         applyThemePreferences();
       }
 
       function setThemePalette(palette) {
-        themePalette = clampThemeChoice(palette, THEME_PALETTES, "ivory");
+        themePalette = clampThemeChoice(palette, THEME_PALETTES, "moss-party");
         localStorage.setItem(THEME_STORAGE_KEYS.palette, themePalette);
         applyThemePreferences();
       }
@@ -19121,25 +19717,13 @@
         if (typeof renderChart === "function") renderChart();
       }
 
-      function cycleThemeMode() {
-        const currentIndex = THEME_MODES.indexOf(themeMode);
-        const next = THEME_MODES[(currentIndex + 1 + THEME_MODES.length) % THEME_MODES.length];
-        setThemeMode(next);
-        showToast(`Theme: ${next === "auto" ? "Auto" : next}`, "info");
-      }
-
       function setupThemeControls() {
-        if (!themeMediaQuery && window.matchMedia) {
-          themeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-          themeMediaQuery.addEventListener?.("change", () => {
-            if (themeMode === "auto") applyThemePreferences();
-          });
-        }
-
         const quickToggle = document.getElementById("theme-toggle");
         if (quickToggle && !quickToggle.dataset.bound) {
           quickToggle.type = "button";
-          quickToggle.addEventListener("click", cycleThemeMode);
+          quickToggle.addEventListener("click", () => {
+            setThemeMode(themeMode === "dark" ? "light" : "dark");
+          });
           quickToggle.dataset.bound = "1";
         }
 
@@ -19495,6 +20079,21 @@
         setButtonText("btn-save",      uiText("save"));
         setButtonText("btn-export",    uiText("exportDb"));
         setButtonText("btn-print",     uiText("print"));
+        setButtonText("btn-import",    uiText("import"));
+        setTextById("paper-flap-chart", uiText("chart"));
+        setTextById("paper-flap-lyrics", uiText("lyrics"));
+        setTextById("paper-flap-database", uiText("database"));
+        document.getElementById("settings-toggle")?.setAttribute("title", uiText("settings"));
+        document.getElementById("shortcut-toggle")?.setAttribute("title", uiText("shortcuts"));
+        document.getElementById("theme-toggle")?.setAttribute("title", uiText("theme"));
+        setTextById("editor-zoom-out", "−");
+        setTextById("editor-zoom-in", "+");
+        setTextById("editor-zoom-fit", "Fit");
+        setTextById("editor-zoom-reset", "100");
+        document.getElementById("editor-zoom-out")?.setAttribute("title", uiText("zoomOut"));
+        document.getElementById("editor-zoom-in")?.setAttribute("title", uiText("zoomIn"));
+        document.getElementById("editor-zoom-fit")?.setAttribute("title", uiText("fitChartToEditorWidth"));
+        document.getElementById("editor-zoom-reset")?.setAttribute("title", uiText("resetChartZoom"));
         document.querySelectorAll(".wizard-btn-skip").forEach(btn => {
           btn.textContent = uiText("wizardSkip");
         });
@@ -19515,6 +20114,7 @@
         const guideTitle = document.querySelector(".shortcut-panel-title strong");
         if (guideTitle) guideTitle.textContent = currentLang === "karen" ? uiText("shortcuts") : uiText("appGuideTitle", { fallback: "App Guide" });
         renderShortcutGuide();
+        updateTranslationQueue();
 
         const langHint = document.getElementById("lang-picker-hint");
         if (langHint) {
@@ -19608,6 +20208,129 @@
       function setTextById(id, text) {
         const el = document.getElementById(id);
         if (el && text !== undefined && text !== null) el.textContent = text;
+      }
+
+      function apiUrl(path) {
+        const raw = String(path || "");
+        if (!raw.startsWith("/api/")) return raw;
+        const configuredOrigin = String(window.__KAREN_MUSIC_API_ORIGIN__ || "").trim().replace(/\/+$/, "");
+        if (configuredOrigin) return `${configuredOrigin}${raw}`;
+        return location.protocol === "file:" ? `http://127.0.0.1:5000${raw}` : raw;
+      }
+
+      const nativeFetch = window.fetch.bind(window);
+      window.fetch = function patchedFetch(input, init) {
+        if (typeof input === "string") {
+          return nativeFetch(apiUrl(input), init);
+        }
+        if (input instanceof Request) {
+          const requestUrl = String(input.url || "");
+          if (requestUrl.startsWith("/api/")) {
+            return nativeFetch(apiUrl(requestUrl), init);
+          }
+        }
+        return nativeFetch(input, init);
+      };
+
+      function updateTranslationQueue() {
+        const trackables = [
+          { id: "btn-import", key: "import", kind: "button" },
+          { id: "btn-new", key: "newSong", kind: "button" },
+          { id: "btn-save", key: "save", kind: "button" },
+          { id: "btn-print", key: "print", kind: "button" },
+          { id: "btn-export", key: "exportDb", kind: "button" },
+          { id: "song-db-title", key: "songDatabase", kind: "text" },
+          { id: "wq-label-title", key: "wizardLabelTitle", kind: "text" },
+          { id: "wq-label-key", key: "wizardLabelKey", kind: "text" },
+          { id: "wq-label-tempo", key: "wizardLabelTempo", kind: "text" },
+          { id: "wq-label-category", key: "wizardLabelCategory", kind: "text" },
+          { id: "wq-label-style", key: "wizardLabelStyle", kind: "text" },
+          { id: "wq-label-instruments", key: "wizardLabelInstruments", kind: "text" },
+          { id: "label-date-created", key: "dateCreatedLabel", kind: "text" },
+          { id: "label-next-performance", key: "nextPerformanceLabel", kind: "text" },
+          { id: "label-date-performed", key: "datePerformedLabel", kind: "text" },
+          { id: "label-reference-media", key: "referenceMediaLabel", kind: "text" },
+          { id: "label-performance-videos", key: "performanceVideosLabel", kind: "text" },
+          { id: "label-handwritten-links", key: "handwrittenPhotoLinksLabel", kind: "text" },
+          { id: "label-reference-notes", key: "referenceNotesLabel", kind: "text" },
+          { id: "songTitle", key: "englishTitlePlaceholder", kind: "placeholder" },
+          { id: "songTitleKaren", key: "karenTitlePlaceholder", kind: "placeholder" },
+          { id: "songKey", key: "keyPlaceholder", kind: "placeholder" },
+          { id: "songStyle", key: "stylePlaceholder", kind: "placeholder" },
+          { id: "songTempo", key: "tempoPlaceholder", kind: "placeholder" },
+          { id: "songInstruments", key: "instrPlaceholder", kind: "placeholder" },
+          { id: "karenText", key: "notesPlaceholder", kind: "placeholder" },
+          { id: "wq-songTitle", key: "titlePlaceholder", kind: "placeholder" },
+          { id: "wq-songKey", key: "keyPlaceholder", kind: "placeholder" },
+          { id: "wq-songTempo", key: "tempoPlaceholder", kind: "placeholder" },
+          { id: "wq-songStyle", key: "stylePlaceholder", kind: "placeholder" },
+          { id: "wg-songTitle", key: "titlePlaceholder", kind: "placeholder" },
+          { id: "wg-songKey", key: "keyPlaceholder", kind: "placeholder" },
+          { id: "wg-songTempo", key: "tempoPlaceholder", kind: "placeholder" },
+          { id: "wg-songStyle", key: "stylePlaceholder", kind: "placeholder" },
+          { id: "btn-add-performed-date", key: "addDateLabel", kind: "button" },
+          { id: "section-modal-title", key: "addSection", kind: "text" },
+          { id: "section-modal-exit-btn", key: "escToExit", kind: "button" },
+          { id: "wq-mode-hint-text", key: "wizardPreferGuided", kind: "text" },
+          { id: "wq-mode-link", key: "wizardSwitchGuided", kind: "text" },
+          { id: "shortcut-toggle", key: "shortcuts", kind: "title" },
+          { id: "settings-toggle", key: "settings", kind: "title" },
+          { id: "theme-toggle", key: "theme", kind: "title" },
+          { id: "editor-zoom-out", key: "zoomOut", kind: "title" },
+          { id: "editor-zoom-in", key: "zoomIn", kind: "title" },
+          { id: "editor-zoom-fit", key: "fitChartToEditorWidth", kind: "title" },
+          { id: "editor-zoom-reset", key: "resetChartZoom", kind: "title" },
+          { id: "paper-flap-chart", key: "chart", kind: "button" },
+          { id: "paper-flap-lyrics", key: "lyrics", kind: "button" },
+          { id: "paper-flap-database", key: "database", kind: "button" },
+        ];
+        const queue = [];
+        trackables.forEach(item => {
+          const { id, key, kind } = item;
+          const el = document.getElementById(id);
+          const english = String(TRANSLATIONS.english?.[key] || "").trim();
+          const karen = String(TRANSLATIONS.karen?.[key] || "").trim();
+          if (!el || !english) return;
+          const current = kind === "placeholder"
+            ? String(el.placeholder || "").trim()
+            : kind === "title"
+              ? String(el.title || "").trim()
+              : String(el.textContent || "").trim();
+          if (!karen || current === english || current.includes(english) || current === "") {
+            queue.push({ id, key, english, karen, kind, current });
+          }
+        });
+        window.karenTranslationQueue = queue;
+        const badge = document.getElementById("translation-queue-count");
+        if (badge) badge.textContent = String(queue.length);
+        const list = document.getElementById("translation-queue-list");
+        if (list) {
+          list.innerHTML = "";
+          if (currentLang !== "karen") {
+            const empty = document.createElement("li");
+            empty.className = "translation-queue-empty";
+            empty.textContent = "Switch to Karen to review unresolved labels.";
+            list.appendChild(empty);
+            return;
+          }
+          if (!queue.length) {
+            const empty = document.createElement("li");
+            empty.className = "translation-queue-empty";
+            empty.textContent = "No unresolved English labels found.";
+            list.appendChild(empty);
+            return;
+          }
+          queue.forEach(item => {
+            const li = document.createElement("li");
+            li.className = "translation-queue-item";
+            const strong = document.createElement("strong");
+            strong.textContent = item.english;
+            const meta = document.createElement("span");
+            meta.textContent = item.karen ? `Karen: ${item.karen}` : `Missing Karen text for ${item.id}`;
+            li.append(strong, meta);
+            list.appendChild(li);
+          });
+        }
       }
 
       // ============================================================
@@ -19883,8 +20606,9 @@
           key:         document.getElementById("wq-songKey").value.trim(),
           tempo:       document.getElementById("wq-songTempo").value.trim(),
           category:    document.getElementById("wq-songCategory").value,
-          style:       document.getElementById("wq-songStyle").value.trim(),
+          style:       document.getElementById("wq-songStyle").value,
           instruments: document.getElementById("wq-songInstruments").value.trim(),
+          beatsPerMeasure: Number(document.getElementById("wq-timeSignature")?.value || 4) || 4,
         });
         enterEditorFromWizard();
         closeWizard();
@@ -20013,6 +20737,9 @@
         if (vals.tempo)       setTempoValue("songTempo", vals.tempo, { render: false });
         if (vals.category)    document.getElementById("songCategory").value    = vals.category;
         if (vals.style)       document.getElementById("songStyle").value       = vals.style;
+        if (vals.beatsPerMeasure) {
+          setBeatsPerMeasure(Number(vals.beatsPerMeasure) || 4, { render: false });
+        }
         if (vals.instruments !== undefined) {
           document.getElementById("songInstruments").value = vals.instruments || "";
           ["instr-sidebar","instr-wq","instr-wg"].forEach(groupId => {
@@ -20075,6 +20802,31 @@
         };
 
         overlay.addEventListener("keydown", overlay._wizardKeyHandler);
+        if (!overlay.dataset.wheelBound) {
+          overlay.addEventListener("wheel", (e) => {
+            const target = e.target?.closest?.(".wizard-scroll-select, #wq-songTempo, #wg-songTempo, .tempo-stepper, #wizard-quick .instr-checklist");
+            if (!target) return;
+            if (target.matches?.(".wizard-scroll-select")) {
+              e.preventDefault();
+              const options = Array.from(target.options || []);
+              if (!options.length) return;
+              const dir = e.deltaY > 0 ? 1 : -1;
+              const idx = options.findIndex(opt => opt.selected);
+              const next = options[(Math.max(0, idx) + dir + options.length) % options.length];
+              if (next) {
+                next.selected = true;
+                target.dispatchEvent(new Event("change", { bubbles: true }));
+              }
+              return;
+            }
+            if (target.id === "wq-songTempo" || target.id === "wg-songTempo") {
+              e.preventDefault();
+              changeTempo(target.id, e.deltaY > 0 ? -1 : 1);
+              return;
+            }
+          }, { passive: false });
+          overlay.dataset.wheelBound = "1";
+        }
       }
 
       // ── SETTINGS PANEL ──────────────────────────────────────────
@@ -20237,6 +20989,16 @@
         applyTranslations();
         startTranslationAutoReload();
         document.body.classList.add("app-ready");
+      }
+
+      const leadAudioImport = document.getElementById("lead-audio-import");
+      if (leadAudioImport && !leadAudioImport.dataset.bound) {
+        leadAudioImport.addEventListener("change", async () => {
+          const file = leadAudioImport.files && leadAudioImport.files[0];
+          leadAudioImport.value = "";
+          if (file) await importLeadAudioStem(file);
+        });
+        leadAudioImport.dataset.bound = "1";
       }
 
       window.onload = () => {

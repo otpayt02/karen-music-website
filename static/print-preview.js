@@ -39,17 +39,32 @@
     ['presentation','Presentation','Instrument Sans','Instrument Sans','11pt','1.42'],
     ['night-session','Night Session','Instrument Sans','IBM Plex Mono','9.2pt','1.25'],
     ['archive','Archive','Fraunces','Instrument Sans','9pt','1.2'],
+    ['orchestra','Orchestra','Fraunces','Fraunces','10pt','1.34'],
+    ['songwriter','Songwriter','Instrument Sans','Fraunces','9.4pt','1.28'],
+    ['blueprint','Blueprint','IBM Plex Mono','Fraunces','8.9pt','1.19'],
   ].map(([id,label,fontTitle,fontBody,fontSize,lineHeight]) => ({id,label,fontTitle,fontBody,fontSize,lineHeight}));
 
   const STYLE_PRESETS = [
-    { id: 'classic', label: 'Classic', template: 'clean-mono', fontBody: 'Instrument Sans', fontTitle: 'Fraunces', fontSize: '9.5pt', lineHeight: '1.25', sectionStyle: 'bold' },
-    { id: 'clean', label: 'Clean', template: 'clean-mono', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '9pt', lineHeight: '1.2', sectionStyle: 'caps' },
-    { id: 'church', label: 'Church Bulletin', template: 'church-bulletin', fontBody: 'Fraunces', fontTitle: 'Fraunces', fontSize: '9.6pt', lineHeight: '1.28', sectionStyle: 'italic' },
-    { id: 'minimal', label: 'Minimal', template: 'minimal', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '8.9pt', lineHeight: '1.16', sectionStyle: 'smallcaps' },
-    { id: 'bold', label: 'Bold', template: 'bold-impact', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '9.6pt', lineHeight: '1.16', sectionStyle: 'bold' },
+    { id: 'classic', label: 'Classic Ledger', template: 'clean-mono', fontBody: 'Instrument Sans', fontTitle: 'Fraunces', fontSize: '9.5pt', lineHeight: '1.25', sectionStyle: 'bold', bodyScale: '1', titleScale: '1' },
+    { id: 'clean', label: 'Clean Panel', template: 'clean-mono', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '9pt', lineHeight: '1.2', sectionStyle: 'caps', bodyScale: '0.94', titleScale: '0.96' },
+    { id: 'church', label: 'Church Bulletin', template: 'church-bulletin', fontBody: 'Fraunces', fontTitle: 'Fraunces', fontSize: '9.6pt', lineHeight: '1.28', sectionStyle: 'italic', bodyScale: '1.04', titleScale: '1.03' },
+    { id: 'minimal', label: 'Minimal Sheet', template: 'minimal', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '8.9pt', lineHeight: '1.16', sectionStyle: 'smallcaps', bodyScale: '0.9', titleScale: '0.94' },
+    { id: 'bold', label: 'Bold Console', template: 'bold-impact', fontBody: 'Instrument Sans', fontTitle: 'Instrument Sans', fontSize: '9.6pt', lineHeight: '1.16', sectionStyle: 'bold', bodyScale: '1.08', titleScale: '1.12' },
+    { id: 'orchestral', label: 'Orchestral', template: 'orchestra', fontBody: 'Fraunces', fontTitle: 'Fraunces', fontSize: '10pt', lineHeight: '1.34', sectionStyle: 'italic', bodyScale: '1.1', titleScale: '1.08' },
+    { id: 'songwriter', label: 'Songwriter', template: 'songwriter', fontBody: 'Instrument Sans', fontTitle: 'Fraunces', fontSize: '9.4pt', lineHeight: '1.28', sectionStyle: 'smallcaps', bodyScale: '0.98', titleScale: '1.04' },
+    { id: 'blueprint', label: 'Blueprint', template: 'blueprint', fontBody: 'IBM Plex Mono', fontTitle: 'Fraunces', fontSize: '8.9pt', lineHeight: '1.19', sectionStyle: 'caps', bodyScale: '0.92', titleScale: '0.98' },
   ];
 
   let activeTemplate = localStorage.getItem('karenMusicPrintTheme') || 'clean-mono';
+  let activeTypography = {
+    fontBody: 'Instrument Sans',
+    fontTitle: 'Fraunces',
+    fontSize: '9.5pt',
+    lineHeight: '1.25',
+    sectionStyle: 'bold',
+    bodyScale: '1',
+    titleScale: '1',
+  };
 
   /* ──────────────────────────────────────────────────────────
      TEMPLATE APPLICATION
@@ -72,10 +87,13 @@
 
   function applyLiveTypography(overrides = {}) {
     const root = document.documentElement;
+    activeTypography = { ...activeTypography, ...overrides };
     if (overrides.fontBody) root.style.setProperty('--print-font-body', `'${overrides.fontBody}', sans-serif`);
     if (overrides.fontTitle) root.style.setProperty('--print-font-title', `'${overrides.fontTitle}', serif`);
     if (overrides.fontSize) root.style.setProperty('--print-font-size', overrides.fontSize);
     if (overrides.lineHeight) root.style.setProperty('--print-line-height', overrides.lineHeight);
+    if (overrides.bodyScale) root.style.setProperty('--print-body-scale', overrides.bodyScale);
+    if (overrides.titleScale) root.style.setProperty('--print-title-scale', overrides.titleScale);
     if (overrides.sectionStyle) root.dataset.printSectionStyle = overrides.sectionStyle;
     try { window._printTypography = { ...overrides }; } catch(e) {}
   }
@@ -238,9 +256,19 @@
       ? `<span class="pp-footer-bpm">${bpmParts.join(' • ')}</span>`
       : '';
 
-    const categoryParts = [song.category, song.instruments].filter(Boolean);
+    const categoryParts = [song.category].filter(Boolean);
     const categoryHtml = categoryParts.length
       ? `<span class="pp-footer-category">${categoryParts.map(esc).join(' · ')}</span>`
+      : '';
+    const instrumentParts = String(song.instruments || '')
+      .split(/[,\n]/)
+      .map(v => v.trim())
+      .filter(Boolean);
+    const instrumentHtml = instrumentParts.length
+      ? `<details class="pp-footer-instruments" open>
+           <summary>${esc('Instruments')}</summary>
+           <div class="pp-footer-instruments-list">${instrumentParts.map(name => `<span>${esc(name)}</span>`).join('')}</div>
+         </details>`
       : '';
 
     // ── Chart body ──────────────────────────────────────────
@@ -300,6 +328,7 @@
   </div>
   <div class="pp-footer">
       <div class="pp-footer-left">${bpmHtml}</div>
+    <div class="pp-footer-center">${instrumentHtml}</div>
     <div class="pp-footer-right">${categoryHtml}</div>
   </div>
 </div>
@@ -328,6 +357,7 @@
         <div id="preview-toolbar">
           <span id="preview-toolbar-title">Print Preview</span>
           <div id="preview-toolbar-templates"></div>
+          <button id="preview-save-changes" title="Save preview settings">Save changes</button>
           <button id="preview-print-now" title="Print now">🖨 Print</button>
           <button id="preview-close-btn" aria-label="Close preview">✕</button>
         </div>
@@ -343,6 +373,18 @@
               <option value="Fraunces">Fraunces</option>
               <option value="IBM Plex Mono">IBM Plex Mono</option>
               <option value="Noto Sans Myanmar">Noto Sans Myanmar</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Arial Narrow">Arial Narrow</option>
+            </select>
+          </label>
+          <label>
+            <span>Title family</span>
+            <select id="preview-title-font-select">
+              <option value="Fraunces">Fraunces</option>
+              <option value="Instrument Sans">Instrument Sans</option>
+              <option value="IBM Plex Mono">IBM Plex Mono</option>
+              <option value="Noto Sans Myanmar">Noto Sans Myanmar</option>
+              <option value="Georgia">Georgia</option>
             </select>
           </label>
           <label>
@@ -358,6 +400,10 @@
               <option value="caps">All caps</option>
             </select>
           </label>
+          <label>
+            <span>Body scale</span>
+            <input id="preview-body-scale" type="range" min="0.86" max="1.18" step="0.01" value="1">
+          </label>
         </div>
         <div id="preview-content"></div>
       </div>
@@ -367,6 +413,14 @@
 
     overlay.addEventListener('click', e => { if (e.target === overlay) closePreview(); });
     overlay.querySelector('#preview-close-btn').addEventListener('click', closePreview);
+    overlay.querySelector('#preview-save-changes').addEventListener('click', () => {
+      persistPreviewSettings();
+      refreshPreview();
+      const btn = overlay.querySelector('#preview-save-changes');
+      const original = btn.textContent;
+      btn.textContent = 'Saved';
+      setTimeout(() => { btn.textContent = original; }, 1200);
+    });
     overlay.querySelector('#preview-print-now').addEventListener('click', () => { closePreview(); setTimeout(() => window.print(), 100); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
 
@@ -374,8 +428,10 @@
     renderTemplateSwitcher(overlay.querySelector('#preview-toolbar-templates'));
     const themeSelect = overlay.querySelector('#preview-theme-select');
     const fontSelect = overlay.querySelector('#preview-font-select');
+    const titleFontSelect = overlay.querySelector('#preview-title-font-select');
     const lineSpacing = overlay.querySelector('#preview-line-spacing');
     const sectionStyle = overlay.querySelector('#preview-section-style');
+    const bodyScale = overlay.querySelector('#preview-body-scale');
     if (themeSelect) {
       themeSelect.innerHTML = STYLE_PRESETS.map(p => `<option value="${p.id}">${p.label}</option>`).join('');
       themeSelect.value = STYLE_PRESETS.find(p => p.template === activeTemplate)?.id || 'classic';
@@ -386,19 +442,78 @@
         refreshPreview();
       });
     }
-    [fontSelect, lineSpacing, sectionStyle].forEach(el => {
+    [fontSelect, titleFontSelect, lineSpacing, sectionStyle, bodyScale].forEach(el => {
       if (!el) return;
       el.addEventListener('input', () => {
         applyLiveTypography({
           fontBody: fontSelect?.value || 'Instrument Sans',
+          fontTitle: titleFontSelect?.value || 'Fraunces',
           lineHeight: lineSpacing?.value || '1.25',
           sectionStyle: sectionStyle?.value || 'bold',
-          fontTitle: fontSelect?.value || 'Fraunces',
+          bodyScale: bodyScale?.value || '1',
         });
         refreshPreview();
       });
     });
-    applyLiveTypography(STYLE_PRESETS.find(p => p.template === activeTemplate) || STYLE_PRESETS[0]);
+    applySavedPreviewSettings();
+  }
+
+  function persistPreviewSettings() {
+    const overlay = document.getElementById('print-preview-overlay');
+    if (!overlay) return;
+    const themeSelect = overlay.querySelector('#preview-theme-select');
+    const fontSelect = overlay.querySelector('#preview-font-select');
+    const titleFontSelect = overlay.querySelector('#preview-title-font-select');
+    const lineSpacing = overlay.querySelector('#preview-line-spacing');
+    const sectionStyle = overlay.querySelector('#preview-section-style');
+    const bodyScale = overlay.querySelector('#preview-body-scale');
+    const preset = STYLE_PRESETS.find(p => p.id === themeSelect?.value) || STYLE_PRESETS[0];
+    const settings = {
+      templateId: preset.template,
+      presetId: preset.id,
+      fontBody: fontSelect?.value || 'Instrument Sans',
+      fontTitle: titleFontSelect?.value || 'Fraunces',
+      fontSize: preset.fontSize,
+      lineHeight: lineSpacing?.value || preset.lineHeight,
+      sectionStyle: sectionStyle?.value || preset.sectionStyle,
+      bodyScale: bodyScale?.value || '1',
+      titleScale: preset.titleScale || '1',
+    };
+    localStorage.setItem('karenMusicPrintPreviewSettings', JSON.stringify(settings));
+    applyTemplate(settings.templateId);
+    applyLiveTypography(settings);
+  }
+
+  function applySavedPreviewSettings() {
+    const overlay = document.getElementById('print-preview-overlay');
+    if (!overlay) return;
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem('karenMusicPrintPreviewSettings') || 'null'); } catch(e) {}
+    const preset = saved
+      ? (STYLE_PRESETS.find(p => p.id === saved.presetId) || STYLE_PRESETS.find(p => p.template === saved.templateId))
+      : STYLE_PRESETS.find(p => p.template === activeTemplate) || STYLE_PRESETS[0];
+    const themeSelect = overlay.querySelector('#preview-theme-select');
+    const fontSelect = overlay.querySelector('#preview-font-select');
+    const titleFontSelect = overlay.querySelector('#preview-title-font-select');
+    const lineSpacing = overlay.querySelector('#preview-line-spacing');
+    const sectionStyle = overlay.querySelector('#preview-section-style');
+    const bodyScale = overlay.querySelector('#preview-body-scale');
+    if (themeSelect) themeSelect.value = preset?.id || 'classic';
+    if (fontSelect && saved?.fontBody) fontSelect.value = saved.fontBody;
+    if (titleFontSelect && saved?.fontTitle) titleFontSelect.value = saved.fontTitle;
+    if (lineSpacing && saved?.lineHeight) lineSpacing.value = saved.lineHeight;
+    if (sectionStyle && saved?.sectionStyle) sectionStyle.value = saved.sectionStyle;
+    if (bodyScale && saved?.bodyScale) bodyScale.value = saved.bodyScale;
+    applyTemplate(preset?.template || activeTemplate);
+    applyLiveTypography({
+      fontBody: saved?.fontBody || preset?.fontBody || 'Instrument Sans',
+      fontTitle: saved?.fontTitle || preset?.fontTitle || 'Fraunces',
+      fontSize: saved?.fontSize || preset?.fontSize || '9.5pt',
+      lineHeight: saved?.lineHeight || preset?.lineHeight || '1.25',
+      sectionStyle: saved?.sectionStyle || preset?.sectionStyle || 'bold',
+      bodyScale: saved?.bodyScale || '1',
+      titleScale: saved?.titleScale || preset?.titleScale || '1',
+    });
   }
 
   function refreshPreview() {
@@ -416,13 +531,18 @@
     style.id = 'pp-preview-styles';
     style.textContent = `
       .pp-page { padding: 0; }
+      .pp-page {
+        width: 100%;
+        max-width: 8.5in;
+        overflow: hidden;
+      }
       .pp-header {
         padding-bottom: 6px;
         margin-bottom: 8px;
         border-bottom: none;
       }
       .pp-title-karen {
-        font-size: 18pt;
+        font-size: calc(18pt * var(--print-title-scale, 1));
         font-weight: 800;
         font-family: 'Noto Sans Myanmar','Fraunces',serif;
         line-height: 1.1;
@@ -437,7 +557,7 @@
         margin-bottom: 4px;
       }
       .pp-style {
-        font-size: 18pt;
+        font-size: calc(18pt * var(--print-title-scale, 1));
         font-weight: 700;
         color: #000;
         margin-top: 2px;
@@ -450,6 +570,10 @@
       .pp-body {
         flex: 1;
         margin-bottom: 8px;
+        overflow: hidden;
+        transform: scale(var(--print-body-scale, 1));
+        transform-origin: top left;
+        width: calc(100% / var(--print-body-scale, 1));
       }
       .pp-no-chart {
         color: #888;
@@ -465,6 +589,7 @@
         border-top: none;
         font-size: 8pt;
         color: #333;
+        gap: 12px;
       }
       .pp-footer-bpm {
         font-weight: 700;
@@ -475,6 +600,86 @@
         font-size: 8pt;
         color: #555;
         text-align: right;
+      }
+      .pp-footer-center {
+        flex: 1 1 auto;
+        text-align: center;
+      }
+      .pp-footer-instruments {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .pp-footer-instruments summary {
+        cursor: pointer;
+        list-style: none;
+        font-size: 7.5pt;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #222;
+      }
+      .pp-footer-instruments summary::-webkit-details-marker {
+        display: none;
+      }
+      .pp-footer-instruments-list {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-left: 8px;
+        justify-content: center;
+      }
+      .pp-footer-instruments-list span {
+        display: inline-flex;
+        align-items: center;
+        padding: 1px 7px;
+        border-radius: 999px;
+        border: 1px solid rgba(0,0,0,0.2);
+        font-size: 7.6pt;
+        background: rgba(0,0,0,0.03);
+      }
+      .pp-body * {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .pp-body .measure,
+      .pp-body .beat,
+      .pp-body .line,
+      .pp-body .section {
+        min-width: 0;
+        overflow: hidden;
+      }
+      .pp-body .measure-row {
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .pp-body .beat {
+        flex: 0 1 auto;
+      }
+      .pp-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px 18px;
+        align-items: end;
+      }
+      .pp-title-block {
+        min-width: 0;
+        display: grid;
+        gap: 2px;
+      }
+      .pp-footer-left,
+      .pp-footer-right {
+        min-width: 0;
+      }
+      .pp-footer-left {
+        text-align: left;
+      }
+      .pp-footer-right {
+        text-align: right;
+      }
+      .pp-footer-category {
+        display: inline-block;
+        max-width: 100%;
       }
     `;
     document.head.appendChild(style);

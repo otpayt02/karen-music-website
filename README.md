@@ -2,6 +2,13 @@
 
 Desktop/web chord-chart editor for Karen and Myanmar song charts.
 
+## Current source of truth
+
+- The legacy HTML monolith in `index.html` is the primary UI surface for the current workstream.
+- The React/Vite files remain as migration artifacts unless the operator explicitly switches the target back to them.
+- The project-specific Codex prompt pack lives under `prompts/`.
+- For multi-issue annotation dumps, follow `prompts/project/issue-priority.md` after the source-of-truth docs.
+
 ## Stack
 
 - FastAPI backend
@@ -57,4 +64,3 @@ The packaged app opens the local FastAPI server in a WebView window and preserve
 - The app no longer depends on Flask.
 - Existing `songs.db` files are migrated in place.
 - Legacy song exports remain readable through the normalized schema.
-

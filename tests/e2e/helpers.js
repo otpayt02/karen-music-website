@@ -17,8 +17,11 @@ async function chooseLanguageAndEnterEditor(page, lang = "english") {
   const wizard = page.locator("#wizard-overlay");
   await expect(wizard).toBeVisible();
 
-  const visibleSkip = page.locator("#wizard-overlay .wizard-btn-skip:visible").first();
-  await visibleSkip.click();
+  const visibleDismiss = page.locator(
+    "#wizard-overlay .wizard-btn-skip:visible, #wizard-quick .wizard-btn-primary:visible"
+  ).first();
+  await expect(visibleDismiss).toBeVisible();
+  await visibleDismiss.click();
 
   await expect(wizard).toBeHidden();
   await expect(page.locator("#chart-container")).toBeVisible();

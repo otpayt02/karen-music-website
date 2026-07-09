@@ -19,7 +19,33 @@ if (-not $SkipStoppingRunningApp) {
     $runningApps = @(Get-Process -Name $AppName -ErrorAction SilentlyContinue)
     if ($runningApps.Count -gt 0) {
         Write-Host "Stopping running $AppName process(es) so PyInstaller can replace dist files..."
-        $runningApps | Stop-Process -Force
+        foreach ($runningApp in $runningApps) {
+            try {
+                $null = $runningApp.CloseMainWindow()
+            } catch {
+                Write-Warning "CloseMainWindow failed for PID $($runningApp.Id): $($_.Exception.Message)"
+            }
+        }
+
+        Start-Sleep -Seconds 2
+        $runningApps = @(Get-Process -Name $AppName -ErrorAction SilentlyContinue)
+        foreach ($runningApp in $runningApps) {
+            $taskKilled = $false
+            try {
+                & taskkill.exe /F /T /PID $runningApp.Id | Out-Null
+                $taskKilled = $true
+            } catch {
+                Write-Warning "taskkill failed for PID $($runningApp.Id): $($_.Exception.Message)"
+            }
+
+            if (-not $taskKilled) {
+                try {
+                    Stop-Process -Id $runningApp.Id -Force -ErrorAction Stop
+                } catch {
+                    Write-Warning "Stop-Process failed for PID $($runningApp.Id): $($_.Exception.Message)"
+                }
+            }
+        }
         Start-Sleep -Seconds 2
     }
 }
@@ -56,7 +82,7 @@ if (-not (Test-Path $IconPath)) {
     }
 }
 
-$DistPath = Join-Path $ProjectRoot "dist"
+$DistPath = Join-Path $ProjectRoot "build\package-dist"
 $WorkPath = Join-Path $ProjectRoot "build\pyinstaller"
 $SpecPath = Join-Path $ProjectRoot "build\pyinstaller"
 

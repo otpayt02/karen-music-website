@@ -9,12 +9,23 @@ $ErrorActionPreference = "Stop"
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Resolve-Path (Join-Path $ScriptDir "..")
+$PackageAppPath = Join-Path $ProjectRoot "build\package-dist\$AppName\$AppName.exe"
+$DistAppPath = Join-Path $ProjectRoot "dist\$AppName\$AppName.exe"
 
 if (-not $AppPath) {
-    $AppPath = Join-Path $ProjectRoot "dist\$AppName\$AppName.exe"
+    if (Test-Path $PackageAppPath) {
+        $AppPath = $PackageAppPath
+    } else {
+        $AppPath = $DistAppPath
+    }
 }
 if (-not $IconPath) {
-    $IconPath = Join-Path $ProjectRoot "dist\$AppName\app.ico"
+    $PackageIconPath = Join-Path $ProjectRoot "build\package-dist\$AppName\app.ico"
+    if (Test-Path $PackageIconPath) {
+        $IconPath = $PackageIconPath
+    } else {
+        $IconPath = Join-Path $ProjectRoot "dist\$AppName\app.ico"
+    }
 }
 
 $ResolvedAppPath = Resolve-Path $AppPath

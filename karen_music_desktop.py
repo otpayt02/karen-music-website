@@ -1,9 +1,11 @@
 import os
 import socket
-import subprocess
 import sys
 import time
 import urllib.request
+import threading
+
+import uvicorn
 
 APP_NAME = "Karen Music Director"
 DEFAULT_PORT = 5000
@@ -37,19 +39,43 @@ def open_app_window(url):
     webview.start(gui="edgechromium", private_mode=False)
 
 
+def start_server(port: int):
+    from app import app as fastapi_app
+
+    config = uvicorn.Config(
+        fastapi_app,
+        host="127.0.0.1",
+        port=port,
+        log_level="warning",
+        log_config=None,
+        access_log=False,
+    )
+    server = uvicorn.Server(config)
+    server.install_signal_handlers = lambda: None
+    thread = threading.Thread(target=server.run, daemon=True)
+    thread.start()
+    return server, thread
+
+
 def main():
-    port = find_open_port()
-    proc = subprocess.Popen([sys.executable, "app.py"], env={**os.environ, "UVICORN_PORT": str(port)}, cwd=os.path.dirname(__file__) or ".")
+    port = DEFAULT_PORT
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(0.2)
+        if sock.connect_ex(("127.0.0.1", port)) == 0:
+            raise RuntimeError(f"localhost:{port} is already in use. Close the other Karen Music app before launching.")
+    os.environ["UVICORN_PORT"] = str(port)
+    os.environ["KAREN_MUSIC_API_ORIGIN"] = f"http://127.0.0.1:{port}"
+    server, thread = start_server(port)
     try:
         wait_for_server(f"http://127.0.0.1:{port}")
         if os.environ.get("KAREN_MUSIC_NO_BROWSER") == "1":
-            while proc.poll() is None:
+            while thread.is_alive():
                 time.sleep(1)
         else:
             open_app_window(f"http://127.0.0.1:{port}")
     finally:
-        if proc.poll() is None:
-            proc.terminate()
+        server.should_exit = True
+        thread.join(timeout=5)
 
 
 if __name__ == "__main__":
