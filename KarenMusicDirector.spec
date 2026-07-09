@@ -2,11 +2,11 @@
 
 
 a = Analysis(
-    ['app.py'],
+    ['karen_music_desktop.py'],
     pathex=[],
     binaries=[],
-    datas=[('static', 'static'), ('index.html', '.')],
-    hiddenimports=[],
+    datas=[('dist', 'dist')],
+    hiddenimports=['uvicorn', 'webview', 'app'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

@@ -1,0 +1,56 @@
+{
+  "id": 14,
+  "title": "Database Search 1779247255799",
+  "category": "Choir",
+  "key": "Bb",
+  "style": "Processional",
+  "tempo": 88,
+  "date_performed": "2026-05-17",
+  "instruments": "",
+  "chart_json": {
+    "sections": [],
+    "onlySpans": [],
+    "slurs": [],
+    "lyricsSections": [],
+    "beatsPerMeasure": 4,
+    "defaultMeasuresPerRow": 8,
+    "rowDefaultExplicit": false
+  },
+  "raw_editor_text": "Opening verse\nblue folder lyric token",
+  "chart_image_path": null,
+  "created_at": null,
+  "updated_at": null,
+  "notes": "Opening verse\nblue folder lyric token",
+  "row_lead_json": {},
+  "current_key": "Bb",
+  "original_key": "Bb",
+  "created_date": "2026-05-20",
+  "next_performance_date": "",
+  "performed_dates_json": "[\"2026-05-17\"]",
+  "reference_media_json": "{\"videos\": [], \"images\": [], \"info\": \"\"}",
+  "title_karen": "တၢ်သးဝံၣ် Database",
+  "file_metadata_json": "[{\"id\": \"local-1779247257768-f06f6da46656e8\", \"name\": \"Choir PDF\", \"kind\": \"PDF\", \"path\": \"https://example.com/choir-packet.pdf\", \"url\": \"https://example.com/choir-packet.pdf\", \"notes\": \"blue folder attachment token\", \"stored_filename\": \"\", \"original_filename\": \"\", \"uploaded\": false, \"size\": null, \"added_at\": \"2026-05-20T03:20:57.768Z\"}]",
+  "performed_dates": [
+    "2026-05-17"
+  ],
+  "reference_media": {
+    "videos": [],
+    "images": [],
+    "info": ""
+  },
+  "file_metadata": [
+    {
+      "id": "local-1779247257768-f06f6da46656e8",
+      "name": "Choir PDF",
+      "kind": "PDF",
+      "path": "https://example.com/choir-packet.pdf",
+      "url": "https://example.com/choir-packet.pdf",
+      "notes": "blue folder attachment token",
+      "stored_filename": "",
+      "original_filename": "",
+      "uploaded": false,
+      "size": null,
+      "added_at": "2026-05-20T03:20:57.768Z"
+    }
+  ]
+}
