@@ -58,6 +58,10 @@ DIST_ASSETS_CANDIDATES = (
     RESOURCE_DIR / "dist" / "assets",
     BASE_DIR / "dist" / "assets",
 )
+REDESIGN_INDEX_CANDIDATES = (
+    RESOURCE_DIR / "dist" / "react-index.html",
+    BASE_DIR / "dist" / "react-index.html",
+)
 
 app = FastAPI(title="Karen Music Director")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -637,6 +641,17 @@ def index() -> HTMLResponse:
             html = f"{injection}{html}"
         return HTMLResponse(html)
     return HTMLResponse("<!doctype html><html><body><div id='root'></div></body></html>")
+
+
+@app.get("/redesign")
+def redesign() -> HTMLResponse:
+    index_path = resolve_first_existing_path(REDESIGN_INDEX_CANDIDATES)
+    if index_path:
+        return HTMLResponse(index_path.read_text(encoding="utf-8"))
+    return HTMLResponse(
+        "<!doctype html><html><body><h1>Run npm run build to generate the redesigned UI.</h1></body></html>",
+        status_code=503,
+    )
 
 
 @app.get("/print/{song_id}")
