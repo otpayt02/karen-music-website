@@ -3,7 +3,7 @@ import json
 import app as app_module
 import import_service
 from fastapi.testclient import TestClient
-from import_service import normalize_vision_song
+from import_service import IMPORT_CRITERIA, normalize_vision_song, parse_chart_text
 
 
 def configure_temp_storage(monkeypatch, tmp_path):
@@ -60,6 +60,9 @@ def test_normalizes_vision_output_into_editor_beats():
         "key": "Bb",
         "style": "Ballad",
         "tempo": "80",
+        "time_signature": "6/8",
+        "instruments": ["Piano 1", "Drums"],
+        "song_group": "Youth",
         "confidence": 0.82,
         "warnings": ["Measure 2 is faint"],
         "sections": [{
@@ -80,6 +83,68 @@ def test_normalizes_vision_output_into_editor_beats():
     assert first_beat["chordState"]["seven"] is True
     assert first_beat["circle"] is True
     assert result["confidence"] == 0.82
+    assert result["chart_json"]["beatsPerMeasure"] == 6
+    assert len(result["chart_json"]["sections"][0]["measures"][0]["beats"]) == 6
+    assert result["instruments"] == "Piano 1, Drums"
+    assert result["chart_json"]["songGroup"] == "Youth"
+
+
+def test_import_criteria_exposes_every_supported_source(monkeypatch, tmp_path):
+    configure_temp_storage(monkeypatch, tmp_path)
+    client = TestClient(app_module.app)
+
+    response = client.get("/api/import/criteria")
+
+    assert response.status_code == 200
+    extensions = {extension for source in response.json()["accepted_sources"] for extension in source["extensions"]}
+    assert {".json", ".txt", ".chordpro", ".png", ".jpg", ".pdf"}.issubset(extensions)
+    assert "beat positions" in response.json()["chart_fields"]
+    assert response.json()["version"] == IMPORT_CRITERIA["version"]
+
+
+def test_text_chart_code_fills_metadata_structure_and_marks(monkeypatch, tmp_path):
+    configure_temp_storage(monkeypatch, tmp_path)
+    client = TestClient(app_module.app)
+    chart_code = """Title: Text Import Song
+Karen Title: တၢ်သးဝံၣ်
+Category: Youth
+Current Key: G
+Original Key: Bb
+Style: Worship
+Tempo: 84
+Time: 6/8
+Instruments: Piano 1, Drums
+Group: Youth Team
+[Verse]
+| (G) - C. - x - | D/F# - Em - G - |
+"""
+
+    response = client.post(
+        "/api/import/code",
+        files={"file": ("song.chordpro", chart_code.encode("utf-8"), "text/plain")},
+    )
+
+    assert response.status_code == 200, response.text
+    result = response.json()
+    first_measure = result["chart_json"]["sections"][0]["measures"][0]
+    assert result["title"] == "Text Import Song"
+    assert result["current_key"] == "G"
+    assert result["original_key"] == "Bb"
+    assert result["instruments"] == "Piano 1, Drums"
+    assert result["chart_json"]["beatsPerMeasure"] == 6
+    assert result["chart_json"]["songGroup"] == "Youth Team"
+    assert first_measure["beats"][0]["circle"] is True
+    assert first_measure["beats"][2]["dot"] is True
+    assert first_measure["beats"][4]["xMarks"] == 1
+    assert result["import_review"]["source_kind"] == "text-chart"
+
+
+def test_parse_chart_text_supports_inline_chordpro_chords():
+    result = parse_chart_text("{title: Inline Song}\n{key: C}\n{start_of_chorus}\n[C]Praise [G/B]the [Am]Lord [F]today")
+
+    beats = result["chart_json"]["sections"][0]["measures"][0]["beats"]
+    assert [beat["chordState"]["root"] for beat in beats] == ["C", "G", "A", "F"]
+    assert beats[1]["bass"] == "B"
 
 
 def test_json_import_recovery_mirroring(monkeypatch, tmp_path):
@@ -101,6 +166,7 @@ def test_json_import_recovery_mirroring(monkeypatch, tmp_path):
     )
     assert import_response.status_code == 200
     assert import_response.json()["chart_json"]["sections"][0]["type"] == "Verse"
+    assert import_response.json()["import_review"]["source_kind"] == "editor-json"
 
 
 def test_vision_import_route_returns_reviewable_draft(monkeypatch, tmp_path):
@@ -117,6 +183,46 @@ def test_vision_import_route_returns_reviewable_draft(monkeypatch, tmp_path):
     assert response.status_code == 200
     assert response.json()["title"] == "OCR Song"
     assert response.json()["confidence"] == 0.75
+
+
+def test_pdf_vision_import_uses_the_same_reviewable_route(monkeypatch, tmp_path):
+    configure_temp_storage(monkeypatch, tmp_path)
+    expected = {**sample_song("PDF OCR Song"), "confidence": 0.81, "warnings": ["Page 2 ending is faint"]}
+    monkeypatch.setattr(app_module, "interpret_chart_upload", lambda *_args, **_kwargs: expected)
+    client = TestClient(app_module.app)
+
+    response = client.post(
+        "/api/import/vision",
+        files={"file": ("chart.pdf", b"%PDF-fake", "application/pdf")},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["title"] == "PDF OCR Song"
+    assert response.json()["source_filename"] == "chart.pdf"
+
+
+def test_imported_metadata_persists_after_save_and_reload(monkeypatch, tmp_path):
+    configure_temp_storage(monkeypatch, tmp_path)
+    client = TestClient(app_module.app)
+    payload = sample_song("Persistent Import")
+    payload.update({
+        "instruments": "Piano 1, Drums",
+        "created_date": "2026-07-16",
+        "next_performance_date": "2026-08-02",
+        "performed_dates": ["2026-07-10"],
+    })
+    payload["chart_json"]["songGroup"] = "Youth Team"
+
+    created = client.post("/api/songs", json=payload)
+    assert created.status_code == 200, created.text
+    loaded = client.get(f"/api/songs/{created.json()['id']}")
+
+    assert loaded.status_code == 200
+    assert loaded.json()["instruments"] == "Piano 1, Drums"
+    assert loaded.json()["created_date"] == "2026-07-16"
+    assert loaded.json()["next_performance_date"] == "2026-08-02"
+    assert loaded.json()["performed_dates"] == ["2026-07-10"]
+    assert loaded.json()["chart_json"]["songGroup"] == "Youth Team"
 
 
 def test_nvidia_vision_import_uses_openai_compatible_chat_endpoint(monkeypatch, tmp_path):

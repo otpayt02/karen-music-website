@@ -1,0 +1,214 @@
+- generic [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - generic [ref=f2e4]:
+      - img "Karen Music"
+      - generic [ref=f2e5]:
+        - generic [ref=f2e6]: တၢ်သးဝံၣ်ကညီ
+        - generic [ref=f2e7]: Karen Music
+    - generic [ref=f2e8]: Select Language / ဃုထၢတၢ်ကျိၥ်
+    - generic [ref=f2e9]:
+      - button "ကညီကျိ S'gaw Karen ←" [ref=f2e10] [cursor=pointer]:
+        - generic [ref=f2e11]: ကညီကျိ
+        - generic [ref=f2e12]: S'gaw Karen
+        - generic [ref=f2e13]: ←
+      - button "အဲကလံၥ် English →" [ref=f2e14] [cursor=pointer]:
+        - generic [ref=f2e15]: အဲကလံၥ်
+        - generic [ref=f2e16]: English
+        - generic [ref=f2e17]: →
+    - generic [ref=f2e18]:
+      - generic [ref=f2e19]: Press ↵ to continue
+      - generic [ref=f2e20]: မၤသီၣ်ချဲးကလဲၤဆူညါ
+  - text: ✓ ✓ ✓ ✓ ✓ ✓ ✓ ✓ ✓ ✓ ✓
+  - button "☰" [ref=f2e21] [cursor=pointer]
+  - button "⚙" [ref=f2e22] [cursor=pointer]
+  - 'button "Theme: light" [ref=f2e23] [cursor=pointer]': ☼
+  - generic:
+    - heading "KAREN MUSIC" [level=2]
+    - generic:
+      - generic: Song Title (English)
+      - textbox "Song Title (English)":
+        - /placeholder: English title
+    - generic:
+      - generic: Song Title (Karen)
+      - textbox "Song Title (Karen)":
+        - /placeholder: Karen title
+    - generic:
+      - generic: Category
+      - combobox "Category":
+        - option "—" [selected]
+        - option "Praise / Worship"
+        - option "Choir"
+        - option "Youth"
+        - option "Solo"
+        - option "Kids"
+    - generic:
+      - generic: Key
+      - textbox "Key":
+        - /placeholder: e.g. G
+    - generic:
+      - generic: Transpose
+      - generic:
+        - combobox:
+          - option "Original Key" [selected]
+          - option "C"
+          - option "Db"
+          - option "D"
+          - option "Eb"
+          - option "E"
+          - option "F"
+          - option "Gb"
+          - option "G"
+          - option "Ab"
+          - option "A"
+          - option "Bb"
+          - option "B"
+        - button "Apply"
+    - generic:
+      - generic: Style
+      - textbox "Style":
+        - /placeholder: e.g. Alter Rock
+    - generic:
+      - generic: Tempo
+      - generic:
+        - button "▼"
+        - slider "Sidebar tempo slider": "120"
+        - spinbutton "Tempo"
+        - button "▲"
+    - generic:
+      - generic: Instruments
+      - generic:
+        - button "Piano 1"
+        - button "Piano 2"
+        - button "Electric Guitar"
+        - button "Acoustic Guitar"
+        - button "Electric Bass"
+        - button "Drums"
+        - button "Keytar"
+    - generic:
+      - generic: Notes
+      - textbox "Notes":
+        - /placeholder: Type notes here...
+    - generic:
+      - generic: Date Created
+      - textbox "Date Created"
+    - generic:
+      - generic: Next Performance Date
+      - textbox "Next Performance Date"
+    - generic:
+      - generic: Date Performed
+      - generic:
+        - textbox "Date Performed"
+        - button "Add"
+      - list:
+        - listitem: No performed dates yet
+    - generic:
+      - generic: Reference / Media
+      - generic: Performance Videos (YouTube)
+      - textbox "Performance Videos (YouTube)":
+        - /placeholder: One URL per line
+      - generic: Handwritten / Photo Links
+      - textbox "Handwritten / Photo Links":
+        - /placeholder: One URL per line
+      - generic: Reference Notes
+      - textbox "Reference Notes":
+        - /placeholder: Other media details and references
+    - generic:
+      - button "New Song"
+      - button "Save"
+      - button "Import"
+      - button "Print"
+      - button "Export"
+    - generic:
+      - heading "Song Database" [level=3]
+  - generic [ref=f2e24]:
+    - textbox
+    - generic [ref=f2e25]:
+      - generic "Paper view tabs" [ref=f2e26]:
+        - button "Chart" [pressed] [ref=f2e27] [cursor=pointer]
+        - button "Lyrics" [ref=f2e28] [cursor=pointer]
+        - button "Database" [ref=f2e29] [cursor=pointer]
+      - generic [ref=f2e30]:
+        - generic [ref=f2e31]:
+          - generic [ref=f2e32]:
+            - generic [ref=f2e33]:
+              - textbox "Karen song title" [ref=f2e34]:
+                - /placeholder: Karen title
+              - textbox "English song title" [ref=f2e35]:
+                - /placeholder: English title
+            - combobox "Song style" [ref=f2e37]
+            - combobox "Song key" [ref=f2e39]:
+              - option "Key" [selected]
+              - option "C"
+              - option "Dᵇ"
+              - option "D"
+              - option "Eᵇ"
+              - option "E"
+              - option "F"
+              - option "Gᵇ"
+              - option "G"
+              - option "Aᵇ"
+              - option "A"
+              - option "Bᵇ"
+              - option "B"
+          - generic [ref=f2e40]:
+            - group [ref=f2e41]:
+              - generic "Reference ▾" [ref=f2e42] [cursor=pointer]
+            - textbox "Group" [ref=f2e43]
+        - generic "Lyrics sheet":
+          - generic:
+            - generic:
+              - generic: တၢ်သးဝံၣ်ကညီ
+              - generic: New Song
+            - generic:
+              - generic: Lyrics
+              - button "Add Lyrics Section"
+          - generic: Add a lyrics section to begin.
+          - generic: Lyrics Sheet
+        - generic "Database sheet":
+          - generic:
+            - generic:
+              - generic: Archive Workspace
+              - heading "New Song" [level=2]
+              - generic: Search, files, and song metadata
+            - generic:
+              - generic: 0 songs
+              - button "Export Library"
+          - generic:
+            - generic: Search Any Metadata
+            - generic:
+              - searchbox "Search Any Metadata"
+              - button "Clear"
+          - generic:
+            - region "Database results":
+              - generic: Songs
+            - region "Selected song metadata":
+              - generic:
+                - generic: Selected Song
+                - generic: Notes will appear here.
+              - generic:
+                - generic: Files and References
+                - generic:
+                  - textbox "File title"
+                  - combobox "File type":
+                    - option "Lead Sheet" [selected]
+                    - option "Audio"
+                    - option "Stem / Track"
+                    - option "WAV"
+                    - option "MIDI"
+                    - option "Video"
+                    - option "PDF"
+                    - option "Image"
+                    - option "Reference"
+                  - textbox "Instrument or stem name"
+                  - textbox "URL or local file path"
+                  - textbox "Music stem, part, or WAV-to-MIDI source note"
+                  - textbox "Notes, source, arrangement details, permissions, mix or chart context..."
+                - generic:
+                  - button "Choose File"
+                  - button "Add File"
+  - button "?" [ref=f2e44] [cursor=pointer]
+  - text: "- - + + + + + + + + +"
+  - generic:
+    - generic:
+      - button "Close Karen keyboard": ×
+    - generic: "Typing into: —"

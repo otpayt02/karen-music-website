@@ -95,6 +95,7 @@ $pyinstallerArgs = @(
     "--distpath", $DistPath,
     "--workpath", $WorkPath,
     "--specpath", $SpecPath,
+    "--add-data", "$ProjectRoot\index.html;.",
     "--add-data", "$ProjectRoot\dist;dist",
     "--add-data", "$ProjectRoot\songs.db;.",
     "--add-data", "$ProjectRoot\static;static",

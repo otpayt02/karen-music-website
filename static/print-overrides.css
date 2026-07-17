@@ -88,7 +88,7 @@
     margin-bottom: 1pt !important;
   }
 
-  /* §2.3 — English title: small parenthetical BELOW Karen */
+  /* §2.3 — English title: small, plain, and below Karen */
   .pp-title-english,
   #ph-title-english,
   .print-spec-title-english,
@@ -171,6 +171,20 @@
     letter-spacing: 0.05em !important;
     color: #111 !important;
   }
+
+  #print-batch .paper-header {
+    display: grid !important;
+    position: static !important;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, .95fr) !important;
+  }
+
+  #print-batch .paper-footer {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, .9fr) !important;
+  }
+
+  .paper-meta-print-value { border: 0 !important; background: transparent !important; }
+  .paper-instrument-print-value { text-align: center !important; font-weight: 800 !important; }
 
   .pp-footer-right,
   #ph-footer-right,
@@ -397,7 +411,7 @@ html[data-print-section-style="bold"] #print-batch .section-header { font-weight
 #print-batch .chord-wrap.has-circle { border: 2px solid var(--sheet-rule) !important; background: transparent !important; }
 
 /* Print metadata stays available to cloned preview sheets, not the live editor canvas. */
-#chart-container > .paper-header { display: none !important; }
+#chart-container > .paper-header { display: grid !important; }
 
 html[data-print-template="clean-mono"] { --sheet-title-font:'IBM Plex Mono',monospace; --sheet-body-font:'Instrument Sans',sans-serif; --sheet-section:#eef2f2; --sheet-pad:22px 28px 32px; --sheet-measure-gap:2px; }
 html[data-print-template="clean-mono"] .pp-page .paper-header { grid-template-columns:1.6fr .8fr .6fr; border-bottom:2px solid var(--sheet-rule)!important; }

@@ -2,7 +2,7 @@
 from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.hooks import collect_submodules
 
-datas = [('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\dist', 'dist'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\songs.db', '.'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\static', 'static'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\chart_images', 'chart_images'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\packaging\\app.ico', '.'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\translations_updated.txt', '.')]
+datas = [('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\index.html', '.'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\dist', 'dist'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\songs.db', '.'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\static', 'static'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\chart_images', 'chart_images'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\packaging\\app.ico', '.'), ('C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\translations_updated.txt', '.')]
 hiddenimports = ['fastapi', 'uvicorn', 'starlette']
 datas += collect_data_files('webview')
 hiddenimports += collect_submodules('webview')

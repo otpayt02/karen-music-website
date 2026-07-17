@@ -18,7 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from import_service import interpret_chart_upload, normalize_vision_song
+from import_service import IMPORT_CRITERIA, interpret_chart_code, interpret_chart_upload, normalize_vision_song
 
 IS_FROZEN = getattr(sys, "frozen", False)
 BASE_DIR = Path(__file__).resolve().parent
@@ -44,10 +44,10 @@ LOCAL_IMAGE_DIR = DATA_DIR / "chart_images"
 SETTINGS_PATH = DATA_DIR / "app_settings.json"
 API_ORIGIN = os.environ.get("KAREN_MUSIC_API_ORIGIN", "").strip().rstrip("/")
 INDEX_CANDIDATES = (
-    RESOURCE_DIR / "dist" / "index.html",
-    BASE_DIR / "dist" / "index.html",
     RESOURCE_DIR / "index.html",
     BASE_DIR / "index.html",
+    RESOURCE_DIR / "dist" / "index.html",
+    BASE_DIR / "dist" / "index.html",
     BASE_DIR / "legacy-index.html",
 )
 STATIC_CANDIDATES = (
@@ -209,6 +209,7 @@ def parse_json(value: str, default: Any) -> Any:
 
 
 def row_to_song(row: sqlite3.Row) -> dict[str, Any]:
+    metadata = parse_json(row["metadata_json"], {})
     song = {
         "id": row["id"],
         "title": row["title"],
@@ -222,18 +223,20 @@ def row_to_song(row: sqlite3.Row) -> dict[str, Any]:
         "notes": row["notes"],
         "chart_json": parse_json(row["chart_json"], {}),
         "lyrics_json": parse_json(row["lyrics_json"], []),
-        "metadata_json": parse_json(row["metadata_json"], {}),
+        "metadata_json": metadata,
         "tags_json": parse_json(row["tags_json"], []),
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
         "version": row["version"],
     }
-    song["performed_dates"] = []
-    song["reference_media"] = {}
-    song["file_metadata"] = []
-    song["created_date"] = song["created_at"][:10] if song["created_at"] else ""
-    song["next_performance_date"] = ""
-    song["date_performed"] = ""
+    song["performed_dates"] = metadata.get("performed_dates", []) if isinstance(metadata.get("performed_dates"), list) else []
+    song["reference_media"] = metadata.get("reference_media", {}) if isinstance(metadata.get("reference_media"), dict) else {}
+    file_metadata = metadata.get("fileMetadata", metadata.get("file_metadata", []))
+    song["file_metadata"] = file_metadata if isinstance(file_metadata, list) else []
+    song["instruments"] = str(metadata.get("instruments") or "")
+    song["created_date"] = str(metadata.get("created_date") or (song["created_at"][:10] if song["created_at"] else ""))
+    song["next_performance_date"] = str(metadata.get("next_performance_date") or "")
+    song["date_performed"] = song["performed_dates"][-1] if song["performed_dates"] else ""
     song["chart_bundle"] = {
         "sections": song["chart_json"].get("sections", []) if isinstance(song["chart_json"], dict) else [],
         "onlySpans": song["chart_json"].get("onlySpans", []) if isinstance(song["chart_json"], dict) else [],
@@ -242,6 +245,7 @@ def row_to_song(row: sqlite3.Row) -> dict[str, Any]:
         "beatsPerMeasure": song["chart_json"].get("beatsPerMeasure", 4) if isinstance(song["chart_json"], dict) else 4,
         "defaultMeasuresPerRow": song["chart_json"].get("defaultMeasuresPerRow", 4) if isinstance(song["chart_json"], dict) else 4,
         "rowDefaultExplicit": song["chart_json"].get("rowDefaultExplicit", False) if isinstance(song["chart_json"], dict) else False,
+        "songGroup": song["chart_json"].get("songGroup", "") if isinstance(song["chart_json"], dict) else "",
     }
     song["rowleadjson"] = song["metadata_json"].get("rowLead", {}) if isinstance(song["metadata_json"], dict) else {}
     return song
@@ -252,6 +256,7 @@ def legacy_song_from_row(row: sqlite3.Row) -> dict[str, Any]:
     chart = song.get("chart_bundle", {})
     return {
         "id": song["id"],
+        "version": song["version"],
         "title": song["title"],
         "title_karen": song["title_karen"],
         "category": song["category"],
@@ -267,6 +272,7 @@ def legacy_song_from_row(row: sqlite3.Row) -> dict[str, Any]:
         "reference_media": song["reference_media"],
         "file_metadata": song["file_metadata"],
         "notes": song["notes"],
+        "instruments": song["instruments"],
         "chart_json": chart,
         "rowleadjson": song["rowleadjson"],
     }
@@ -279,6 +285,9 @@ def normalize_legacy_payload(payload: dict[str, Any]) -> dict[str, Any]:
     row_lead = payload.get("rowleadjson")
     if row_lead is None:
         row_lead = payload.get("row_lead_json") or payload.get("rowLead") or {}
+    file_metadata = payload.get("file_metadata")
+    if file_metadata is None:
+        file_metadata = payload.get("fileMetadata") or []
     return {
         "title": payload.get("title", ""),
         "title_karen": payload.get("title_karen", ""),
@@ -296,7 +305,8 @@ def normalize_legacy_payload(payload: dict[str, Any]) -> dict[str, Any]:
             "next_performance_date": payload.get("next_performance_date", ""),
             "performed_dates": payload.get("performed_dates", []),
             "reference_media": payload.get("reference_media", {}),
-            "file_metadata": payload.get("file_metadata", []),
+            "fileMetadata": file_metadata,
+            "instruments": payload.get("instruments", ""),
             "rowLead": row_lead,
         },
         "tags_json": payload.get("tags_json") or [],
@@ -308,11 +318,10 @@ def snapshot_song(song: dict[str, Any]) -> str:
 
 
 def upsert_search_index(conn: sqlite3.Connection, song: dict[str, Any]) -> None:
-    conn.execute("DELETE FROM songs_fts WHERE rowid = ?", (song["id"],))
-    conn.execute(
-        "INSERT INTO songs_fts(rowid, title, title_karen, notes) VALUES (?, ?, ?, ?)",
-        (song["id"], song["title"], song["title_karen"], song["notes"]),
-    )
+    # FTS5 external-content tables can report a malformed index when a row is
+    # deleted before it has ever been indexed. Rebuild from the authoritative
+    # songs table so new imports and updates remain searchable and atomic.
+    conn.execute("INSERT INTO songs_fts(songs_fts) VALUES ('rebuild')")
 
 
 def save_song(song_id: int | None, payload: dict[str, Any]) -> dict[str, Any]:
@@ -525,15 +534,34 @@ def download_song_file(song_id: int, filename: str) -> FileResponse:
     return FileResponse(path)
 
 
+@app.get("/api/import/criteria")
+def import_criteria() -> dict[str, Any]:
+    return IMPORT_CRITERIA
+
+
+@app.post("/api/import/code")
+async def import_code(file: UploadFile = File(...)) -> dict[str, Any]:
+    try:
+        return interpret_chart_code(file.filename or "chart.txt", await file.read())
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+
 @app.post("/api/import/png")
 async def import_png(file: UploadFile = File(...)) -> dict[str, Any]:
     content = await file.read()
-    review = interpret_chart_upload(file.filename, file.content_type, content, api_key=os.environ.get("OPENAI_API_KEY"))
-    source_path = IMPORT_DIR / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{Path(file.filename).name}"
+    try:
+        review = interpret_chart_upload(file.filename, file.content_type, content, api_key=os.environ.get("OPENAI_API_KEY"))
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(503, str(exc)) from exc
+    safe_filename = Path(file.filename or "chord-chart").name
+    source_path = IMPORT_DIR / f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{safe_filename}"
     source_path.write_bytes(content)
     import_conn = db()
     import_row = {
-        "source_filename": file.filename,
+        "source_filename": safe_filename,
         "source_path": str(source_path),
         "ocr_confidence": review.get("confidence", 0),
         "uncertain_fields_json": json.dumps(review.get("warnings", []), ensure_ascii=False),
@@ -551,9 +579,9 @@ async def import_png(file: UploadFile = File(...)) -> dict[str, Any]:
     import_conn.commit()
     import_conn.close()
     review["import_id"] = import_id
-    review["source_filename"] = file.filename
+    review["source_filename"] = safe_filename
     review["source_path"] = str(source_path)
-    review["kind"] = "png-import"
+    review["kind"] = "vision-import"
     return review
 
 
@@ -564,8 +592,10 @@ async def import_vision(file: UploadFile = File(...)) -> dict[str, Any]:
 
 @app.post("/api/import/json")
 async def import_json(file: UploadFile = File(...)) -> dict[str, Any]:
-    payload = json.loads((await file.read()).decode("utf-8"))
-    return payload
+    try:
+        return interpret_chart_code(file.filename or "chart.json", await file.read())
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
 
 
 @app.post("/api/recover-library")

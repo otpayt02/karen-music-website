@@ -12,7 +12,18 @@ test.describe("shared editor logic", () => {
 
     await page.locator("#lang-btn-english").click();
     await expect(page.locator("#lang-picker-overlay")).toBeHidden();
+    await expect(page.locator("#wizard-overlay")).toBeHidden();
+    await expect(page.locator("#chart-container")).toBeVisible();
+  });
+
+  test("opens the metadata wizard only after New Song is pressed", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+    await page.locator("#sidebar-toggle").click();
+
+    await expect(page.locator("#wizard-overlay")).toBeHidden();
+    await page.locator("#btn-new").click();
     await expect(page.locator("#wizard-overlay")).toBeVisible();
+    await expect(page.locator("#wizard-quick")).toBeVisible();
   });
 
   test("transpose dropdown applies target keys and Original immediately", async ({ page }) => {

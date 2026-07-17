@@ -1,0 +1,32 @@
+- iframe [ref=e2]:
+  - generic [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - generic [ref=f1e5]: Verified in this pass
+        - strong [ref=f1e6]: One-file chart import
+      - paragraph [ref=f1e7]: JSON and text parse locally; image and PDF OCR produce a criteria-backed, reviewable unsaved editor draft.
+    - generic "Karen Music feature hierarchy" [ref=f1e9]:
+      - generic [ref=f1e10]:
+        - heading "Create & arrange" [level=3] [ref=f1e11]
+        - generic [ref=f1e12]:
+          - button "Chord-chart editor · implemented" [ref=f1e13] [cursor=pointer]
+          - button "Lead melody & cues · implemented" [ref=f1e14] [cursor=pointer]
+          - button "Lyrics & timing · implemented" [ref=f1e15] [cursor=pointer]
+      - generic [ref=f1e16]:
+        - heading "Plan & organize" [level=3] [ref=f1e17]
+        - generic [ref=f1e18]:
+          - button "Song setup & metadata · implemented" [ref=f1e19] [cursor=pointer]
+          - button "Song database & search · implemented" [ref=f1e20] [cursor=pointer]
+          - button "Files & references · implemented" [ref=f1e21] [cursor=pointer]
+      - generic [ref=f1e22]:
+        - heading "Import & deliver" [level=3] [ref=f1e23]
+        - generic [ref=f1e24]:
+          - button "One-file chart import · verified" [pressed] [ref=f1e25] [cursor=pointer]
+          - button "Save, export & print · implemented" [ref=f1e26] [cursor=pointer]
+          - button "Desktop & packaging · implemented" [ref=f1e27] [cursor=pointer]
+      - generic [ref=f1e28]:
+        - heading "Operate & localize" [level=3] [ref=f1e29]
+        - generic [ref=f1e30]:
+          - button "Karen input tools · implemented" [ref=f1e31] [cursor=pointer]
+          - button "Appearance & settings · implemented" [ref=f1e32] [cursor=pointer]
+          - button "Language & translation · partial" [ref=f1e33] [cursor=pointer]

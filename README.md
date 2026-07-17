@@ -53,11 +53,13 @@ npm run build
 
 The packaged app opens the local FastAPI server in a WebView window and preserves the existing songs database.
 
-## PNG import
+## One-file chart import
 
-- Upload a PNG from the new Import control.
-- The OCR review screen shows confidence and warnings before save.
-- Imported PNGs are stored as attachments and the parsed song is saved to SQLite.
+- Click **Import** to see accepted formats, recognized fields, chart notation, image-quality guidance, privacy boundaries, and the review policy.
+- Import Karen Music JSON, text/ChordPro chart code, PNG/JPG/WEBP images, or PDFs.
+- JSON and text formats parse locally; images and PDFs use the first configured Gemini, NVIDIA, or OpenAI vision provider that succeeds.
+- Review confidence, recognized and missing fields, warnings, sections, and measures before filling the editor.
+- The filled editor remains an unsaved draft until the operator reviews it and presses **Save**.
 
 ## Migration notes
 
