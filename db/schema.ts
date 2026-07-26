@@ -1,8 +1,9 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const songs = sqliteTable("songs", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  ownerKey: text("owner_key").notNull().default(""),
   titleKaren: text("title_karen").notNull().default(""),
   titleEnglish: text("title_english").notNull(),
   style: text("style").notNull().default("Worship"),
@@ -13,4 +14,6 @@ export const songs = sqliteTable("songs", {
   payload: text("payload").notNull(),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
-});
+}, (table) => [
+  index("songs_owner_key_idx").on(table.ownerKey),
+]);

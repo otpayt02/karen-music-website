@@ -11,7 +11,7 @@ test("ships the Karen Music Director application shell without starter artifacts
     readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
   ]);
 
-  assert.match(page, /<MusicDirector \/>/);
+  assert.match(page, /<MusicDirector viewer=/);
   assert.match(layout, /title:\s*"Karen Music Director"/);
   assert.match(editor, /New song/);
   assert.match(editor, /Song details/);

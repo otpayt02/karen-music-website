@@ -25,6 +25,18 @@ type Measure = {
   leadSlotsByBeat?: number[];
   rowLeadView?: string[];
 };
+type BeatLocation = {
+  section: number;
+  measure: number;
+  beat: number;
+};
+type InstrumentCueRange = {
+  id: string;
+  rowKey: string;
+  abbr: string;
+  start: BeatLocation;
+  end: BeatLocation;
+};
 type Section = {
   id: string;
   name: string;
@@ -47,11 +59,39 @@ type Song = {
   sections: Section[];
   onlySpans?: Array<{ start: string; end: string }>;
   slurs?: Array<{ start: string; end: string }>;
+  instrumentCueRanges?: InstrumentCueRange[];
+  sourceKind?: "synthetic" | "approved-sanitized" | "imported-json";
+  reviewState?: "draft" | "reviewed";
   updatedAt?: string;
 };
 
 const instrumentOptions = ["Piano 1", "Piano 2", "Acoustic Guitar", "Bass", "Drums", "Strings"];
+const cueAbbreviationOptions = ["P1", "P2", "AG", "EG", "B", "D", "STR"];
 const sectionOptions = ["INTRO", "VERSE", "PRE-CHORUS", "CHORUS", "BRIDGE", "SOLO", "ENDING"];
+const KAREN_LAYOUT = [
+  "က", "ခ", "ဂ", "ဃ", "င",
+  "စ", "ဆ", "ၡ", "ည", "ယ",
+  "ရ", "လ", "ဝ", "သ", "မ",
+  "ဘ", "ဖ", "ပ", "န", "ဒ",
+  "ထ", "တ", "ဟ", "အ", "ဧ",
+  "ါ", "ံ", "ိ", "ီ", "ု",
+  "ူ", "ဲ", "ၢ", "့", "်",
+  "း", "ၢ်", "ာ်", "ၣ်", "ၤ",
+  "ှ", "ၠ", "ြ", "ျ", "ွ",
+  "ဝ", "၁", "၂", "၃", "၄",
+  "၅", "၆", "၇", "၈", "၉",
+];
+const KAREN_GROUPS = [
+  { label: "Numbers", keys: KAREN_LAYOUT.slice(45) },
+  { label: "Tones", keys: KAREN_LAYOUT.slice(35, 40) },
+  { label: "Consonants", keys: KAREN_LAYOUT.slice(0, 25) },
+  { label: "Vowels", keys: KAREN_LAYOUT.slice(25, 35) },
+  { label: "Medials", keys: KAREN_LAYOUT.slice(40, 45) },
+];
+const KAREN_HOTKEYS = "abcdefghijklmnopqrstuvwxyz".split("").reduce<Record<string, { base: string; shift: string }>>((map, key, index) => {
+  map[key] = { base: KAREN_LAYOUT[index] || "", shift: KAREN_LAYOUT[index + 26] || "" };
+  return map;
+}, {});
 const DEFAULT_MEASURES_PER_ROW = 8;
 const MIN_MEASURES_PER_ROW = 4;
 const MAX_MEASURES_PER_ROW = 16;
@@ -90,6 +130,67 @@ function rowsForSection(section: Section) {
   return rows;
 }
 
+function totalLeadSlots(measure: Measure) {
+  return measure.beats.reduce((total, _beat, index) => total + (measure.leadSlotsByBeat?.[index] ?? 4), 0);
+}
+
+function normalizeLeadSlots(measure: Measure) {
+  return measure.beats.map((_beat, index) => measure.leadSlotsByBeat?.[index] ?? 4);
+}
+
+function leadBeatForSlot(measure: Measure, slotIndex: number) {
+  let cursor = 0;
+  const counts = normalizeLeadSlots(measure);
+  for (let beatIndex = 0; beatIndex < counts.length; beatIndex += 1) {
+    cursor += counts[beatIndex];
+    if (slotIndex < cursor) return beatIndex;
+  }
+  return Math.max(0, counts.length - 1);
+}
+
+function resizeLeadBeat(measure: Measure, beatIndex: number, nextCount: number) {
+  const previousCounts = normalizeLeadSlots(measure);
+  const previousCells = measure.rowLeadView ?? [];
+  const groups: string[][] = [];
+  let cursor = 0;
+  previousCounts.forEach((count) => {
+    groups.push(previousCells.slice(cursor, cursor + count));
+    cursor += count;
+  });
+  previousCounts[beatIndex] = nextCount;
+  groups[beatIndex] = Array.from({ length: nextCount }, (_, index) => groups[beatIndex]?.[index] || "");
+  measure.leadSlotsByBeat = previousCounts;
+  measure.rowLeadView = groups.flat();
+}
+
+function cueRowKey(song: Song, location: BeatLocation) {
+  const section = song.sections[location.section];
+  const row = rowsForSection(section).find((candidate) =>
+    location.measure >= candidate.start && location.measure < candidate.start + candidate.measures.length
+  );
+  return `${section.id}:${row?.rowIndex ?? 0}`;
+}
+
+function orderedRange(range: InstrumentCueRange): InstrumentCueRange {
+  const startValue = range.start.measure * 100 + range.start.beat;
+  const endValue = range.end.measure * 100 + range.end.beat;
+  return startValue <= endValue ? range : { ...range, start: range.end, end: range.start };
+}
+
+type ImportReview = {
+  filename: string;
+  source: string;
+  sectionCount: number;
+  measureCount: number;
+  warnings: string[];
+  candidate: Song;
+};
+
+type Viewer = {
+  authenticated: boolean;
+  displayName?: string;
+};
+
 function beatKey(section: number, measure: number, beat: number, pre = false) {
   return `${section}:${pre ? "pre" : measure}:${beat}`;
 }
@@ -107,6 +208,8 @@ const demoSong = (): Song => ({
   meter: "4/4",
   group: "Sunday Team",
   instruments: ["Piano 1", "Acoustic Guitar"],
+  sourceKind: "synthetic",
+  reviewState: "reviewed",
   lyrics: "Verse 1\nAdd approved S’gaw Karen and English lyrics here.\n\nChorus\nThis hosted chart uses demonstration content only.",
   sections: [
     {
@@ -139,7 +242,7 @@ function chordLabel(chord: Chord | null) {
   return `${chord.root}${chord.flat ? "♭" : ""}${chord.minor ? "m" : ""}${chord.seven ? "₇" : ""}${quality}`;
 }
 
-export function MusicDirector() {
+export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: Viewer }) {
   const [song, setSong] = useState<Song>(() => demoSong());
   const [tab, setTab] = useState<"chart" | "lyrics" | "database">("chart");
   const [selected, setSelected] = useState({ section: 0, measure: 0, beat: 0, pre: false });
@@ -153,7 +256,9 @@ export function MusicDirector() {
   const [printPage, setPrintPage] = useState(1);
   const [instrumentOpen, setInstrumentOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
-  const [status, setStatus] = useState("Demo chart, not yet saved");
+  const [status, setStatus] = useState(
+    viewer.authenticated ? "Demo chart, not yet saved" : "Local synthetic demo; sign in to use the private library"
+  );
   const [songs, setSongs] = useState<Song[]>([]);
   const [search, setSearch] = useState("");
   const [zoom, setZoom] = useState(100);
@@ -161,11 +266,23 @@ export function MusicDirector() {
   const [pendingSuperscript, setPendingSuperscript] = useState(false);
   const [pendingSlur, setPendingSlur] = useState<string | null>(null);
   const [pendingOnly, setPendingOnly] = useState<string | null>(null);
+  const [activeCueSlot, setActiveCueSlot] = useState(0);
+  const [importReview, setImportReview] = useState<ImportReview | null>(null);
+  const [importReviewConfirmed, setImportReviewConfirmed] = useState(false);
+  const [saveReviewOpen, setSaveReviewOpen] = useState(false);
+  const [saveReviewConfirmed, setSaveReviewConfirmed] = useState(false);
+  const [karenKeyboardOpen, setKarenKeyboardOpen] = useState(false);
+  const [karenTargetLabel, setKarenTargetLabel] = useState("Karen text");
   const fileInput = useRef<HTMLInputElement>(null);
   const printButton = useRef<HTMLButtonElement>(null);
   const editorTarget = useRef<HTMLElement>(null);
   const undoHistory = useRef<Song[]>([]);
   const redoHistory = useRef<Song[]>([]);
+  const leadInputs = useRef<Array<HTMLInputElement | null>>([]);
+  const karenTarget = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const karenSuppressOpen = useRef(false);
+  const karenUndoHistory = useRef<Array<{ element: HTMLInputElement | HTMLTextAreaElement; value: string; caret: number }>>([]);
+  const karenRedoHistory = useRef<Array<{ element: HTMLInputElement | HTMLTextAreaElement; value: string; caret: number }>>([]);
 
   const activeMeasure = useMemo(() => {
     const section = song.sections[selected.section];
@@ -241,6 +358,7 @@ export function MusicDirector() {
   }, [insertMeasure]);
 
   useEffect(() => {
+    if (!viewer.authenticated) return;
     fetch("/api/songs")
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((data) => {
@@ -248,7 +366,7 @@ export function MusicDirector() {
         if (data.warning) setStatus(data.warning);
       })
       .catch(() => setStatus("Hosted library is unavailable; this draft remains local"));
-  }, []);
+  }, [viewer.authenticated]);
 
   function updateSong(patch: Partial<Song>) {
     setSong((current) => ({ ...current, ...patch }));
@@ -284,6 +402,224 @@ export function MusicDirector() {
     undoHistory.current.push(structuredClone(song));
     setSong(next);
     setStatus("Redid chart edit");
+  }
+
+  function leadLocation(delta: -1 | 1): { section: number; measure: number; beat: number; pre: boolean } | null {
+    if (selected.pre) {
+      return delta > 0 ? { section: selected.section, measure: 0, beat: 0, pre: false } : null;
+    }
+    const section = song.sections[selected.section];
+    if (delta < 0 && selected.measure > 0) {
+      return { section: selected.section, measure: selected.measure - 1, beat: 0, pre: false };
+    }
+    if (delta < 0 && selected.measure === 0 && section.preMeasure) {
+      return { section: selected.section, measure: 0, beat: 0, pre: true };
+    }
+    if (delta > 0 && selected.measure < section.measures.length - 1) {
+      return { section: selected.section, measure: selected.measure + 1, beat: 0, pre: false };
+    }
+    const nextSectionIndex = selected.section + delta;
+    const nextSection = song.sections[nextSectionIndex];
+    if (!nextSection) return null;
+    if (delta > 0 && nextSection.preMeasure) {
+      return { section: nextSectionIndex, measure: 0, beat: 0, pre: true };
+    }
+    return {
+      section: nextSectionIndex,
+      measure: delta > 0 ? 0 : nextSection.measures.length - 1,
+      beat: 0,
+      pre: false,
+    };
+  }
+
+  function shiftLeadMeasure(delta: -1 | 1) {
+    const location = leadLocation(delta);
+    if (!location) return;
+    setSelected(location);
+    setStatus(`Lead editor moved to ${song.sections[location.section].name} ${location.pre ? "pre-section" : `measure ${location.measure + 1}`}`);
+    requestAnimationFrame(() => leadInputs.current[0]?.focus());
+  }
+
+  function adjustLeadBaseOctave(delta: -1 | 1) {
+    commitSong((next) => {
+      const section = next.sections[selected.section];
+      const measure = selected.pre ? section.preMeasure : section.measures[selected.measure];
+      if (!measure) return;
+      measure.leadEnabled = true;
+      measure.leadBaseOctave = Math.max(1, Math.min(8, (measure.leadBaseOctave ?? 4) + delta));
+    }, "Lead base octave changed");
+  }
+
+  function adjustLeadNote(index: number, delta: -1 | 1) {
+    commitSong((next) => {
+      const section = next.sections[selected.section];
+      const measure = selected.pre ? section.preMeasure : section.measures[selected.measure];
+      if (!measure) return;
+      measure.leadEnabled = true;
+      measure.rowLeadView ??= Array.from({ length: totalLeadSlots(measure) }, () => "");
+      const current = measure.rowLeadView[index] || "";
+      if (!current) return;
+      const bare = current.replace(/^[\^_]+/, "");
+      const prefix = current.slice(0, current.length - bare.length);
+      const level = prefix.split("").reduce((value, marker) => value + (marker === "^" ? 1 : -1), 0);
+      const nextLevel = Math.max(-2, Math.min(2, level + delta));
+      measure.rowLeadView[index] = `${nextLevel > 0 ? "^".repeat(nextLevel) : "_".repeat(Math.abs(nextLevel))}${bare}`;
+    }, "Lead note octave changed");
+  }
+
+  function handleLeadModalKey(event: KeyboardEvent<HTMLElement>) {
+    const key = event.key;
+    const inputIndex = leadInputs.current.findIndex((input) => input === event.target);
+    if (key === "Escape") {
+      event.preventDefault();
+      setLeadModalOpen(false);
+      editorTarget.current?.focus();
+      return;
+    }
+    if (event.ctrlKey && key.toLowerCase() === "z") { event.preventDefault(); undo(); return; }
+    if (event.ctrlKey && key.toLowerCase() === "y") { event.preventDefault(); redo(); return; }
+    if (event.ctrlKey && key === "ArrowLeft") { event.preventDefault(); shiftLeadMeasure(-1); return; }
+    if (event.ctrlKey && key === "ArrowRight") { event.preventDefault(); shiftLeadMeasure(1); return; }
+    if (event.ctrlKey && key === "ArrowUp") { event.preventDefault(); adjustLeadBaseOctave(1); return; }
+    if (event.ctrlKey && key === "ArrowDown") { event.preventDefault(); adjustLeadBaseOctave(-1); return; }
+    if (inputIndex < 0) return;
+    if (key === "ArrowLeft") {
+      event.preventDefault();
+      leadInputs.current[Math.max(0, inputIndex - 1)]?.focus();
+    } else if (key === "ArrowRight" || key === "Enter") {
+      event.preventDefault();
+      leadInputs.current[Math.min(leadInputs.current.length - 1, inputIndex + 1)]?.focus();
+    } else if (key === "ArrowUp") {
+      event.preventDefault();
+      adjustLeadNote(inputIndex, 1);
+    } else if (key === "ArrowDown") {
+      event.preventDefault();
+      adjustLeadNote(inputIndex, -1);
+    }
+  }
+
+  function setCueRangeEndpoint(endpoint: "start" | "end") {
+    if (selected.pre) return;
+    const currentLocation = { section: selected.section, measure: selected.measure, beat: selected.beat };
+    const rowKey = cueRowKey(song, currentLocation);
+    commitSong((next) => {
+      next.instrumentCueRanges ??= [];
+      const rowRanges = next.instrumentCueRanges.filter((range) => range.rowKey === rowKey);
+      let range = rowRanges[activeCueSlot];
+      if (!range) {
+        range = {
+          id: crypto.randomUUID(),
+          rowKey,
+          abbr: cueAbbreviationOptions[0],
+          start: currentLocation,
+          end: currentLocation,
+        };
+        next.instrumentCueRanges.push(range);
+      }
+      range[endpoint] = currentLocation;
+      Object.assign(range, orderedRange(range));
+    }, `Instrument cue ${endpoint} set`);
+  }
+
+  function setCueRangeAbbreviation(abbr: string) {
+    if (selected.pre) return;
+    const currentLocation = { section: selected.section, measure: selected.measure, beat: selected.beat };
+    const rowKey = cueRowKey(song, currentLocation);
+    commitSong((next) => {
+      next.instrumentCueRanges ??= [];
+      const rowRanges = next.instrumentCueRanges.filter((range) => range.rowKey === rowKey);
+      let range = rowRanges[activeCueSlot];
+      if (!range) {
+        range = { id: crypto.randomUUID(), rowKey, abbr, start: currentLocation, end: currentLocation };
+        next.instrumentCueRanges.push(range);
+      } else {
+        range.abbr = abbr;
+      }
+    }, "Instrument cue label changed");
+  }
+
+  function clearCueRange() {
+    if (selected.pre) return;
+    const rowKey = cueRowKey(song, selected);
+    commitSong((next) => {
+      const rowRanges = (next.instrumentCueRanges ?? []).filter((range) => range.rowKey === rowKey);
+      const target = rowRanges[activeCueSlot];
+      if (target) next.instrumentCueRanges = (next.instrumentCueRanges ?? []).filter((range) => range.id !== target.id);
+    }, "Instrument cue range cleared");
+  }
+
+  function openKarenKeyboard(target: HTMLInputElement | HTMLTextAreaElement) {
+    if (karenSuppressOpen.current) return;
+    karenTarget.current = target;
+    setKarenTargetLabel(target.getAttribute("aria-label") || "Karen text");
+    setKarenKeyboardOpen(true);
+  }
+
+  function closeKarenKeyboard() {
+    const target = karenTarget.current;
+    setKarenKeyboardOpen(false);
+    karenSuppressOpen.current = true;
+    requestAnimationFrame(() => {
+      target?.focus({ preventScroll: true });
+      karenSuppressOpen.current = false;
+    });
+  }
+
+  function setKarenTargetValue(target: HTMLInputElement | HTMLTextAreaElement, value: string, caret: number) {
+    const field = target.dataset.karenField;
+    if (field === "titleKaren") updateSong({ titleKaren: value });
+    if (field === "lyrics") updateSong({ lyrics: value });
+    requestAnimationFrame(() => {
+      target.focus();
+      target.setSelectionRange(caret, caret);
+    });
+  }
+
+  function insertKarenCharacter(character: string) {
+    const target = karenTarget.current;
+    if (!target) return;
+    const start = target.selectionStart ?? target.value.length;
+    const end = target.selectionEnd ?? start;
+    karenUndoHistory.current.push({ element: target, value: target.value, caret: start });
+    karenRedoHistory.current = [];
+    const value = `${target.value.slice(0, start)}${character}${target.value.slice(end)}`;
+    setKarenTargetValue(target, value, start + character.length);
+  }
+
+  function karenBackspace() {
+    const target = karenTarget.current;
+    if (!target) return;
+    const start = target.selectionStart ?? target.value.length;
+    const end = target.selectionEnd ?? start;
+    if (start === 0 && end === 0) return;
+    karenUndoHistory.current.push({ element: target, value: target.value, caret: start });
+    karenRedoHistory.current = [];
+    const deleteStart = start === end ? Array.from(target.value.slice(0, start)).slice(0, -1).join("").length : start;
+    setKarenTargetValue(target, `${target.value.slice(0, deleteStart)}${target.value.slice(end)}`, deleteStart);
+  }
+
+  function restoreKarenHistory(source: typeof karenUndoHistory, destination: typeof karenRedoHistory) {
+    const snapshot = source.current.pop();
+    const target = karenTarget.current;
+    if (!snapshot || !target) return;
+    destination.current.push({ element: target, value: target.value, caret: target.selectionStart ?? target.value.length });
+    karenTarget.current = snapshot.element;
+    setKarenTargetValue(snapshot.element, snapshot.value, snapshot.caret);
+  }
+
+  function handleKarenKeyboardKey(event: KeyboardEvent<HTMLElement>) {
+    const lower = event.key.toLowerCase();
+    if (event.key === "Escape") { event.preventDefault(); closeKarenKeyboard(); return; }
+    if (event.key === "Backspace") { event.preventDefault(); karenBackspace(); return; }
+    if (event.ctrlKey && lower === "z") { event.preventDefault(); restoreKarenHistory(karenUndoHistory, karenRedoHistory); return; }
+    if (event.ctrlKey && lower === "y") { event.preventDefault(); restoreKarenHistory(karenRedoHistory, karenUndoHistory); return; }
+    if (!event.ctrlKey && !event.altKey && !event.metaKey && /^[a-z]$/.test(lower)) {
+      const character = KAREN_HOTKEYS[lower]?.[event.shiftKey ? "shift" : "base"];
+      if (character) {
+        event.preventDefault();
+        insertKarenCharacter(character);
+      }
+    }
   }
 
   function addSection(name: string) {
@@ -441,6 +777,11 @@ export function MusicDirector() {
       if (sectionKeyMap[lower]) { event.preventDefault(); addSection(sectionKeyMap[lower]); }
       return;
     }
+    if (karenKeyboardOpen) {
+      handleKarenKeyboardKey(event);
+      return;
+    }
+    if (leadModalOpen || importReview || saveReviewOpen || newSongOpen || printRoomOpen) return;
     if (target.matches("input, textarea, select, [contenteditable='true']")) return;
 
     if (key === "?" || (event.shiftKey && key === "/")) {
@@ -499,7 +840,7 @@ export function MusicDirector() {
       else insertMeasure(Number(song.meter.split("/")[0]) || 4);
       return;
     }
-    if (lower === "l") { event.preventDefault(); setLeadModalOpen(true); return; }
+    if (lower === "l") { event.preventDefault(); setKarenKeyboardOpen(false); setLeadModalOpen(true); return; }
     if (lower === "r") {
       event.preventDefault();
       mutateActiveBeat((_beat, measure) => { measure.roll = !measure.roll; }, "Measure roll changed");
@@ -599,7 +940,13 @@ export function MusicDirector() {
       const response = await fetch("/api/songs", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(song),
+        body: JSON.stringify({
+          ...song,
+          saveApproval: {
+            reviewed: true,
+            syntheticOrApproved: true,
+          },
+        }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Save failed");
@@ -607,9 +954,17 @@ export function MusicDirector() {
       setSong(saved);
       setSongs((current) => [saved, ...current.filter((item) => item.id !== saved.id)]);
       setStatus("Saved to hosted library");
+      setSaveReviewOpen(false);
+      setSaveReviewConfirmed(false);
     } catch {
       setStatus("Save failed; export this draft before leaving");
     }
+  }
+
+  function requestSaveSong() {
+    setKarenKeyboardOpen(false);
+    setSaveReviewConfirmed(false);
+    setSaveReviewOpen(true);
   }
 
   function exportSong() {
@@ -631,15 +986,52 @@ export function MusicDirector() {
       try {
         const imported = JSON.parse(String(reader.result)) as Song;
         if (!Array.isArray(imported.sections)) throw new Error();
-        setSong({ ...imported, id: undefined });
-        setSelected({ section: 0, measure: 0, beat: 0, pre: false });
-        setStatus("Imported for review; press Save after checking");
+        const fallback = demoSong();
+        const candidate: Song = {
+          ...fallback,
+          ...imported,
+          id: undefined,
+          sourceKind: "imported-json",
+          reviewState: "draft",
+          instruments: Array.isArray(imported.instruments)
+            ? imported.instruments.filter((instrument): instrument is string => typeof instrument === "string").slice(0, 12)
+            : fallback.instruments,
+          sections: imported.sections.filter((section): section is Section =>
+            Boolean(section && typeof section === "object" && Array.isArray((section as Section).measures))
+          ),
+        };
+        if (!candidate.sections.length) throw new Error();
+        const warnings = [
+          !candidate.titleEnglish?.trim() ? "English title is missing." : "",
+          candidate.sections.some((section) => section.measures.some((measure) => !Array.isArray(measure.beats))) ? "One or more measures need beat review." : "",
+        ].filter(Boolean);
+        setImportReview({
+          filename: file.name,
+          source: "Karen Music JSON",
+          sectionCount: candidate.sections.length,
+          measureCount: candidate.sections.reduce((total, section) => total + section.measures.length, 0),
+          warnings,
+          candidate,
+        });
+        setImportReviewConfirmed(false);
+        setStatus("Import ready for review; the editor has not changed");
       } catch {
         setStatus("Import could not be read; choose a Karen Music JSON export");
       }
     };
     reader.readAsText(file);
     event.target.value = "";
+  }
+
+  function applyImportReview() {
+    if (!importReview || !importReviewConfirmed) return;
+    setKarenKeyboardOpen(false);
+    setSong({ ...importReview.candidate, id: undefined, reviewState: "reviewed" });
+    setSelected({ section: 0, measure: 0, beat: 0, pre: false });
+    setImportReview(null);
+    setImportReviewConfirmed(false);
+    setStatus("Imported as an unsaved reviewed draft");
+    requestAnimationFrame(() => editorTarget.current?.focus());
   }
 
   function startNewSong() {
@@ -649,6 +1041,7 @@ export function MusicDirector() {
   }
 
   function openPrintRoom() {
+    setKarenKeyboardOpen(false);
     setPrintPage(1);
     setPrintRoomOpen(true);
   }
@@ -656,6 +1049,9 @@ export function MusicDirector() {
   const filteredSongs = songs.filter((item) =>
     `${item.titleKaren} ${item.titleEnglish} ${item.key} ${item.style}`.toLowerCase().includes(search.toLowerCase())
   );
+  const activeCueRowKey = selected.pre ? "" : cueRowKey(song, selected);
+  const activeCueRanges = (song.instrumentCueRanges ?? []).filter((range) => range.rowKey === activeCueRowKey).slice(0, 2);
+  const activeCueRange = activeCueRanges[activeCueSlot];
 
   return (
     <main className="app-shell" onKeyDownCapture={handleEditorKey}>
@@ -668,9 +1064,9 @@ export function MusicDirector() {
           </div>
         </div>
         <nav className="global-actions" aria-label="Song actions">
-          <button onClick={() => setNewSongOpen(true)}>New song</button>
-          <button onClick={saveSong} className="primary">Save</button>
-          <button onClick={() => fileInput.current?.click()}>Import</button>
+          <button onClick={() => { setKarenKeyboardOpen(false); setNewSongOpen(true); }}>New song</button>
+          <button onClick={requestSaveSong} className="primary">Save</button>
+          <button onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }}>Import</button>
           <button onClick={exportSong}>Export</button>
           <button ref={printButton} onClick={openPrintRoom}>Print</button>
           <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle color theme">{theme === "dark" ? "Light" : "Dark"}</button>
@@ -684,7 +1080,7 @@ export function MusicDirector() {
             <span>Song details</span>
             <button className="icon-button" onClick={() => setSidebarOpen(false)} aria-label="Close song details">×</button>
           </div>
-          <label>Karen title<input lang="kar" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /></label>
+          <label>Karen title<input aria-label="Karen title" lang="kar" dir="ltr" data-karen-field="titleKaren" value={song.titleKaren} onFocus={(event) => openKarenKeyboard(event.currentTarget)} onChange={(event) => updateSong({ titleKaren: event.target.value })} /></label>
           <label>English title<input value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></label>
           <div className="field-pair">
             <label>Key<select value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select></label>
@@ -753,7 +1149,7 @@ export function MusicDirector() {
               style={{ "--paper-scale": zoom / 100 } as React.CSSProperties}
             >
               <header className="paper-header">
-                <div><input aria-label="Karen title on paper" lang="kar" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><input aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></div>
+                <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onFocus={(event) => openKarenKeyboard(event.currentTarget)} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><input aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></div>
                 <input aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
                 <select aria-label="Song key on paper" value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select>
               </header>
@@ -802,6 +1198,12 @@ export function MusicDirector() {
                             ending={measureIndex === section.measures.length - 1}
                             slurPending={pendingSlur === beatKey(sectionIndex, measureIndex, selected.beat)}
                             onlyPending={pendingOnly === beatKey(sectionIndex, measureIndex, selected.beat)}
+                            cueStarts={measure.beats.map((_beat, beatIndex) => (song.instrumentCueRanges ?? [])
+                              .filter((range) => range.start.section === sectionIndex && range.start.measure === measureIndex && range.start.beat === beatIndex)
+                              .map((range) => range.abbr))}
+                            cueEnds={measure.beats.map((_beat, beatIndex) => (song.instrumentCueRanges ?? [])
+                              .filter((range) => range.end.section === sectionIndex && range.end.measure === measureIndex && range.end.beat === beatIndex)
+                              .map((range) => range.abbr))}
                           />;
                         })}
                       </div>
@@ -837,7 +1239,7 @@ export function MusicDirector() {
 
             {tab === "lyrics" && <article className="paper lyrics-paper">
               <header><div><strong lang="kar">{song.titleKaren || "Karen title"}</strong><span>{song.titleEnglish || "English title"}</span></div><span>{song.key}</span></header>
-              <textarea aria-label="Song lyrics" value={song.lyrics} onChange={(event) => updateSong({ lyrics: event.target.value })} placeholder="Lyrics" />
+              <textarea aria-label="Song lyrics" lang="kar" dir="ltr" data-karen-field="lyrics" value={song.lyrics} onFocus={(event) => openKarenKeyboard(event.currentTarget)} onChange={(event) => updateSong({ lyrics: event.target.value })} placeholder="Lyrics" />
             </article>}
 
             {tab === "database" && <article className="paper database-paper">
@@ -858,7 +1260,7 @@ export function MusicDirector() {
         <button onClick={() => setSidebarOpen(true)}>Details</button>
         <button onClick={() => setTab("chart")} aria-current={tab === "chart"}>Chart</button>
         <button onClick={() => insertMeasure(Number(song.meter.split("/")[0]) || 4)}>+ Measure</button>
-        <button onClick={saveSong}>Save</button>
+        <button onClick={requestSaveSong}>Save</button>
         <button onClick={openPrintRoom}>Print</button>
       </nav>
 
@@ -885,10 +1287,16 @@ export function MusicDirector() {
       </div>}
 
       {leadModalOpen && activeMeasure && <div className="modal-backdrop" role="presentation">
-        <section className="modal lead-modal" role="dialog" aria-modal="true" aria-labelledby="lead-modal-title">
-          <header>
-            <div><span className="eyebrow">Current measure</span><h2 id="lead-modal-title">Lead melody</h2></div>
-            <button className="icon-button" onClick={() => setLeadModalOpen(false)} aria-label="Close lead melody dialog">×</button>
+        <section className="modal lead-modal" role="dialog" aria-modal="true" aria-labelledby="lead-modal-title" onKeyDownCapture={handleLeadModalKey}>
+          <header className="lead-modal-header">
+            <button className="lead-measure-nav" onClick={() => shiftLeadMeasure(-1)} disabled={!leadLocation(-1)} aria-label="Previous lead measure">‹</button>
+            <div>
+              <span className="eyebrow">{song.sections[selected.section].name}</span>
+              <h2 id="lead-modal-title">Lead melody</h2>
+              <span className="lead-measure-label">{selected.pre ? "Pre-section" : `Measure ${selected.measure + 1}`}</span>
+            </div>
+            <button className="lead-measure-nav" onClick={() => shiftLeadMeasure(1)} disabled={!leadLocation(1)} aria-label="Next lead measure">›</button>
+            <button className="icon-button" onClick={() => { setLeadModalOpen(false); editorTarget.current?.focus(); }} aria-label="Close lead melody dialog">×</button>
           </header>
           <div className="lead-settings">
             <label>Base octave
@@ -900,40 +1308,164 @@ export function MusicDirector() {
                 {Array.from({ length: 8 }, (_, index) => <option key={index + 1}>{index + 1}</option>)}
               </select>
             </label>
-            <label>Spaces per beat
-              <select value={activeMeasure.leadSlotsByBeat?.[0] ?? 4} onChange={(event) => commitSong((next) => {
-                const section = next.sections[selected.section];
-                const measure = selected.pre ? section.preMeasure : section.measures[selected.measure];
-                if (!measure) return;
-                const slots = Number(event.target.value);
-                measure.leadEnabled = true;
-                measure.leadSlotsByBeat = measure.beats.map(() => slots);
-                measure.rowLeadView = Array.from({ length: measure.beats.length * slots }, (_, index) => measure.rowLeadView?.[index] || "");
-              }, "Lead spacing changed")}>
-                {[3, 4, 6].map((count) => <option key={count}>{count}</option>)}
-              </select>
-            </label>
+            <div className="lead-beat-settings" aria-label="Spaces per beat">
+              {activeMeasure.beats.map((_beat, beatIndex) => <label key={beatIndex}>Beat {beatIndex + 1}
+                <select value={activeMeasure.leadSlotsByBeat?.[beatIndex] ?? 4} onChange={(event) => commitSong((next) => {
+                  const section = next.sections[selected.section];
+                  const measure = selected.pre ? section.preMeasure : section.measures[selected.measure];
+                  if (!measure) return;
+                  measure.leadEnabled = true;
+                  resizeLeadBeat(measure, beatIndex, Number(event.target.value));
+                }, `Beat ${beatIndex + 1} spacing changed`)}>
+                  {(selected.pre ? [1, 2, 3, 4, 5, 6] : [3, 4, 6]).map((count) => <option key={count}>{count}</option>)}
+                </select>
+              </label>)}
+            </div>
           </div>
-          <div className="lead-note-grid" style={{ "--lead-columns": activeMeasure.beats.length * (activeMeasure.leadSlotsByBeat?.[0] ?? 4) } as React.CSSProperties}>
-            {Array.from({ length: activeMeasure.beats.length * (activeMeasure.leadSlotsByBeat?.[0] ?? 4) }, (_, index) => <input
+          <div className="lead-note-grid" style={{ "--lead-columns": totalLeadSlots(activeMeasure) } as React.CSSProperties}>
+            {Array.from({ length: totalLeadSlots(activeMeasure) }, (_, index) => <input
               key={index}
+              ref={(element) => { leadInputs.current[index] = element; }}
+              data-lead-slot={index}
               aria-label={`Lead note slot ${index + 1}`}
               value={activeMeasure.rowLeadView?.[index] || ""}
-              maxLength={3}
+              maxLength={4}
+              onFocus={() => setSelected((current) => ({ ...current, beat: leadBeatForSlot(activeMeasure, index) }))}
               onChange={(event) => commitSong((next) => {
                 const section = next.sections[selected.section];
                 const measure = selected.pre ? section.preMeasure : section.measures[selected.measure];
                 if (!measure) return;
                 measure.leadEnabled = true;
-                measure.rowLeadView ??= [];
+                measure.leadSlotsByBeat ??= measure.beats.map(() => 4);
+                measure.rowLeadView ??= Array.from({ length: totalLeadSlots(measure) }, () => "");
                 measure.rowLeadView[index] = event.target.value;
               }, "Lead note changed")}
             />)}
           </div>
-          <p className="modal-note">Use 1-7 for scale degrees, ^ or _ for octave direction, and clear a box to remove a note.</p>
+          <div className="lead-grid-actions">
+            <button onClick={() => {
+              const focused = leadInputs.current.findIndex((input) => input === document.activeElement);
+              if (focused >= 0) commitSong((next) => {
+                const section = next.sections[selected.section];
+                const measure = selected.pre ? section.preMeasure : section.measures[selected.measure];
+                if (measure?.rowLeadView) measure.rowLeadView[focused] = "";
+              }, "Lead note cleared");
+            }}>Clear note</button>
+            <button onClick={() => commitSong((next) => {
+              const section = next.sections[selected.section];
+              const measure = selected.pre ? section.preMeasure : section.measures[selected.measure];
+              if (measure) measure.rowLeadView = Array.from({ length: totalLeadSlots(measure) }, () => "");
+            }, "Lead measure cleared")}>Clear measure</button>
+            <button onClick={undo}>Undo</button>
+            <button onClick={redo}>Redo</button>
+          </div>
+
+          {!selected.pre && <section className="cue-range-editor" aria-labelledby="cue-range-title">
+            <div>
+              <span className="eyebrow">Instrument cues</span>
+              <strong id="cue-range-title">Two ranges per visual row</strong>
+            </div>
+            <div className="cue-range-slots">
+              {[0, 1].map((slot) => {
+                const range = activeCueRanges[slot];
+                return <button key={slot} className={activeCueSlot === slot ? "selected" : ""} onClick={() => setActiveCueSlot(slot)}>
+                  {range ? `${range.abbr}: M${range.start.measure + 1}.${range.start.beat + 1}–M${range.end.measure + 1}.${range.end.beat + 1}` : `Range ${slot + 1}`}
+                </button>;
+              })}
+            </div>
+            <div className="cue-abbreviations" aria-label="Cue abbreviations">
+              {cueAbbreviationOptions.map((abbr) => <button key={abbr} className={activeCueRange?.abbr === abbr ? "selected" : ""} onClick={() => setCueRangeAbbreviation(abbr)}>{abbr}</button>)}
+            </div>
+            <div className="cue-range-actions">
+              <button onClick={() => setCueRangeEndpoint("start")}>Start here</button>
+              <button onClick={() => setCueRangeEndpoint("end")}>End here</button>
+              <button onClick={clearCueRange}>Clear range</button>
+            </div>
+          </section>}
+
+          <p className="modal-note">Left/Right moves lead slots. Ctrl+Left/Right changes measure. Up/Down changes a note octave. Ctrl+Up/Down changes base octave. Ctrl+Z/Y undo or redo.</p>
           <div className="modal-actions"><button className="primary" onClick={() => { setLeadModalOpen(false); editorTarget.current?.focus(); }}>Done</button></div>
         </section>
       </div>}
+
+      {importReview && <div className="modal-backdrop" role="presentation">
+        <section className="modal import-review-modal" role="dialog" aria-modal="true" aria-labelledby="import-review-title">
+          <header>
+            <div><span className="eyebrow">Unsaved import review</span><h2 id="import-review-title">Review before replacing the editor</h2></div>
+            <button className="icon-button" onClick={() => { setImportReview(null); setImportReviewConfirmed(false); setStatus("Import canceled; editor unchanged"); }} aria-label="Close import review">×</button>
+          </header>
+          <dl className="review-facts">
+            <div><dt>File</dt><dd>{importReview.filename}</dd></div>
+            <div><dt>Source</dt><dd>{importReview.source}</dd></div>
+            <div><dt>Sections</dt><dd>{importReview.sectionCount}</dd></div>
+            <div><dt>Measures</dt><dd>{importReview.measureCount}</dd></div>
+          </dl>
+          <div className={`review-warning ${importReview.warnings.length ? "attention" : "clear"}`}>
+            <strong>{importReview.warnings.length ? "Review needed" : "Structure check passed"}</strong>
+            {importReview.warnings.length
+              ? <ul>{importReview.warnings.map((warning) => <li key={warning}>{warning}</li>)}</ul>
+              : <span>No structural warnings were detected. Musical accuracy still needs human review.</span>}
+          </div>
+          <label className="review-check">
+            <input type="checkbox" checked={importReviewConfirmed} onChange={(event) => setImportReviewConfirmed(event.target.checked)} />
+            Replace the current editor with this unsaved draft. I will verify the chart before Save.
+          </label>
+          <p>Import never writes to the hosted library. Save has a separate identity and approval gate.</p>
+          <div className="modal-actions">
+            <button onClick={() => { setImportReview(null); setImportReviewConfirmed(false); setStatus("Import canceled; editor unchanged"); }}>Cancel</button>
+            <button className="primary" disabled={!importReviewConfirmed} onClick={applyImportReview}>Load unsaved draft</button>
+          </div>
+        </section>
+      </div>}
+
+      {saveReviewOpen && <div className="modal-backdrop" role="presentation">
+        <section className="modal save-review-modal" role="dialog" aria-modal="true" aria-labelledby="save-review-title">
+          <header>
+            <div><span className="eyebrow">Private hosted persistence</span><h2 id="save-review-title">Confirm this chart is safe to save</h2></div>
+            <button className="icon-button" onClick={() => setSaveReviewOpen(false)} aria-label="Close save review">×</button>
+          </header>
+          <p>{viewer.authenticated
+            ? `This chart will be stored in ${viewer.displayName || "your"} private hosted library and separated from other users.`
+            : "Sign in through the hosted site before saving. Local preview edits and exports still work."}</p>
+          <label className="review-check">
+            <input type="checkbox" checked={saveReviewConfirmed} disabled={!viewer.authenticated} onChange={(event) => setSaveReviewConfirmed(event.target.checked)} />
+            This chart contains synthetic content only, or every song element was explicitly approved and sanitized for hosting.
+          </label>
+          <div className="persistence-boundary">
+            <strong>Never included automatically</strong>
+            <span>`songs.db`, desktop charts, images, provider payloads, credentials, and unsaved imports.</span>
+          </div>
+          <div className="modal-actions">
+            <button onClick={() => setSaveReviewOpen(false)}>Cancel</button>
+            <button className="primary" disabled={!viewer.authenticated || !saveReviewConfirmed} onClick={saveSong}>Save to private library</button>
+          </div>
+        </section>
+      </div>}
+
+      {karenKeyboardOpen && <aside className="karen-keyboard-tray" role="dialog" aria-modal="false" aria-label="Karen keyboard" onKeyDownCapture={handleKarenKeyboardKey}>
+        <header>
+          <div><span className="eyebrow">Typing into</span><strong>{karenTargetLabel}</strong></div>
+          <span className="karen-hotkey-note">A–Z / Shift+A–Z</span>
+          <button className="icon-button" onClick={closeKarenKeyboard} aria-label="Close Karen keyboard">×</button>
+        </header>
+        <div className="karen-keyboard-groups">
+          {KAREN_GROUPS.map((group) => <section key={group.label} className={`karen-keyboard-group karen-${group.label.toLowerCase()}`}>
+            <span>{group.label}</span>
+            <div>
+              {group.keys.map((character, index) => <button key={`${group.label}-${index}`} lang="kar" aria-label={`Karen key ${character}`} onMouseDown={(event) => event.preventDefault()} onClick={() => insertKarenCharacter(character)}>{character}</button>)}
+            </div>
+          </section>)}
+          <section className="karen-keyboard-group karen-commands">
+            <span>Commands</span>
+            <div>
+              <button onClick={() => restoreKarenHistory(karenUndoHistory, karenRedoHistory)}>Undo</button>
+              <button onClick={() => restoreKarenHistory(karenRedoHistory, karenUndoHistory)}>Redo</button>
+              <button onClick={karenBackspace} aria-label="Karen keyboard backspace">⌫</button>
+              <button onClick={closeKarenKeyboard}>Esc</button>
+            </div>
+          </section>
+        </div>
+      </aside>}
 
       {shortcutsOpen && <aside className="shortcut-panel" aria-label="Keyboard shortcuts">
         <header><div><strong>Keyboard shortcuts</strong><span>Legacy chord-entry contract</span></div><button className="icon-button" onClick={() => setShortcutsOpen(false)} aria-label="Close shortcuts">×</button></header>
@@ -950,6 +1482,8 @@ export function MusicDirector() {
           <dt>. / X / O / R</dt><dd>Push, x marks, circle, or measure roll.</dd>
           <dt>S / comma</dt><dd>Start or finish a slur or Only / All In span.</dd>
           <dt>L</dt><dd>Open lead melody editing.</dd>
+          <dt>Lead arrows</dt><dd>Left/Right moves slots; Ctrl+Left/Right changes measure; Up/Down changes note octave; Ctrl+Up/Down changes base octave.</dd>
+          <dt>Karen A-Z</dt><dd>While the Karen keyboard is open, type A-Z or Shift+A-Z; Escape closes, Backspace deletes, and Ctrl+Z/Y undo or redo.</dd>
           <dt>Enter</dt><dd>Open Add Section; use I, V, P, C, B, S, or E.</dd>
           <dt>Ctrl+Z / Ctrl+Y</dt><dd>Undo or redo chart edits.</dd>
           <dt>Ctrl+P / ?</dt><dd>Open print room or this guide.</dd>
@@ -1031,6 +1565,8 @@ function MeasureView({
   ending = false,
   slurPending = false,
   onlyPending = false,
+  cueStarts = [],
+  cueEnds = [],
 }: {
   measure: Measure;
   active: boolean;
@@ -1040,18 +1576,21 @@ function MeasureView({
   ending?: boolean;
   slurPending?: boolean;
   onlyPending?: boolean;
+  cueStarts?: string[][];
+  cueEnds?: string[][];
 }) {
-  const slots = measure.leadSlotsByBeat?.[0] ?? 4;
   return <div className={`measure ${active ? "active-measure" : ""} ${pre ? "pre-measure" : ""} ${ending ? "ending-bar" : ""} ${measure.roll ? "has-roll" : ""}`}>
-    {measure.leadEnabled && <div className="lead-row" style={{ gridTemplateColumns: `repeat(${measure.beats.length * slots}, minmax(0, 1fr))` }}>
-      {Array.from({ length: measure.beats.length * slots }, (_, index) => <span key={index}>{measure.rowLeadView?.[index] || ""}</span>)}
+    {measure.leadEnabled && <div className="lead-row" style={{ gridTemplateColumns: `repeat(${totalLeadSlots(measure)}, minmax(0, 1fr))` }}>
+      {Array.from({ length: totalLeadSlots(measure) }, (_, index) => <span key={index}>{measure.rowLeadView?.[index] || ""}</span>)}
     </div>}
     <div className="beat-row" style={{ gridTemplateColumns: `repeat(${measure.beats.length}, minmax(0, 1fr))` }}>
       {measure.beats.map((beat, index) => <button
         key={index}
-        className={`${activeBeat === index ? "active-beat" : ""} ${slurPending && activeBeat === index ? "slur-pending" : ""} ${onlyPending && activeBeat === index ? "only-pending" : ""}`}
+        className={`${activeBeat === index ? "active-beat" : ""} ${slurPending && activeBeat === index ? "slur-pending" : ""} ${onlyPending && activeBeat === index ? "only-pending" : ""} ${cueStarts[index]?.length ? "lead-range-start" : ""} ${cueEnds[index]?.length ? "lead-range-end" : ""}`}
         onClick={() => onBeat(index)}
-        aria-label={`${pre ? "Pre-measure" : "Measure"} beat ${index + 1}${beat.chord ? `, ${chordLabel(beat.chord)}` : ""}`}
+        aria-label={`${pre ? "Pre-measure" : "Measure"} beat ${index + 1}${beat.chord ? `, ${chordLabel(beat.chord)}` : ""}${cueStarts[index]?.length ? `, ${cueStarts[index].join(", ")} cue starts` : ""}${cueEnds[index]?.length ? `, ${cueEnds[index].join(", ")} cue ends` : ""}`}
+        data-cue-start={cueStarts[index]?.join(",") || undefined}
+        data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
         <span className={`chord ${beat.circle ? "circled" : ""}`}>{chordLabel(beat.chord)}</span>
         {(beat.dot || beat.xMarks || beat.manualUnderline || beat.bass) && <span className="rhythm-marks">
@@ -1094,7 +1633,7 @@ function PrintSheet({
     </header>
 
     <div className="print-sheet-body">
-      {song.sections.map((section) => <section className="print-section" key={section.id}>
+      {song.sections.map((section, sectionIndex) => <section className="print-section" key={section.id}>
         <h3>{section.name}</h3>
         {rowsForSection(section).map((row) => <div className="print-row-wrap" key={`${section.id}-print-row-${row.rowIndex}`}>
           {row.rowIndex === 0 && section.preMeasure && <PrintMeasure measure={section.preMeasure} pre />}
@@ -1105,6 +1644,12 @@ function PrintSheet({
                 key={`${section.id}-print-${measureIndex}`}
                 measure={measure}
                 ending={measureIndex === section.measures.length - 1}
+                cueStarts={measure.beats.map((_beat, beatIndex) => (song.instrumentCueRanges ?? [])
+                  .filter((range) => range.start.section === sectionIndex && range.start.measure === measureIndex && range.start.beat === beatIndex)
+                  .map((range) => range.abbr))}
+                cueEnds={measure.beats.map((_beat, beatIndex) => (song.instrumentCueRanges ?? [])
+                  .filter((range) => range.end.section === sectionIndex && range.end.measure === measureIndex && range.end.beat === beatIndex)
+                  .map((range) => range.abbr))}
               />;
             })}
           </div>
@@ -1122,13 +1667,30 @@ function PrintSheet({
   </article>;
 }
 
-function PrintMeasure({ measure, pre = false, ending = false }: { measure: Measure; pre?: boolean; ending?: boolean }) {
+function PrintMeasure({
+  measure,
+  pre = false,
+  ending = false,
+  cueStarts = [],
+  cueEnds = [],
+}: {
+  measure: Measure;
+  pre?: boolean;
+  ending?: boolean;
+  cueStarts?: string[][];
+  cueEnds?: string[][];
+}) {
   return <div className={`print-measure ${pre ? "is-pre-measure" : ""} ${ending ? "ending-bar" : ""}`}>
     {measure.leadEnabled && <div className="print-lead-row" style={{ gridTemplateColumns: `repeat(${measure.rowLeadView?.length || 1}, minmax(0, 1fr))` }}>
       {(measure.rowLeadView || []).map((note, index) => <span key={index}>{note}</span>)}
     </div>}
     <div className="print-beat-row" style={{ gridTemplateColumns: `repeat(${measure.beats.length}, minmax(0, 1fr))` }}>
-      {measure.beats.map((beat, index) => <span key={index}>
+      {measure.beats.map((beat, index) => <span
+        key={index}
+        className={`${cueStarts[index]?.length ? "lead-range-start" : ""} ${cueEnds[index]?.length ? "lead-range-end" : ""}`}
+        data-cue-start={cueStarts[index]?.join(",") || undefined}
+        data-cue-end={cueEnds[index]?.join(",") || undefined}
+      >
         <strong className={beat.circle ? "circled" : ""}>{chordLabel(beat.chord)}</strong>
         {(beat.dot || beat.xMarks || beat.manualUnderline || beat.bass) && <small>{beat.dot ? "•" : ""}{"x".repeat(beat.xMarks || 0)}</small>}
         {beat.bass && <em>{beat.bass}</em>}

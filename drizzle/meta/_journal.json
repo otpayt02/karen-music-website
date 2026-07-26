@@ -8,6 +8,20 @@
       "when": 1785012412897,
       "tag": "0000_watery_colleen_wing",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1785067788428,
+      "tag": "0001_aspiring_shinko_yamashiro",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1785067830858,
+      "tag": "0002_greedy_warpath",
+      "breakpoints": true
     }
   ]
 }
