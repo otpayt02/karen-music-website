@@ -46,6 +46,6 @@
 
 ## Remaining scope
 
-The broader sidebar, context menu, Karen keyboard, hover-routed wheel/scroll behavior, cursor anchoring, advanced database details, attachment review, and ground-truth pairing are later phases. They are not Phase 1 design defects.
+The full Karen keyboard, import review, advanced lead navigation, and two-slot instrument cue ranges are now implemented and verified without changing the paper geometry. Hover-routed wheel/scroll behavior, cursor anchoring, contextual right-click tools, advanced database details, attachment review, and ground-truth pairing remain later phases. The current production update is blocked by Sites source-repository connectivity, not by visual QA.
 
 final result: passed
