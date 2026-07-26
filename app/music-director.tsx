@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Chord = { root: string; minor?: boolean; flat?: boolean };
 type Beat = { chord: Chord | null };
@@ -23,6 +23,22 @@ type Song = {
 
 const instrumentOptions = ["Piano 1", "Piano 2", "Acoustic Guitar", "Bass", "Drums", "Strings"];
 const createMeasure = (count = 4): Measure => ({ beats: Array.from({ length: count }, () => ({ chord: null })) });
+const clampZoom = (value: number) => Math.min(175, Math.max(55, value));
+const nextZoom = (current: number, direction: -1 | 1) =>
+  clampZoom(Math.round(current * (direction > 0 ? 1.12 : 1 / 1.12)));
+
+function paginationItems(current: number, total: number): Array<number | "ellipsis"> {
+  if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
+  const visible = new Set([1, 2, total - 1, total, current - 1, current, current + 1]);
+  const pages = [...visible].filter((page) => page >= 1 && page <= total).sort((a, b) => a - b);
+  const items: Array<number | "ellipsis"> = [];
+  pages.forEach((page, index) => {
+    if (index > 0 && page - pages[index - 1] > 1) items.push("ellipsis");
+    items.push(page);
+  });
+  return items;
+}
+
 const demoSong = (): Song => ({
   titleKaren: "တၢ်သးဝံၣ်အဒိ",
   titleEnglish: "Practice Song",
@@ -64,8 +80,12 @@ export function MusicDirector() {
   const [song, setSong] = useState<Song>(() => demoSong());
   const [tab, setTab] = useState<"chart" | "lyrics" | "database">("chart");
   const [selected, setSelected] = useState({ section: 0, measure: 0, beat: 0, pre: false });
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() =>
+    typeof window === "undefined" ? true : !window.matchMedia("(max-width: 900px)").matches
+  );
   const [newSongOpen, setNewSongOpen] = useState(false);
+  const [printRoomOpen, setPrintRoomOpen] = useState(false);
+  const [printPage, setPrintPage] = useState(1);
   const [instrumentOpen, setInstrumentOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [status, setStatus] = useState("Demo chart, not yet saved");
@@ -73,11 +93,28 @@ export function MusicDirector() {
   const [search, setSearch] = useState("");
   const [zoom, setZoom] = useState(100);
   const fileInput = useRef<HTMLInputElement>(null);
+  const printButton = useRef<HTMLButtonElement>(null);
 
   const activeMeasure = useMemo(() => {
     const section = song.sections[selected.section];
     return selected.pre ? section?.preMeasure : section?.measures[selected.measure];
   }, [song, selected]);
+
+  const printCopies = useMemo(
+    () => [...song.instruments, "Reference"],
+    [song.instruments],
+  );
+
+  const insertMeasure = useCallback((beatCount: number) => {
+    if (selected.pre) return;
+    setSong((current) => {
+      const next = structuredClone(current);
+      next.sections[selected.section].measures.splice(selected.measure + 1, 0, createMeasure(beatCount));
+      return next;
+    });
+    setSelected((current) => ({ ...current, measure: current.measure + 1, beat: 0, pre: false }));
+    setStatus(`Inserted ${beatCount}-beat measure`);
+  }, [selected.measure, selected.pre, selected.section]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -85,11 +122,22 @@ export function MusicDirector() {
 
   useEffect(() => {
     document.documentElement.dataset.appReady = "true";
-    if (window.matchMedia("(max-width: 900px)").matches) setSidebarOpen(false);
     return () => {
       delete document.documentElement.dataset.appReady;
     };
   }, []);
+
+  useEffect(() => {
+    if (!printRoomOpen) return;
+    const closeOnEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setPrintRoomOpen(false);
+        printButton.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [printRoomOpen]);
 
   useEffect(() => {
     const handleVariableMeasure = (event: globalThis.KeyboardEvent) => {
@@ -103,12 +151,15 @@ export function MusicDirector() {
     };
     document.addEventListener("keydown", handleVariableMeasure, true);
     return () => document.removeEventListener("keydown", handleVariableMeasure, true);
-  }, [selected.section, selected.measure, selected.pre]);
+  }, [insertMeasure]);
 
   useEffect(() => {
     fetch("/api/songs")
       .then((response) => response.ok ? response.json() : Promise.reject())
-      .then((data) => setSongs(data.songs ?? []))
+      .then((data) => {
+        setSongs(data.songs ?? []);
+        if (data.warning) setStatus(data.warning);
+      })
       .catch(() => setStatus("Hosted library is unavailable; this draft remains local"));
   }, []);
 
@@ -130,17 +181,6 @@ export function MusicDirector() {
       return next;
     });
     setStatus("Unsaved changes");
-  }
-
-  function insertMeasure(beatCount: number) {
-    if (selected.pre) return;
-    setSong((current) => {
-      const next = structuredClone(current);
-      next.sections[selected.section].measures.splice(selected.measure + 1, 0, createMeasure(beatCount));
-      return next;
-    });
-    setSelected((current) => ({ ...current, measure: current.measure + 1, beat: 0, pre: false }));
-    setStatus(`Inserted ${beatCount}-beat measure`);
   }
 
   function handleEditorKey(event: KeyboardEvent<HTMLElement>) {
@@ -245,6 +285,11 @@ export function MusicDirector() {
     setStatus("New unsaved song");
   }
 
+  function openPrintRoom() {
+    setPrintPage(1);
+    setPrintRoomOpen(true);
+  }
+
   const filteredSongs = songs.filter((item) =>
     `${item.titleKaren} ${item.titleEnglish} ${item.key} ${item.style}`.toLowerCase().includes(search.toLowerCase())
   );
@@ -264,7 +309,7 @@ export function MusicDirector() {
           <button onClick={saveSong} className="primary">Save</button>
           <button onClick={() => fileInput.current?.click()}>Import</button>
           <button onClick={exportSong}>Export</button>
-          <button onClick={() => window.print()}>Print</button>
+          <button ref={printButton} onClick={openPrintRoom}>Print</button>
           <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle color theme">{theme === "dark" ? "Light" : "Dark"}</button>
           <input ref={fileInput} type="file" accept=".json,application/json" onChange={importSong} hidden />
         </nav>
@@ -309,8 +354,8 @@ export function MusicDirector() {
           </div>
           <div className="shortcut-note">
             <strong>Keyboard</strong>
-            <span>A–G enters chords</span>
-            <span>Ctrl+1–6 inserts a measure</span>
+            <span>A-G enters chords</span>
+            <span>Ctrl+1-6 inserts a measure</span>
             <span>Arrow keys move the cursor</span>
           </div>
         </aside>
@@ -319,13 +364,13 @@ export function MusicDirector() {
           <div className="command-bar">
             <div className="song-position">
               <span className="eyebrow">Active chart</span>
-              <strong>{song.key} · {song.style}</strong>
+              <strong>{song.key} / {song.style}</strong>
             </div>
             <div className="view-controls" aria-label="View controls">
-              <button onClick={() => setZoom((value) => Math.max(70, value - 10))} aria-label="Zoom out">−</button>
+              <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
               <output>{zoom}%</output>
-              <button onClick={() => setZoom((value) => Math.min(140, value + 10))} aria-label="Zoom in">+</button>
-              <button onClick={() => setZoom(100)}>Fit</button>
+              <button onClick={() => setZoom((value) => nextZoom(value, 1))} aria-label="Zoom in">+</button>
+              <button onClick={() => setZoom(100)}>100%</button>
             </div>
             <span className="status" aria-live="polite">{status}</span>
           </div>
@@ -337,7 +382,7 @@ export function MusicDirector() {
               ))}
             </div>
 
-            {tab === "chart" && <article className="paper chart-paper" tabIndex={0} style={{ "--paper-zoom": zoom / 100 } as React.CSSProperties}>
+            {tab === "chart" && <article className="paper chart-paper" tabIndex={0} style={{ "--paper-scale": zoom / 100 } as React.CSSProperties}>
               <header className="paper-header">
                 <div><input aria-label="Karen title on paper" lang="kar" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><input aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></div>
                 <input aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
@@ -380,7 +425,7 @@ export function MusicDirector() {
               <div className="song-list">
                 {filteredSongs.length === 0 ? <div className="empty-state"><strong>No hosted songs yet</strong><span>Save a reviewed, sanitized chart to add it to this private library.</span></div> :
                   filteredSongs.map((item) => <button key={item.id} onClick={() => { setSong(item); setTab("chart"); setStatus("Loaded from hosted library"); }}>
-                    <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key} · {item.style} · {item.meter}</small>
+                    <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key}, {item.style}, {item.meter}</small>
                   </button>)}
               </div>
             </article>}
@@ -393,7 +438,7 @@ export function MusicDirector() {
         <button onClick={() => setTab("chart")} aria-current={tab === "chart"}>Chart</button>
         <button onClick={() => insertMeasure(Number(song.meter.split("/")[0]) || 4)}>+ Measure</button>
         <button onClick={saveSong}>Save</button>
-        <button onClick={() => window.print()}>Print</button>
+        <button onClick={openPrintRoom}>Print</button>
       </nav>
 
       {newSongOpen && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setNewSongOpen(false)}>
@@ -403,17 +448,135 @@ export function MusicDirector() {
           <div className="modal-actions"><button onClick={() => setNewSongOpen(false)}>Cancel</button><button className="primary" onClick={startNewSong}>Create chart</button></div>
         </section>
       </div>}
+
+      {printRoomOpen && <div className="print-room-overlay" role="presentation">
+        <section className="print-room" role="dialog" aria-modal="true" aria-labelledby="print-room-title">
+          <header className="print-room-toolbar">
+            <div>
+              <span className="print-room-kicker">Print room</span>
+              <h2 id="print-room-title">One physical page per copy</h2>
+              <p>{printCopies.length} Letter pages: one per instrument plus Reference.</p>
+            </div>
+            <div className="print-room-actions">
+              <button onClick={() => setPrintRoomOpen(false)}>Back to editor</button>
+              <button className="primary" onClick={() => window.print()}>Print all copies</button>
+            </div>
+          </header>
+
+          <div className="print-preview-screen">
+            <PrintSheet
+              song={song}
+              instrument={printCopies[printPage - 1]}
+              editable
+              onUpdate={updateSong}
+            />
+          </div>
+
+          <nav className="print-pagination" aria-label="Printout pages">
+            <button
+              onClick={() => setPrintPage((page) => Math.max(1, page - 1))}
+              disabled={printPage === 1}
+              aria-label="Previous printout page"
+            >
+              Previous
+            </button>
+            <div className="print-page-numbers">
+              {paginationItems(printPage, printCopies.length).map((item, index) =>
+                item === "ellipsis"
+                  ? <span key={`ellipsis-${index}`} aria-hidden="true">…</span>
+                  : <button
+                    key={item}
+                    onClick={() => setPrintPage(item)}
+                    aria-current={printPage === item ? "page" : undefined}
+                    aria-label={`Show printout page ${item}, ${printCopies[item - 1]}`}
+                  >
+                    {item}
+                  </button>
+              )}
+            </div>
+            <button
+              onClick={() => setPrintPage((page) => Math.min(printCopies.length, page + 1))}
+              disabled={printPage === printCopies.length}
+              aria-label="Next printout page"
+            >
+              Next
+            </button>
+          </nav>
+          <p className="print-page-caption" aria-live="polite">
+            Page {printPage} of {printCopies.length}: {printCopies[printPage - 1]}
+          </p>
+
+          <div className="print-stack" aria-hidden="true">
+            {printCopies.map((instrument) => <PrintSheet key={instrument} song={song} instrument={instrument} />)}
+          </div>
+        </section>
+      </div>}
     </main>
   );
 }
 
 function MeasureView({ measure, active, activeBeat = -1, onBeat, pre = false }: { measure: Measure; active: boolean; activeBeat?: number; onBeat: (beat: number) => void; pre?: boolean }) {
-  return <div className={`measure ${active ? "active-measure" : ""} ${pre ? "pre-measure" : ""}`} style={{ gridTemplateColumns: `repeat(${measure.beats.length}, minmax(28px, 1fr))` }}>
+  return <div className={`measure ${active ? "active-measure" : ""} ${pre ? "pre-measure" : ""}`} style={{ gridTemplateColumns: `repeat(${measure.beats.length}, minmax(0, 1fr))` }}>
     {measure.beats.map((beat, index) => <button
       key={index}
       className={activeBeat === index ? "active-beat" : ""}
       onClick={() => onBeat(index)}
       aria-label={`${pre ? "Pre-measure" : "Measure"} beat ${index + 1}${beat.chord ? `, ${chordLabel(beat.chord)}` : ""}`}
     >{chordLabel(beat.chord)}</button>)}
+  </div>;
+}
+
+function PrintSheet({
+  song,
+  instrument,
+  editable = false,
+  onUpdate,
+}: {
+  song: Song;
+  instrument: string;
+  editable?: boolean;
+  onUpdate?: (patch: Partial<Song>) => void;
+}) {
+  return <article className="print-sheet" data-print-page={instrument}>
+    <header className="print-sheet-header">
+      <div>
+        {editable
+          ? <input aria-label="Karen title in print preview" lang="kar" value={song.titleKaren} onChange={(event) => onUpdate?.({ titleKaren: event.target.value })} />
+          : <strong lang="kar">{song.titleKaren}</strong>}
+        {editable
+          ? <input aria-label="English title in print preview" value={song.titleEnglish} onChange={(event) => onUpdate?.({ titleEnglish: event.target.value })} />
+          : <span>{song.titleEnglish}</span>}
+      </div>
+      {editable
+        ? <input aria-label="Song style in print preview" value={song.style} onChange={(event) => onUpdate?.({ style: event.target.value })} />
+        : <strong>{song.style}</strong>}
+      <strong>{song.key}</strong>
+    </header>
+
+    <div className="print-sheet-body">
+      {song.sections.map((section) => <section className="print-section" key={section.id}>
+        <h3>{section.name}</h3>
+        <div className="print-measure-row">
+          {section.preMeasure && <PrintMeasure measure={section.preMeasure} pre />}
+          {section.measures.map((measure, measureIndex) =>
+            <PrintMeasure key={`${section.id}-print-${measureIndex}`} measure={measure} />
+          )}
+        </div>
+      </section>)}
+    </div>
+
+    <footer className="print-sheet-footer">
+      <span>{song.bpm} BPM, {song.meter}</span>
+      <strong>{instrument}</strong>
+      {editable
+        ? <input aria-label="Group in print preview" value={song.group} onChange={(event) => onUpdate?.({ group: event.target.value })} />
+        : <span>{song.group}</span>}
+    </footer>
+  </article>;
+}
+
+function PrintMeasure({ measure, pre = false }: { measure: Measure; pre?: boolean }) {
+  return <div className={`print-measure ${pre ? "is-pre-measure" : ""}`} style={{ gridTemplateColumns: `repeat(${measure.beats.length}, minmax(0, 1fr))` }}>
+    {measure.beats.map((beat, index) => <span key={index}>{chordLabel(beat.chord)}</span>)}
   </div>;
 }

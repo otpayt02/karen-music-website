@@ -16,8 +16,13 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /New song/);
   assert.match(editor, /Song details/);
   assert.match(editor, /\["chart", "lyrics", "database"\]/);
-  assert.match(editor, /Ctrl\+1–6 inserts a measure/);
+  assert.match(editor, /Ctrl\+1-6 inserts a measure/);
+  assert.match(editor, /One physical page per copy/);
+  assert.match(editor, /paginationItems/);
   assert.match(styles, /\.mobile-toolbar/);
+  assert.match(styles, /karen-village-aerial\.png/);
+  assert.match(styles, /--letter-width:\s*8\.5in/);
+  assert.match(styles, /\.print-sheet/);
   assert.match(styles, /@media print/);
   assert.match(hosting, /"d1": "DB"/);
 

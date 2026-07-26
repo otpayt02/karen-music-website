@@ -17,6 +17,8 @@
   --border: #3b4440;
   --sidebar-width: 310px;
   --radius: 5px;
+  --letter-width: 8.5in;
+  --letter-height: 11in;
   color-scheme: dark;
 }
 
@@ -74,6 +76,7 @@ button {
   font-weight: 650;
 }
 button:hover { border-color: var(--shell-muted); background: var(--case-soft); }
+button:disabled { cursor: not-allowed; opacity: .42; }
 button.primary { background: var(--leaf); border-color: var(--leaf); color: white; }
 button.primary:hover { background: #66845a; }
 .icon-button { width: 38px; padding: 0; font-size: 18px; }
@@ -163,12 +166,11 @@ button.primary:hover { background: #66845a; }
   min-height: calc(100dvh - 120px);
   padding: 22px 34px 80px 62px;
   background:
-    linear-gradient(90deg, rgb(255 255 255 / .025) 1px, transparent 1px),
-    linear-gradient(rgb(255 255 255 / .025) 1px, transparent 1px),
-    var(--case);
-  background-size: 28px 28px;
+    linear-gradient(rgb(10 17 13 / .72), rgb(10 17 13 / .88)),
+    url("/karen-village-aerial.png") center / cover fixed;
   position: relative;
   overflow: auto;
+  isolation: isolate;
 }
 .paper-tabs {
   position: absolute;
@@ -193,17 +195,22 @@ button.primary:hover { background: #66845a; }
   box-shadow: inset 3px 0 0 var(--leaf-bright);
 }
 .paper {
-  width: min(100%, 1050px);
-  min-height: 720px;
+  width: min(100%, var(--letter-width));
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 8.5 / 11;
   margin: 0 auto;
   background: var(--paper);
   color: var(--ink);
   border: 1px solid #d7d4c9;
   border-radius: 2px;
   box-shadow: 0 28px 80px rgb(0 0 0 / .28);
+  overflow: hidden;
 }
 .chart-paper {
   transform-origin: top center;
+  transform: scale(var(--paper-scale, 1));
+  transition: transform 180ms cubic-bezier(.2, .8, .2, 1);
   font-family: "Segoe UI Variable", "Noto Sans Myanmar", sans-serif;
 }
 .paper-header {
@@ -230,10 +237,13 @@ button.primary:hover { background: #66845a; }
 .paper-header > select { text-align-last: right; font-size: 20px; }
 .paper-header input:hover, .paper-header input:focus, .paper-footer input:hover, .paper-footer input:focus { border-bottom-color: var(--leaf); outline: none; }
 
-.chart-body { padding: 14px 22px 70px; }
-.chart-section { border-left: 4px solid var(--thread); padding-left: 8px; margin-bottom: 14px; }
-.chart-section:nth-child(3n + 2) { border-left-color: var(--leaf); }
-.chart-section:nth-child(3n) { border-left-color: var(--brass); }
+.chart-body {
+  position: absolute;
+  inset: 86px 0 42px;
+  padding: 14px 22px;
+  overflow: hidden;
+}
+.chart-section { margin-bottom: 14px; }
 .section-title {
   min-height: 28px;
   display: flex;
@@ -353,6 +363,178 @@ button.primary:hover { background: #66845a; }
 .modal p { color: var(--shell-muted); line-height: 1.55; }
 .modal-actions { justify-content: flex-end; gap: 8px; margin-top: 22px; }
 
+.print-room-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  overflow: auto;
+  background:
+    linear-gradient(rgb(8 14 11 / .82), rgb(8 14 11 / .94)),
+    url("/karen-village-aerial.png") center / cover fixed;
+}
+.print-room {
+  min-height: 100dvh;
+  padding: 18px 24px 40px;
+}
+.print-room-toolbar {
+  width: min(1180px, 100%);
+  min-height: 72px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  color: var(--shell-text);
+}
+.print-room-toolbar > div:first-child { display: grid; gap: 3px; }
+.print-room-kicker {
+  color: var(--leaf-bright);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.print-room-toolbar h2 { margin: 0; font-size: clamp(19px, 2.4vw, 28px); }
+.print-room-toolbar p { margin: 0; color: var(--shell-muted); font-size: 13px; }
+.print-room-actions { display: flex; gap: 8px; flex: 0 0 auto; }
+.print-preview-screen {
+  width: 100%;
+  display: grid;
+  place-items: start center;
+  overflow: auto;
+  padding: 0 0 8px;
+}
+.print-sheet {
+  width: min(var(--letter-width), calc(100vw - 48px));
+  height: auto;
+  aspect-ratio: 8.5 / 11;
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid #d7d4c9;
+  border-radius: 2px;
+  box-shadow: 0 30px 90px rgb(0 0 0 / .42);
+  font-family: "Segoe UI Variable", "Noto Sans Myanmar", sans-serif;
+}
+.print-sheet-header {
+  height: 86px;
+  display: grid;
+  grid-template-columns: 1fr .65fr .25fr;
+  align-items: start;
+  gap: 18px;
+  padding: 20px 24px 15px;
+  border-bottom: 2px solid var(--ink);
+}
+.print-sheet-header > div { display: grid; gap: 2px; }
+.print-sheet-header input,
+.print-sheet-footer input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  padding: 2px 1px;
+  font-weight: 750;
+}
+.print-sheet-header > div input:first-child,
+.print-sheet-header > div strong:first-child { font-size: 20px; }
+.print-sheet-header > div input:last-child,
+.print-sheet-header > div span:last-child { color: #5c605b; font-size: 13px; font-weight: 450; }
+.print-sheet-header > input,
+.print-sheet-header > strong { text-align: center; font-size: 17px; }
+.print-sheet-header > strong:last-child { text-align: right; font-size: 20px; }
+.print-sheet-header input:hover,
+.print-sheet-header input:focus,
+.print-sheet-footer input:hover,
+.print-sheet-footer input:focus {
+  border-bottom-color: var(--leaf);
+  outline: none;
+}
+.print-sheet-body {
+  position: absolute;
+  inset: 86px 0 42px;
+  padding: 14px 22px;
+  overflow: hidden;
+}
+.print-section { margin-bottom: 14px; }
+.print-section h3 {
+  min-height: 28px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid var(--ink);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: .04em;
+}
+.print-measure-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding-top: 7px;
+}
+.print-measure {
+  min-height: 62px;
+  display: grid;
+  border-left: 2px solid var(--ink);
+  border-right: 1px solid #d6d4ca;
+}
+.print-measure.is-pre-measure {
+  grid-column: span 1;
+  border-style: dashed;
+}
+.print-measure span {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  padding: 8px 4px;
+  font-size: 18px;
+  font-weight: 800;
+}
+.print-sheet-footer {
+  height: 42px;
+  position: absolute;
+  inset: auto 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: end;
+  gap: 12px;
+  border-top: 1px solid #aaa79d;
+  padding: 9px 24px 12px;
+  font-size: 11px;
+}
+.print-sheet-footer strong { text-align: center; }
+.print-sheet-footer > :last-child { text-align: right; }
+.print-pagination {
+  width: min(760px, 100%);
+  margin: 16px auto 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+.print-page-numbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.print-page-numbers button {
+  width: 38px;
+  min-height: 38px;
+  padding: 0;
+}
+.print-page-numbers button[aria-current="page"] {
+  background: var(--leaf);
+  border-color: var(--leaf-bright);
+  color: white;
+}
+.print-page-numbers span { min-width: 22px; text-align: center; color: var(--shell-muted); }
+.print-page-caption { margin: 8px 0 0; text-align: center; color: var(--shell-muted); font-size: 12px; }
+.print-stack { display: none; }
+
 @media (max-width: 900px) {
   .app-header { align-items: flex-start; }
   .global-actions button:not(.primary):not(:last-of-type) { display: none; }
@@ -376,7 +558,7 @@ button.primary:hover { background: #66845a; }
     z-index: 10;
     flex-direction: row;
     margin: 0 auto 8px;
-    width: min(100%, 1050px);
+    width: min(100%, var(--letter-width));
     background: var(--case);
     padding: 5px 0;
   }
@@ -409,7 +591,7 @@ button.primary:hover { background: #66845a; }
   .paper {
     min-width: 0;
     width: 100%;
-    min-height: 680px;
+    min-height: 0;
   }
   .paper-area { overflow-x: hidden; }
   .paper-tabs { min-width: 0; width: calc(100vw - 28px); margin-left: 0; }
@@ -417,17 +599,74 @@ button.primary:hover { background: #66845a; }
   .paper-header > div input:first-child { font-size: 16px; }
   .paper-header > input, .paper-header > select { font-size: 14px; }
   .chart-body { padding-inline: 10px; }
-  .measure { flex-basis: calc(50% - 2px); min-width: 120px; }
+  .measure {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+    min-height: 54px;
+  }
+  .measure button { min-height: 54px; padding-inline: 1px; font-size: 15px; }
+  .row-stepper { width: 28px; min-height: 54px; }
   .paper-footer { padding-inline: 12px; }
+  .print-room { padding: 10px 10px 26px; }
+  .print-room-toolbar { align-items: stretch; gap: 12px; }
+  .print-room-toolbar p { display: none; }
+  .print-room-actions { flex-direction: column; }
+  .print-room-actions button { min-height: 40px; }
+  .print-sheet { width: calc(100vw - 20px); }
+  .print-sheet-header {
+    height: 74px;
+    grid-template-columns: 1.4fr .65fr .35fr;
+    gap: 7px;
+    padding: 14px 12px 10px;
+  }
+  .print-sheet-header > div input:first-child,
+  .print-sheet-header > div strong:first-child { font-size: 16px; }
+  .print-sheet-header > input,
+  .print-sheet-header > strong,
+  .print-sheet-header > strong:last-child { font-size: 14px; }
+  .print-sheet-body { inset: 74px 0 42px; padding-inline: 10px; }
+  .print-sheet-footer { padding-inline: 12px; }
+  .print-pagination { grid-template-columns: 1fr 1fr; }
+  .print-page-numbers { grid-column: 1 / -1; grid-row: 1; }
 }
 
 @media print {
+  @page { size: Letter; margin: 0; }
   :root { color-scheme: light; }
   body { background: white; }
   .app-header, .sidebar, .command-bar, .paper-tabs, .mobile-toolbar { display: none !important; }
   .workspace, .editor-stage, .paper-area { display: block; min-height: 0; padding: 0; background: white; }
   .paper { width: 8.5in; height: 11in; min-height: 11in; max-height: 11in; margin: 0; border: 0; box-shadow: none; overflow: hidden; break-after: page; }
   .lyrics-paper, .database-paper { display: none; }
+  .print-room-overlay {
+    position: absolute;
+    inset: 0;
+    overflow: visible;
+    background: white;
+  }
+  .print-room { min-height: 0; padding: 0; }
+  .print-room-toolbar,
+  .print-preview-screen,
+  .print-pagination,
+  .print-page-caption { display: none !important; }
+  .print-stack { display: block; }
+  .print-stack .print-sheet {
+    width: var(--letter-width);
+    height: var(--letter-height);
+    min-height: var(--letter-height);
+    max-height: var(--letter-height);
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    break-after: page;
+    page-break-after: always;
+  }
+  .print-stack .print-sheet:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

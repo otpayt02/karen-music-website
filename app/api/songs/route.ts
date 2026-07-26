@@ -22,8 +22,11 @@ export async function GET() {
   try {
     const rows = await getDb().select().from(songs).orderBy(desc(songs.updatedAt), desc(songs.id)).limit(200);
     return Response.json({ songs: rows.map(parseSong) });
-  } catch (error) {
-    return Response.json({ error: error instanceof Error ? error.message : "Library unavailable", songs: [] }, { status: 503 });
+  } catch {
+    return Response.json({
+      songs: [],
+      warning: "Hosted library is unavailable; this draft remains local",
+    });
   }
 }
 
