@@ -19,10 +19,18 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /Ctrl\+1-6 inserts a measure/);
   assert.match(editor, /One physical page per copy/);
   assert.match(editor, /paginationItems/);
+  assert.match(editor, /DEFAULT_MEASURES_PER_ROW = 8/);
+  assert.match(editor, /rowsForSection/);
+  assert.match(editor, /ending=\{measureIndex === section\.measures\.length - 1\}/);
+  assert.match(editor, /Lead melody/);
+  assert.match(editor, /Keyboard shortcuts/);
   assert.match(styles, /\.mobile-toolbar/);
   assert.match(styles, /karen-village-aerial\.png/);
   assert.match(styles, /--letter-width:\s*8\.5in/);
   assert.match(styles, /\.print-sheet/);
+  assert.match(styles, /repeat\(var\(--measure-columns, 8\)/);
+  assert.match(styles, /\.measure\.ending-bar/);
+  assert.match(styles, /\.measure:hover/);
   assert.match(styles, /@media print/);
   assert.match(hosting, /"d1": "DB"/);
 
