@@ -68,6 +68,9 @@ type Song = {
 const instrumentOptions = ["Piano 1", "Piano 2", "Acoustic Guitar", "Bass", "Drums", "Strings"];
 const cueAbbreviationOptions = ["P1", "P2", "AG", "EG", "B", "D", "STR"];
 const sectionOptions = ["INTRO", "VERSE", "PRE-CHORUS", "CHORUS", "BRIDGE", "SOLO", "ENDING"];
+const songGroupOptions = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
+const MIN_BPM = 55;
+const MAX_BPM = 155;
 const KAREN_LAYOUT = [
   "က", "ခ", "ဂ", "ဃ", "င",
   "စ", "ဆ", "ၡ", "ည", "ယ",
@@ -99,6 +102,24 @@ const createMeasure = (count = 4): Measure => ({ beats: Array.from({ length: cou
 const clampZoom = (value: number) => Math.min(175, Math.max(55, value));
 const nextZoom = (current: number, direction: -1 | 1) =>
   clampZoom(Math.round(current * (direction > 0 ? 1.12 : 1 / 1.12)));
+
+function clampBpm(value: number) {
+  return Math.min(MAX_BPM, Math.max(MIN_BPM, Math.round(Number(value) || 76)));
+}
+
+function normalizeSongGroup(value: string | undefined) {
+  const group = value?.trim().toLowerCase() ?? "";
+  if (group.includes("praise") || group.includes("worship")) return "Praise & Worship";
+  if (group.includes("kid")) return "Kids";
+  if (group.includes("youth")) return "Youth";
+  if (group.includes("choir")) return "Choir";
+  if (group.includes("solo")) return "Solo";
+  return "Praise & Worship";
+}
+
+function normalizeSongMetadata(song: Song): Song {
+  return { ...song, bpm: clampBpm(song.bpm), group: normalizeSongGroup(song.group) };
+}
 
 function paginationItems(current: number, total: number): Array<number | "ellipsis"> {
   if (total <= 7) return Array.from({ length: total }, (_, index) => index + 1);
@@ -228,7 +249,7 @@ const demoSong = (): Song => ({
   key: "G",
   bpm: 76,
   meter: "4/4",
-  group: "Sunday Team",
+  group: "Praise & Worship",
   instruments: ["Piano 1", "Acoustic Guitar"],
   sourceKind: "synthetic",
   reviewState: "reviewed",
@@ -397,7 +418,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     fetch("/api/songs")
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((data) => {
-        setSongs(data.songs ?? []);
+        setSongs((data.songs ?? []).map((item: Song) => normalizeSongMetadata(item)));
         if (data.warning) setStatus(data.warning);
       })
       .catch(() => setStatus("Hosted library is unavailable; this draft remains local"));
@@ -1021,7 +1042,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Save failed");
-      const saved = data.song as Song;
+      const saved = normalizeSongMetadata(data.song as Song);
       setSong(saved);
       setSongs((current) => [saved, ...current.filter((item) => item.id !== saved.id)]);
       setStatus("Saved to hosted library");
@@ -1062,6 +1083,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           ...fallback,
           ...imported,
           id: undefined,
+          bpm: clampBpm(imported.bpm),
+          group: normalizeSongGroup(imported.group),
           sourceKind: "imported-json",
           reviewState: "draft",
           instruments: Array.isArray(imported.instruments)
@@ -1174,10 +1197,26 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <label>Style<input value={song.style} onChange={(event) => updateSong({ style: event.target.value })} /></label>
           </div>
           <div className="field-pair">
-            <label>BPM<input type="number" value={song.bpm} onChange={(event) => updateSong({ bpm: Number(event.target.value) })} /></label>
+            <label className="bpm-field">
+              <span>BPM <output>{song.bpm}</output></span>
+              <span className="bpm-slider">
+                <small>{MIN_BPM}</small>
+                <input
+                  type="range"
+                  min={MIN_BPM}
+                  max={MAX_BPM}
+                  step="1"
+                  value={song.bpm}
+                  aria-label="BPM"
+                  aria-valuetext={`${song.bpm} beats per minute`}
+                  onChange={(event) => updateSong({ bpm: clampBpm(Number(event.target.value)) })}
+                />
+                <small>{MAX_BPM}</small>
+              </span>
+            </label>
             <label>Meter<select value={song.meter} onChange={(event) => updateSong({ meter: event.target.value })}>{["4/4", "3/4", "5/5", "6/8"].map((meter) => <option key={meter}>{meter}</option>)}</select></label>
           </div>
-          <label>Group<input value={song.group} onChange={(event) => updateSong({ group: event.target.value })} /></label>
+          <label>Group<select value={song.group} onChange={(event) => updateSong({ group: event.target.value })}>{songGroupOptions.map((group) => <option key={group}>{group}</option>)}</select></label>
           <div className="instrument-field">
             <span>Print instruments</span>
             <button onClick={() => setInstrumentOpen((value) => !value)} aria-expanded={instrumentOpen}>
@@ -1331,7 +1370,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                     </label>)}
                   </div>
                 </details>
-                <input aria-label="Group on paper" placeholder="Group" value={song.group} onChange={(event) => updateSong({ group: event.target.value })} />
+                <select aria-label="Group on paper" value={song.group} onChange={(event) => updateSong({ group: event.target.value })}>{songGroupOptions.map((group) => <option key={group}>{group}</option>)}</select>
               </footer>
             </article>}
 
@@ -1345,7 +1384,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <input className="library-search" type="search" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
               <div className="song-list">
                 {filteredSongs.length === 0 ? <div className="empty-state"><strong>No hosted songs yet</strong><span>Save a reviewed, sanitized chart to add it to this private library.</span></div> :
-                  filteredSongs.map((item) => <button key={item.id} onClick={() => { setSong(item); setTab("chart"); setStatus("Loaded from hosted library"); }}>
+                  filteredSongs.map((item) => <button key={item.id} onClick={() => { setSong(normalizeSongMetadata(item)); setTab("chart"); setStatus("Loaded from hosted library"); }}>
                     <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key}, {item.style}, {item.meter}</small>
                   </button>)}
               </div>
@@ -1768,7 +1807,7 @@ function PrintSheet({
       <span>{song.bpm} BPM, {song.meter}</span>
       <strong>{instrument}</strong>
       {editable
-        ? <input aria-label="Group in print preview" value={song.group} onChange={(event) => onUpdate?.({ group: event.target.value })} />
+        ? <select aria-label="Group in print preview" value={song.group} onChange={(event) => onUpdate?.({ group: event.target.value })}>{songGroupOptions.map((group) => <option key={group}>{group}</option>)}</select>
         : <span>{song.group}</span>}
     </footer>
   </article>;

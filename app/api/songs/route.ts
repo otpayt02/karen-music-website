@@ -2,6 +2,19 @@ import { desc, eq } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { songs } from "../../../db/schema";
 
+const SONG_GROUPS = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
+const MIN_BPM = 55;
+const MAX_BPM = 155;
+
+function clampBpm(value: number | undefined) {
+  return Math.min(MAX_BPM, Math.max(MIN_BPM, Math.round(Number(value) || 76)));
+}
+
+function normalizeSongGroup(value: string | undefined) {
+  const group = value?.trim().toLowerCase() ?? "";
+  return SONG_GROUPS.find((option) => option.toLowerCase() === group) ?? "Praise & Worship";
+}
+
 type SongPayload = {
   id?: number;
   titleKaren?: string;
@@ -70,7 +83,11 @@ export async function POST(request: Request) {
     if (payload.sections.length > 50) {
       return Response.json({ error: "Chart exceeds the hosted section limit" }, { status: 400 });
     }
-    const safePayload = { ...payload };
+    const safePayload = {
+      ...payload,
+      bpm: clampBpm(payload.bpm),
+      group: normalizeSongGroup(payload.group),
+    };
     delete safePayload.saveApproval;
     const serializedPayload = JSON.stringify({ ...safePayload, id: undefined });
     if (new TextEncoder().encode(serializedPayload).byteLength > MAX_PAYLOAD_BYTES) {
@@ -82,9 +99,9 @@ export async function POST(request: Request) {
       titleEnglish: payload.titleEnglish.trim(),
       style: payload.style?.trim() || "Worship",
       songKey: payload.key?.trim() || "C",
-      bpm: Math.max(1, Number(payload.bpm) || 72),
+      bpm: safePayload.bpm,
       meter: payload.meter?.trim() || "4/4",
-      songGroup: payload.group?.trim() ?? "",
+      songGroup: safePayload.group,
       payload: serializedPayload,
       updatedAt: new Date().toISOString(),
     };
