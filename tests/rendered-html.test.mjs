@@ -15,13 +15,15 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(page, /<MusicDirector viewer=/);
   assert.match(layout, /title:\s*"Karen Music Director"/);
   assert.match(editor, /New song/);
-  assert.match(editor, /Settings and library/);
+  assert.match(editor, /aria-label="Song library"/);
+  assert.match(editor, />Song Library</);
   assert.match(editor, /\["chart", "lyrics"\]/);
   assert.doesNotMatch(editor, /tab === "database"/);
-  assert.match(editor, /\["settings", "library"\]/);
+  assert.doesNotMatch(editor, /sidebarView/);
+  assert.match(editor, /className="settings-menu"/);
   assert.match(editor, /timeSignatureOptions = \["2\/4", "3\/4", "4\/4", "6\/8"\]/);
   assert.match(editor, /aria-label="Time signature on paper"/);
-  assert.match(editor, /Ctrl\+1-6 inserts a measure/);
+  assert.match(editor, /<dt>Ctrl\+1-6<\/dt>/);
   assert.match(editor, /One physical page per copy/);
   assert.match(editor, /paginationItems/);
   assert.match(editor, /DEFAULT_MEASURES_PER_ROW = 8/);
@@ -30,6 +32,9 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /MAX_BPM = 155/);
   assert.match(editor, /type="range"/);
   assert.match(editor, /rowsForSection/);
+  assert.match(editor, /editorRowsForSection/);
+  assert.match(editor, /materializeMeasuresThrough/);
+  assert.match(editor, /Create measures through measure/);
   assert.match(editor, /rowGridTemplate/);
   assert.match(editor, /ChordNotation/);
   assert.match(editor, /Karen title keyboard/);
@@ -46,6 +51,7 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(styles, /repeat\(var\(--measure-columns, 8\)/);
   assert.match(styles, /\.measure\.ending-bar/);
   assert.match(styles, /\.measure:hover/);
+  assert.match(styles, /\.ghost-measure/);
   assert.match(styles, /--font-mono:\s*"IBM Plex Mono"/);
   assert.match(styles, /\.section-tone-chorus/);
   assert.match(styles, /\.karen-keyboard-overlay/);

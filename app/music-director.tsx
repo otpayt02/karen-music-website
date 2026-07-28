@@ -67,7 +67,8 @@ type Song = {
 
 const instrumentOptions = ["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Guitar", "Drums", "Electric Bass", "Keytar"] as const;
 const cueAbbreviationOptions = ["P1", "P2", "AG", "EG", "B", "D", "STR"];
-const sectionOptions = ["INTRO", "VERSE", "PRE-CHORUS", "CHORUS", "BRIDGE", "SOLO", "ENDING"];
+const defaultSectionOptions = ["INTRO", "VERSE", "PRE-CHORUS", "CHORUS", "BRIDGE", "SOLO", "ENDING"];
+const defaultStyleOptions = ["Worship", "Praise", "Hymn", "Traditional", "Contemporary"];
 const songGroupOptions = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
 const timeSignatureOptions = ["2/4", "3/4", "4/4", "6/8"] as const;
 const MIN_BPM = 55;
@@ -170,6 +171,21 @@ function rowsForSection(section: Section) {
     rows.push({ start, measures: section.measures.slice(start, start + cap), cap, rowIndex });
     start += cap;
     rowIndex += 1;
+  }
+  return rows;
+}
+
+function editorRowsForSection(section: Section) {
+  const rows = rowsForSection(section);
+  if (rows.length === 0) {
+    const cap = clampMeasuresPerRow(section.rowMeasureCounts?.[0] ?? section.measuresPerRow ?? DEFAULT_MEASURES_PER_ROW);
+    return [{ start: 0, measures: [], cap, rowIndex: 0 }];
+  }
+  const last = rows[rows.length - 1];
+  if (last.measures.length === last.cap) {
+    const rowIndex = last.rowIndex + 1;
+    const cap = clampMeasuresPerRow(section.rowMeasureCounts?.[rowIndex] ?? section.measuresPerRow ?? DEFAULT_MEASURES_PER_ROW);
+    return [...rows, { start: section.measures.length, measures: [], cap, rowIndex }];
   }
   return rows;
 }
@@ -322,7 +338,6 @@ function ChordNotation({ chord }: { chord: Chord | null }) {
 export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: Viewer }) {
   const [song, setSong] = useState<Song>(() => demoSong());
   const [tab, setTab] = useState<"chart" | "lyrics">("chart");
-  const [sidebarView, setSidebarView] = useState<"settings" | "library">("settings");
   const [selected, setSelected] = useState({ section: 0, measure: 0, beat: 0, pre: false });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [newSongOpen, setNewSongOpen] = useState(false);
@@ -334,6 +349,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [printPage, setPrintPage] = useState(1);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [karenTitleKeyboardEnabled, setKarenTitleKeyboardEnabled] = useState(true);
+  const [styleOptions, setStyleOptions] = useState<string[]>(defaultStyleOptions);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>(defaultSectionOptions);
+  const [groupOptions, setGroupOptions] = useState<string[]>([...songGroupOptions]);
+  const [styleDraft, setStyleDraft] = useState(defaultStyleOptions.join(", "));
+  const [categoryDraft, setCategoryDraft] = useState(defaultSectionOptions.join(", "));
+  const [groupDraft, setGroupDraft] = useState(songGroupOptions.join(", "));
   const [status, setStatus] = useState(
     viewer.authenticated ? "Demo chart, not yet saved" : "Local synthetic demo; sign in to use the private library"
   );
@@ -396,6 +417,11 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  useEffect(() => {
+    setStyleOptions((current) => current.includes(song.style) || !song.style ? current : [...current, song.style]);
+    setGroupOptions((current) => current.includes(song.group) || !song.group ? current : [...current, song.group]);
+  }, [song.group, song.style]);
 
   useEffect(() => {
     if (!window.matchMedia("(max-width: 900px)").matches) return;
@@ -1167,6 +1193,37 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     setPrintRoomOpen(true);
   }
 
+  function applyOptionDraft(kind: "styles" | "categories" | "groups", value: string) {
+    const options = [...new Set(value.split(",").map((item) => item.trim()).filter(Boolean))];
+    if (!options.length) return;
+    if (kind === "styles") {
+      const next = song.style && !options.includes(song.style) ? [...options, song.style] : options;
+      setStyleOptions(next);
+      setStyleDraft(next.join(", "));
+    } else if (kind === "categories") {
+      setCategoryOptions(options.map((item) => item.toUpperCase()));
+      setCategoryDraft(options.map((item) => item.toUpperCase()).join(", "));
+    } else {
+      const next = song.group && !options.includes(song.group) ? [...options, song.group] : options;
+      setGroupOptions(next);
+      setGroupDraft(next.join(", "));
+    }
+  }
+
+  function materializeMeasuresThrough(sectionIndex: number, targetMeasure: number) {
+    const beatCount = Number(song.meter.split("/")[0]) || 4;
+    const currentLength = song.sections[sectionIndex].measures.length;
+    if (targetMeasure < currentLength) return;
+    const count = targetMeasure - currentLength + 1;
+    commitSong((next) => {
+      for (let index = 0; index < count; index += 1) {
+        next.sections[sectionIndex].measures.push(createMeasure(beatCount));
+      }
+    }, `Created through measure ${targetMeasure + 1}`);
+    setSelected({ section: sectionIndex, measure: targetMeasure, beat: 0, pre: false });
+    window.requestAnimationFrame(() => editorTarget.current?.focus());
+  }
+
   const filteredSongs = songs.filter((item) =>
     `${item.titleKaren} ${item.titleEnglish} ${item.key} ${item.style}`.toLowerCase().includes(search.toLowerCase())
   );
@@ -1190,51 +1247,43 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <button onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }}>Import</button>
           <button onClick={exportSong}>Export</button>
           <button ref={printButton} onClick={openPrintRoom}>Print</button>
-          <button onClick={() => { setSidebarView("settings"); setSidebarOpen(true); }}>Settings</button>
+          <details className="settings-menu">
+            <summary>Settings</summary>
+            <div className="settings-popover">
+              <label className="setting-row">
+                <input
+                  type="checkbox"
+                  checked={karenTitleKeyboardEnabled}
+                  onChange={(event) => {
+                    setKarenTitleKeyboardEnabled(event.target.checked);
+                    if (!event.target.checked) setKarenKeyboardOpen(false);
+                  }}
+                />
+                <span><strong>Karen title keyboard</strong><small>Open the Karen keyboard from Karen title fields.</small></span>
+              </label>
+              <label>Song styles
+                <input value={styleDraft} onChange={(event) => setStyleDraft(event.target.value)} onBlur={(event) => applyOptionDraft("styles", event.target.value)} />
+                <small>Comma-separated choices. Loaded styles remain available.</small>
+              </label>
+              <label>Section categories
+                <input value={categoryDraft} onChange={(event) => setCategoryDraft(event.target.value)} onBlur={(event) => applyOptionDraft("categories", event.target.value)} />
+              </label>
+              <label>Groups
+                <input value={groupDraft} onChange={(event) => setGroupDraft(event.target.value)} onBlur={(event) => applyOptionDraft("groups", event.target.value)} />
+              </label>
+            </div>
+          </details>
           <input ref={fileInput} type="file" accept=".json,application/json" onChange={importSong} hidden />
         </nav>
       </header>
 
       <div className={`workspace ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
-        <aside className="sidebar" aria-label="Settings and library">
+        <aside className="sidebar" aria-label="Song library">
           <div className="sidebar-heading">
-            <span>Workspace</span>
+            <span>Song Library</span>
             <button className="icon-button" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">×</button>
           </div>
-          <div className="sidebar-tabs" role="tablist" aria-label="Sidebar views">
-            {(["settings", "library"] as const).map((view) => <button
-              key={view}
-              role="tab"
-              aria-selected={sidebarView === view}
-              onClick={() => setSidebarView(view)}
-            >
-              {view === "settings" ? "Settings" : "Library"}
-            </button>)}
-          </div>
-          {sidebarView === "settings" ? <section className="sidebar-panel settings-panel" role="tabpanel" aria-label="Settings panel">
-            <div>
-              <span className="eyebrow">Input</span>
-              <strong>Editor settings</strong>
-            </div>
-            <label className="setting-row">
-              <input
-                type="checkbox"
-                checked={karenTitleKeyboardEnabled}
-                onChange={(event) => {
-                  setKarenTitleKeyboardEnabled(event.target.checked);
-                  if (!event.target.checked) setKarenKeyboardOpen(false);
-                }}
-              />
-              <span><strong>Karen title keyboard</strong><small>Open the Karen keyboard from title fields.</small></span>
-            </label>
-            <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle color theme">{theme === "dark" ? "Use light theme" : "Use dark theme"}</button>
-            <div className="shortcut-note">
-              <strong>Keyboard</strong>
-              <span>A-G enters chords</span>
-              <span>Ctrl+1-6 inserts a measure</span>
-              <span>Arrow keys move the cursor</span>
-            </div>
-          </section> : <section className="sidebar-panel library-panel" role="tabpanel" aria-label="Library panel">
+          <section className="sidebar-panel library-panel" aria-label="Library panel">
             <div className="library-heading">
               <div><span className="eyebrow">Database</span><strong>Song library</strong></div>
               <output>{songs.length}</output>
@@ -1246,7 +1295,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                   <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key}, {item.style}, {item.meter}</small>
                 </button>)}
             </div>
-          </section>}
+          </section>
         </aside>
 
         <section className="editor-stage" aria-label="Music editor">
@@ -1269,6 +1318,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               {(["chart", "lyrics"] as const).map((name) => (
                 <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>
               ))}
+              <button className="rail-icon" onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle dark mode" aria-pressed={theme === "dark"} title="Toggle dark mode">{theme === "dark" ? "☾" : "☼"}</button>
+              <button className="rail-icon" onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Docs and keyboard shortcuts">?</button>
             </div>
 
             {tab === "chart" && <article
@@ -1279,8 +1330,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               style={{ "--paper-scale": zoom / 100 } as React.CSSProperties}
             >
               <header className="paper-header">
-                <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><span className="parenthesized-field paper-english-title"><span aria-hidden="true">(</span><input data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span></div>
-                <input aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
+                <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><span className="parenthesized-field paper-english-title"><span aria-hidden="true">(</span><input data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" size={Math.max(1, Array.from(song.titleEnglish || " ").length)} value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span></div>
+                <select aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })}>{styleOptions.map((style) => <option key={style}>{style}</option>)}</select>
                 <select aria-label="Song key on paper" value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select>
               </header>
               <div className="chart-body">
@@ -1303,7 +1354,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                       <h3>{section.name}</h3>
                       <button className="section-delete" onClick={() => removeSection(sectionIndex)} aria-label={`Remove ${section.name}`}>×</button>
                     </header>
-                    {rowsForSection(section).map((row) => <div className="chart-row-wrap" key={`${section.id}-row-${row.rowIndex}`}>
+                    {editorRowsForSection(section).map((row) => <div className="chart-row-wrap" key={`${section.id}-row-${row.rowIndex}`}>
                       {row.rowIndex === 0 && section.preMeasure && <MeasureView
                         measure={section.preMeasure}
                         active={selected.section === sectionIndex && selected.pre}
@@ -1331,6 +1382,20 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                               .map((range) => range.abbr))}
                           />;
                         })}
+                        {Array.from({ length: Math.max(0, row.cap - row.measures.length) }, (_, ghostOffset) => {
+                          const measureIndex = row.start + row.measures.length + ghostOffset;
+                          const beatCount = Number(song.meter.split("/")[0]) || 4;
+                          return <button
+                            key={`${section.id}-ghost-${measureIndex}`}
+                            className="ghost-measure"
+                            style={{ "--ghost-beats": beatCount } as React.CSSProperties}
+                            onClick={() => materializeMeasuresThrough(sectionIndex, measureIndex)}
+                            aria-label={`Create measures through measure ${measureIndex + 1}`}
+                          >
+                            <span className="ghost-beats" aria-hidden="true">{Array.from({ length: beatCount }, (_, beat) => <i key={beat} />)}</span>
+                            <span className="ghost-plus" aria-hidden="true">+</span>
+                          </button>;
+                        })}
                       </div>
                       <div className="row-density" aria-label={`Measures in row: ${row.cap}`}>
                         <button onClick={() => changeRowCap(sectionIndex, row.rowIndex, 1)} aria-label="More measures in this row">▲</button>
@@ -1338,14 +1403,6 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                         <button onClick={() => changeRowCap(sectionIndex, row.rowIndex, -1)} aria-label="Fewer measures in this row">▼</button>
                       </div>
                     </div>)}
-                    <button className="add-measure" onClick={() => {
-                      const measure = section.measures.length - 1;
-                      const beatCount = Number(song.meter.split("/")[0]) || 4;
-                      commitSong((next) => {
-                        next.sections[sectionIndex].measures.push(createMeasure(beatCount));
-                      }, `Inserted ${beatCount}-beat measure`);
-                      setSelected({ section: sectionIndex, measure: measure + 1, beat: 0, pre: false });
-                    }}>+ Measure</button>
                   </section>
                 </div>)}
                 <button
@@ -1393,7 +1450,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                     </label>)}
                   </div>
                 </details>
-                <select aria-label="Group on paper" value={song.group} onChange={(event) => updateSong({ group: event.target.value })}>{songGroupOptions.map((group) => <option key={group}>{group}</option>)}</select>
+                <select aria-label="Group on paper" value={song.group} onChange={(event) => updateSong({ group: event.target.value })}>{groupOptions.map((group) => <option key={group}>{group}</option>)}</select>
               </footer>
             </article>}
 
@@ -1428,7 +1485,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <button className="icon-button" onClick={() => setSectionModalOpen(false)} aria-label="Close section dialog">×</button>
           </header>
           <div className="section-choice-grid">
-            {sectionOptions.map((name) => <button key={name} onClick={() => addSection(name)}>
+            {categoryOptions.map((name) => <button key={name} onClick={() => addSection(name)}>
               <kbd>{name === "PRE-CHORUS" ? "P" : name[0]}</kbd>{name}
             </button>)}
           </div>
