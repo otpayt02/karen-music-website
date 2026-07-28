@@ -38,6 +38,7 @@ type SongPayload = {
   titleKaren?: string;
   titleEnglish?: string;
   style?: string;
+  category?: string;
   key?: string;
   bpm?: number;
   meter?: string;

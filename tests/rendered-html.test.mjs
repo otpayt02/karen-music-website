@@ -21,6 +21,8 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.doesNotMatch(editor, /tab === "database"/);
   assert.doesNotMatch(editor, /sidebarView/);
   assert.match(editor, /className="settings-menu"/);
+  assert.match(editor, /defaultCategoryOptions = \["Praise \/ Worship", "Choir", "Youth", "Solo", "Kids"\]/);
+  assert.match(editor, /Current song category/);
   assert.match(editor, /timeSignatureOptions = \["2\/4", "3\/4", "4\/4", "6\/8"\]/);
   assert.match(editor, /aria-label="Time signature on paper"/);
   assert.match(editor, /<dt>Ctrl\+1-6<\/dt>/);

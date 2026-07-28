@@ -104,7 +104,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   box-shadow: 0 22px 70px rgb(0 0 0 / .42);
 }
 .settings-popover label { display: grid; gap: 5px; color: var(--shell-text); font-size: 12px; font-weight: 800; text-align: left; }
-.settings-popover input:not([type="checkbox"]) { width: 100%; min-height: 38px; border: 1px solid var(--border); border-radius: 6px; background: var(--case); color: var(--shell-text); padding: 7px 9px; }
+.settings-popover input:not([type="checkbox"]),
+.settings-popover select { width: 100%; min-height: 38px; border: 1px solid var(--border); border-radius: 6px; background: var(--case); color: var(--shell-text); padding: 7px 9px; }
 .settings-popover .setting-row { grid-template-columns: 18px minmax(0, 1fr); align-items: start; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .settings-popover .setting-row input { width: 18px; min-height: 18px; margin-top: 2px; }
 .settings-popover small { color: var(--shell-muted); font-weight: 500; line-height: 1.35; }

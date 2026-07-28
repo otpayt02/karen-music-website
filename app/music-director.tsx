@@ -50,6 +50,7 @@ type Song = {
   titleKaren: string;
   titleEnglish: string;
   style: string;
+  category: string;
   key: string;
   bpm: number;
   meter: string;
@@ -69,6 +70,7 @@ const instrumentOptions = ["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Gu
 const cueAbbreviationOptions = ["P1", "P2", "AG", "EG", "B", "D", "STR"];
 const defaultSectionOptions = ["INTRO", "VERSE", "PRE-CHORUS", "CHORUS", "BRIDGE", "SOLO", "ENDING"];
 const defaultStyleOptions = ["Worship", "Praise", "Hymn", "Traditional", "Contemporary"];
+const defaultCategoryOptions = ["Praise / Worship", "Choir", "Youth", "Solo", "Kids"];
 const songGroupOptions = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
 const timeSignatureOptions = ["2/4", "3/4", "4/4", "6/8"] as const;
 const MIN_BPM = 55;
@@ -138,6 +140,7 @@ function normalizeInstruments(value: unknown): string[] {
 function normalizeSongMetadata(song: Song): Song {
   return {
     ...song,
+    category: song.category?.trim() || "Praise / Worship",
     bpm: clampBpm(song.bpm),
     meter: normalizeTimeSignature(song.meter),
     group: normalizeSongGroup(song.group),
@@ -285,6 +288,7 @@ const demoSong = (): Song => ({
   titleKaren: "တၢ်သးဝံၣ်အဒိ",
   titleEnglish: "Practice Song",
   style: "Worship",
+  category: "Praise / Worship",
   key: "G",
   bpm: 76,
   meter: "4/4",
@@ -350,10 +354,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [karenTitleKeyboardEnabled, setKarenTitleKeyboardEnabled] = useState(true);
   const [styleOptions, setStyleOptions] = useState<string[]>(defaultStyleOptions);
-  const [categoryOptions, setCategoryOptions] = useState<string[]>(defaultSectionOptions);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>(defaultCategoryOptions);
   const [groupOptions, setGroupOptions] = useState<string[]>([...songGroupOptions]);
   const [styleDraft, setStyleDraft] = useState(defaultStyleOptions.join(", "));
-  const [categoryDraft, setCategoryDraft] = useState(defaultSectionOptions.join(", "));
+  const [categoryDraft, setCategoryDraft] = useState(defaultCategoryOptions.join(", "));
   const [groupDraft, setGroupDraft] = useState(songGroupOptions.join(", "));
   const [status, setStatus] = useState(
     viewer.authenticated ? "Demo chart, not yet saved" : "Local synthetic demo; sign in to use the private library"
@@ -421,7 +425,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   useEffect(() => {
     setStyleOptions((current) => current.includes(song.style) || !song.style ? current : [...current, song.style]);
     setGroupOptions((current) => current.includes(song.group) || !song.group ? current : [...current, song.group]);
-  }, [song.group, song.style]);
+    setCategoryOptions((current) => current.includes(song.category) || !song.category ? current : [...current, song.category]);
+  }, [song.category, song.group, song.style]);
 
   useEffect(() => {
     if (!window.matchMedia("(max-width: 900px)").matches) return;
@@ -1201,8 +1206,9 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       setStyleOptions(next);
       setStyleDraft(next.join(", "));
     } else if (kind === "categories") {
-      setCategoryOptions(options.map((item) => item.toUpperCase()));
-      setCategoryDraft(options.map((item) => item.toUpperCase()).join(", "));
+      const next = song.category && !options.includes(song.category) ? [...options, song.category] : options;
+      setCategoryOptions(next);
+      setCategoryDraft(next.join(", "));
     } else {
       const next = song.group && !options.includes(song.group) ? [...options, song.group] : options;
       setGroupOptions(next);
@@ -1225,7 +1231,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   }
 
   const filteredSongs = songs.filter((item) =>
-    `${item.titleKaren} ${item.titleEnglish} ${item.key} ${item.style}`.toLowerCase().includes(search.toLowerCase())
+    `${item.titleKaren} ${item.titleEnglish} ${item.key} ${item.style} ${item.category}`.toLowerCase().includes(search.toLowerCase())
   );
   const activeCueRowKey = selected.pre ? "" : cueRowKey(song, selected);
   const activeCueRanges = (song.instrumentCueRanges ?? []).filter((range) => range.rowKey === activeCueRowKey).slice(0, 2);
@@ -1265,8 +1271,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 <input value={styleDraft} onChange={(event) => setStyleDraft(event.target.value)} onBlur={(event) => applyOptionDraft("styles", event.target.value)} />
                 <small>Comma-separated choices. Loaded styles remain available.</small>
               </label>
-              <label>Section categories
+              <label>Categories
                 <input value={categoryDraft} onChange={(event) => setCategoryDraft(event.target.value)} onBlur={(event) => applyOptionDraft("categories", event.target.value)} />
+              </label>
+              <label>Current song category
+                <select value={song.category} onChange={(event) => updateSong({ category: event.target.value })}>
+                  {categoryOptions.map((category) => <option key={category}>{category}</option>)}
+                </select>
               </label>
               <label>Groups
                 <input value={groupDraft} onChange={(event) => setGroupDraft(event.target.value)} onBlur={(event) => applyOptionDraft("groups", event.target.value)} />
@@ -1485,7 +1496,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <button className="icon-button" onClick={() => setSectionModalOpen(false)} aria-label="Close section dialog">×</button>
           </header>
           <div className="section-choice-grid">
-            {categoryOptions.map((name) => <button key={name} onClick={() => addSection(name)}>
+            {defaultSectionOptions.map((name) => <button key={name} onClick={() => addSection(name)}>
               <kbd>{name === "PRE-CHORUS" ? "P" : name[0]}</kbd>{name}
             </button>)}
           </div>
