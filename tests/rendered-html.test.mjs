@@ -23,7 +23,8 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /rowsForSection/);
   assert.match(editor, /rowGridTemplate/);
   assert.match(editor, /ChordNotation/);
-  assert.match(editor, /Karen language input/);
+  assert.match(editor, /Karen title keyboard/);
+  assert.match(editor, /target\.dataset\.karenField !== "titleKaren"/);
   assert.match(editor, /Choose centered footer instruments/);
   assert.match(editor, /ending=\{measureIndex === section\.measures\.length - 1\}/);
   assert.match(editor, /Lead melody/);

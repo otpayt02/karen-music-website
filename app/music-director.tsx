@@ -289,7 +289,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [printPage, setPrintPage] = useState(1);
   const [instrumentOpen, setInstrumentOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
-  const [karenInputEnabled, setKarenInputEnabled] = useState(false);
+  const [karenTitleKeyboardEnabled, setKarenTitleKeyboardEnabled] = useState(true);
   const [status, setStatus] = useState(
     viewer.authenticated ? "Demo chart, not yet saved" : "Local synthetic demo; sign in to use the private library"
   );
@@ -605,10 +605,6 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     setKarenPreview(value);
     const field = target.dataset.karenField;
     if (field === "titleKaren") updateSong({ titleKaren: value });
-    if (field === "style") updateSong({ style: value });
-    if (field === "group") updateSong({ group: value });
-    if (field === "lyrics") updateSong({ lyrics: value });
-    if (field === "search") setSearch(value);
     const prototype = target instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
     const setter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
     if (!field && setter) {
@@ -723,13 +719,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   }
 
   function handleTextFocus(event: FocusEvent<HTMLElement>) {
-    if (!karenInputEnabled) return;
+    if (!karenTitleKeyboardEnabled) return;
     const target = event.target;
     if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
-    const isTextBox = target instanceof HTMLTextAreaElement
-      || !target.type
-      || ["text", "search"].includes(target.type);
-    if (!isTextBox || target.dataset.karenExempt === "true") return;
+    if (target.dataset.karenField !== "titleKaren") return;
     openKarenKeyboard(target);
   }
 
@@ -1153,13 +1146,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <label>
                 <input
                   type="checkbox"
-                  checked={karenInputEnabled}
+                  checked={karenTitleKeyboardEnabled}
                   onChange={(event) => {
-                    setKarenInputEnabled(event.target.checked);
+                    setKarenTitleKeyboardEnabled(event.target.checked);
                     if (!event.target.checked) setKarenKeyboardOpen(false);
                   }}
                 />
-                Karen language input
+                Karen title keyboard
               </label>
               <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle color theme">{theme === "dark" ? "Light theme" : "Dark theme"}</button>
             </div>
@@ -1178,13 +1171,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <label>English title<span className="parenthesized-field"><span aria-hidden="true">(</span><input data-karen-exempt="true" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span></label>
           <div className="field-pair">
             <label>Key<select value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select></label>
-            <label>Style<input data-karen-field="style" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} /></label>
+            <label>Style<input value={song.style} onChange={(event) => updateSong({ style: event.target.value })} /></label>
           </div>
           <div className="field-pair">
             <label>BPM<input type="number" value={song.bpm} onChange={(event) => updateSong({ bpm: Number(event.target.value) })} /></label>
             <label>Meter<select value={song.meter} onChange={(event) => updateSong({ meter: event.target.value })}>{["4/4", "3/4", "5/5", "6/8"].map((meter) => <option key={meter}>{meter}</option>)}</select></label>
           </div>
-          <label>Group<input data-karen-field="group" value={song.group} onChange={(event) => updateSong({ group: event.target.value })} /></label>
+          <label>Group<input value={song.group} onChange={(event) => updateSong({ group: event.target.value })} /></label>
           <div className="instrument-field">
             <span>Print instruments</span>
             <button onClick={() => setInstrumentOpen((value) => !value)} aria-expanded={instrumentOpen}>
@@ -1244,7 +1237,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             >
               <header className="paper-header">
                 <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><span className="parenthesized-field paper-english-title"><span aria-hidden="true">(</span><input data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span></div>
-                <input data-karen-field="style" aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
+                <input aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
                 <select aria-label="Song key on paper" value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select>
               </header>
               <div className="chart-body">
@@ -1338,13 +1331,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                     </label>)}
                   </div>
                 </details>
-                <input data-karen-field="group" aria-label="Group on paper" placeholder="Group" value={song.group} onChange={(event) => updateSong({ group: event.target.value })} />
+                <input aria-label="Group on paper" placeholder="Group" value={song.group} onChange={(event) => updateSong({ group: event.target.value })} />
               </footer>
             </article>}
 
             {tab === "lyrics" && <article className="paper lyrics-paper">
               <header><div><strong lang="kar">{song.titleKaren || "Karen title"}</strong><span>{song.titleEnglish || "English title"}</span></div><span>{song.key}</span></header>
-              <textarea aria-label="Song lyrics" lang="kar" dir="ltr" data-karen-field="lyrics" value={song.lyrics} onFocus={(event) => openKarenKeyboard(event.currentTarget)} onChange={(event) => updateSong({ lyrics: event.target.value })} placeholder="Lyrics" />
+              <textarea aria-label="Song lyrics" lang="kar" dir="ltr" value={song.lyrics} onChange={(event) => updateSong({ lyrics: event.target.value })} placeholder="Lyrics" />
             </article>}
 
             {tab === "database" && <article className="paper database-paper">
