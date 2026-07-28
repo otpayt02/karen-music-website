@@ -15,8 +15,12 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(page, /<MusicDirector viewer=/);
   assert.match(layout, /title:\s*"Karen Music Director"/);
   assert.match(editor, /New song/);
-  assert.match(editor, /Song details/);
-  assert.match(editor, /\["chart", "lyrics", "database"\]/);
+  assert.match(editor, /Settings and library/);
+  assert.match(editor, /\["chart", "lyrics"\]/);
+  assert.doesNotMatch(editor, /tab === "database"/);
+  assert.match(editor, /\["settings", "library"\]/);
+  assert.match(editor, /timeSignatureOptions = \["2\/4", "3\/4", "4\/4", "6\/8"\]/);
+  assert.match(editor, /aria-label="Time signature on paper"/);
   assert.match(editor, /Ctrl\+1-6 inserts a measure/);
   assert.match(editor, /One physical page per copy/);
   assert.match(editor, /paginationItems/);
@@ -50,6 +54,7 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(hosting, /"d1": "DB"/);
   assert.match(songsRoute, /SONG_GROUPS = \["Praise & Worship", "Kids", "Youth", "Choir", "Solo"\]/);
   assert.match(songsRoute, /INSTRUMENTS = \["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Guitar", "Drums", "Electric Bass", "Keytar"\]/);
+  assert.match(songsRoute, /TIME_SIGNATURES = \["2\/4", "3\/4", "4\/4", "6\/8"\]/);
   assert.match(songsRoute, /MIN_BPM = 55/);
   assert.match(songsRoute, /MAX_BPM = 155/);
   assert.match(songsRoute, /bpm: safePayload\.bpm/);

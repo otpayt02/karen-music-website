@@ -69,6 +69,7 @@ const instrumentOptions = ["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Gu
 const cueAbbreviationOptions = ["P1", "P2", "AG", "EG", "B", "D", "STR"];
 const sectionOptions = ["INTRO", "VERSE", "PRE-CHORUS", "CHORUS", "BRIDGE", "SOLO", "ENDING"];
 const songGroupOptions = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
+const timeSignatureOptions = ["2/4", "3/4", "4/4", "6/8"] as const;
 const MIN_BPM = 55;
 const MAX_BPM = 155;
 const KAREN_LAYOUT = [
@@ -117,6 +118,10 @@ function normalizeSongGroup(value: string | undefined) {
   return "Praise & Worship";
 }
 
+function normalizeTimeSignature(value: string | undefined) {
+  return timeSignatureOptions.find((signature) => signature === value) ?? "4/4";
+}
+
 function normalizeInstruments(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   const normalized = value.flatMap((item) => {
@@ -133,6 +138,7 @@ function normalizeSongMetadata(song: Song): Song {
   return {
     ...song,
     bpm: clampBpm(song.bpm),
+    meter: normalizeTimeSignature(song.meter),
     group: normalizeSongGroup(song.group),
     instruments: normalizeInstruments(song.instruments),
   };
@@ -315,7 +321,8 @@ function ChordNotation({ chord }: { chord: Chord | null }) {
 
 export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: Viewer }) {
   const [song, setSong] = useState<Song>(() => demoSong());
-  const [tab, setTab] = useState<"chart" | "lyrics" | "database">("chart");
+  const [tab, setTab] = useState<"chart" | "lyrics">("chart");
+  const [sidebarView, setSidebarView] = useState<"settings" | "library">("settings");
   const [selected, setSelected] = useState({ section: 0, measure: 0, beat: 0, pre: false });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [newSongOpen, setNewSongOpen] = useState(false);
@@ -325,7 +332,6 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [printRoomOpen, setPrintRoomOpen] = useState(false);
   const [printPage, setPrintPage] = useState(1);
-  const [instrumentOpen, setInstrumentOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [karenTitleKeyboardEnabled, setKarenTitleKeyboardEnabled] = useState(true);
   const [status, setStatus] = useState(
@@ -756,12 +762,15 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     requestAnimationFrame(() => editorTarget.current?.focus());
   }
 
-  function handleTextFocus(event: FocusEvent<HTMLElement>) {
+  function handleKarenTextTarget(target: EventTarget | null) {
     if (!karenTitleKeyboardEnabled) return;
-    const target = event.target;
     if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
     if (target.dataset.karenField !== "titleKaren") return;
     openKarenKeyboard(target);
+  }
+
+  function handleTextFocus(event: FocusEvent<HTMLElement>) {
+    handleKarenTextTarget(event.target);
   }
 
   function moveRight(createAtEnd = false) {
@@ -1101,6 +1110,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           ...imported,
           id: undefined,
           bpm: clampBpm(imported.bpm),
+          meter: normalizeTimeSignature(imported.meter),
           group: normalizeSongGroup(imported.group),
           sourceKind: "imported-json",
           reviewState: "draft",
@@ -1165,10 +1175,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const activeCueRange = activeCueRanges[activeCueSlot];
 
   return (
-    <main className="app-shell" onKeyDownCapture={handleEditorKey} onFocusCapture={handleTextFocus}>
+    <main className="app-shell" onKeyDownCapture={handleEditorKey} onFocusCapture={handleTextFocus} onClickCapture={(event) => handleKarenTextTarget(event.target)}>
       <header className="app-header">
         <div className="brand">
-          <button className="icon-button" onClick={() => setSidebarOpen((value) => !value)} aria-label="Toggle song details">☰</button>
+          <button className="icon-button" onClick={() => setSidebarOpen((value) => !value)} aria-label="Toggle settings and library">☰</button>
           <div>
             <strong>Karen Music Director</strong>
             <span>ကညီတၢ်သးဝံၣ်</span>
@@ -1180,86 +1190,63 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <button onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }}>Import</button>
           <button onClick={exportSong}>Export</button>
           <button ref={printButton} onClick={openPrintRoom}>Print</button>
-          <details className="settings-menu">
-            <summary>Settings</summary>
-            <div>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={karenTitleKeyboardEnabled}
-                  onChange={(event) => {
-                    setKarenTitleKeyboardEnabled(event.target.checked);
-                    if (!event.target.checked) setKarenKeyboardOpen(false);
-                  }}
-                />
-                Karen title keyboard
-              </label>
-              <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle color theme">{theme === "dark" ? "Light theme" : "Dark theme"}</button>
-            </div>
-          </details>
+          <button onClick={() => { setSidebarView("settings"); setSidebarOpen(true); }}>Settings</button>
           <input ref={fileInput} type="file" accept=".json,application/json" onChange={importSong} hidden />
         </nav>
       </header>
 
       <div className={`workspace ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
-        <aside className="sidebar" aria-label="Song details">
+        <aside className="sidebar" aria-label="Settings and library">
           <div className="sidebar-heading">
-            <span>Song details</span>
-            <button className="icon-button" onClick={() => setSidebarOpen(false)} aria-label="Close song details">×</button>
+            <span>Workspace</span>
+            <button className="icon-button" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">×</button>
           </div>
-          <label>Karen title<input aria-label="Karen title" lang="kar" dir="ltr" data-karen-field="titleKaren" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /></label>
-          <label>English title<span className="parenthesized-field"><span aria-hidden="true">(</span><input data-karen-exempt="true" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span></label>
-          <div className="field-pair">
-            <label>Key<select value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select></label>
-            <label>Style<input value={song.style} onChange={(event) => updateSong({ style: event.target.value })} /></label>
+          <div className="sidebar-tabs" role="tablist" aria-label="Sidebar views">
+            {(["settings", "library"] as const).map((view) => <button
+              key={view}
+              role="tab"
+              aria-selected={sidebarView === view}
+              onClick={() => setSidebarView(view)}
+            >
+              {view === "settings" ? "Settings" : "Library"}
+            </button>)}
           </div>
-          <div className="field-pair">
-            <label className="bpm-field">
-              <span>BPM <output>{song.bpm}</output></span>
-              <span className="bpm-slider">
-                <small>{MIN_BPM}</small>
-                <input
-                  type="range"
-                  min={MIN_BPM}
-                  max={MAX_BPM}
-                  step="1"
-                  value={song.bpm}
-                  aria-label="BPM"
-                  aria-valuetext={`${song.bpm} beats per minute`}
-                  onChange={(event) => updateSong({ bpm: clampBpm(Number(event.target.value)) })}
-                />
-                <small>{MAX_BPM}</small>
-              </span>
+          {sidebarView === "settings" ? <section className="sidebar-panel settings-panel" role="tabpanel" aria-label="Settings panel">
+            <div>
+              <span className="eyebrow">Input</span>
+              <strong>Editor settings</strong>
+            </div>
+            <label className="setting-row">
+              <input
+                type="checkbox"
+                checked={karenTitleKeyboardEnabled}
+                onChange={(event) => {
+                  setKarenTitleKeyboardEnabled(event.target.checked);
+                  if (!event.target.checked) setKarenKeyboardOpen(false);
+                }}
+              />
+              <span><strong>Karen title keyboard</strong><small>Open the Karen keyboard from title fields.</small></span>
             </label>
-            <label>Meter<select value={song.meter} onChange={(event) => updateSong({ meter: event.target.value })}>{["4/4", "3/4", "5/5", "6/8"].map((meter) => <option key={meter}>{meter}</option>)}</select></label>
-          </div>
-          <label>Group<select value={song.group} onChange={(event) => updateSong({ group: event.target.value })}>{songGroupOptions.map((group) => <option key={group}>{group}</option>)}</select></label>
-          <div className="instrument-field">
-            <span>Print instruments</span>
-            <button onClick={() => setInstrumentOpen((value) => !value)} aria-expanded={instrumentOpen}>
-              {song.instruments.length ? song.instruments.join(", ") : "Reference only"}
-            </button>
-            {instrumentOpen && <div className="instrument-menu">
-              {instrumentOptions.map((instrument) => <label key={instrument}>
-                <input
-                  type="checkbox"
-                  checked={song.instruments.includes(instrument)}
-                  onChange={() => updateSong({
-                    instruments: song.instruments.includes(instrument)
-                      ? song.instruments.filter((item) => item !== instrument)
-                      : [...song.instruments, instrument],
-                  })}
-                />
-                {instrument}
-              </label>)}
-            </div>}
-          </div>
-          <div className="shortcut-note">
-            <strong>Keyboard</strong>
-            <span>A-G enters chords</span>
-            <span>Ctrl+1-6 inserts a measure</span>
-            <span>Arrow keys move the cursor</span>
-          </div>
+            <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle color theme">{theme === "dark" ? "Use light theme" : "Use dark theme"}</button>
+            <div className="shortcut-note">
+              <strong>Keyboard</strong>
+              <span>A-G enters chords</span>
+              <span>Ctrl+1-6 inserts a measure</span>
+              <span>Arrow keys move the cursor</span>
+            </div>
+          </section> : <section className="sidebar-panel library-panel" role="tabpanel" aria-label="Library panel">
+            <div className="library-heading">
+              <div><span className="eyebrow">Database</span><strong>Song library</strong></div>
+              <output>{songs.length}</output>
+            </div>
+            <input className="library-search" type="search" aria-label="Search song library" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
+            <div className="song-list">
+              {filteredSongs.length === 0 ? <div className="empty-state"><strong>No hosted songs yet</strong><span>Save a reviewed, sanitized chart to add it to this private library.</span></div> :
+                filteredSongs.map((item) => <button key={item.id} onClick={() => { setSong(normalizeSongMetadata(item)); setTab("chart"); setStatus("Loaded from hosted library"); }}>
+                  <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key}, {item.style}, {item.meter}</small>
+                </button>)}
+            </div>
+          </section>}
         </aside>
 
         <section className="editor-stage" aria-label="Music editor">
@@ -1279,7 +1266,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
 
           <div className="paper-area">
             <div className="paper-tabs" role="tablist" aria-label="Song work surfaces">
-              {(["chart", "lyrics", "database"] as const).map((name) => (
+              {(["chart", "lyrics"] as const).map((name) => (
                 <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>
               ))}
             </div>
@@ -1369,7 +1356,26 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 </button>
               </div>
               <footer className="paper-footer">
-                <span>{song.bpm} BPM, {song.meter}</span>
+                <div className="paper-tempo-controls">
+                  <label className="paper-bpm-control">
+                    <small>{MIN_BPM}</small>
+                    <input
+                      type="range"
+                      min={MIN_BPM}
+                      max={MAX_BPM}
+                      step="1"
+                      value={song.bpm}
+                      aria-label="BPM on paper"
+                      aria-valuetext={`${song.bpm} beats per minute`}
+                      onChange={(event) => updateSong({ bpm: clampBpm(Number(event.target.value)) })}
+                    />
+                    <small>{MAX_BPM}</small>
+                    <output>{song.bpm} BPM</output>
+                  </label>
+                  <select aria-label="Time signature on paper" value={song.meter} onChange={(event) => updateSong({ meter: normalizeTimeSignature(event.target.value) })}>
+                    {timeSignatureOptions.map((signature) => <option key={signature}>{signature}</option>)}
+                  </select>
+                </div>
                 <details className="paper-instrument-picker">
                   <summary aria-label="Choose centered footer instruments">{song.instruments.length ? song.instruments.join(" / ") : "Reference"}</summary>
                   <div className="paper-instrument-menu">
@@ -1395,23 +1401,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <header><div><strong lang="kar">{song.titleKaren || "Karen title"}</strong><span>{song.titleEnglish || "English title"}</span></div><span>{song.key}</span></header>
               <textarea aria-label="Song lyrics" lang="kar" dir="ltr" value={song.lyrics} onChange={(event) => updateSong({ lyrics: event.target.value })} placeholder="Lyrics" />
             </article>}
-
-            {tab === "database" && <article className="paper database-paper">
-              <header><div><strong>Song library</strong><span>Approved hosted charts</span></div><span>{songs.length} songs</span></header>
-              <input className="library-search" type="search" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
-              <div className="song-list">
-                {filteredSongs.length === 0 ? <div className="empty-state"><strong>No hosted songs yet</strong><span>Save a reviewed, sanitized chart to add it to this private library.</span></div> :
-                  filteredSongs.map((item) => <button key={item.id} onClick={() => { setSong(normalizeSongMetadata(item)); setTab("chart"); setStatus("Loaded from hosted library"); }}>
-                    <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key}, {item.style}, {item.meter}</small>
-                  </button>)}
-              </div>
-            </article>}
           </div>
         </section>
       </div>
 
       <nav className="mobile-toolbar" aria-label="Mobile editor tools">
-        <button onClick={() => setSidebarOpen(true)}>Details</button>
+        <button onClick={() => setSidebarOpen(true)}>Sidebar</button>
         <button onClick={() => setTab("chart")} aria-current={tab === "chart"}>Chart</button>
         <button onClick={() => insertMeasure(Number(song.meter.split("/")[0]) || 4)}>+ Measure</button>
         <button onClick={requestSaveSong}>Save</button>

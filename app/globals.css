@@ -71,39 +71,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .brand strong { font-family: var(--font-display); font-size: 15px; font-weight: 750; letter-spacing: -.01em; }
 .brand span { color: var(--shell-muted); font-size: 12px; margin-top: 4px; }
 .global-actions { gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
-.settings-menu { position: relative; }
-.settings-menu > summary {
-  min-height: 36px;
-  display: inline-flex;
-  align-items: center;
-  list-style: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 7px 12px;
-  background: var(--case-raised);
-  color: var(--shell-text);
-  cursor: pointer;
-  font-weight: 650;
-}
-.settings-menu > summary::-webkit-details-marker { display: none; }
-.settings-menu > summary::after { content: "▾"; margin-left: 7px; color: var(--shell-muted); font-size: 10px; }
-.settings-menu > div {
-  width: 230px;
-  position: absolute;
-  z-index: 55;
-  top: calc(100% + 6px);
-  right: 0;
-  display: grid;
-  gap: 7px;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--case-raised);
-  box-shadow: 0 18px 50px rgb(0 0 0 / .34);
-}
-.settings-menu label { display: flex; align-items: center; gap: 9px; min-height: 38px; color: var(--shell-text); font-size: 12px; font-weight: 700; }
-.settings-menu label input { width: 18px; height: 18px; }
-.settings-menu button { width: 100%; text-align: left; }
 button {
   min-height: 36px;
   border: 1px solid var(--border);
@@ -139,6 +106,62 @@ button.primary:hover { background: #66845a; }
 }
 .sidebar-collapsed .sidebar { opacity: 0; pointer-events: none; transform: translateX(-12px); }
 .sidebar-heading { display: flex; align-items: center; justify-content: space-between; font-weight: 750; }
+.sidebar-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--case);
+}
+.sidebar-tabs button { min-height: 38px; border-color: transparent; background: transparent; }
+.sidebar-tabs button[aria-selected="true"] {
+  border-color: var(--leaf);
+  background: var(--case-soft);
+  box-shadow: inset 0 -2px 0 var(--leaf-bright);
+}
+.sidebar-panel { min-height: 0; display: grid; align-content: start; gap: 14px; }
+.settings-panel > div:first-child { display: grid; gap: 3px; }
+.sidebar .setting-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--case);
+  color: var(--shell-text);
+}
+.sidebar .setting-row input { width: 18px; min-height: 18px; margin-top: 2px; }
+.setting-row span { display: grid; gap: 3px; }
+.setting-row small { color: var(--shell-muted); font-weight: 500; line-height: 1.35; }
+.library-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; }
+.library-heading > div { display: grid; gap: 3px; }
+.library-heading output { color: var(--leaf-bright); font: 800 18px var(--font-mono); }
+.sidebar .library-search {
+  min-height: 42px;
+  margin: 0;
+  border-color: var(--border);
+  background: var(--case);
+  color: var(--shell-text);
+}
+.sidebar .song-list { min-height: 0; overflow: auto; }
+.sidebar .song-list > button {
+  grid-template-columns: 1fr;
+  gap: 3px;
+  border-color: var(--border);
+  background: var(--case);
+  color: var(--shell-text);
+}
+.sidebar .song-list > button:hover { background: var(--case-soft); }
+.sidebar .song-list small { text-align: left; color: var(--shell-muted); }
+.sidebar .empty-state {
+  min-height: 220px;
+  padding: 20px;
+  border: 1px dashed var(--border);
+  color: var(--shell-muted);
+}
 .sidebar label, .instrument-field { display: grid; gap: 6px; color: var(--shell-muted); font-size: 12px; font-weight: 700; }
 .sidebar input, .sidebar select, .instrument-field > button {
   width: 100%;
@@ -569,8 +592,8 @@ button.primary:hover { background: #66845a; }
 }
 .paper-footer {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  align-items: end;
+  grid-template-columns: minmax(210px, 1fr) minmax(150px, 1fr) minmax(100px, 1fr);
+  align-items: center;
   gap: 12px;
   min-height: 42px;
   border-top: 1px solid #aaa79d;
@@ -583,6 +606,36 @@ button.primary:hover { background: #66845a; }
 }
 .chart-paper { position: relative; }
 .paper-footer input, .paper-footer select { text-align: right; font-size: 11px; }
+.paper-tempo-controls {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+.paper-bpm-control {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(48px, 1fr) auto auto;
+  align-items: center;
+  gap: 4px;
+}
+.paper-bpm-control small { color: #6d716c; font: 700 8px var(--font-mono); }
+.paper-bpm-control output {
+  min-width: 48px;
+  color: var(--ink);
+  font: 750 9px var(--font-mono);
+  text-align: right;
+}
+.paper-footer .paper-bpm-control input[type="range"] {
+  width: 100%;
+  min-height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--leaf);
+}
+.paper-tempo-controls > select { width: 55px; font-family: var(--font-mono); font-weight: 750; }
 .paper-instrument-picker { min-width: 0; position: relative; justify-self: center; color: #111; text-align: center; }
 .paper-instrument-picker > summary {
   max-width: 260px;
@@ -624,10 +677,10 @@ button.primary:hover { background: #66845a; }
 }
 .paper-instrument-menu input { width: 16px; height: 16px; }
 
-.lyrics-paper, .database-paper { padding: 24px; }
-.lyrics-paper header, .database-paper header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
-.lyrics-paper header div, .database-paper header div { display: grid; }
-.lyrics-paper header span, .database-paper header span { color: #676b66; font-size: 13px; }
+.lyrics-paper { padding: 24px; }
+.lyrics-paper header { display: flex; justify-content: space-between; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+.lyrics-paper header div { display: grid; }
+.lyrics-paper header span { color: #676b66; font-size: 13px; }
 .lyrics-paper textarea {
   width: 100%;
   min-height: 620px;
@@ -1232,7 +1285,7 @@ button.primary:hover { background: #66845a; }
   .app-header, .sidebar, .command-bar, .paper-tabs, .mobile-toolbar, .karen-keyboard-overlay { display: none !important; }
   .workspace, .editor-stage, .paper-area { display: block; min-height: 0; padding: 0; background: white; }
   .paper { width: 8.5in; height: 11in; min-height: 11in; max-height: 11in; margin: 0; border: 0; box-shadow: none; overflow: hidden; break-after: page; }
-  .lyrics-paper, .database-paper { display: none; }
+  .lyrics-paper { display: none; }
   .print-room-overlay {
     position: absolute;
     inset: 0;

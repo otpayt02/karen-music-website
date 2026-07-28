@@ -4,6 +4,7 @@ import { songs } from "../../../db/schema";
 
 const SONG_GROUPS = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
 const INSTRUMENTS = ["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Guitar", "Drums", "Electric Bass", "Keytar"] as const;
+const TIME_SIGNATURES = ["2/4", "3/4", "4/4", "6/8"] as const;
 const MIN_BPM = 55;
 const MAX_BPM = 155;
 
@@ -14,6 +15,10 @@ function clampBpm(value: number | undefined) {
 function normalizeSongGroup(value: string | undefined) {
   const group = value?.trim().toLowerCase() ?? "";
   return SONG_GROUPS.find((option) => option.toLowerCase() === group) ?? "Praise & Worship";
+}
+
+function normalizeTimeSignature(value: string | undefined) {
+  return TIME_SIGNATURES.find((signature) => signature === value) ?? "4/4";
 }
 
 function normalizeInstruments(value: unknown): string[] {
@@ -49,7 +54,13 @@ type SongPayload = {
 
 function parseSong(row: typeof songs.$inferSelect) {
   const payload = JSON.parse(row.payload);
-  return { ...payload, instruments: normalizeInstruments(payload.instruments), id: row.id, updatedAt: row.updatedAt };
+  return {
+    ...payload,
+    meter: normalizeTimeSignature(payload.meter),
+    instruments: normalizeInstruments(payload.instruments),
+    id: row.id,
+    updatedAt: row.updatedAt,
+  };
 }
 
 const MAX_PAYLOAD_BYTES = 500_000;
@@ -101,6 +112,7 @@ export async function POST(request: Request) {
     const safePayload = {
       ...payload,
       bpm: clampBpm(payload.bpm),
+      meter: normalizeTimeSignature(payload.meter),
       group: normalizeSongGroup(payload.group),
       instruments: normalizeInstruments(payload.instruments),
     };
@@ -116,7 +128,7 @@ export async function POST(request: Request) {
       style: payload.style?.trim() || "Worship",
       songKey: payload.key?.trim() || "C",
       bpm: safePayload.bpm,
-      meter: payload.meter?.trim() || "4/4",
+      meter: safePayload.meter,
       songGroup: safePayload.group,
       payload: serializedPayload,
       updatedAt: new Date().toISOString(),
