@@ -21,6 +21,10 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /paginationItems/);
   assert.match(editor, /DEFAULT_MEASURES_PER_ROW = 8/);
   assert.match(editor, /rowsForSection/);
+  assert.match(editor, /rowGridTemplate/);
+  assert.match(editor, /ChordNotation/);
+  assert.match(editor, /Karen language input/);
+  assert.match(editor, /Choose centered footer instruments/);
   assert.match(editor, /ending=\{measureIndex === section\.measures\.length - 1\}/);
   assert.match(editor, /Lead melody/);
   assert.match(editor, /Keyboard shortcuts/);
@@ -31,6 +35,10 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(styles, /repeat\(var\(--measure-columns, 8\)/);
   assert.match(styles, /\.measure\.ending-bar/);
   assert.match(styles, /\.measure:hover/);
+  assert.match(styles, /--font-mono:\s*"IBM Plex Mono"/);
+  assert.match(styles, /\.section-tone-chorus/);
+  assert.match(styles, /\.karen-keyboard-overlay/);
+  assert.match(styles, /@keyframes karenKeyDrift/);
   assert.match(styles, /@media print/);
   assert.match(hosting, /"d1": "DB"/);
 

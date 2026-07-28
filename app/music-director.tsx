@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Chord = {
   root: string;
@@ -130,6 +130,28 @@ function rowsForSection(section: Section) {
   return rows;
 }
 
+function sectionTone(name: string) {
+  return `section-tone-${name.toLowerCase().replace(/[^a-z]+/g, "-").replace(/^-|-$/g, "")}`;
+}
+
+function measureWidthWeight(measure: Measure) {
+  const longestChord = measure.beats.reduce((longest, beat) => {
+    const value = `${chordLabel(beat.chord)}${beat.bass ? `/${beat.bass}` : ""}`;
+    return Math.max(longest, Array.from(value).length);
+  }, 0);
+  const chordDensity = measure.beats.reduce((total, beat) => total + (beat.chord ? 1 : 0), 0);
+  const complexity = Math.max(0, longestChord - 2) * 0.16
+    + Math.max(0, measure.beats.length - 4) * 0.08
+    + Math.max(0, chordDensity - 2) * 0.035;
+  return Math.min(1.72, 1 + complexity);
+}
+
+function rowGridTemplate(measures: Measure[], capacity: number) {
+  const used = measures.map((measure) => `minmax(0, ${measureWidthWeight(measure).toFixed(2)}fr)`);
+  const empty = Array.from({ length: Math.max(0, capacity - measures.length) }, () => "minmax(0, 1fr)");
+  return [...used, ...empty].join(" ");
+}
+
 function totalLeadSlots(measure: Measure) {
   return measure.beats.reduce((total, _beat, index) => total + (measure.leadSlotsByBeat?.[index] ?? 4), 0);
 }
@@ -242,6 +264,17 @@ function chordLabel(chord: Chord | null) {
   return `${chord.root}${chord.flat ? "♭" : ""}${chord.minor ? "m" : ""}${chord.seven ? "₇" : ""}${quality}`;
 }
 
+function ChordNotation({ chord }: { chord: Chord | null }) {
+  if (!chord) return null;
+  return <>
+    <span className="chord-root">{chord.root}</span>
+    {chord.flat && <span className="chord-flat">♭</span>}
+    {chord.minor && <span className="chord-minor">m</span>}
+    {chord.seven && <span className="chord-seven">₇</span>}
+    {chord.quality && <span className="chord-quality">{chord.quality === "triangle7" ? "Δ7" : chord.quality}</span>}
+  </>;
+}
+
 export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: Viewer }) {
   const [song, setSong] = useState<Song>(() => demoSong());
   const [tab, setTab] = useState<"chart" | "lyrics" | "database">("chart");
@@ -256,6 +289,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [printPage, setPrintPage] = useState(1);
   const [instrumentOpen, setInstrumentOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [karenInputEnabled, setKarenInputEnabled] = useState(false);
   const [status, setStatus] = useState(
     viewer.authenticated ? "Demo chart, not yet saved" : "Local synthetic demo; sign in to use the private library"
   );
@@ -273,6 +307,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [saveReviewConfirmed, setSaveReviewConfirmed] = useState(false);
   const [karenKeyboardOpen, setKarenKeyboardOpen] = useState(false);
   const [karenTargetLabel, setKarenTargetLabel] = useState("Karen text");
+  const [karenPreview, setKarenPreview] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const printButton = useRef<HTMLButtonElement>(null);
   const editorTarget = useRef<HTMLElement>(null);
@@ -551,7 +586,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   function openKarenKeyboard(target: HTMLInputElement | HTMLTextAreaElement) {
     if (karenSuppressOpen.current) return;
     karenTarget.current = target;
-    setKarenTargetLabel(target.getAttribute("aria-label") || "Karen text");
+    setKarenTargetLabel(target.getAttribute("aria-label") || target.labels?.[0]?.textContent?.trim() || target.placeholder || "Karen text");
+    setKarenPreview(target.value);
     setKarenKeyboardOpen(true);
   }
 
@@ -566,9 +602,19 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   }
 
   function setKarenTargetValue(target: HTMLInputElement | HTMLTextAreaElement, value: string, caret: number) {
+    setKarenPreview(value);
     const field = target.dataset.karenField;
     if (field === "titleKaren") updateSong({ titleKaren: value });
+    if (field === "style") updateSong({ style: value });
+    if (field === "group") updateSong({ group: value });
     if (field === "lyrics") updateSong({ lyrics: value });
+    if (field === "search") setSearch(value);
+    const prototype = target instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
+    const setter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
+    if (!field && setter) {
+      setter.call(target, value);
+      target.dispatchEvent(new Event("input", { bubbles: true }));
+    }
     requestAnimationFrame(() => {
       target.focus();
       target.setSelectionRange(caret, caret);
@@ -609,6 +655,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
 
   function handleKarenKeyboardKey(event: KeyboardEvent<HTMLElement>) {
     const lower = event.key.toLowerCase();
+    if (event.key === "Enter") {
+      event.preventDefault();
+      setStatus(`${karenTargetLabel} updated`);
+      closeKarenKeyboard();
+      return;
+    }
     if (event.key === "Escape") { event.preventDefault(); closeKarenKeyboard(); return; }
     if (event.key === "Backspace") { event.preventDefault(); karenBackspace(); return; }
     if (event.ctrlKey && lower === "z") { event.preventDefault(); restoreKarenHistory(karenUndoHistory, karenRedoHistory); return; }
@@ -653,6 +705,32 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       const current = section.rowMeasureCounts[rowIndex] ?? section.measuresPerRow ?? DEFAULT_MEASURES_PER_ROW;
       section.rowMeasureCounts[rowIndex] = clampMeasuresPerRow(current + delta);
     }, "Measures per row changed");
+  }
+
+  function togglePreMeasure(sectionIndex: number) {
+    const hadPreMeasure = Boolean(song.sections[sectionIndex]?.preMeasure);
+    commitSong((next) => {
+      const section = next.sections[sectionIndex];
+      section.preMeasure = section.preMeasure ? null : createMeasure(1);
+      if (section.preMeasure) {
+        section.preMeasure.leadSlotsByBeat = [6];
+      }
+    }, hadPreMeasure ? "Pre-measure removed" : "Pre-measure added");
+    setSelected(hadPreMeasure
+      ? { section: sectionIndex, measure: 0, beat: 0, pre: false }
+      : { section: sectionIndex, measure: 0, beat: 0, pre: true });
+    requestAnimationFrame(() => editorTarget.current?.focus());
+  }
+
+  function handleTextFocus(event: FocusEvent<HTMLElement>) {
+    if (!karenInputEnabled) return;
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+    const isTextBox = target instanceof HTMLTextAreaElement
+      || !target.type
+      || ["text", "search"].includes(target.type);
+    if (!isTextBox || target.dataset.karenExempt === "true") return;
+    openKarenKeyboard(target);
   }
 
   function moveRight(createAtEnd = false) {
@@ -1054,7 +1132,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const activeCueRange = activeCueRanges[activeCueSlot];
 
   return (
-    <main className="app-shell" onKeyDownCapture={handleEditorKey}>
+    <main className="app-shell" onKeyDownCapture={handleEditorKey} onFocusCapture={handleTextFocus}>
       <header className="app-header">
         <div className="brand">
           <button className="icon-button" onClick={() => setSidebarOpen((value) => !value)} aria-label="Toggle song details">☰</button>
@@ -1069,7 +1147,23 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <button onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }}>Import</button>
           <button onClick={exportSong}>Export</button>
           <button ref={printButton} onClick={openPrintRoom}>Print</button>
-          <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle color theme">{theme === "dark" ? "Light" : "Dark"}</button>
+          <details className="settings-menu">
+            <summary>Settings</summary>
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={karenInputEnabled}
+                  onChange={(event) => {
+                    setKarenInputEnabled(event.target.checked);
+                    if (!event.target.checked) setKarenKeyboardOpen(false);
+                  }}
+                />
+                Karen language input
+              </label>
+              <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle color theme">{theme === "dark" ? "Light theme" : "Dark theme"}</button>
+            </div>
+          </details>
           <input ref={fileInput} type="file" accept=".json,application/json" onChange={importSong} hidden />
         </nav>
       </header>
@@ -1080,17 +1174,17 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <span>Song details</span>
             <button className="icon-button" onClick={() => setSidebarOpen(false)} aria-label="Close song details">×</button>
           </div>
-          <label>Karen title<input aria-label="Karen title" lang="kar" dir="ltr" data-karen-field="titleKaren" value={song.titleKaren} onFocus={(event) => openKarenKeyboard(event.currentTarget)} onChange={(event) => updateSong({ titleKaren: event.target.value })} /></label>
-          <label>English title<input value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></label>
+          <label>Karen title<input aria-label="Karen title" lang="kar" dir="ltr" data-karen-field="titleKaren" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /></label>
+          <label>English title<span className="parenthesized-field"><span aria-hidden="true">(</span><input data-karen-exempt="true" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span></label>
           <div className="field-pair">
             <label>Key<select value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select></label>
-            <label>Style<input value={song.style} onChange={(event) => updateSong({ style: event.target.value })} /></label>
+            <label>Style<input data-karen-field="style" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} /></label>
           </div>
           <div className="field-pair">
             <label>BPM<input type="number" value={song.bpm} onChange={(event) => updateSong({ bpm: Number(event.target.value) })} /></label>
             <label>Meter<select value={song.meter} onChange={(event) => updateSong({ meter: event.target.value })}>{["4/4", "3/4", "5/5", "6/8"].map((meter) => <option key={meter}>{meter}</option>)}</select></label>
           </div>
-          <label>Group<input value={song.group} onChange={(event) => updateSong({ group: event.target.value })} /></label>
+          <label>Group<input data-karen-field="group" value={song.group} onChange={(event) => updateSong({ group: event.target.value })} /></label>
           <div className="instrument-field">
             <span>Print instruments</span>
             <button onClick={() => setInstrumentOpen((value) => !value)} aria-expanded={instrumentOpen}>
@@ -1149,8 +1243,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               style={{ "--paper-scale": zoom / 100 } as React.CSSProperties}
             >
               <header className="paper-header">
-                <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onFocus={(event) => openKarenKeyboard(event.currentTarget)} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><input aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></div>
-                <input aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
+                <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><span className="parenthesized-field paper-english-title"><span aria-hidden="true">(</span><input data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span></div>
+                <input data-karen-field="style" aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
                 <select aria-label="Song key on paper" value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select>
               </header>
               <div className="chart-body">
@@ -1162,16 +1256,11 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                   >
                     +
                   </button>
-                  <section className="chart-section">
+                  <section className={`chart-section ${sectionTone(section.name)}`} data-section-type={section.name}>
                     <header className="section-title">
                       <button
                         className={`premeasure-toggle ${section.preMeasure ? "active" : ""}`}
-                        onClick={() => {
-                          commitSong((next) => {
-                            const target = next.sections[sectionIndex];
-                            target.preMeasure = target.preMeasure ? null : createMeasure(1);
-                          }, section.preMeasure ? "Pre-measure removed" : "Pre-measure added");
-                        }}
+                        onClick={() => togglePreMeasure(sectionIndex)}
                         aria-label={`Toggle one-beat pre-measure for ${section.name}`}
                         aria-pressed={Boolean(section.preMeasure)}
                       />
@@ -1186,7 +1275,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                         onBeat={(beat) => setSelected({ section: sectionIndex, measure: 0, beat, pre: true })}
                         pre
                       />}
-                      <div className="measure-row" style={{ "--measure-columns": row.cap } as React.CSSProperties}>
+                      <div className="measure-row" style={{ gridTemplateColumns: rowGridTemplate(row.measures, row.cap) }}>
                         {row.measures.map((measure, rowOffset) => {
                           const measureIndex = row.start + rowOffset;
                           return <MeasureView
@@ -1208,9 +1297,9 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                         })}
                       </div>
                       <div className="row-density" aria-label={`Measures in row: ${row.cap}`}>
-                        <button onClick={() => changeRowCap(sectionIndex, row.rowIndex, 1)} aria-label="More measures in this row">+</button>
+                        <button onClick={() => changeRowCap(sectionIndex, row.rowIndex, 1)} aria-label="More measures in this row">▲</button>
                         <output>{row.cap}</output>
-                        <button onClick={() => changeRowCap(sectionIndex, row.rowIndex, -1)} aria-label="Fewer measures in this row">−</button>
+                        <button onClick={() => changeRowCap(sectionIndex, row.rowIndex, -1)} aria-label="Fewer measures in this row">▼</button>
                       </div>
                     </div>)}
                     <button className="add-measure" onClick={() => {
@@ -1232,8 +1321,24 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               </div>
               <footer className="paper-footer">
                 <span>{song.bpm} BPM, {song.meter}</span>
-                <span>{song.instruments[0] || "Reference"}</span>
-                <input aria-label="Group on paper" placeholder="Group" value={song.group} onChange={(event) => updateSong({ group: event.target.value })} />
+                <details className="paper-instrument-picker">
+                  <summary aria-label="Choose centered footer instruments">{song.instruments.length ? song.instruments.join(" / ") : "Reference"}</summary>
+                  <div className="paper-instrument-menu">
+                    {instrumentOptions.map((instrument) => <label key={instrument}>
+                      <input
+                        type="checkbox"
+                        checked={song.instruments.includes(instrument)}
+                        onChange={() => updateSong({
+                          instruments: song.instruments.includes(instrument)
+                            ? song.instruments.filter((item) => item !== instrument)
+                            : [...song.instruments, instrument],
+                        })}
+                      />
+                      {instrument}
+                    </label>)}
+                  </div>
+                </details>
+                <input data-karen-field="group" aria-label="Group on paper" placeholder="Group" value={song.group} onChange={(event) => updateSong({ group: event.target.value })} />
               </footer>
             </article>}
 
@@ -1442,17 +1547,26 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
         </section>
       </div>}
 
-      {karenKeyboardOpen && <aside className="karen-keyboard-tray" role="dialog" aria-modal="false" aria-label="Karen keyboard" onKeyDownCapture={handleKarenKeyboardKey}>
+      {karenKeyboardOpen && <div className="karen-keyboard-overlay" role="presentation"><aside className="karen-keyboard-tray" role="dialog" aria-modal="true" aria-label="Karen keyboard">
         <header>
           <div><span className="eyebrow">Typing into</span><strong>{karenTargetLabel}</strong></div>
-          <span className="karen-hotkey-note">A–Z / Shift+A–Z</span>
+          <span className="karen-hotkey-note">Enter applies · Esc closes · A–Z maps</span>
           <button className="icon-button" onClick={closeKarenKeyboard} aria-label="Close Karen keyboard">×</button>
         </header>
+        <div className="karen-focus-preview" lang="kar">{karenPreview || "…"}</div>
         <div className="karen-keyboard-groups">
           {KAREN_GROUPS.map((group) => <section key={group.label} className={`karen-keyboard-group karen-${group.label.toLowerCase()}`}>
             <span>{group.label}</span>
             <div>
-              {group.keys.map((character, index) => <button key={`${group.label}-${index}`} lang="kar" aria-label={`Karen key ${character}`} onMouseDown={(event) => event.preventDefault()} onClick={() => insertKarenCharacter(character)}>{character}</button>)}
+              {group.keys.map((character, index) => <button
+                key={`${group.label}-${index}`}
+                className="floating-key"
+                style={{ "--key-index": index } as React.CSSProperties}
+                lang="kar"
+                aria-label={`Karen key ${character}`}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertKarenCharacter(character)}
+              >{character}</button>)}
             </div>
           </section>)}
           <section className="karen-keyboard-group karen-commands">
@@ -1461,11 +1575,11 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <button onClick={() => restoreKarenHistory(karenUndoHistory, karenRedoHistory)}>Undo</button>
               <button onClick={() => restoreKarenHistory(karenRedoHistory, karenUndoHistory)}>Redo</button>
               <button onClick={karenBackspace} aria-label="Karen keyboard backspace">⌫</button>
-              <button onClick={closeKarenKeyboard}>Esc</button>
+              <button onClick={() => { setStatus(`${karenTargetLabel} updated`); closeKarenKeyboard(); }}>Enter</button>
             </div>
           </section>
         </div>
-      </aside>}
+      </aside></div>}
 
       {shortcutsOpen && <aside className="shortcut-panel" aria-label="Keyboard shortcuts">
         <header><div><strong>Keyboard shortcuts</strong><span>Legacy chord-entry contract</span></div><button className="icon-button" onClick={() => setShortcutsOpen(false)} aria-label="Close shortcuts">×</button></header>
@@ -1592,7 +1706,7 @@ function MeasureView({
         data-cue-start={cueStarts[index]?.join(",") || undefined}
         data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
-        <span className={`chord ${beat.circle ? "circled" : ""}`}>{chordLabel(beat.chord)}</span>
+        <span className={`chord ${beat.circle ? "circled" : ""}`}><ChordNotation chord={beat.chord} /></span>
         {(beat.dot || beat.xMarks || beat.manualUnderline || beat.bass) && <span className="rhythm-marks">
           {beat.dot && <span className="push-dot">•</span>}
           {Boolean(beat.xMarks) && <span>{"x".repeat(beat.xMarks || 0)}</span>}
@@ -1623,8 +1737,8 @@ function PrintSheet({
           ? <input aria-label="Karen title in print preview" lang="kar" value={song.titleKaren} onChange={(event) => onUpdate?.({ titleKaren: event.target.value })} />
           : <strong lang="kar">{song.titleKaren}</strong>}
         {editable
-          ? <input aria-label="English title in print preview" value={song.titleEnglish} onChange={(event) => onUpdate?.({ titleEnglish: event.target.value })} />
-          : <span>{song.titleEnglish}</span>}
+          ? <span className="parenthesized-field"><span aria-hidden="true">(</span><input data-karen-exempt="true" aria-label="English title in print preview" value={song.titleEnglish} onChange={(event) => onUpdate?.({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span>
+          : <span>({song.titleEnglish})</span>}
       </div>
       {editable
         ? <input aria-label="Song style in print preview" value={song.style} onChange={(event) => onUpdate?.({ style: event.target.value })} />
@@ -1633,11 +1747,11 @@ function PrintSheet({
     </header>
 
     <div className="print-sheet-body">
-      {song.sections.map((section, sectionIndex) => <section className="print-section" key={section.id}>
+      {song.sections.map((section, sectionIndex) => <section className={`print-section ${sectionTone(section.name)}`} data-section-type={section.name} key={section.id}>
         <h3>{section.name}</h3>
         {rowsForSection(section).map((row) => <div className="print-row-wrap" key={`${section.id}-print-row-${row.rowIndex}`}>
           {row.rowIndex === 0 && section.preMeasure && <PrintMeasure measure={section.preMeasure} pre />}
-          <div className="print-measure-row" style={{ "--measure-columns": row.cap } as React.CSSProperties}>
+          <div className="print-measure-row" style={{ gridTemplateColumns: rowGridTemplate(row.measures, row.cap) }}>
             {row.measures.map((measure, rowOffset) => {
               const measureIndex = row.start + rowOffset;
               return <PrintMeasure
@@ -1691,7 +1805,7 @@ function PrintMeasure({
         data-cue-start={cueStarts[index]?.join(",") || undefined}
         data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
-        <strong className={beat.circle ? "circled" : ""}>{chordLabel(beat.chord)}</strong>
+        <strong className={beat.circle ? "circled" : ""}><ChordNotation chord={beat.chord} /></strong>
         {(beat.dot || beat.xMarks || beat.manualUnderline || beat.bass) && <small>{beat.dot ? "•" : ""}{"x".repeat(beat.xMarks || 0)}</small>}
         {beat.bass && <em>{beat.bass}</em>}
       </span>)}
