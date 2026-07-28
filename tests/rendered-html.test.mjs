@@ -31,6 +31,7 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /Karen title keyboard/);
   assert.match(editor, /target\.dataset\.karenField !== "titleKaren"/);
   assert.match(editor, /Choose centered footer instruments/);
+  assert.match(editor, /instrumentOptions = \["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Guitar", "Drums", "Electric Bass", "Keytar"\]/);
   assert.match(editor, /ending=\{measureIndex === section\.measures\.length - 1\}/);
   assert.match(editor, /Lead melody/);
   assert.match(editor, /Keyboard shortcuts/);
@@ -48,6 +49,7 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(styles, /@media print/);
   assert.match(hosting, /"d1": "DB"/);
   assert.match(songsRoute, /SONG_GROUPS = \["Praise & Worship", "Kids", "Youth", "Choir", "Solo"\]/);
+  assert.match(songsRoute, /INSTRUMENTS = \["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Guitar", "Drums", "Electric Bass", "Keytar"\]/);
   assert.match(songsRoute, /MIN_BPM = 55/);
   assert.match(songsRoute, /MAX_BPM = 155/);
   assert.match(songsRoute, /bpm: safePayload\.bpm/);

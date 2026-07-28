@@ -65,7 +65,7 @@ type Song = {
   updatedAt?: string;
 };
 
-const instrumentOptions = ["Piano 1", "Piano 2", "Acoustic Guitar", "Bass", "Drums", "Strings"];
+const instrumentOptions = ["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Guitar", "Drums", "Electric Bass", "Keytar"] as const;
 const cueAbbreviationOptions = ["P1", "P2", "AG", "EG", "B", "D", "STR"];
 const sectionOptions = ["INTRO", "VERSE", "PRE-CHORUS", "CHORUS", "BRIDGE", "SOLO", "ENDING"];
 const songGroupOptions = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
@@ -117,8 +117,25 @@ function normalizeSongGroup(value: string | undefined) {
   return "Praise & Worship";
 }
 
+function normalizeInstruments(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const normalized = value.flatMap((item) => {
+    if (typeof item !== "string") return [];
+    const name = item.trim();
+    if (name.toLowerCase() === "bass") return ["Electric Bass"];
+    const option = instrumentOptions.find((candidate) => candidate.toLowerCase() === name.toLowerCase());
+    return option ? [option] : [];
+  });
+  return [...new Set(normalized)];
+}
+
 function normalizeSongMetadata(song: Song): Song {
-  return { ...song, bpm: clampBpm(song.bpm), group: normalizeSongGroup(song.group) };
+  return {
+    ...song,
+    bpm: clampBpm(song.bpm),
+    group: normalizeSongGroup(song.group),
+    instruments: normalizeInstruments(song.instruments),
+  };
 }
 
 function paginationItems(current: number, total: number): Array<number | "ellipsis"> {
@@ -1088,7 +1105,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           sourceKind: "imported-json",
           reviewState: "draft",
           instruments: Array.isArray(imported.instruments)
-            ? imported.instruments.filter((instrument): instrument is string => typeof instrument === "string").slice(0, 12)
+            ? normalizeInstruments(imported.instruments)
             : fallback.instruments,
           sections: imported.sections.filter((section): section is Section =>
             Boolean(section && typeof section === "object" && Array.isArray((section as Section).measures))

@@ -3,6 +3,7 @@ import { getDb } from "../../../db";
 import { songs } from "../../../db/schema";
 
 const SONG_GROUPS = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
+const INSTRUMENTS = ["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Guitar", "Drums", "Electric Bass", "Keytar"] as const;
 const MIN_BPM = 55;
 const MAX_BPM = 155;
 
@@ -15,6 +16,18 @@ function normalizeSongGroup(value: string | undefined) {
   return SONG_GROUPS.find((option) => option.toLowerCase() === group) ?? "Praise & Worship";
 }
 
+function normalizeInstruments(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const normalized = value.flatMap((item) => {
+    if (typeof item !== "string") return [];
+    const name = item.trim();
+    if (name.toLowerCase() === "bass") return ["Electric Bass"];
+    const option = INSTRUMENTS.find((candidate) => candidate.toLowerCase() === name.toLowerCase());
+    return option ? [option] : [];
+  });
+  return [...new Set(normalized)];
+}
+
 type SongPayload = {
   id?: number;
   titleKaren?: string;
@@ -24,6 +37,7 @@ type SongPayload = {
   bpm?: number;
   meter?: string;
   group?: string;
+  instruments?: unknown;
   sections?: unknown[];
   sourceKind?: string;
   reviewState?: string;
@@ -34,7 +48,8 @@ type SongPayload = {
 };
 
 function parseSong(row: typeof songs.$inferSelect) {
-  return { ...JSON.parse(row.payload), id: row.id, updatedAt: row.updatedAt };
+  const payload = JSON.parse(row.payload);
+  return { ...payload, instruments: normalizeInstruments(payload.instruments), id: row.id, updatedAt: row.updatedAt };
 }
 
 const MAX_PAYLOAD_BYTES = 500_000;
@@ -87,6 +102,7 @@ export async function POST(request: Request) {
       ...payload,
       bpm: clampBpm(payload.bpm),
       group: normalizeSongGroup(payload.group),
+      instruments: normalizeInstruments(payload.instruments),
     };
     delete safePayload.saveApproval;
     const serializedPayload = JSON.stringify({ ...safePayload, id: undefined });
