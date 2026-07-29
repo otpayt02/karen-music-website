@@ -55,14 +55,56 @@ test.describe("WYSIWYG print paper", () => {
   test("builds print copies from the same paper for instruments and Reference", async ({ page }) => {
     await page.evaluate(() => {
       document.querySelector("#instr-sidebar .instr-choice[data-value='Piano 1']").classList.add("selected");
+      document.querySelector("#instr-sidebar .instr-choice[data-value='Drums']").classList.add("selected");
       syncAllInstrFields();
       buildPrintBatch();
     });
-    await expect(page.locator("#print-batch .chart-container")).toHaveCount(2);
-    await expect(page.locator("#print-batch .paper-header")).toHaveCount(2);
+    await expect(page.locator("#print-batch > .print-sheet")).toHaveCount(3);
+    await expect(page.locator("#print-batch .chart-container")).toHaveCount(3);
+    await expect(page.locator("#print-batch .paper-header")).toHaveCount(3);
     await expect(page.locator("#print-batch .paper-instrument-print-value").nth(0)).toHaveText("Piano 1");
-    await expect(page.locator("#print-batch .paper-instrument-print-value").nth(1)).toHaveText("Reference");
+    await expect(page.locator("#print-batch .paper-instrument-print-value").nth(1)).toHaveText("Drums");
+    await expect(page.locator("#print-batch .paper-instrument-print-value").nth(2)).toHaveText("Reference");
     await expect(page.locator("#print-batch input, #print-batch select, #print-batch details")).toHaveCount(0);
+
+    const layout = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll("#print-batch > .print-sheet")).map(sheet => {
+        const chart = sheet.querySelector(".chart-container");
+        const footer = sheet.querySelector(".paper-instrument-print-value");
+        const sheetRect = sheet.getBoundingClientRect();
+        const chartRect = chart.getBoundingClientRect();
+        const footerRect = footer.getBoundingClientRect();
+        return {
+          name: sheet.dataset.copyName,
+          chartInsideSheet: chartRect.top >= sheetRect.top && chartRect.bottom <= sheetRect.bottom,
+          footerInsideSheet: footerRect.top >= sheetRect.top && footerRect.bottom <= sheetRect.bottom,
+          footerCentered: Math.abs(
+            (footerRect.left + footerRect.width / 2) - (sheetRect.left + sheetRect.width / 2)
+          ) < 2,
+          overflow: getComputedStyle(sheet).overflow
+        };
+      });
+    });
+
+    expect(layout).toEqual([
+      { name: "Piano 1", chartInsideSheet: true, footerInsideSheet: true, footerCentered: true, overflow: "hidden" },
+      { name: "Drums", chartInsideSheet: true, footerInsideSheet: true, footerCentered: true, overflow: "hidden" },
+      { name: "Reference", chartInsideSheet: true, footerInsideSheet: true, footerCentered: true, overflow: "hidden" }
+    ]);
+  });
+
+  test("prints one Reference page when no instruments are selected", async ({ page }) => {
+    await page.evaluate(() => {
+      document.querySelectorAll("#instr-sidebar .instr-choice").forEach(choice => {
+        choice.classList.remove("selected");
+      });
+      syncAllInstrFields();
+      buildPrintBatch();
+    });
+
+    await expect(page.locator("#print-batch > .print-sheet")).toHaveCount(1);
+    await expect(page.locator("#print-batch > .print-sheet")).toHaveAttribute("data-copy-kind", "reference");
+    await expect(page.locator("#print-batch .paper-instrument-print-value")).toHaveText("Reference");
   });
 
   test("paper header becomes sticky naturally at the viewport edge", async ({ page }) => {

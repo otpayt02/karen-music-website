@@ -80,6 +80,68 @@ test.describe("measure and beat insertion shortcuts", () => {
     expect(data.nextRoots[0]).toBe("G");
   });
 
+  test("Ctrl+1 through Ctrl+6 insert exact-length measures immediately to the right", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    for (let beatCount = 1; beatCount <= 6; beatCount += 1) {
+      await page.evaluate(() => {
+        const first = createMeasure(4);
+        first.beats[0].chordState = { root: "C", flat: false, minor: false, triangle: false, seven: false };
+        const later = createMeasure(4);
+        later.beats[0].chordState = { root: "G", flat: false, minor: false, triangle: false, seven: false };
+        state.sections = [{ type: "Verse", preMeasure: null, measures: [first, later] }];
+        state.currentSectionIdx = 0;
+        state.currentMeasureIdx = 0;
+        state.currentBeatIdx = 2;
+        renderChart();
+        document.getElementById("focus-trap")?.focus();
+      });
+
+      await page.keyboard.press(`Control+${beatCount}`);
+
+      const data = await page.evaluate(() => ({
+        currentMeasureIdx: state.currentMeasureIdx,
+        currentBeatIdx: state.currentBeatIdx,
+        lengths: state.sections[0].measures.map(measure => measure.beats.length),
+        laterRoot: state.sections[0].measures[2].beats[0].chordState?.root || ""
+      }));
+
+      expect(data.currentMeasureIdx).toBe(1);
+      expect(data.currentBeatIdx).toBe(0);
+      expect(data.lengths).toEqual([4, beatCount, 4]);
+      expect(data.laterRoot).toBe("G");
+    }
+  });
+
+  test("Backspace removes an empty pre-measure and returns to the section's first beat", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    await page.evaluate(() => {
+      state.sections = [{
+        type: "Verse",
+        preMeasure: createPreMeasure(),
+        measures: [createMeasure(4)]
+      }];
+      state.currentSectionIdx = 0;
+      state.currentMeasureIdx = PRE_MEASURE_INDEX;
+      state.currentBeatIdx = 0;
+      renderChart();
+      document.getElementById("focus-trap")?.focus();
+    });
+
+    await page.keyboard.press("Backspace");
+
+    const data = await page.evaluate(() => ({
+      preMeasure: state.sections[0].preMeasure,
+      currentMeasureIdx: state.currentMeasureIdx,
+      currentBeatIdx: state.currentBeatIdx
+    }));
+
+    expect(data.preMeasure).toBeNull();
+    expect(data.currentMeasureIdx).toBe(0);
+    expect(data.currentBeatIdx).toBe(0);
+  });
+
   test("Space moves forward without changing measure contents", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
 

@@ -421,7 +421,16 @@
       btn.textContent = 'Saved';
       setTimeout(() => { btn.textContent = original; }, 1200);
     });
-    overlay.querySelector('#preview-print-now').addEventListener('click', () => { closePreview(); setTimeout(() => window.print(), 100); });
+    overlay.querySelector('#preview-print-now').addEventListener('click', () => {
+      closePreview();
+      setTimeout(() => {
+        if (typeof window.printInstrumentPackets === 'function') {
+          window.printInstrumentPackets();
+        } else {
+          window.print();
+        }
+      }, 100);
+    });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
 
     // Render template buttons inside toolbar
@@ -904,9 +913,12 @@
   function preparePrintOutput() {
     applyPrintSpecToLegacySheets();
 
-    // Instrument packets intentionally use #print-batch. Plain Ctrl+P does not,
-    // so build the same spec-compliant document used by Preview Print and make
-    // it the only printed content for the browser/desktop print dialog.
+    // Every print entry point must use the same per-instrument packet. This
+    // includes Print, Preview Print, and the browser/desktop Ctrl+P command.
+    if (!hasInstrumentPrintBatch() && typeof window.buildPrintBatch === 'function') {
+      window.buildPrintBatch();
+    }
+
     if (hasInstrumentPrintBatch()) {
       document.body.classList.remove('pp-print-host-active');
       return;

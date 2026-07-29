@@ -22,7 +22,7 @@ TEXT_CHART_EXTENSIONS = {".txt", ".cho", ".crd", ".pro", ".chordpro"}
 
 
 IMPORT_CRITERIA = {
-    "version": "2026-07-16",
+    "version": "2026-07-19",
     "accepted_sources": [
         {
             "kind": "editor-json",
@@ -60,6 +60,7 @@ IMPORT_CRITERIA = {
         "section order and labels",
         "measure order and bar lines",
         "beat positions",
+        "two chords without visible beat underlines default to beats 1 and 3 in 4/4, or beats 1 and 4 in 6/8",
         "chord roots, accidentals, qualities, sevenths, and slash bass notes",
         "circle marks",
         "dot marks",
@@ -118,8 +119,9 @@ VISION_SCHEMA = {
                         "items": {
                             "type": "object",
                             "additionalProperties": False,
-                            "required": ["beats"],
+                            "required": ["beats", "beat_underlines_visible"],
                             "properties": {
+                                "beat_underlines_visible": {"type": "boolean"},
                                 "beats": {
                                     "type": "array",
                                     "items": {
@@ -148,7 +150,10 @@ VISION_SCHEMA = {
 SYSTEM_PROMPT = """You transcribe a photographed or PDF chord chart into structured data for a music director.
 Inspect every page from top-left to bottom-right and preserve page order, visible section order, measure order, bar lines, beat positions, chord spellings, slash bass notes, circle marks, dot marks, and x marks.
 Actively inspect headers, margins, footers, and handwritten annotations for S'gaw Karen title, English title, category, current key, original key, style, tempo/BPM, time signature, instruments, group, and notes. Populate every schema field visibly supported by the source; use an empty string or empty list when a field is not present.
-Use one beat object per visible beat position. Use an empty chord when the chart shows no new chord on that beat. Preserve 3/4, 4/4, or 6/8 exactly when shown.
+Treat the visible vertical grid columns as fixed beat slots. For each measure, return exactly the time-signature numerator's number of beat objects when that grid is visible: 3 for 3/4, 4 for 4/4, and 6 for 6/8. Read left-to-right by column center; do not compact populated beats left or right and do not create an extra beat for an annotation. Use an empty chord for every visible column with no new chord.
+Set beat_underlines_visible=true only when drawn beat underlines, beat marks, or a visible grid establish exact chord positions in that measure. When a measure has exactly two chords and beat_underlines_visible=false, split the measure evenly by placing the first chord on beat 1 and the second chord at the start of the latter half: beat 3 in 4/4 or beat 4 in 6/8.
+An x or group of x strokes belongs to the grid column where it is drawn and does not consume or insert another beat. A hand-drawn ellipse around a chord sets circle=true on that same beat. A filled dot beside a chord sets dot=true on that same beat. Keep those marks attached to their chord even when the mark crosses a grid line.
+Preserve 3/4, 4/4, or 6/8 exactly when shown.
 Never invent unreadable content. Add a concise, location-specific warning for cropped, faint, ambiguous, or missing content and lower confidence accordingly.
 Section names should be concise, such as Intro, Verse, Pre-Chorus, Chorus, Bridge, Solo, or Ending.
 Return only the requested structured output."""
@@ -267,6 +272,61 @@ def _vision_beat_to_editor(raw_beat):
     }
 
 
+def _raw_vision_beat_is_blank(raw_beat):
+    return (
+        not str(raw_beat.get("chord") or "").strip()
+        and not str(raw_beat.get("bass") or "").strip()
+        and not bool(raw_beat.get("circle"))
+        and not bool(raw_beat.get("dot"))
+        and int(raw_beat.get("x_marks") or 0) == 0
+    )
+
+
+def _empty_raw_vision_beat():
+    return {"chord": "", "bass": "", "circle": False, "dot": False, "x_marks": 0}
+
+
+def _spread_unlined_two_chord_measure(raw_measure, beats_per_measure):
+    """Split two floating chord events evenly when no beat underlines establish positions."""
+    raw_beats = list(raw_measure.get("beats", []) or [])
+    underlines_visible = raw_measure.get("beat_underlines_visible")
+    positions_are_implicit = underlines_visible is False or (
+        underlines_visible is None and len(raw_beats) == 2
+    )
+    if not positions_are_implicit:
+        return raw_beats, False
+
+    chord_events = [
+        beat for beat in raw_beats
+        if str(beat.get("chord") or "").strip() or str(beat.get("bass") or "").strip()
+    ]
+    non_chord_events = [
+        beat for beat in raw_beats
+        if not _raw_vision_beat_is_blank(beat)
+        and not (str(beat.get("chord") or "").strip() or str(beat.get("bass") or "").strip())
+    ]
+    if len(chord_events) != 2 or non_chord_events:
+        return raw_beats, False
+
+    spread = [_empty_raw_vision_beat() for _ in range(beats_per_measure)]
+    spread[0] = chord_events[0]
+    spread[beats_per_measure // 2] = chord_events[1]
+    return spread, True
+
+
+def _fit_vision_measure_beats(raw_beats, beats_per_measure):
+    """Fit only unambiguous surplus blanks; preserve every non-empty annotation."""
+    fitted = list(raw_beats or [])
+    removed_blank_count = 0
+    while len(fitted) > beats_per_measure:
+        blank_index = next((index for index, beat in enumerate(fitted) if _raw_vision_beat_is_blank(beat)), None)
+        if blank_index is None:
+            break
+        fitted.pop(blank_index)
+        removed_blank_count += 1
+    return fitted, removed_blank_count
+
+
 def _string_list(value):
     if isinstance(value, list):
         return [str(item).strip() for item in value if str(item).strip()]
@@ -320,19 +380,42 @@ def normalize_vision_song(extracted, provider="vision"):
     raw_sections = extracted.get("sections", []) if isinstance(extracted, dict) else []
     beats_per_measure = _coerce_beats_per_measure(extracted.get("time_signature"), raw_sections)
     sections = []
-    for raw_section in raw_sections:
+    normalization_warnings = []
+    for section_index, raw_section in enumerate(raw_sections):
         measures = []
-        for raw_measure in raw_section.get("measures", []):
-            beats = [_vision_beat_to_editor(raw_beat) for raw_beat in raw_measure.get("beats", [])]
+        for measure_index, raw_measure in enumerate(raw_section.get("measures", [])):
+            raw_beats, used_unlined_two_chord_default = _spread_unlined_two_chord_measure(
+                raw_measure, beats_per_measure
+            )
+            fitted_raw_beats, removed_blank_count = _fit_vision_measure_beats(raw_beats, beats_per_measure)
+            beats = [_vision_beat_to_editor(raw_beat) for raw_beat in fitted_raw_beats]
             while len(beats) < beats_per_measure:
                 beats.append(_empty_editor_beat())
+            if used_unlined_two_chord_default:
+                normalization_warnings.append(
+                    f"Section {section_index + 1}, measure {measure_index + 1}: placed two chords "
+                    f"without visible beat underlines on beats 1 and {beats_per_measure // 2 + 1}; "
+                    "review the default placement."
+                )
+            if removed_blank_count:
+                normalization_warnings.append(
+                    f"Section {section_index + 1}, measure {measure_index + 1}: removed "
+                    f"{removed_blank_count} surplus blank OCR beat slot to match {beats_per_measure} beats; "
+                    "review beat placement."
+                )
+            elif len(beats) > beats_per_measure:
+                normalization_warnings.append(
+                    f"Section {section_index + 1}, measure {measure_index + 1}: OCR returned "
+                    f"{len(beats)} non-empty beat slots for a {beats_per_measure}-beat measure; "
+                    "all notation was preserved for review."
+                )
             measures.append({"beats": beats, "forceUnderline": False, "isEndingBar": False, "roll": False})
         if measures:
             sections.append({"type": str(raw_section.get("type") or "Verse"), "measures": measures})
 
     current_key = str(extracted.get("current_key") or extracted.get("key") or "")
     original_key = str(extracted.get("original_key") or current_key)
-    warnings = [str(value) for value in extracted.get("warnings", [])]
+    warnings = [str(value) for value in extracted.get("warnings", [])] + normalization_warnings
     if not sections:
         warnings.append("No chart measures were confidently detected; add or correct sections before saving.")
     notes = str(extracted.get("notes") or "").strip()

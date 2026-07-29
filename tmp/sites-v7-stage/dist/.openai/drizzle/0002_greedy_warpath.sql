@@ -1,0 +1,1 @@
+CREATE INDEX `songs_owner_key_idx` ON `songs` (`owner_key`);

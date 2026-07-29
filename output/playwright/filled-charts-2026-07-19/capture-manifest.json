@@ -1,0 +1,87 @@
+{
+  "captured_at_utc": "2026-07-19T07:37:33.668Z",
+  "local_only": true,
+  "publication_approved": false,
+  "raw_provider_payloads_retained": false,
+  "songs_saved": false,
+  "correction_path": "Live Gemini OCR was reviewed; missing chord roots were replaced with source-grounded local chart-code drafts.",
+  "limitations": "Karen titles, rolls, melody numbers, phrase arcs, and ambiguous x/dot/figured-bass marks remain review items.",
+  "charts": [
+    {
+      "source_image": "codex-clipboard-1662b728-149f-4725-bfc4-6a17854ebc3d.jpg",
+      "reviewed_transcription": "drafts/01-go-go-review.chordpro",
+      "screenshot": "01-go-go-filled-chart-reviewed.png",
+      "review": {
+        "source": "text-chart / local chart-code parser",
+        "confidence": "92%",
+        "sections": 9,
+        "measures": 107,
+        "warnings": "Missing or not proven: S'gaw Karen title, category, tempo / BPM, instruments, group\nText chart code was parsed locally; review beat spacing and section boundaries before saving."
+      },
+      "editor": {
+        "id": null,
+        "title": "Go Go",
+        "titleKaren": "",
+        "key": "F",
+        "sections": 9,
+        "measures": 107,
+        "beatsPerMeasure": 4
+      },
+      "save_clicked": false,
+      "status": "manual review draft; compare ambiguous source marks before Save"
+    },
+    {
+      "source_image": "codex-clipboard-ec2de781-ff91-4442-99f2-43ba7bb7f167.jpg",
+      "reviewed_transcription": "drafts/02-chart-24-slow-review.chordpro",
+      "screenshot": "02-chart-24-slow-filled-chart-reviewed.png",
+      "review": {
+        "source": "text-chart / local chart-code parser",
+        "confidence": "92%",
+        "sections": 8,
+        "measures": 68,
+        "warnings": "Missing or not proven: S'gaw Karen title, category, tempo / BPM, instruments, group\nText chart code was parsed locally; review beat spacing and section boundaries before saving."
+      },
+      "editor": {
+        "id": null,
+        "title": "Chart 24",
+        "titleKaren": "",
+        "key": "G",
+        "sections": 8,
+        "measures": 68,
+        "beatsPerMeasure": 4
+      },
+      "save_clicked": false,
+      "status": "manual review draft; compare ambiguous source marks before Save"
+    },
+    {
+      "source_image": "codex-clipboard-f739f704-5e53-4f51-a5e5-e234a801a5b9.jpg",
+      "reviewed_transcription": "drafts/03-move-your-boat-review.chordpro",
+      "screenshot": "03-move-your-boat-filled-chart-reviewed.png",
+      "review": {
+        "source": "text-chart / local chart-code parser",
+        "confidence": "92%",
+        "sections": 8,
+        "measures": 91,
+        "warnings": "Missing or not proven: S'gaw Karen title, category, tempo / BPM, instruments, group\nText chart code was parsed locally; review beat spacing and section boundaries before saving."
+      },
+      "editor": {
+        "id": null,
+        "title": "Move Your Boat",
+        "titleKaren": "",
+        "key": "C",
+        "sections": 8,
+        "measures": 91,
+        "beatsPerMeasure": 4
+      },
+      "two_chord_default_check": {
+        "meter": "4/4",
+        "expected_chord_beats": [1, 3],
+        "two_chord_measures_checked": 83,
+        "placement_mismatches": 0,
+        "verified_via": "Playwright state extraction"
+      },
+      "save_clicked": false,
+      "status": "recaptured with the un-underlined two-chord even-split rule; compare ambiguous source marks before Save"
+    }
+  ]
+}

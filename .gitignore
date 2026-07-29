@@ -8,12 +8,17 @@ build/
 .venv/
 __pycache__/
 *.pyc
+.pytest-tmp-*/
+pytest-local-*/
+.playwright-cli/
+tmp/pdfs/
 
 .env
 .env.*
 api_keys.txt
 app_settings.json
 song_files/
+private/
 
 .idx/
 .vscode/

@@ -1,0 +1,249 @@
+{
+  "mode": "dry-run",
+  "database": "C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\songs.db",
+  "folder": "C:\\Users\\olive\\Projects\\music_director_database\\karen_music_website\\chart_images",
+  "songs_before": 51,
+  "json_sources": 19,
+  "binary_sources": 34,
+  "json_updated": [
+    {
+      "id": 1,
+      "file": "song_1.json",
+      "title": "We Worship God Always"
+    },
+    {
+      "id": 10,
+      "file": "song_10.json",
+      "title": "Thanksgiving"
+    },
+    {
+      "id": 11,
+      "file": "song_11.json",
+      "title": "Karen Gospel Song"
+    },
+    {
+      "id": 12,
+      "file": "song_12.json",
+      "title": "Greeting to Fathers"
+    },
+    {
+      "id": 13,
+      "file": "song_13.json",
+      "title": "Kids Father's Day Song"
+    },
+    {
+      "id": 14,
+      "file": "song_14.json",
+      "title": "Hallelujah"
+    },
+    {
+      "id": 15,
+      "file": "song_15.json",
+      "title": "Creator of Light"
+    },
+    {
+      "id": 16,
+      "file": "song_16.json",
+      "title": "May God Bless You All"
+    },
+    {
+      "id": 17,
+      "file": "song_17.json",
+      "title": "Bless You Fathers"
+    },
+    {
+      "id": 18,
+      "file": "song_18.json",
+      "title": "May God Bless You"
+    },
+    {
+      "id": 19,
+      "file": "song_19.json",
+      "title": "May God Bless You Dad"
+    },
+    {
+      "id": 2,
+      "file": "song_2.json",
+      "title": "God Let Me Praise You"
+    },
+    {
+      "id": 20,
+      "file": "song_20.json",
+      "title": "Creator of Light"
+    },
+    {
+      "id": 21,
+      "file": "song_21.json",
+      "title": "Count Your Blessings"
+    },
+    {
+      "id": 5,
+      "file": "song_5.json",
+      "title": "Love Story"
+    },
+    {
+      "id": 6,
+      "file": "song_6.json",
+      "title": "Who Will Speak Out?"
+    },
+    {
+      "id": 7,
+      "file": "song_7.json",
+      "title": "Untitled"
+    },
+    {
+      "id": 8,
+      "file": "song_8.json",
+      "title": "Tomorrow Is Not for Sure"
+    },
+    {
+      "id": 9,
+      "file": "song_9.json",
+      "title": "We Look Upon Thee for Victory"
+    }
+  ],
+  "binary_attached": [
+    {
+      "id": 29,
+      "file": "1_gig_3_taylor.pdf"
+    },
+    {
+      "id": 30,
+      "file": "alex_sucks_print.pdf"
+    },
+    {
+      "id": 31,
+      "file": "bless_you_fathers.pdf"
+    },
+    {
+      "id": 32,
+      "file": "count_your_blessings_print.pdf"
+    },
+    {
+      "id": 33,
+      "file": "creator_of_light.pdf"
+    },
+    {
+      "id": 34,
+      "file": "firist_official_file_rough_draft.pdf"
+    },
+    {
+      "id": 35,
+      "file": "first_flawless_printout.pdf"
+    },
+    {
+      "id": 36,
+      "file": "good_song.pdf"
+    },
+    {
+      "id": 37,
+      "file": "hallelujah_p_w.pdf"
+    },
+    {
+      "id": 38,
+      "file": "karen_childrens_father_song.pdf"
+    },
+    {
+      "id": 39,
+      "file": "love_story_bridal.pdf"
+    },
+    {
+      "id": 40,
+      "file": "may_god_bless_you.pdf"
+    },
+    {
+      "id": 41,
+      "file": "may_god_bless_you_all.pdf"
+    },
+    {
+      "id": 42,
+      "file": "may_god_bless_you_dad.pdf"
+    },
+    {
+      "id": 43,
+      "file": "Poe_Tha_Country.pdf"
+    },
+    {
+      "id": 44,
+      "file": "pu_ko_tha_byu_print.pdf"
+    },
+    {
+      "id": 7,
+      "file": "song_7_20260517_192502.png"
+    },
+    {
+      "id": 1,
+      "file": "song_new_20260516_154346.png"
+    },
+    {
+      "id": 45,
+      "file": "thanksgiving.pdf"
+    },
+    {
+      "id": 46,
+      "file": "thanksgiving_print.pdf"
+    },
+    {
+      "id": 47,
+      "file": "tomorrow_is_definite_print.pdf"
+    },
+    {
+      "id": 48,
+      "file": "tomorrow_is_not_for_sure_print.pdf"
+    },
+    {
+      "id": 49,
+      "file": "tomorrow_not_for_sure_print.pdf"
+    },
+    {
+      "id": 50,
+      "file": "we_look_upon_thee_for_victory_print.pdf"
+    },
+    {
+      "id": 51,
+      "file": "We_Praise_God_Always_clean_print.pdf"
+    },
+    {
+      "id": 52,
+      "file": "we_praise_you_print.pdf"
+    },
+    {
+      "id": 53,
+      "file": "who_will_preach.pdf"
+    },
+    {
+      "id": 54,
+      "file": "who_will_speak_out.pdf"
+    },
+    {
+      "id": 55,
+      "file": "youth_Move_Your_Boat_print.pdf"
+    }
+  ],
+  "reference_songs_created": [
+    {
+      "file": "127.0.0.1.pdf",
+      "title": "127.0.0.1"
+    },
+    {
+      "file": "127.0.0.2.pdf",
+      "title": "127.0.0.2"
+    },
+    {
+      "file": "1_saw_moo_gay.pdf",
+      "title": "1 Saw Moo Gay"
+    },
+    {
+      "file": "bad.pdf",
+      "title": "Bad"
+    },
+    {
+      "file": "youth_7_25.pdf",
+      "title": "Youth 7 25"
+    }
+  ],
+  "historical_rows_preserved": 51,
+  "backup": null,
+  "songs_after": 56,
+  "covered_files": 53
+}

@@ -29,6 +29,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600..800&family=IBM+Plex+Mono:wght@400;600;700&family=Instrument+Sans:wght@400;500;600;700;800&family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/print-overrides.css">
   <link rel="stylesheet" href="/static/event-tags.css">
+  <link rel="stylesheet" href="/src/tailwind.css">
+  <script src="/static/print-preview.js" defer></script>
   <script src="/static/event-tags.js" defer></script>
 
     <style>
@@ -2681,29 +2683,9 @@
         grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 0.95fr);
         align-items: end;
         column-gap: 18px;
-        border-bottom: 0;
+        border-bottom: 2px solid #000;
         padding-bottom: 5px;
         margin-bottom: 12px;
-        position: sticky;
-        top: 0;
-        z-index: 45;
-        background: #fff;
-      }
-      .paper-meta-control {
-        appearance: none;
-        width: 100%;
-        min-width: 0;
-        padding: 0;
-        border: 0;
-        border-radius: 0;
-        outline: 0;
-        background: transparent;
-        color: #111;
-      }
-      .paper-meta-control::placeholder { color: #777; opacity: 0.75; }
-      .paper-meta-control:focus-visible {
-        box-shadow: 0 2px 0 #8b5a2b;
-        background: #fffaf0;
       }
       .paper-head-cell {
         min-width: 0;
@@ -2716,6 +2698,7 @@
       }
       .paper-title-karen {
         font-family: var(--font-karen);
+        order: 2;
         font-size: var(--paper-header-primary-size, 1.22em);
         font-weight: 800;
         letter-spacing: 0.02em;
@@ -2724,8 +2707,9 @@
       }
       .paper-title-english {
         font-family: var(--font-display);
+        order: 1;
         font-size: var(--paper-header-secondary-size, 0.66em);
-        font-weight: 400;
+        font-weight: 900;
         letter-spacing: 0.02em;
         color: #111;
         line-height: 1;
@@ -2830,7 +2814,7 @@
         font-family: var(--font-ui);
         font-size: 0.62em;
         color: #666;
-        border-top: 0;
+        border-top: 1px solid #ccc;
         padding-top: 5px;
         min-height: 38px;
         z-index: 20;
@@ -9688,6 +9672,50 @@
         }
       }
 
+      .editor-zoom-toolbar {
+        position: sticky;
+        top: 8px;
+        z-index: 10;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        align-self: center;
+        margin: 0 auto 10px;
+        padding: 5px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.10);
+        border: 1px solid rgba(255,255,255,0.14);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+      }
+
+      .editor-zoom-btn,
+      .editor-zoom-fit {
+        min-width: 30px;
+        height: 30px;
+        margin: 0;
+        padding: 0 9px;
+        border-radius: 999px;
+        font-size: 0.78em;
+        line-height: 1;
+        box-shadow: none;
+      }
+
+      .editor-zoom-btn {
+        width: 30px;
+        padding: 0;
+        font-size: 1.05em;
+      }
+
+      .editor-zoom-label {
+        min-width: 44px;
+        color: rgba(255,255,255,0.88);
+        font-size: 0.74em;
+        font-weight: 900;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+
       .paper-stack {
         transform: scale(var(--editor-zoom));
         transform-origin: top center;
@@ -9844,6 +9872,25 @@
       .wizard-inline-title .wizard-input {
         width: 100%;
       }
+
+      /* WYSIWYG paper metadata and page-specific print packet footer. */
+      .paper-meta-control {
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        outline: 0;
+        color: #111;
+        background: transparent;
+        box-shadow: none;
+        font: inherit;
+      }
+      .paper-meta-control:focus-visible {
+        outline: 1px dashed #777;
+        outline-offset: 2px;
+      }
       #ph-footer-left { color: #111; font-weight: 800; text-align: left; }
       .paper-group-control { text-align: right; font-weight: 700; font-size: 1em; }
       .paper-instrument-picker { position: relative; text-align: center; color: #111; }
@@ -9878,7 +9925,94 @@
       }
       .paper-instrument-picker[open] .paper-instrument-wheel { opacity: 1; pointer-events: auto; }
       .paper-instrument-option { display: flex; gap: 8px; align-items: center; padding: 6px; text-align: left; }
-      .paper-instrument-option input { accent-color: #8b5a2b; }
+
+      /* Every copy is a discrete physical Letter sheet, preventing cross-page overflow. */
+      #print-batch > .print-sheet {
+        box-sizing: border-box;
+        position: relative;
+        isolation: isolate;
+        contain: strict;
+        width: 8.5in;
+        height: 11in;
+        margin: 0 auto 24px;
+        padding: 0;
+        overflow: hidden;
+        background: #fff;
+      }
+      #print-batch > .print-sheet > .chart-container {
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+        max-height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+      #print-batch .paper-instrument-print-value {
+        justify-self: center;
+        align-self: end;
+        width: 100%;
+        text-align: center;
+        color: #111;
+        font-weight: 800;
+      }
+      #paper-header {
+        position: sticky;
+        top: 0;
+        z-index: 24;
+        background: #fff;
+      }
+      #paper-header .paper-meta-control {
+        appearance: none !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        outline: 0;
+        color: #111 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+      #paper-header .paper-title-karen,
+      #paper-header .paper-style-value,
+      #paper-header .paper-key-value {
+        font-weight: 800 !important;
+      }
+      #paper-header .paper-title-english {
+        font-weight: 400 !important;
+      }
+      @media print {
+        #paper-header { position: static !important; }
+        #print-batch > .print-sheet {
+          display: block !important;
+          width: 8.5in !important;
+          height: 11in !important;
+          min-height: 11in !important;
+          max-height: 11in !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+          break-after: page;
+          break-inside: avoid-page;
+          page-break-after: always;
+          page-break-inside: avoid;
+        }
+        #print-batch > .print-sheet:last-child {
+          break-after: auto;
+          page-break-after: auto;
+        }
+        #print-batch > .print-sheet > .chart-container {
+          width: 8.5in !important;
+          height: 11in !important;
+          min-height: 11in !important;
+          max-height: 11in !important;
+          margin: 0 !important;
+          overflow: hidden !important;
+          break-inside: avoid !important;
+          page-break-inside: avoid !important;
+        }
+      }
 
       .karen-hotkey-settings {
         display: grid;
@@ -9949,417 +10083,6 @@
         .paper-stack {
           transform: none !important;
           margin-bottom: 0 !important;
-        }
-      }
-      /* Startup metadata wizard: compact, self-contained, and wheel-first. */
-      #wizard-quick.wizard-card {
-        width: min(780px, calc(100vw - 28px));
-        max-height: none;
-        overflow: visible;
-        padding: 22px;
-      }
-
-      #wizard-quick .wizard-fields {
-        display: grid;
-        gap: 12px;
-      }
-
-      #wizard-quick .wizard-inline-title,
-      #wizard-quick .wizard-wheel-row,
-      #wizard-quick .wizard-metadata-bottom,
-      #wizard-quick .wizard-metadata-left {
-        display: grid;
-        gap: 10px;
-      }
-
-      #wizard-quick .wizard-inline-title {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      #wizard-quick .wizard-wheel-row {
-        grid-template-columns: 1.35fr repeat(2, minmax(0, 1fr));
-      }
-
-      #wizard-quick .wizard-metadata-bottom {
-        grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-        align-items: stretch;
-      }
-
-      #wizard-quick .wizard-metadata-left {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      #wizard-quick .wizard-field-group {
-        min-width: 0;
-      }
-
-      #wizard-quick .wizard-scroll-select {
-        cursor: ns-resize;
-      }
-
-      #wizard-quick .wizard-scroll-select:hover {
-        border-color: color-mix(in srgb, var(--accent) 78%, white 22%);
-        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
-      }
-
-      #wizard-quick .wizard-instruments-field {
-        display: grid;
-        grid-template-rows: auto minmax(86px, 1fr) auto;
-      }
-
-      #wizard-quick #instr-wq {
-        min-height: 86px;
-        max-height: 126px;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-      }
-
-      #wizard-quick .wizard-actions,
-      #wizard-guided-actions {
-        position: static;
-        padding-top: 4px;
-        background: none !important;
-      }
-
-      .lang-picker-overlay {
-        overflow: hidden;
-        padding: 16px;
-      }
-
-      .lang-picker-card {
-        width: min(1080px, calc(100vw - 32px));
-        max-width: 1080px;
-        max-height: calc(100svh - 32px);
-        overflow: hidden;
-      }
-
-      .lang-picker-buttons {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-      }
-
-      .lang-btn {
-        min-height: 156px;
-        display: flex;
-        flex: 1 1 0;
-        align-items: center;
-        justify-content: center;
-      }
-
-      @media (max-width: 720px) {
-        #wizard-quick.wizard-card {
-          width: min(96vw, 620px);
-          padding: 16px;
-        }
-
-        #wizard-quick .wizard-wheel-row {
-          grid-template-columns: 1.2fr repeat(2, minmax(0, 0.9fr));
-        }
-
-        .lang-picker-card {
-          width: min(96vw, 620px);
-          max-height: calc(100svh - 20px);
-          padding: 16px;
-        }
-
-        .lang-picker-hero {
-          min-height: 132px;
-        }
-
-        .lang-btn {
-          min-height: 112px;
-        }
-      }
-
-      @media (max-width: 480px) {
-        #wizard-quick .wizard-inline-title,
-        #wizard-quick .wizard-wheel-row,
-        #wizard-quick .wizard-metadata-bottom,
-        #wizard-quick .wizard-metadata-left {
-          gap: 7px;
-        }
-
-        #wizard-quick .wizard-wheel-row {
-          grid-template-columns: 1.15fr repeat(2, minmax(0, 0.92fr));
-        }
-
-        #wizard-quick #instr-wq {
-          min-height: 76px;
-          max-height: 96px;
-        }
-
-        .lang-picker-card {
-          grid-template-columns: 1fr;
-          grid-template-rows: auto auto auto auto;
-          gap: 10px;
-        }
-
-        .lang-picker-hero,
-        .lang-picker-sub,
-        .lang-picker-buttons,
-        .lang-picker-hint {
-          grid-column: 1;
-        }
-
-        .lang-picker-hero {
-          min-height: 96px;
-        }
-
-        .lang-btn {
-          min-height: 92px;
-        }
-      }
-
-      /* Import proofing desk: criteria first, then a reviewable draft. */
-      html .modal.song-import-modal {
-        width: min(920px, calc(100vw - 28px));
-        max-width: 920px;
-        max-height: calc(100svh - 28px);
-        overflow-y: auto;
-        padding: 0;
-        background: var(--panel-bg-strong) !important;
-        color: var(--text);
-        box-shadow: var(--deep-shadow);
-      }
-
-      .song-import-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 22px 24px 18px;
-        border-bottom: 1px solid var(--border);
-      }
-
-      .song-import-kicker {
-        margin: 0 0 4px;
-        color: var(--accent);
-        font: 700 0.72rem/1.2 var(--font-mono);
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-      }
-
-      .song-import-header h2 {
-        margin: 0;
-        color: var(--text);
-        font-size: 1.45rem;
-      }
-
-      .song-import-intro {
-        max-width: 680px;
-        margin: 7px 0 0;
-        color: var(--text-muted);
-      }
-
-      .song-import-close {
-        flex: 0 0 auto;
-        width: 34px;
-        height: 34px;
-        margin: 0 !important;
-        padding: 0;
-        border: 1px solid var(--border);
-        border-radius: 50%;
-        background: transparent;
-        color: var(--text);
-        font-size: 1.15rem;
-      }
-
-      .song-import-body {
-        display: grid;
-        gap: 20px;
-        padding: 20px 24px 24px;
-      }
-
-      .song-import-source-strip {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        border-top: 1px solid var(--border);
-        border-bottom: 1px solid var(--border);
-      }
-
-      .song-import-source {
-        min-width: 0;
-        padding: 13px 14px;
-      }
-
-      .song-import-source + .song-import-source {
-        border-left: 1px solid var(--border);
-      }
-
-      .song-import-source strong,
-      .song-import-source span {
-        display: block;
-      }
-
-      .song-import-source strong {
-        margin-bottom: 4px;
-        color: var(--text);
-      }
-
-      .song-import-source span {
-        color: var(--text-muted);
-        font: 600 0.72rem/1.45 var(--font-mono);
-        overflow-wrap: anywhere;
-      }
-
-      .song-import-criteria-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 22px;
-      }
-
-      .song-import-criteria-group h3 {
-        margin: 0 0 8px;
-        color: var(--text);
-        font: 700 0.82rem/1.2 var(--font-mono);
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-      }
-
-      .song-import-checklist,
-      .song-import-warning-list {
-        display: grid;
-        gap: 7px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-      }
-
-      .song-import-checklist li,
-      .song-import-warning-list li {
-        position: relative;
-        padding-left: 20px;
-        color: var(--text-muted);
-        font-size: 0.86rem;
-      }
-
-      .song-import-checklist li::before {
-        content: "✓";
-        position: absolute;
-        left: 0;
-        color: var(--accent);
-        font-weight: 800;
-      }
-
-      .song-import-code-note,
-      .song-import-privacy {
-        margin: 0;
-        padding: 11px 13px;
-        border-left: 3px solid var(--accent);
-        background: color-mix(in srgb, var(--accent-dim) 70%, transparent);
-        color: var(--text-muted);
-        font-size: 0.82rem;
-      }
-
-      .song-import-code-note code {
-        color: var(--text);
-        font-family: var(--font-mono);
-      }
-
-      .song-import-actions {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 8px;
-      }
-
-      .song-import-actions button {
-        margin: 0;
-      }
-
-      .song-import-status {
-        flex: 1 1 260px;
-        min-height: 1.2em;
-        color: var(--text-muted);
-        font: 600 0.78rem/1.45 var(--font-mono);
-      }
-
-      .song-import-status.is-error {
-        color: #ff8f87;
-      }
-
-      .song-import-review {
-        display: grid;
-        gap: 14px;
-        padding-top: 18px;
-        border-top: 1px solid var(--border);
-      }
-
-      .song-import-review[hidden] {
-        display: none;
-      }
-
-      .song-import-review-summary {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 1px;
-        background: var(--border);
-        border: 1px solid var(--border);
-      }
-
-      .song-import-review-stat {
-        min-width: 0;
-        padding: 10px 12px;
-        background: var(--sidebar-bg);
-      }
-
-      .song-import-review-stat span,
-      .song-import-review-stat strong {
-        display: block;
-      }
-
-      .song-import-review-stat span {
-        color: var(--text-muted);
-        font-size: 0.7rem;
-      }
-
-      .song-import-review-stat strong {
-        margin-top: 2px;
-        color: var(--text);
-        font: 700 1rem/1.2 var(--font-mono);
-      }
-
-      .song-import-review-columns {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-      }
-
-      .song-import-review-columns h3 {
-        margin: 0 0 7px;
-        color: var(--text);
-        font-size: 0.88rem;
-      }
-
-      .song-import-warning-list li::before {
-        content: "—";
-        position: absolute;
-        left: 0;
-        color: var(--accent);
-      }
-
-      @media (max-width: 680px) {
-        .song-import-source-strip,
-        .song-import-criteria-grid,
-        .song-import-review-columns {
-          grid-template-columns: 1fr;
-        }
-
-        .song-import-source + .song-import-source {
-          border-left: 0;
-          border-top: 1px solid var(--border);
-        }
-
-        .song-import-review-summary {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .song-import-header,
-        .song-import-body {
-          padding-left: 16px;
-          padding-right: 16px;
         }
       }
     </style>
@@ -10435,21 +10158,7 @@
               <input class="wizard-input" id="wq-songTitleKaren" type="text" placeholder="တၢ်သးဝံၣ်ကညီ" autocomplete="off" data-karen-keyboard="true">
             </div>
           </div>
-          <div class="wizard-wheel-row">
-            <div class="wizard-field-group">
-              <label class="wizard-label" id="wq-label-style">Style</label>
-              <select class="wizard-input wizard-scroll-select" id="wq-songStyle">
-                <option value="" selected>Alter Rock</option>
-                <option value="Alter Rock">Alter Rock</option>
-                <option value="Ballad">Ballad</option>
-                <option value="Praise & Worship">Praise & Worship</option>
-                <option value="Choral">Choral</option>
-                <option value="March">March</option>
-                <option value="Worship">Worship</option>
-                <option value="Upbeat">Upbeat</option>
-                <option value="Acoustic">Acoustic</option>
-              </select>
-            </div>
+          <div class="wizard-inline-row">
             <div class="wizard-field-group">
               <label class="wizard-label" id="wq-label-key">Key</label>
               <select class="wizard-input wizard-scroll-select" id="wq-songKey">
@@ -10478,17 +10187,6 @@
                 <option value="Kids">Kids</option>
               </select>
             </div>
-          </div>
-          <div class="wizard-metadata-bottom">
-            <div class="wizard-metadata-left">
-            <div class="wizard-field-group">
-              <label class="wizard-label" id="wq-label-time">Time signature</label>
-              <select class="wizard-input wizard-scroll-select" id="wq-timeSignature">
-                <option value="4" selected>4/4</option>
-                <option value="3">3/4</option>
-                <option value="6">6/8</option>
-              </select>
-            </div>
             <div class="wizard-field-group">
               <label class="wizard-label" id="wq-label-tempo">Tempo</label>
               <div class="tempo-stepper" data-target="wq-songTempo">
@@ -10497,21 +10195,42 @@
                 <button type="button" class="tempo-btn" onclick="changeTempo('wq-songTempo', 1)">+</button>
               </div>
             </div>
+            <div class="wizard-field-group">
+              <label class="wizard-label" id="wq-label-time">Time signature</label>
+              <select class="wizard-input wizard-scroll-select" id="wq-timeSignature">
+                <option value="4" selected>4/4</option>
+                <option value="3">3/4</option>
+                <option value="6">6/8</option>
+              </select>
             </div>
-            <div class="wizard-field-group wizard-instruments-field">
-              <label class="wizard-label" id="wq-label-instruments">Instruments</label>
-              <div id="instr-wq" class="instr-checklist">
-                <button type="button" class="instr-choice" data-value="Piano 1">Piano 1</button>
-                <button type="button" class="instr-choice" data-value="Piano 2">Piano 2</button>
-                <button type="button" class="instr-choice" data-value="Electric Guitar">Electric Guitar</button>
-                <button type="button" class="instr-choice" data-value="Acoustic Guitar">Acoustic Guitar</button>
-                <button type="button" class="instr-choice" data-value="Electric Bass">Electric Bass</button>
-                <button type="button" class="instr-choice" data-value="Drums">Drums</button>
-                <button type="button" class="instr-choice" data-value="Keytar">Keytar</button>
-              </div>
-              <div class="instr-tags" id="instr-wq-tags"></div>
-              <input type="hidden" id="wq-songInstruments">
+          </div>
+          <div class="wizard-field-group">
+            <label class="wizard-label" id="wq-label-style">Style</label>
+            <select class="wizard-input wizard-scroll-select" id="wq-songStyle">
+              <option value="" selected>Alter Rock</option>
+              <option value="Alter Rock">Alter Rock</option>
+              <option value="Ballad">Ballad</option>
+              <option value="Praise & Worship">Praise & Worship</option>
+              <option value="Choral">Choral</option>
+              <option value="March">March</option>
+              <option value="Worship">Worship</option>
+              <option value="Upbeat">Upbeat</option>
+              <option value="Acoustic">Acoustic</option>
+            </select>
+          </div>
+          <div class="wizard-field-group">
+            <label class="wizard-label" id="wq-label-instruments">Instruments</label>
+            <div id="instr-wq" class="instr-checklist">
+              <button type="button" class="instr-choice" data-value="Piano 1">Piano 1</button>
+              <button type="button" class="instr-choice" data-value="Piano 2">Piano 2</button>
+              <button type="button" class="instr-choice" data-value="Electric Guitar">Electric Guitar</button>
+              <button type="button" class="instr-choice" data-value="Acoustic Guitar">Acoustic Guitar</button>
+              <button type="button" class="instr-choice" data-value="Electric Bass">Electric Bass</button>
+              <button type="button" class="instr-choice" data-value="Drums">Drums</button>
+              <button type="button" class="instr-choice" data-value="Keytar">Keytar</button>
             </div>
+            <div class="instr-tags" id="instr-wq-tags"></div>
+            <input type="hidden" id="wq-songInstruments">
           </div>
         </div>
         <div class="wizard-actions">
@@ -10613,89 +10332,6 @@
       </div>
 
     </div><!-- /wizard-overlay -->
-
-    <!-- Import criteria and OCR review -->
-    <div id="song-import-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="song-import-title" style="display:none;">
-      <div class="modal song-import-modal">
-        <div class="song-import-header">
-          <div>
-            <p class="song-import-kicker">Chart intake / proof before save</p>
-            <h2 id="song-import-title">Import a complete chord-chart draft</h2>
-            <p class="song-import-intro">Choose one chart-code file, handwritten or printed chart image, or PDF. The importer fills everything it can prove and flags what still needs a human check.</p>
-          </div>
-          <button type="button" class="song-import-close" onclick="closeSongImport()" aria-label="Close import">×</button>
-        </div>
-        <div class="song-import-body">
-          <div class="song-import-source-strip" id="song-import-source-strip" aria-label="Accepted source types">
-            <div class="song-import-source"><strong>Karen chart code</strong><span>.json</span></div>
-            <div class="song-import-source"><strong>Text / ChordPro</strong><span>.txt .cho .crd .pro .chordpro</span></div>
-            <div class="song-import-source"><strong>Photo / PDF OCR</strong><span>.png .jpg .jpeg .webp .pdf</span></div>
-          </div>
-
-          <div class="song-import-criteria-grid">
-            <section class="song-import-criteria-group">
-              <h3>Song information it looks for</h3>
-              <ul class="song-import-checklist" id="song-import-metadata-criteria">
-                <li>English and S'gaw Karen titles</li>
-                <li>Category, current key, and original key</li>
-                <li>Style, tempo / BPM, and time signature</li>
-                <li>Instruments, group, and notes</li>
-              </ul>
-            </section>
-            <section class="song-import-criteria-group">
-              <h3>Chart notation it looks for</h3>
-              <ul class="song-import-checklist" id="song-import-chart-criteria">
-                <li>Section and measure order</li>
-                <li>Beat positions and chord spellings</li>
-                <li>Slash bass notes and chord qualities</li>
-                <li>Circle, dot, and x marks</li>
-              </ul>
-            </section>
-          </div>
-
-          <section class="song-import-criteria-group">
-            <h3>For the best handwriting or PDF result</h3>
-            <ul class="song-import-checklist" id="song-import-image-criteria">
-              <li>Show every page edge and keep measures uncropped.</li>
-              <li>Use sharp focus, even lighting, and no glare or shadows.</li>
-              <li>Keep multi-page charts in performance order.</li>
-            </ul>
-          </section>
-
-          <p class="song-import-code-note" id="song-import-code-note"><strong>Text chart example:</strong> <code>[Verse] | G - C - | D/F# - Em - |</code>. Use headers such as <code>Title:</code>, <code>Key:</code>, <code>Tempo:</code>, and <code>Time:</code>.</p>
-          <p class="song-import-privacy" id="song-import-privacy">JSON and text chart code stay local. Images and PDFs go only to a configured vision provider. Every result remains an unsaved draft until you review it and press Save.</p>
-
-          <div class="song-import-actions">
-            <div class="song-import-status" id="song-import-status" role="status" aria-live="polite">Ready for one chart file, up to 20 MB.</div>
-            <button type="button" class="wizard-btn-secondary" onclick="closeSongImport()">Cancel</button>
-            <button type="button" class="wizard-btn-primary" id="song-import-choose" onclick="chooseSongImportFile()">Choose chart file</button>
-          </div>
-
-          <section class="song-import-review" id="song-import-review" hidden aria-label="Import review">
-            <div class="song-import-review-summary">
-              <div class="song-import-review-stat"><span>Source</span><strong id="song-import-review-source">—</strong></div>
-              <div class="song-import-review-stat"><span>Confidence</span><strong id="song-import-review-confidence">—</strong></div>
-              <div class="song-import-review-stat"><span>Sections</span><strong id="song-import-review-sections">0</strong></div>
-              <div class="song-import-review-stat"><span>Measures</span><strong id="song-import-review-measures">0</strong></div>
-            </div>
-            <div class="song-import-review-columns">
-              <div>
-                <h3>Recognized</h3>
-                <ul class="song-import-checklist" id="song-import-recognized"></ul>
-              </div>
-              <div>
-                <h3>Needs review</h3>
-                <ul class="song-import-warning-list" id="song-import-warnings"></ul>
-              </div>
-            </div>
-            <div class="song-import-actions">
-              <button type="button" class="wizard-btn-secondary" onclick="chooseSongImportFile()">Choose another file</button>
-              <button type="button" class="wizard-btn-primary" id="song-import-apply" onclick="applySongImportDraft()">Fill the chord editor</button>
-            </div>
-          </section>
-        </div>
-      </div>
-    </div>
 
     <!-- ============================================================
         SIDEBAR TOGGLE BUTTON (always visible top-left)
@@ -10938,7 +10574,7 @@
         <button id="btn-new" onclick="newSong()">New</button>
         <button id="btn-save" onclick="saveSong()">Save</button>
         <button id="btn-import" type="button" onclick="openSongImport()">Import</button>
-        <input id="song-import-file" type="file" accept=".json,.txt,.cho,.crd,.pro,.chordpro,.png,.jpg,.jpeg,.webp,.pdf,application/json,text/plain,image/png,image/jpeg,image/webp,application/pdf" hidden>
+        <input id="song-import-file" type="file" accept=".json,.png,.jpg,.jpeg,.webp,.pdf,application/json,image/png,image/jpeg,image/webp,application/pdf" hidden>
         <button id="btn-print" onclick="printInstrumentPackets()">Print</button>
         <button id="btn-export" onclick="exportDb()">Export</button>
       </div>
@@ -10963,6 +10599,14 @@
         readonly
         tabindex="0"
       >
+
+      <div class="editor-zoom-toolbar" aria-label="Chart zoom controls">
+        <button type="button" id="editor-zoom-out" class="editor-zoom-btn" title="Zoom out" onclick="changeEditorZoom(-0.01)">−</button>
+        <span id="editor-zoom-label" class="editor-zoom-label">100%</span>
+        <button type="button" id="editor-zoom-in" class="editor-zoom-btn" title="Zoom in" onclick="changeEditorZoom(0.01)">+</button>
+        <button type="button" id="editor-zoom-fit" class="editor-zoom-fit" title="Fit chart to editor width" onclick="fitEditorZoomToWidth()">Fit</button>
+        <button type="button" id="editor-zoom-reset" class="editor-zoom-fit" title="Reset chart zoom" onclick="setEditorZoom(1)">100</button>
+      </div>
 
       <!-- Stacked chart / lyrics paper containers -->
       <div class="paper-stack" id="paper-stack" data-active-paper="chart">
@@ -11500,8 +11144,8 @@
           slotChoice: 4,
           working: null
         },
-        karenInputTargetId: null,
-        songGroup: "",
+          karenInputTargetId: null,
+          songGroup: "",
       };
 
       let songsCache = [];
@@ -11513,8 +11157,6 @@
       const EDITOR_ZOOM_STORAGE_KEY = "karenMusicEditorZoom";
       const EDITOR_ZOOM_MIN = 0.55;
       const EDITOR_ZOOM_MAX = 1.85;
-      const EDITOR_ZOOM_WHEEL_SENSITIVITY = 0.0028;
-      const EDITOR_ZOOM_TOUCH_SENSITIVITY = 1.35;
       let editorZoom = 1;
       let activeInstrumentScrollGroup = null;
 
@@ -11745,6 +11387,12 @@
         const extraY = stack ? Math.max(0, (zoom - 1) * (stack.offsetHeight || 1056)) : 0;
         document.documentElement.style.setProperty("--editor-zoom-extra-y", `${Math.round(extraY)}px`);
 
+        const label = document.getElementById("editor-zoom-label");
+        if (label) label.textContent = `${Math.round(zoom * 100)}%`;
+
+        document.getElementById("editor-zoom-out")?.toggleAttribute("disabled", zoom <= EDITOR_ZOOM_MIN + 0.001);
+        document.getElementById("editor-zoom-in")?.toggleAttribute("disabled", zoom >= EDITOR_ZOOM_MAX - 0.001);
+
         if (opts.persist !== false) {
           localStorage.setItem(EDITOR_ZOOM_STORAGE_KEY, zoom.toFixed(2));
         }
@@ -11756,10 +11404,9 @@
         applyEditorZoom(options);
       }
 
-      function scaleEditorZoom(factor) {
-        const safeFactor = Number(factor);
-        if (!Number.isFinite(safeFactor) || safeFactor <= 0) return;
-        setEditorZoom(editorZoom * safeFactor);
+      function changeEditorZoom(delta) {
+        const step = Number(delta || 0) >= 0 ? 0.02 : -0.02;
+        setEditorZoom(editorZoom + step);
       }
 
       function fitEditorZoomToWidth() {
@@ -11782,26 +11429,8 @@
           editor.addEventListener("wheel", (event) => {
             if (!event.ctrlKey && !event.metaKey) return;
             event.preventDefault();
-            const delta = Math.max(-160, Math.min(160, event.deltaY));
-            scaleEditorZoom(Math.exp(-delta * EDITOR_ZOOM_WHEEL_SENSITIVITY));
+            changeEditorZoom(event.deltaY < 0 ? 1 : -1);
           }, { passive: false });
-          let pinchDistance = 0;
-          editor.addEventListener("touchstart", (event) => {
-            if (event.touches.length !== 2) return;
-            const [first, second] = event.touches;
-            pinchDistance = Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY);
-          }, { passive: true });
-          editor.addEventListener("touchmove", (event) => {
-            if (event.touches.length !== 2 || !pinchDistance) return;
-            const [first, second] = event.touches;
-            const nextDistance = Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY);
-            if (!nextDistance) return;
-            event.preventDefault();
-            scaleEditorZoom(Math.pow(nextDistance / pinchDistance, EDITOR_ZOOM_TOUCH_SENSITIVITY));
-            pinchDistance = nextDistance;
-          }, { passive: false });
-          editor.addEventListener("touchend", () => { pinchDistance = 0; }, { passive: true });
-          editor.addEventListener("touchcancel", () => { pinchDistance = 0; }, { passive: true });
           editor.dataset.zoomWheelBound = "1";
         }
       }
@@ -12561,6 +12190,12 @@
 
         withMeasurablePrintBatch(() => {
           pages.forEach(pageInfo => {
+            const sheet = document.createElement("section");
+            sheet.className = "print-sheet";
+            sheet.dataset.copyKind = pageInfo.kind;
+            sheet.dataset.copyName = pageInfo.name || "Reference";
+            sheet.setAttribute("aria-label", `${pageInfo.name || "Reference"} print copy`);
+
             const clone = source.cloneNode(true);
             clone.removeAttribute("id");
             stripEditorOnlyPrintUi(clone);
@@ -12573,13 +12208,18 @@
             updateFooterDateRow(footerCreated, formatDatePair("dateCreatedLabel", createdDate || "__/__/____"));
             const footerPerformed = clone.querySelector("#ph-footer-next");
             updateFooterDateRow(footerPerformed, formatDatePair("datePerformedLabel", performedDate || "__/__/____"));
+            const footerRight = clone.querySelector("#ph-footer-right");
+            if (footerRight) {
+              setStackedBilingual(footerRight, getCategoryLabelPair(String(document.getElementById("songCategory")?.value || "")), { category: true, parenthesizeKaren: false });
+            }
             filterLeadRowsForPrintPage(clone, pageInfo);
 
-            host.appendChild(clone);
+            sheet.appendChild(clone);
+            host.appendChild(sheet);
             applyBeatCellLayout(clone);
-            fitChartContentToPaper(clone);
             renderOnlySpans(clone);
             renderSlurs(clone);
+            fitChartContentToPaper(clone);
           });
         });
       }
@@ -14950,7 +14590,7 @@
         if (!section || !measure) return false;
 
         const baseBeats = Math.max(1, Number(state.beatsPerMeasure) || 4);
-        const nextCount = Math.max(1, Math.min(Number(beatCount) || baseBeats, baseBeats));
+        const nextCount = Math.max(1, Math.min(Number(beatCount) || baseBeats, 6));
         const currentBeatCount = getBeatCountForMeasure(measure);
         const insertionPoint = getGlobalBeatIndex(state.currentSectionIdx, state.currentMeasureIdx, currentBeatCount - 1);
         const insertIdx = state.currentMeasureIdx + 1;
@@ -15091,10 +14731,7 @@
         }
         const measure = currentMeasure();
         if (!measure) return;
-        const maxBeats = getBeatCountForMeasure(measure);
-        const baseBeats = state.beatsPerMeasure || 4;
-        const nextCount = Math.max(1, Math.min(Number(beatCount) || 1, maxBeats, baseBeats));
-        insertMeasureAfterCurrent(nextCount);
+        insertMeasureAfterCurrent(Math.max(1, Math.min(Number(beatCount) || 1, 6)));
       }
 
       function beatHasStructuralUnderline(beat) {
@@ -16462,7 +16099,6 @@
         const notesPreview = document.getElementById("database-notes-preview");
         const results = document.getElementById("database-results");
         const filesList = document.getElementById("database-file-list");
-        bindSilkyScroll(results);
 
         if (title) title.textContent = meta.title;
         if (metaLine) {
@@ -16786,7 +16422,6 @@
         if (phTitleEnglish) phTitleEnglish.value = titlePair.english || "";
         applyPrintStylePreset(songStyle, document.getElementById("chart-container"));
 
-        const styleTempoPair = formatStyleTempoPair(songStyle, songTempo);
         if (phStyleValue) phStyleValue.value = songStyle || "";
 
         const keyPair = formatKeyPair(currentKey, origKey);
@@ -17500,16 +17135,13 @@
         if (e.ctrlKey && e.key === "z") { e.preventDefault(); undo(); return; }
         if (e.ctrlKey && e.key === "y") { e.preventDefault(); redo(); return; }
 
-        // ── CTRL+1..4: toggle manual underline on beat 1..4 of current measure ──
-        if (e.ctrlKey && /^[1-4]$/.test(e.key)) {
+        // ── CTRL+1..6: insert a measure with exactly that many beats ──
+        if (e.ctrlKey && !e.altKey && !e.metaKey && /^[1-6]$/.test(e.key)) {
           e.preventDefault();
           state.pendingBass = false;
           state.pendingTriangle = false;
           state.pendingSup = false;
-          const beatIdx = Number(e.key) - 1;
-          if (toggleManualUnderlineOnMeasureBeat(beatIdx)) {
-            renderChart();
-          }
+          insertMeasureWithBeatCount(Number(e.key));
           return;
         }
 
@@ -17708,6 +17340,22 @@
           const measure = currentMeasure();
           if (!section || !measure) return;
           let targetBeat = getCurrentBeat();
+
+          if (state.currentMeasureIdx === PRE_MEASURE_INDEX) {
+            if (targetBeat && !beatIsEmpty(targetBeat)) {
+              saveState();
+              const removed = removeChordPartsInOrder(targetBeat);
+              if (!removed) removeLastBeatRenderChange(targetBeat);
+            } else {
+              saveState();
+              section.preMeasure = null;
+              state.currentMeasureIdx = 0;
+              state.currentBeatIdx = 0;
+              refreshSectionEndingBars(section);
+            }
+            renderChart();
+            return;
+          }
           const onFirstBeat = state.currentBeatIdx === 0;
           const onFirstMeasure = state.currentMeasureIdx === 0;
           const onLastMeasure = state.currentMeasureIdx === section.measures.length - 1;
@@ -17971,10 +17619,20 @@
         const footerHeight = footer.getBoundingClientRect().height || 0;
         const reserve = 8;
         const availableHeight = Math.max(100, innerHeight - headerHeight - footerHeight - reserve);
+        const availableWidth = Math.max(
+          100,
+          chart.clientWidth
+            - (parseFloat(chartStyle.paddingLeft) || 0)
+            - (parseFloat(chartStyle.paddingRight) || 0)
+        );
         const contentHeight = sections.scrollHeight || 0;
+        const contentWidth = Math.max(sections.scrollWidth || 0, sections.offsetWidth || 0);
+        if (!contentHeight || !contentWidth) return;
 
-        if (!contentHeight || contentHeight <= availableHeight) return;
-        const scale = Math.max(0.12, availableHeight / contentHeight);
+        const verticalScale = contentHeight > availableHeight ? availableHeight / contentHeight : 1;
+        const horizontalScale = contentWidth > availableWidth ? availableWidth / contentWidth : 1;
+        const scale = Math.max(0.12, Math.min(1, verticalScale, horizontalScale));
+        if (scale >= 0.999) return;
         sections.style.transform = `scale(${scale})`;
         sections.style.width = `${100 / scale}%`;
       }
@@ -18609,13 +18267,12 @@
         state.onlySpans         = Array.isArray(chartBundle.onlySpans) ? chartBundle.onlySpans : [];
         state.slurs             = Array.isArray(chartBundle.slurs) ? chartBundle.slurs : [];
         state.lyricsSections    = normalizeLyricsSections(chartBundle.lyricsSections || chartBundle.lyrics || []);
-        state.songGroup         = String(chartBundle.songGroup || "");
         const inferredBpm = (() => {
           const savedBpm = Number(chartBundle.beatsPerMeasure);
-          if (savedBpm === 3 || savedBpm === 4 || savedBpm === 6) return savedBpm;
+          if (savedBpm === 3 || savedBpm === 4) return savedBpm;
           const first = state.sections?.[0]?.measures?.[0];
           const len = Array.isArray(first?.beats) ? first.beats.length : 4;
-          return len === 3 || len === 6 ? len : 4;
+          return len === 3 ? 3 : 4;
         })();
         setBeatsPerMeasure(inferredBpm, { render: false, normalizeExisting: false });
         const savedDefaultMpr = Number(chartBundle.defaultMeasuresPerRow);
@@ -18708,7 +18365,6 @@
             beatsPerMeasure: state.beatsPerMeasure || 4,
             defaultMeasuresPerRow: getDefaultMeasuresPerRow(),
             rowDefaultExplicit: !!state.rowDefaultExplicit
-            ,songGroup: state.songGroup || ""
           },
           rowleadjson:    state.rowLead || {},
           chartpngdataurl: dataUrl
@@ -18754,7 +18410,6 @@
         state.referenceMedia = { videos: [], images: [], info: "" };
         state.fileMetadata = [];
         state.lyricsSections = [];
-        state.songGroup = "";
         state.defaultMeasuresPerRow = getAutoDefaultMeasuresPerRow();
         state.rowDefaultExplicit = false;
         syncDefaultMeasuresPerRowInput();
@@ -18785,196 +18440,61 @@
         openWizard();
       }
 
-      let pendingSongImportDraft = null;
-      let importCriteriaCache = null;
-
-      function setSongImportStatus(message, type = "info") {
-        const status = document.getElementById("song-import-status");
-        if (!status) return;
-        status.textContent = message || "";
-        status.classList.toggle("is-error", type === "error");
-      }
-
-      function fillSongImportList(id, items) {
-        const list = document.getElementById(id);
-        if (!list || !Array.isArray(items)) return;
-        list.innerHTML = "";
-        items.forEach(item => {
-          const li = document.createElement("li");
-          li.textContent = String(item || "");
-          list.appendChild(li);
-        });
-      }
-
-      function renderSongImportCriteria(criteria) {
-        if (!criteria || typeof criteria !== "object") return;
-        const sourceStrip = document.getElementById("song-import-source-strip");
-        if (sourceStrip && Array.isArray(criteria.accepted_sources)) {
-          sourceStrip.innerHTML = "";
-          criteria.accepted_sources.forEach(source => {
-            const item = document.createElement("div");
-            item.className = "song-import-source";
-            const title = document.createElement("strong");
-            title.textContent = source.label || source.kind || "Chart file";
-            const extensions = document.createElement("span");
-            extensions.textContent = Array.isArray(source.extensions) ? source.extensions.join(" ") : "";
-            item.append(title, extensions);
-            sourceStrip.appendChild(item);
-          });
-        }
-        fillSongImportList("song-import-metadata-criteria", criteria.metadata_fields);
-        fillSongImportList("song-import-chart-criteria", criteria.chart_fields);
-        fillSongImportList("song-import-image-criteria", criteria.image_quality);
-        const privacy = document.getElementById("song-import-privacy");
-        if (privacy) {
-          privacy.textContent = `${criteria.privacy || ""} ${criteria.review_policy || ""}`.trim();
-        }
-        const maxMb = Math.round(Number(criteria.max_bytes || 0) / (1024 * 1024));
-        setSongImportStatus(`Ready for one chart file${maxMb ? `, up to ${maxMb} MB` : ""}.`);
-      }
-
-      async function loadSongImportCriteria() {
-        if (importCriteriaCache) {
-          renderSongImportCriteria(importCriteriaCache);
-          return;
-        }
-        try {
-          const response = await fetch("/api/import/criteria");
-          if (!response.ok) return;
-          importCriteriaCache = await response.json();
-          renderSongImportCriteria(importCriteriaCache);
-        } catch (error) {
-          console.warn("Import criteria endpoint unavailable; using the built-in criteria.", error);
-        }
-      }
-
-      function setupSongImportDialog() {
-        const overlay = document.getElementById("song-import-overlay");
-        if (!overlay || overlay.dataset.bound) return;
-        overlay.addEventListener("click", event => {
-          if (event.target === overlay) closeSongImport();
-        });
-        document.addEventListener("keydown", event => {
-          if (event.key === "Escape" && overlay.style.display !== "none") closeSongImport();
-        });
-        overlay.dataset.bound = "1";
-      }
-
       function openSongImport() {
-        const overlay = document.getElementById("song-import-overlay");
-        if (!overlay) return;
-        pendingSongImportDraft = null;
-        document.getElementById("song-import-review")?.setAttribute("hidden", "");
-        setSongImportStatus("Ready for one chart file, up to 20 MB.");
-        overlay.style.display = "flex";
-        overlay.classList.add("open");
-        loadSongImportCriteria();
-        requestAnimationFrame(() => document.getElementById("song-import-choose")?.focus());
-      }
-
-      function closeSongImport() {
-        const overlay = document.getElementById("song-import-overlay");
-        if (!overlay) return;
-        overlay.classList.remove("open");
-        overlay.style.display = "none";
-        pendingSongImportDraft = null;
-        const input = document.getElementById("song-import-file");
-        if (input) input.value = "";
-        document.getElementById("btn-import")?.focus();
-      }
-
-      function chooseSongImportFile() {
         const input = document.getElementById("song-import-file");
         if (!input) return;
         input.value = "";
         input.click();
       }
 
-      function renderSongImportReview(result, file) {
-        const review = result.import_review && typeof result.import_review === "object" ? result.import_review : {};
-        const chart = result.chart_json || result.chartjson || {};
-        const sections = Array.isArray(chart.sections) ? chart.sections : [];
-        const sectionCount = Number.isFinite(Number(review.section_count)) ? Number(review.section_count) : sections.length;
-        const measureCount = Number.isFinite(Number(review.measure_count))
-          ? Number(review.measure_count)
-          : sections.reduce((total, section) => total + (Array.isArray(section.measures) ? section.measures.length : 0), 0);
-        const provider = String(review.provider || "local");
-        const sourceKind = String(review.source_kind || (file.name.toLowerCase().endsWith(".json") ? "editor-json" : "vision"));
-        document.getElementById("song-import-review-source").textContent = provider === "local" ? sourceKind : `${sourceKind} / ${provider}`;
-        document.getElementById("song-import-review-confidence").textContent = Number.isFinite(Number(result.confidence))
-          ? `${Math.round(Number(result.confidence) * 100)}%`
-          : "Review";
-        document.getElementById("song-import-review-sections").textContent = String(sectionCount);
-        document.getElementById("song-import-review-measures").textContent = String(measureCount);
-        fillSongImportList("song-import-recognized", Array.isArray(review.recognized_fields) ? review.recognized_fields : []);
-        const warnings = [];
-        if (Array.isArray(review.missing_fields) && review.missing_fields.length) {
-          warnings.push(`Missing or not proven: ${review.missing_fields.join(", ")}`);
-        }
-        if (Array.isArray(result.warnings)) warnings.push(...result.warnings);
-        if (!warnings.length) warnings.push("No warnings were reported. Compare every measure with the source before saving.");
-        fillSongImportList("song-import-warnings", warnings);
-        document.getElementById("song-import-review")?.removeAttribute("hidden");
-        setSongImportStatus(`${file.name} is ready as an unsaved editor draft.`);
-      }
-
       async function importSongFile(file) {
         if (!file) return;
         const importBtn = document.getElementById("btn-import");
-        const chooseBtn = document.getElementById("song-import-choose");
         const originalText = importBtn?.textContent || uiText("import");
-        const originalChooseText = chooseBtn?.textContent || "Choose chart file";
-        if (file.size > 20 * 1024 * 1024) {
-          setSongImportStatus("This file is larger than 20 MB. Export or scan a smaller source and try again.", "error");
-          return;
+        if (importBtn) {
+          importBtn.disabled = true;
+          importBtn.textContent = file.name.toLowerCase().endsWith(".json") ? uiText("readingJson") : uiText("readingChart");
         }
-        if (importBtn) importBtn.disabled = true;
-        if (chooseBtn) {
-          chooseBtn.disabled = true;
-          chooseBtn.textContent = "Reading chart…";
-        }
-        setSongImportStatus(`Reading ${file.name}…`);
-        document.getElementById("song-import-review")?.setAttribute("hidden", "");
         try {
           const form = new FormData();
           form.append("file", file);
-          const lowerName = file.name.toLowerCase();
-          const isJson = lowerName.endsWith(".json") || file.type === "application/json";
-          const isTextChart = [".txt", ".cho", ".crd", ".pro", ".chordpro"].some(extension => lowerName.endsWith(extension));
-          const endpoint = isJson ? "/api/import/json" : (isTextChart ? "/api/import/code" : "/api/import/vision");
+          const isJson = file.name.toLowerCase().endsWith(".json") || file.type === "application/json";
+          const endpoint = isJson ? "/api/import/json" : "/api/import/vision";
           const response = await fetch(endpoint, { method: "POST", body: form });
           const result = await response.json();
-          if (!response.ok) {
-            const detail = Array.isArray(result.detail) ? result.detail.map(item => item.msg || String(item)).join("; ") : result.detail;
-            throw new Error(detail || result.error || "Import failed");
+          if (!response.ok) throw new Error(result.error || "Import failed");
+
+          const chart = result.chart_json || result.chartjson || {};
+          const sectionCount = Array.isArray(chart.sections) ? chart.sections.length : 0;
+          const measureCount = Array.isArray(chart.sections)
+            ? chart.sections.reduce((total, section) => total + (Array.isArray(section.measures) ? section.measures.length : 0), 0)
+            : 0;
+          const confidence = Number.isFinite(Number(result.confidence))
+            ? `\nOCR confidence: ${Math.round(Number(result.confidence) * 100)}%`
+            : "";
+          const warnings = Array.isArray(result.warnings) && result.warnings.length
+            ? `\nWarnings:\n- ${result.warnings.join("\n- ")}`
+            : "";
+          const approved = window.confirm(
+            `Import ${file.name}?\n\nDetected ${sectionCount} section(s) and ${measureCount} measure(s).${confidence}${warnings}\n\nThe editor will be replaced with this draft. Review it before pressing Save.`
+          );
+          if (!approved) {
+            showToast(uiText("importCanceled"), "success");
+            return;
           }
-          pendingSongImportDraft = { result, fileName: file.name };
-          renderSongImportReview(result, file);
+
+          await loadSong({ ...result, id: null });
+          state.id = null;
+          renderChart();
+          showToast(uiText("importLoaded"), "success");
         } catch (error) {
-          pendingSongImportDraft = null;
-          const message = error.message || uiText("importFailed");
-          setSongImportStatus(message, "error");
-          showToast(message, "error");
+          showToast(error.message || uiText("importFailed"), "error");
         } finally {
           if (importBtn) {
             importBtn.disabled = false;
             importBtn.textContent = originalText;
           }
-          if (chooseBtn) {
-            chooseBtn.disabled = false;
-            chooseBtn.textContent = originalChooseText;
-          }
         }
-      }
-
-      async function applySongImportDraft() {
-        if (!pendingSongImportDraft?.result) return;
-        const draft = pendingSongImportDraft;
-        await loadSong({ ...draft.result, id: null });
-        state.id = null;
-        renderChart();
-        closeSongImport();
-        showToast(`${draft.fileName} filled the editor as an unsaved draft. Review it before Save.`, "success");
       }
 
       function safeExportPart(value, fallback) {
@@ -20582,7 +20102,6 @@
           "#sidebar",
           "#main-editor",
           "#songList",
-          "#database-results",
           "#settings-panel",
           "#shortcut-panel .shortcut-panel-body",
           ".wizard-card",
@@ -20614,15 +20133,14 @@
 
           ev.preventDefault();
 
-          const unit = ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? el.clientHeight : 1;
-          const delta = ev.deltaY * unit;
-          const distance = delta * 1.08;
+          const delta = ev.deltaY;
+          const distance = delta * 1.18;
           const nextTop = Math.max(0, Math.min(maxScroll, (raf ? targetTop : el.scrollTop) + distance));
-          const logDelay = 80 + Math.log1p(Math.abs(delta)) * 28;
+          const logDelay = 140 + Math.log1p(Math.abs(delta)) * 68;
 
           startTop = el.scrollTop;
           targetTop = nextTop;
-          duration = Math.max(95, Math.min(260, logDelay));
+          duration = Math.max(170, Math.min(560, logDelay));
           startTime = performance.now();
 
           if (!raf) {
@@ -20632,7 +20150,7 @@
 
         function step(now) {
           const t = Math.min(1, (now - startTime) / duration);
-          const eased = 1 - Math.pow(1 - t, 4);
+          const eased = 1 - Math.pow(1 - t, 3);
           el.scrollTop = startTop + (targetTop - startTop) * eased;
           if (t < 1) {
             raf = requestAnimationFrame(step);
@@ -21361,19 +20879,15 @@
             }).catch(err => console.error("Auto-load failed:", err));
           }
         } else {
-          closeWizard({ immediate: true });
+          const wizard = document.getElementById("wizard-overlay");
+          if (wizard) wizard.style.display = "none";
           focusEditor();
         }
       }
 
-      function closeWizard(options = {}) {
+      function closeWizard() {
         const overlay = document.getElementById("wizard-overlay");
         if (!overlay) return;
-        if (options.immediate) {
-          overlay.classList.remove("dismissing");
-          overlay.style.display = "none";
-          return;
-        }
         overlay.classList.add("dismissing");
         setTimeout(() => {
           overlay.style.display = "none";
@@ -21789,7 +21303,6 @@
 
       async function init() {
         setupThemeControls();
-        setupSongImportDialog();
         const referenceNotes = document.getElementById("songReferenceInfo");
         if (referenceNotes && !referenceNotes.dataset.dateSuggestionBound) {
           referenceNotes.addEventListener("input", suggestDatesFromReferenceNotes);

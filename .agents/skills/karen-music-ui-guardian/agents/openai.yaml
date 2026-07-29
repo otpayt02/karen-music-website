@@ -1,0 +1,4 @@
+interface:
+  display_name: "Karen Music UI Guardian"
+  short_description: "Preserve Karen Music behavior during UI work"
+  default_prompt: "Audit or redesign Karen Music Director while preserving its protected editor, data, print, translation, and keyboard workflows."

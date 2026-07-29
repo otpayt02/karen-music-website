@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Piano 1",
+    "sheet": {
+      "w": 0,
+      "h": 0,
+      "sw": 0,
+      "sh": 0
+    },
+    "chart": {
+      "w": 0,
+      "h": 0,
+      "sw": 0,
+      "sh": 0
+    },
+    "sections": {
+      "w": 0,
+      "sw": 0,
+      "transform": ""
+    },
+    "footer": "BPM, 4/4 Piano 1 Group"
+  },
+  {
+    "name": "Drums",
+    "sheet": {
+      "w": 0,
+      "h": 0,
+      "sw": 0,
+      "sh": 0
+    },
+    "chart": {
+      "w": 0,
+      "h": 0,
+      "sw": 0,
+      "sh": 0
+    },
+    "sections": {
+      "w": 0,
+      "sw": 0,
+      "transform": ""
+    },
+    "footer": "BPM, 4/4 Drums Group"
+  },
+  {
+    "name": "Reference",
+    "sheet": {
+      "w": 0,
+      "h": 0,
+      "sw": 0,
+      "sh": 0
+    },
+    "chart": {
+      "w": 0,
+      "h": 0,
+      "sw": 0,
+      "sh": 0
+    },
+    "sections": {
+      "w": 0,
+      "sw": 0,
+      "transform": ""
+    },
+    "footer": "BPM, 4/4 Reference Group"
+  }
+]

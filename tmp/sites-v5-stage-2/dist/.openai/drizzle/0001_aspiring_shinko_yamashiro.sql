@@ -1,0 +1,1 @@
+ALTER TABLE `songs` ADD `owner_key` text DEFAULT '' NOT NULL;

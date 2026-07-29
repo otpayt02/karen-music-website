@@ -1,0 +1,29 @@
+{
+  "titleKaren": "တၢ်သးဝံၣ်စဲၣ်နီၤ",
+  "titleEnglish": "Synthetic Import Review",
+  "style": "Practice",
+  "key": "C",
+  "bpm": 72,
+  "meter": "4/4",
+  "group": "Demo Team",
+  "instruments": ["Piano 1", "Bass", "Strings", "Keytar"],
+  "lyrics": "Synthetic review text only.",
+  "sections": [
+    {
+      "id": "synthetic-import-section",
+      "name": "VERSE",
+      "preMeasure": null,
+      "measuresPerRow": 8,
+      "measures": [
+        {
+          "beats": [
+            { "chord": { "root": "C" } },
+            { "chord": null },
+            { "chord": { "root": "F" } },
+            { "chord": null }
+          ]
+        }
+      ]
+    }
+  ]
+}
