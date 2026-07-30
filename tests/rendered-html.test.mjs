@@ -15,6 +15,10 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(page, /<MusicDirector viewer=/);
   assert.match(layout, /title:\s*"Karen Music Director"/);
   assert.match(editor, /New song/);
+  assert.match(editor, /const blankSong = \(\): Song =>/);
+  assert.match(editor, /sections:\s*\[\]/);
+  assert.match(editor, /<button onClick=\{startNewSong\}>New song<\/button>/);
+  assert.match(editor, /Blank 4\/4 song ready/);
   assert.match(editor, /aria-label="Song library"/);
   assert.match(editor, />Song Library</);
   assert.match(editor, /\["chart", "lyrics"\]/);
@@ -42,6 +46,11 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /Karen title keyboard/);
   assert.match(editor, /target\.dataset\.karenField !== "titleKaren"/);
   assert.match(editor, /Choose centered footer instruments/);
+  assert.match(editor, /className="paper-english-title"/);
+  assert.match(editor, /list="paper-style-options"/);
+  assert.match(editor, /<option value="">Key<\/option>/);
+  assert.match(editor, /routeWheelToHoveredRegion/);
+  assert.match(editor, /focus\(\{ preventScroll: true \}\)/);
   assert.match(editor, /instrumentOptions = \["Piano 1", "Piano 2", "Acoustic Guitar", "Electric Guitar", "Drums", "Electric Bass", "Keytar"\]/);
   assert.match(editor, /ending=\{measureIndex === section\.measures\.length - 1\}/);
   assert.match(editor, /Lead melody/);
@@ -54,6 +63,8 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(styles, /\.measure\.ending-bar/);
   assert.match(styles, /\.measure:hover/);
   assert.match(styles, /\.ghost-measure/);
+  assert.match(styles, /overscroll-behavior:\s*contain/);
+  assert.match(styles, /\.paper-header \.paper-english-title/);
   assert.match(styles, /--font-mono:\s*"IBM Plex Mono"/);
   assert.match(styles, /\.section-tone-chorus/);
   assert.match(styles, /\.karen-keyboard-overlay/);

@@ -322,6 +322,22 @@ const demoSong = (): Song => ({
   ],
 });
 
+const blankSong = (): Song => ({
+  titleKaren: "",
+  titleEnglish: "",
+  style: "",
+  category: "",
+  key: "",
+  bpm: 105,
+  meter: "4/4",
+  group: "",
+  instruments: [],
+  sourceKind: "synthetic",
+  reviewState: "unreviewed",
+  lyrics: "",
+  sections: [],
+});
+
 function chordLabel(chord: Chord | null) {
   if (!chord) return "";
   const quality = chord.quality === "triangle7" ? "Δ7" : chord.quality || "";
@@ -344,7 +360,6 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [tab, setTab] = useState<"chart" | "lyrics">("chart");
   const [selected, setSelected] = useState({ section: 0, measure: 0, beat: 0, pre: false });
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [newSongOpen, setNewSongOpen] = useState(false);
   const [sectionModalOpen, setSectionModalOpen] = useState(false);
   const [sectionInsertIndex, setSectionInsertIndex] = useState<number | null>(null);
   const [leadModalOpen, setLeadModalOpen] = useState(false);
@@ -412,11 +427,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
 
   const insertMeasure = useCallback((beatCount: number) => {
     if (selected.pre) return;
+    if (!song.sections[selected.section]) return;
     commitSong((next) => {
       next.sections[selected.section].measures.splice(selected.measure + 1, 0, createMeasure(beatCount));
     }, `Inserted ${beatCount}-beat measure`);
     setSelected((current) => ({ ...current, measure: current.measure + 1, beat: 0, pre: false }));
-  }, [commitSong, selected.measure, selected.pre, selected.section]);
+  }, [commitSong, selected.measure, selected.pre, selected.section, song.sections]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -442,11 +458,103 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   }, []);
 
   useEffect(() => {
+    const routeWheelToHoveredRegion = (event: globalThis.WheelEvent) => {
+      if (event.ctrlKey || event.metaKey) return;
+      const origin = event.target instanceof Element ? event.target : null;
+      if (!origin) return;
+
+      const select = origin.closest<HTMLSelectElement>("select:not([multiple])");
+      if (select && Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
+        const options = Array.from(select.options);
+        const direction = event.deltaY > 0 ? 1 : -1;
+        let nextIndex = select.selectedIndex;
+        do {
+          nextIndex += direction;
+        } while (options[nextIndex]?.disabled);
+        nextIndex = Math.max(0, Math.min(options.length - 1, nextIndex));
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (nextIndex !== select.selectedIndex) {
+          select.selectedIndex = nextIndex;
+          select.dispatchEvent(new Event("input", { bubbles: true }));
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        return;
+      }
+
+      const stepControl = origin.closest<HTMLInputElement>('input[type="number"], input[type="range"]');
+      if (stepControl && Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (event.deltaY < 0) stepControl.stepUp();
+        else stepControl.stepDown();
+        stepControl.dispatchEvent(new Event("input", { bubbles: true }));
+        stepControl.dispatchEvent(new Event("change", { bubbles: true }));
+        return;
+      }
+
+      const scrollTarget = event.composedPath()
+        .filter((node): node is HTMLElement => node instanceof HTMLElement)
+        .find((element) => {
+          const styles = window.getComputedStyle(element);
+          const canScrollY = /(auto|scroll)/.test(styles.overflowY) && element.scrollHeight > element.clientHeight;
+          const canScrollX = /(auto|scroll)/.test(styles.overflowX) && element.scrollWidth > element.clientWidth;
+          return canScrollY || canScrollX;
+        });
+      if (!scrollTarget) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (Math.abs(event.deltaY) >= Math.abs(event.deltaX)) scrollTarget.scrollTop += event.deltaY;
+      else scrollTarget.scrollLeft += event.deltaX;
+    };
+
+    let scrollSnapshot: Array<{ element: Element; top: number; left: number }> = [];
+    const captureEditorViewport = (event: PointerEvent) => {
+      const origin = event.target instanceof Element ? event.target : null;
+      if (!origin?.closest(".chart-body")) {
+        scrollSnapshot = [];
+        return;
+      }
+      const candidates = new Set<Element>([document.scrollingElement].filter(Boolean) as Element[]);
+      let current: Element | null = origin.parentElement;
+      while (current) {
+        if (current.scrollHeight > current.clientHeight || current.scrollWidth > current.clientWidth) {
+          candidates.add(current);
+        }
+        current = current.parentElement;
+      }
+      scrollSnapshot = Array.from(candidates).map((element) => ({
+        element,
+        top: element.scrollTop,
+        left: element.scrollLeft,
+      }));
+    };
+    const restoreEditorViewport = () => {
+      if (!scrollSnapshot.length) return;
+      const restore = () => scrollSnapshot.forEach(({ element, top, left }) => {
+        element.scrollTop = top;
+        element.scrollLeft = left;
+      });
+      window.requestAnimationFrame(() => window.requestAnimationFrame(restore));
+    };
+
+    document.addEventListener("wheel", routeWheelToHoveredRegion, { capture: true, passive: false });
+    document.addEventListener("pointerdown", captureEditorViewport, true);
+    document.addEventListener("click", restoreEditorViewport, true);
+    return () => {
+      document.removeEventListener("wheel", routeWheelToHoveredRegion, true);
+      document.removeEventListener("pointerdown", captureEditorViewport, true);
+      document.removeEventListener("click", restoreEditorViewport, true);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!printRoomOpen) return;
     const closeOnEscape = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         setPrintRoomOpen(false);
-        printButton.current?.focus();
+        printButton.current?.focus({ preventScroll: true });
       }
     };
     document.addEventListener("keydown", closeOnEscape);
@@ -547,7 +655,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     if (!location) return;
     setSelected(location);
     setStatus(`Lead editor moved to ${song.sections[location.section].name} ${location.pre ? "pre-section" : `measure ${location.measure + 1}`}`);
-    requestAnimationFrame(() => leadInputs.current[0]?.focus());
+    requestAnimationFrame(() => leadInputs.current[0]?.focus({ preventScroll: true }));
   }
 
   function adjustLeadBaseOctave(delta: -1 | 1) {
@@ -583,7 +691,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     if (key === "Escape") {
       event.preventDefault();
       setLeadModalOpen(false);
-      editorTarget.current?.focus();
+      editorTarget.current?.focus({ preventScroll: true });
       return;
     }
     if (event.ctrlKey && key.toLowerCase() === "z") { event.preventDefault(); undo(); return; }
@@ -595,10 +703,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     if (inputIndex < 0) return;
     if (key === "ArrowLeft") {
       event.preventDefault();
-      leadInputs.current[Math.max(0, inputIndex - 1)]?.focus();
+      leadInputs.current[Math.max(0, inputIndex - 1)]?.focus({ preventScroll: true });
     } else if (key === "ArrowRight" || key === "Enter") {
       event.preventDefault();
-      leadInputs.current[Math.min(leadInputs.current.length - 1, inputIndex + 1)]?.focus();
+      leadInputs.current[Math.min(leadInputs.current.length - 1, inputIndex + 1)]?.focus({ preventScroll: true });
     } else if (key === "ArrowUp") {
       event.preventDefault();
       adjustLeadNote(inputIndex, 1);
@@ -687,7 +795,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       target.dispatchEvent(new Event("input", { bubbles: true }));
     }
     requestAnimationFrame(() => {
-      target.focus();
+      target.focus({ preventScroll: true });
       target.setSelectionRange(caret, caret);
     });
   }
@@ -790,7 +898,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     setSelected(hadPreMeasure
       ? { section: sectionIndex, measure: 0, beat: 0, pre: false }
       : { section: sectionIndex, measure: 0, beat: 0, pre: true });
-    requestAnimationFrame(() => editorTarget.current?.focus());
+    requestAnimationFrame(() => editorTarget.current?.focus({ preventScroll: true }));
   }
 
   function handleKarenTextTarget(target: EventTarget | null) {
@@ -930,7 +1038,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       handleKarenKeyboardKey(event);
       return;
     }
-    if (leadModalOpen || importReview || saveReviewOpen || newSongOpen || printRoomOpen) return;
+    if (leadModalOpen || importReview || saveReviewOpen || printRoomOpen) return;
     if (target.matches("input, textarea, select, [contenteditable='true']")) return;
 
     if (key === "?" || (event.shiftKey && key === "/")) {
@@ -1183,13 +1291,23 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     setImportReview(null);
     setImportReviewConfirmed(false);
     setStatus("Imported as an unsaved reviewed draft");
-    requestAnimationFrame(() => editorTarget.current?.focus());
+    requestAnimationFrame(() => editorTarget.current?.focus({ preventScroll: true }));
   }
 
   function startNewSong() {
-    setSong(demoSong());
-    setNewSongOpen(false);
-    setStatus("New unsaved song");
+    setKarenKeyboardOpen(false);
+    setSong(blankSong());
+    setSelected({ section: 0, measure: 0, beat: 0, pre: false });
+    setSectionInsertIndex(null);
+    setPendingBass(false);
+    setPendingSuperscript(false);
+    setPendingSlur(null);
+    setPendingOnly(null);
+    undoHistory.current = [];
+    redoHistory.current = [];
+    setTab("chart");
+    setStatus("Blank 4/4 song ready — press Enter to add a section");
+    window.requestAnimationFrame(() => editorTarget.current?.focus({ preventScroll: true }));
   }
 
   function openPrintRoom() {
@@ -1227,13 +1345,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       }
     }, `Created through measure ${targetMeasure + 1}`);
     setSelected({ section: sectionIndex, measure: targetMeasure, beat: 0, pre: false });
-    window.requestAnimationFrame(() => editorTarget.current?.focus());
+    window.requestAnimationFrame(() => editorTarget.current?.focus({ preventScroll: true }));
   }
 
   const filteredSongs = songs.filter((item) =>
     `${item.titleKaren} ${item.titleEnglish} ${item.key} ${item.style} ${item.category}`.toLowerCase().includes(search.toLowerCase())
   );
-  const activeCueRowKey = selected.pre ? "" : cueRowKey(song, selected);
+  const activeCueRowKey = selected.pre || !song.sections[selected.section] ? "" : cueRowKey(song, selected);
   const activeCueRanges = (song.instrumentCueRanges ?? []).filter((range) => range.rowKey === activeCueRowKey).slice(0, 2);
   const activeCueRange = activeCueRanges[activeCueSlot];
 
@@ -1248,7 +1366,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           </div>
         </div>
         <nav className="global-actions" aria-label="Song actions">
-          <button onClick={() => { setKarenKeyboardOpen(false); setNewSongOpen(true); }}>New song</button>
+          <button onClick={startNewSong}>New song</button>
           <button onClick={requestSaveSong} className="primary">Save</button>
           <button onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }}>Import</button>
           <button onClick={exportSong}>Export</button>
@@ -1276,6 +1394,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               </label>
               <label>Current song category
                 <select value={song.category} onChange={(event) => updateSong({ category: event.target.value })}>
+                  <option value="">Category</option>
                   {categoryOptions.map((category) => <option key={category}>{category}</option>)}
                 </select>
               </label>
@@ -1295,10 +1414,6 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <button className="icon-button" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">×</button>
           </div>
           <section className="sidebar-panel library-panel" aria-label="Library panel">
-            <div className="library-heading">
-              <div><span className="eyebrow">Database</span><strong>Song library</strong></div>
-              <output>{songs.length}</output>
-            </div>
             <input className="library-search" type="search" aria-label="Search song library" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
             <div className="song-list">
               {filteredSongs.length === 0 ? <div className="empty-state"><strong>No hosted songs yet</strong><span>Save a reviewed, sanitized chart to add it to this private library.</span></div> :
@@ -1313,7 +1428,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <div className="command-bar">
             <div className="song-position">
               <span className="eyebrow">Active chart</span>
-              <strong>{song.key} / {song.style}</strong>
+              <strong>{song.key || "Key"} / {song.style || "Style"}</strong>
             </div>
             <div className="view-controls" aria-label="View controls">
               <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
@@ -1341,9 +1456,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               style={{ "--paper-scale": zoom / 100 } as React.CSSProperties}
             >
               <header className="paper-header">
-                <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><span className="parenthesized-field paper-english-title"><span aria-hidden="true">(</span><input data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" size={Math.max(1, Array.from(song.titleEnglish || " ").length)} value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span></div>
-                <select aria-label="Song style on paper" value={song.style} onChange={(event) => updateSong({ style: event.target.value })}>{styleOptions.map((style) => <option key={style}>{style}</option>)}</select>
-                <select aria-label="Song key on paper" value={song.key} onChange={(event) => updateSong({ key: event.target.value })}>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select>
+                <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><input className="paper-english-title" data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></div>
+                <input aria-label="Song style on paper" list="paper-style-options" placeholder="Style" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
+                <datalist id="paper-style-options">{styleOptions.map((style) => <option key={style} value={style} />)}</datalist>
+                <select aria-label="Song key on paper" value={song.key} onChange={(event) => updateSong({ key: event.target.value })}><option value="">Key</option>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select>
               </header>
               <div className="chart-body">
                 {song.sections.map((section, sectionIndex) => <div className="section-block" key={section.id}>
@@ -1419,8 +1535,9 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 <button
                   className="section-insert section-insert-last"
                   onClick={() => { setSectionInsertIndex(song.sections.length); setSectionModalOpen(true); }}
+                  aria-label="Add section at end"
                 >
-                  + Add section
+                  +
                 </button>
               </div>
               <footer className="paper-footer">
@@ -1461,7 +1578,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                     </label>)}
                   </div>
                 </details>
-                <select aria-label="Group on paper" value={song.group} onChange={(event) => updateSong({ group: event.target.value })}>{groupOptions.map((group) => <option key={group}>{group}</option>)}</select>
+                <select aria-label="Group on paper" value={song.group} onChange={(event) => updateSong({ group: event.target.value })}><option value="">Group</option>{groupOptions.map((group) => <option key={group}>{group}</option>)}</select>
               </footer>
             </article>}
 
@@ -1476,18 +1593,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       <nav className="mobile-toolbar" aria-label="Mobile editor tools">
         <button onClick={() => setSidebarOpen(true)}>Sidebar</button>
         <button onClick={() => setTab("chart")} aria-current={tab === "chart"}>Chart</button>
-        <button onClick={() => insertMeasure(Number(song.meter.split("/")[0]) || 4)}>+ Measure</button>
+        <button onClick={() => insertMeasure(Number(song.meter.split("/")[0]) || 4)} disabled={!activeMeasure}>+ Measure</button>
         <button onClick={requestSaveSong}>Save</button>
         <button onClick={openPrintRoom}>Print</button>
       </nav>
-
-      {newSongOpen && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setNewSongOpen(false)}>
-        <section className="modal" role="dialog" aria-modal="true" aria-labelledby="new-song-title">
-          <header><div><span className="eyebrow">New chart</span><h2 id="new-song-title">Start with song details</h2></div><button className="icon-button" onClick={() => setNewSongOpen(false)} aria-label="Close new song dialog">×</button></header>
-          <p>This creates an unsaved demonstration chart. Add only approved, sanitized song content before saving it online.</p>
-          <div className="modal-actions"><button onClick={() => setNewSongOpen(false)}>Cancel</button><button className="primary" onClick={startNewSong}>Create chart</button></div>
-        </section>
-      </div>}
 
       {sectionModalOpen && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setSectionModalOpen(false)}>
         <section className="modal section-modal" role="dialog" aria-modal="true" aria-labelledby="section-modal-title">
@@ -1513,7 +1622,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <span className="lead-measure-label">{selected.pre ? "Pre-section" : `Measure ${selected.measure + 1}`}</span>
             </div>
             <button className="lead-measure-nav" onClick={() => shiftLeadMeasure(1)} disabled={!leadLocation(1)} aria-label="Next lead measure">›</button>
-            <button className="icon-button" onClick={() => { setLeadModalOpen(false); editorTarget.current?.focus(); }} aria-label="Close lead melody dialog">×</button>
+            <button className="icon-button" onClick={() => { setLeadModalOpen(false); editorTarget.current?.focus({ preventScroll: true }); }} aria-label="Close lead melody dialog">×</button>
           </header>
           <div className="lead-settings">
             <label>Base octave
@@ -1601,7 +1710,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           </section>}
 
           <p className="modal-note">Left/Right moves lead slots. Ctrl+Left/Right changes measure. Up/Down changes a note octave. Ctrl+Up/Down changes base octave. Ctrl+Z/Y undo or redo.</p>
-          <div className="modal-actions"><button className="primary" onClick={() => { setLeadModalOpen(false); editorTarget.current?.focus(); }}>Done</button></div>
+          <div className="modal-actions"><button className="primary" onClick={() => { setLeadModalOpen(false); editorTarget.current?.focus({ preventScroll: true }); }}>Done</button></div>
         </section>
       </div>}
 
