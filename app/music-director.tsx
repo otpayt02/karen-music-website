@@ -52,6 +52,7 @@ type Song = {
   style: string;
   category: string;
   key: string;
+  originalKey?: string;
   bpm: number;
   meter: string;
   group: string;
@@ -73,6 +74,20 @@ const defaultStyleOptions = ["Worship", "Praise", "Hymn", "Traditional", "Contem
 const defaultCategoryOptions = ["Praise / Worship", "Choir", "Youth", "Solo", "Kids"];
 const songGroupOptions = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
 const timeSignatureOptions = ["2/4", "3/4", "4/4", "6/8"] as const;
+const keyOptions = [
+  { value: "C", label: "C" }, { value: "Db", label: "D♭" },
+  { value: "D", label: "D" }, { value: "Eb", label: "E♭" },
+  { value: "E", label: "E" }, { value: "F", label: "F" },
+  { value: "Gb", label: "G♭" }, { value: "G", label: "G" },
+  { value: "Ab", label: "A♭" }, { value: "A", label: "A" },
+  { value: "Bb", label: "B♭" }, { value: "B", label: "B" },
+] as const;
+const flatScale = keyOptions.map((option) => option.value);
+const noteIndex: Record<string, number> = {
+  C: 0, "B#": 0, Db: 1, "C#": 1, D: 2, Eb: 3, "D#": 3,
+  E: 4, Fb: 4, F: 5, "E#": 5, Gb: 6, "F#": 6, G: 7,
+  Ab: 8, "G#": 8, A: 9, Bb: 10, "A#": 10, B: 11, Cb: 11,
+};
 const MIN_BPM = 55;
 const MAX_BPM = 155;
 const KAREN_LAYOUT = [
@@ -137,7 +152,25 @@ function normalizeInstruments(value: unknown): string[] {
   return [...new Set(normalized)];
 }
 
+function normalizeKeyName(value: string | undefined) {
+  const raw = String(value || "").trim().replaceAll("♭", "b").replaceAll("♯", "#");
+  if (!raw) return "";
+  const key = `${raw[0].toUpperCase()}${raw.slice(1)}`;
+  const index = noteIndex[key];
+  return index === undefined ? "" : flatScale[index];
+}
+
+function transposeChord(chord: Chord | null, semitones: number) {
+  if (!chord?.root) return;
+  const source = normalizeKeyName(`${chord.root}${chord.flat ? "b" : ""}`) || normalizeKeyName(chord.root);
+  if (!source) return;
+  const shifted = flatScale[(noteIndex[source] + semitones + 1200) % 12];
+  chord.root = shifted[0];
+  chord.flat = shifted.endsWith("b");
+}
+
 function normalizeSongMetadata(song: Song): Song {
+  const key = normalizeKeyName(song.key);
   return {
     ...song,
     category: song.category?.trim() || "Praise / Worship",
@@ -145,6 +178,8 @@ function normalizeSongMetadata(song: Song): Song {
     meter: normalizeTimeSignature(song.meter),
     group: normalizeSongGroup(song.group),
     instruments: normalizeInstruments(song.instruments),
+    key,
+    originalKey: normalizeKeyName(song.originalKey) || key,
   };
 }
 
@@ -290,6 +325,7 @@ const demoSong = (): Song => ({
   style: "Worship",
   category: "Praise / Worship",
   key: "G",
+  originalKey: "G",
   bpm: 76,
   meter: "4/4",
   group: "Praise & Worship",
@@ -328,6 +364,7 @@ const blankSong = (): Song => ({
   style: "",
   category: "",
   key: "",
+  originalKey: "",
   bpm: 105,
   meter: "4/4",
   group: "",
@@ -357,7 +394,7 @@ function ChordNotation({ chord }: { chord: Chord | null }) {
 
 export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: Viewer }) {
   const [song, setSong] = useState<Song>(() => demoSong());
-  const [tab, setTab] = useState<"chart" | "lyrics">("chart");
+  const [tab, setTab] = useState<"chart" | "lyrics" | "database">("chart");
   const [selected, setSelected] = useState({ section: 0, measure: 0, beat: 0, pre: false });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sectionModalOpen, setSectionModalOpen] = useState(false);
@@ -367,6 +404,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [printRoomOpen, setPrintRoomOpen] = useState(false);
   const [printPage, setPrintPage] = useState(1);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [defaultMeasuresPerRow, setDefaultMeasuresPerRow] = useState(DEFAULT_MEASURES_PER_ROW);
   const [karenTitleKeyboardEnabled, setKarenTitleKeyboardEnabled] = useState(true);
   const [styleOptions, setStyleOptions] = useState<string[]>(defaultStyleOptions);
   const [categoryOptions, setCategoryOptions] = useState<string[]>(defaultCategoryOptions);
@@ -395,6 +434,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const fileInput = useRef<HTMLInputElement>(null);
   const printButton = useRef<HTMLButtonElement>(null);
   const editorTarget = useRef<HTMLElement>(null);
+  const paperAreaTarget = useRef<HTMLDivElement>(null);
   const undoHistory = useRef<Song[]>([]);
   const redoHistory = useRef<Song[]>([]);
   const leadInputs = useRef<Array<HTMLInputElement | null>>([]);
@@ -439,9 +479,16 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   }, [theme]);
 
   useEffect(() => {
-    setStyleOptions((current) => current.includes(song.style) || !song.style ? current : [...current, song.style]);
-    setGroupOptions((current) => current.includes(song.group) || !song.group ? current : [...current, song.group]);
-    setCategoryOptions((current) => current.includes(song.category) || !song.category ? current : [...current, song.category]);
+    document.documentElement.dataset.reducedMotion = reducedMotion ? "true" : "false";
+  }, [reducedMotion]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setStyleOptions((current) => current.includes(song.style) || !song.style ? current : [...current, song.style]);
+      setGroupOptions((current) => current.includes(song.group) || !song.group ? current : [...current, song.group]);
+      setCategoryOptions((current) => current.includes(song.category) || !song.category ? current : [...current, song.category]);
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [song.category, song.group, song.style]);
 
   useEffect(() => {
@@ -589,6 +636,46 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   function updateSong(patch: Partial<Song>) {
     setSong((current) => ({ ...current, ...patch }));
     setStatus("Unsaved changes");
+  }
+
+  function updateSongKey(value: string) {
+    const key = normalizeKeyName(value);
+    setSong((current) => ({
+      ...current,
+      key,
+      originalKey: current.originalKey || key,
+    }));
+    setStatus("Unsaved changes");
+  }
+
+  function transposeSong(targetValue: string) {
+    if (!targetValue) return;
+    commitSong((next) => {
+      const sourceKey = normalizeKeyName(next.key || next.originalKey);
+      const originalKey = normalizeKeyName(next.originalKey || sourceKey);
+      const targetKey = targetValue === "__ORIGINAL__" ? originalKey : normalizeKeyName(targetValue);
+      if (!targetKey) return;
+      if (!sourceKey) {
+        next.key = targetKey;
+        next.originalKey = targetKey;
+        return;
+      }
+      const semitones = (noteIndex[targetKey] - noteIndex[sourceKey] + 12) % 12;
+      if (semitones) {
+        next.sections.forEach((section) => {
+          const measures = [...(section.preMeasure ? [section.preMeasure] : []), ...section.measures];
+          measures.forEach((measure) => measure.beats.forEach((beat) => {
+            transposeChord(beat.chord, semitones);
+            if (beat.bass) {
+              const bass = normalizeKeyName(beat.bass);
+              if (bass) beat.bass = flatScale[(noteIndex[bass] + semitones + 1200) % 12];
+            }
+          }));
+        });
+      }
+      next.key = targetKey;
+      next.originalKey = originalKey || targetKey;
+    }, targetValue === "__ORIGINAL__" ? "Restored original key" : `Transposed to ${normalizeKeyName(targetValue)}`);
   }
 
   function activeBeatFrom(target: Song, location = selected) {
@@ -861,12 +948,40 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
         name,
         preMeasure: null,
         measures: [createMeasure(Number(next.meter.split("/")[0]) || 4)],
-        measuresPerRow: DEFAULT_MEASURES_PER_ROW,
+        measuresPerRow: defaultMeasuresPerRow,
       });
     }, `Added ${name}`);
     setSelected({ section: index, measure: 0, beat: 0, pre: false });
     setSectionModalOpen(false);
     setSectionInsertIndex(null);
+  }
+
+  function closeDatabaseSidebar() {
+    setSidebarOpen(false);
+    setTab((current) => current === "database" ? "chart" : current);
+  }
+
+  function openDatabaseSidebar() {
+    setSidebarOpen(true);
+    setTab("database");
+  }
+
+  function fitPaperToWidth() {
+    const paper = editorTarget.current;
+    const area = paperAreaTarget.current;
+    if (!paper || !area) {
+      setStatus("Fit to width is available in Chart view");
+      return;
+    }
+    const styles = window.getComputedStyle(area);
+    const availableWidth = area.clientWidth
+      - (Number.parseFloat(styles.paddingLeft) || 0)
+      - (Number.parseFloat(styles.paddingRight) || 0);
+    const naturalWidth = paper.offsetWidth;
+    if (!availableWidth || !naturalWidth) return;
+    const fittedZoom = clampZoom(Math.floor((availableWidth / naturalWidth) * 100));
+    setZoom(fittedZoom);
+    setStatus(`Paper fitted to width at ${fittedZoom}%`);
   }
 
   function removeSection(sectionIndex: number) {
@@ -1359,9 +1474,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     <main className="app-shell" onKeyDownCapture={handleEditorKey} onFocusCapture={handleTextFocus} onClickCapture={(event) => handleKarenTextTarget(event.target)}>
       <header className="app-header">
         <div className="brand">
-          <button className="icon-button" onClick={() => setSidebarOpen((value) => !value)} aria-label="Toggle settings and library">☰</button>
+          <button className="icon-button" onClick={() => sidebarOpen ? closeDatabaseSidebar() : openDatabaseSidebar()} aria-label="Toggle song database">☰</button>
+          {/* The approved project logo is a raster asset, so it stays an ordinary image. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="brand-logo" src="/karen-music-logo.png" alt="Karen Music emblem" />
           <div>
-            <strong>Karen Music Director</strong>
+            <strong>Karen Music Director Website</strong>
             <span>ကညီတၢ်သးဝံၣ်</span>
           </div>
         </div>
@@ -1374,6 +1492,21 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <details className="settings-menu">
             <summary>Settings</summary>
             <div className="settings-popover">
+              <div className="settings-group-heading"><strong>Appearance</strong><small>Website shell and motion</small></div>
+              <label>Theme
+                <select value={theme} onChange={(event) => setTheme(event.target.value as "light" | "dark")}>
+                  <option value="dark">Dark village</option>
+                  <option value="light">Light village</option>
+                </select>
+              </label>
+              <label className="setting-row">
+                <input type="checkbox" checked={reducedMotion} onChange={(event) => setReducedMotion(event.target.checked)} />
+                <span><strong>Reduce motion</strong><small>Turn off zoom and panel animation.</small></span>
+              </label>
+              <div className="settings-group-heading"><strong>Music editor</strong><small>Legacy composition defaults</small></div>
+              <label>Default measures per row
+                <input type="number" min={MIN_MEASURES_PER_ROW} max={MAX_MEASURES_PER_ROW} value={defaultMeasuresPerRow} onChange={(event) => setDefaultMeasuresPerRow(Math.max(MIN_MEASURES_PER_ROW, Math.min(MAX_MEASURES_PER_ROW, Number(event.target.value) || DEFAULT_MEASURES_PER_ROW)))} />
+              </label>
               <label className="setting-row">
                 <input
                   type="checkbox"
@@ -1385,6 +1518,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 />
                 <span><strong>Karen title keyboard</strong><small>Open the Karen keyboard from Karen title fields.</small></span>
               </label>
+              <div className="settings-group-heading"><strong>Database choices</strong><small>Styles, categories, and groups</small></div>
               <label>Song styles
                 <input value={styleDraft} onChange={(event) => setStyleDraft(event.target.value)} onBlur={(event) => applyOptionDraft("styles", event.target.value)} />
                 <small>Comma-separated choices. Loaded styles remain available.</small>
@@ -1408,13 +1542,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       </header>
 
       <div className={`workspace ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
-        <aside className="sidebar" aria-label="Song library">
+        <aside className="sidebar" aria-label="Song database">
           <div className="sidebar-heading">
-            <span>Song Library</span>
-            <button className="icon-button" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">×</button>
+            <span>Song Database</span>
+            <button className="icon-button" onClick={closeDatabaseSidebar} aria-label="Close song database">×</button>
           </div>
-          <section className="sidebar-panel library-panel" aria-label="Library panel">
-            <input className="library-search" type="search" aria-label="Search song library" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
+          <section className="sidebar-panel library-panel" aria-label="Database sidebar">
+            <input className="library-search" type="search" aria-label="Search song database" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
             <div className="song-list">
               {filteredSongs.length === 0 ? <div className="empty-state"><strong>No hosted songs yet</strong><span>Save a reviewed, sanitized chart to add it to this private library.</span></div> :
                 filteredSongs.map((item) => <button key={item.id} onClick={() => { setSong(normalizeSongMetadata(item)); setTab("chart"); setStatus("Loaded from hosted library"); }}>
@@ -1434,21 +1568,24 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
               <output>{zoom}%</output>
               <button onClick={() => setZoom((value) => nextZoom(value, 1))} aria-label="Zoom in">+</button>
-              <button onClick={() => setZoom(100)}>100%</button>
+              <button className="fit-width-button" onClick={fitPaperToWidth} aria-label="Fit paper to width" title="Fit paper to width">
+                <span className="fit-paper-icon" aria-hidden="true"><i /></span>
+              </button>
             </div>
             <span className="status" aria-live="polite">{status}</span>
           </div>
 
-          <div className="paper-area">
+          <div className="paper-area" ref={paperAreaTarget}>
             <div className="paper-tabs" role="tablist" aria-label="Song work surfaces">
               {(["chart", "lyrics"] as const).map((name) => (
                 <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>
               ))}
+              <button role="tab" aria-selected={tab === "database"} onClick={openDatabaseSidebar}>database</button>
               <button className="rail-icon" onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle dark mode" aria-pressed={theme === "dark"} title="Toggle dark mode">{theme === "dark" ? "☾" : "☼"}</button>
               <button className="rail-icon" onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Docs and keyboard shortcuts">?</button>
             </div>
 
-            {tab === "chart" && <article
+            {tab !== "lyrics" && <article
               className="paper chart-paper"
               tabIndex={0}
               ref={editorTarget}
@@ -1459,7 +1596,14 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><input className="paper-english-title" data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></div>
                 <input aria-label="Song style on paper" list="paper-style-options" placeholder="Style" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
                 <datalist id="paper-style-options">{styleOptions.map((style) => <option key={style} value={style} />)}</datalist>
-                <select aria-label="Song key on paper" value={song.key} onChange={(event) => updateSong({ key: event.target.value })}><option value="">Key</option>{["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"].map((key) => <option key={key}>{key}</option>)}</select>
+                <div className="paper-key-editor-cluster">
+                  <select className="paper-key-select" aria-label="Song key on paper" value={song.key} onChange={(event) => updateSongKey(event.target.value)}><option value="">Key</option>{keyOptions.map((key) => <option key={key.value} value={key.value}>{key.label}</option>)}</select>
+                  <select className="paper-transpose-control" aria-label="Transpose song" defaultValue="" onChange={(event) => { transposeSong(event.target.value); event.currentTarget.value = ""; }}>
+                    <option value="">Transpose</option>
+                    <option value="__ORIGINAL__">Original</option>
+                    {keyOptions.map((key) => <option key={key.value} value={key.value}>{key.label}</option>)}
+                  </select>
+                </div>
               </header>
               <div className="chart-body">
                 {song.sections.map((section, sectionIndex) => <div className="section-block" key={section.id}>
@@ -1586,12 +1730,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <header><div><strong lang="kar">{song.titleKaren || "Karen title"}</strong><span>{song.titleEnglish || "English title"}</span></div><span>{song.key}</span></header>
               <textarea aria-label="Song lyrics" lang="kar" dir="ltr" value={song.lyrics} onChange={(event) => updateSong({ lyrics: event.target.value })} placeholder="Lyrics" />
             </article>}
+
           </div>
         </section>
       </div>
 
       <nav className="mobile-toolbar" aria-label="Mobile editor tools">
-        <button onClick={() => setSidebarOpen(true)}>Sidebar</button>
+        <button onClick={openDatabaseSidebar}>Database</button>
         <button onClick={() => setTab("chart")} aria-current={tab === "chart"}>Chart</button>
         <button onClick={() => insertMeasure(Number(song.meter.split("/")[0]) || 4)} disabled={!activeMeasure}>+ Measure</button>
         <button onClick={requestSaveSong}>Save</button>
