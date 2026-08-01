@@ -393,7 +393,7 @@ function ChordNotation({ chord }: { chord: Chord | null }) {
 }
 
 export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: Viewer }) {
-  const [song, setSong] = useState<Song>(() => demoSong());
+  const [song, setSong] = useState<Song>(() => blankSong());
   const [tab, setTab] = useState<"chart" | "lyrics" | "database">("chart");
   const [selected, setSelected] = useState({ section: 0, measure: 0, beat: 0, pre: false });
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -413,9 +413,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [styleDraft, setStyleDraft] = useState(defaultStyleOptions.join(", "));
   const [categoryDraft, setCategoryDraft] = useState(defaultCategoryOptions.join(", "));
   const [groupDraft, setGroupDraft] = useState(songGroupOptions.join(", "));
-  const [status, setStatus] = useState(
-    viewer.authenticated ? "Demo chart, not yet saved" : "Local synthetic demo; sign in to use the private library"
-  );
+  const [status, setStatus] = useState("Blank 4/4 song ready — press Enter to add a section");
   const [songs, setSongs] = useState<Song[]>([]);
   const [search, setSearch] = useState("");
   const [zoom, setZoom] = useState(100);
@@ -499,7 +497,9 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
 
   useEffect(() => {
     document.documentElement.dataset.appReady = "true";
+    const frame = window.requestAnimationFrame(() => editorTarget.current?.focus({ preventScroll: true }));
     return () => {
+      window.cancelAnimationFrame(frame);
       delete document.documentElement.dataset.appReady;
     };
   }, []);
@@ -956,7 +956,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     setSectionInsertIndex(null);
   }
 
-  function closeDatabaseSidebar() {
+  function closeWorkspaceSidebar() {
     setSidebarOpen(false);
     setTab((current) => current === "database" ? "chart" : current);
   }
@@ -1474,7 +1474,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     <main className="app-shell" onKeyDownCapture={handleEditorKey} onFocusCapture={handleTextFocus} onClickCapture={(event) => handleKarenTextTarget(event.target)}>
       <header className="app-header">
         <div className="brand">
-          <button className="icon-button" onClick={() => sidebarOpen ? closeDatabaseSidebar() : openDatabaseSidebar()} aria-label="Toggle song database">☰</button>
+          <button className="icon-button" onClick={() => sidebarOpen ? closeWorkspaceSidebar() : setSidebarOpen(true)} aria-label="Toggle music workspace sidebar">☰</button>
           {/* The approved project logo is a raster asset, so it stays an ordinary image. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="brand-logo" src="/karen-music-logo.png" alt="Karen Music emblem" />
@@ -1542,12 +1542,23 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       </header>
 
       <div className={`workspace ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
-        <aside className="sidebar" aria-label="Song database">
+        <aside className="sidebar" aria-label="Music workspace sidebar">
           <div className="sidebar-heading">
-            <span>Song Database</span>
-            <button className="icon-button" onClick={closeDatabaseSidebar} aria-label="Close song database">×</button>
+            <span>Music Workspace</span>
+            <button className="icon-button" onClick={closeWorkspaceSidebar} aria-label="Close music workspace sidebar">×</button>
+          </div>
+          <div className="sidebar-work-surfaces" role="tablist" aria-label="Song work surfaces">
+            {(["chart", "lyrics"] as const).map((name) => (
+              <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>
+            ))}
+            <button role="tab" aria-selected={tab === "database"} onClick={openDatabaseSidebar}>database</button>
+          </div>
+          <div className="sidebar-utilities" aria-label="Appearance and help">
+            <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle dark mode" aria-pressed={theme === "dark"} title="Toggle dark mode"><span aria-hidden="true">{theme === "dark" ? "☾" : "☼"}</span><span>Theme</span></button>
+            <button onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Docs and keyboard shortcuts"><span aria-hidden="true">?</span><span>Guide</span></button>
           </div>
           <section className="sidebar-panel library-panel" aria-label="Database sidebar">
+            <div className="database-sidebar-heading"><strong>Song Database</strong><small>Private hosted library</small></div>
             <input className="library-search" type="search" aria-label="Search song database" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
             <div className="song-list">
               {filteredSongs.length === 0 ? <div className="empty-state"><strong>No hosted songs yet</strong><span>Save a reviewed, sanitized chart to add it to this private library.</span></div> :
@@ -1576,15 +1587,6 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           </div>
 
           <div className="paper-area" ref={paperAreaTarget}>
-            <div className="paper-tabs" role="tablist" aria-label="Song work surfaces">
-              {(["chart", "lyrics"] as const).map((name) => (
-                <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>
-              ))}
-              <button role="tab" aria-selected={tab === "database"} onClick={openDatabaseSidebar}>database</button>
-              <button className="rail-icon" onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle dark mode" aria-pressed={theme === "dark"} title="Toggle dark mode">{theme === "dark" ? "☾" : "☼"}</button>
-              <button className="rail-icon" onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Docs and keyboard shortcuts">?</button>
-            </div>
-
             {tab !== "lyrics" && <article
               className="paper chart-paper"
               tabIndex={0}
@@ -1593,8 +1595,11 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               style={{ "--paper-scale": zoom / 100 } as React.CSSProperties}
             >
               <header className="paper-header">
-                <div><input aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} /><input className="paper-english-title" data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /></div>
-                <input aria-label="Song style on paper" list="paper-style-options" placeholder="Style" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
+                <div className="paper-title-fields">
+                  <input className="paper-content-input paper-karen-title" size={Math.max(1, Array.from(song.titleKaren || "Karen title").length)} aria-label="Karen title on paper" lang="kar" dir="ltr" data-karen-field="titleKaren" placeholder="Karen title" value={song.titleKaren} onChange={(event) => updateSong({ titleKaren: event.target.value })} />
+                  <span className="paper-english-title-wrap"><span aria-hidden="true">(</span><input className="paper-content-input paper-english-title" size={Math.max(1, (song.titleEnglish || "English title").length)} data-karen-exempt="true" aria-label="English title on paper" placeholder="English title" value={song.titleEnglish} onChange={(event) => updateSong({ titleEnglish: event.target.value })} /><span aria-hidden="true">)</span></span>
+                </div>
+                <input className="paper-content-input paper-style-input" size={Math.max(4, (song.style || "Style").length)} aria-label="Song style on paper" list="paper-style-options" placeholder="Style" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
                 <datalist id="paper-style-options">{styleOptions.map((style) => <option key={style} value={style} />)}</datalist>
                 <div className="paper-key-editor-cluster">
                   <select className="paper-key-select" aria-label="Song key on paper" value={song.key} onChange={(event) => updateSongKey(event.target.value)}><option value="">Key</option>{keyOptions.map((key) => <option key={key.value} value={key.value}>{key.label}</option>)}</select>
@@ -1676,13 +1681,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                     </div>)}
                   </section>
                 </div>)}
-                <button
+                {song.sections.length > 0 && <button
                   className="section-insert section-insert-last"
                   onClick={() => { setSectionInsertIndex(song.sections.length); setSectionModalOpen(true); }}
                   aria-label="Add section at end"
                 >
                   +
-                </button>
+                </button>}
               </div>
               <footer className="paper-footer">
                 <div className="paper-tempo-controls">
