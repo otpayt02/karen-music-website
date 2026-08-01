@@ -26,11 +26,11 @@ Nothing in this file is approved for publication.
 - **Day-to-day value:** Reduces repetitive entry while preserving a clear review-before-save checkpoint for rehearsal reliability.
 # Private Sites replica of Karen Music Director
 
-- State: newest visual/input parity is implemented, locally verified, and privately deployed as version 8; the paper owns all metadata, time signature is bounded, and the utility sidebar switches exclusively between Settings and Library.
+- State: the website-first legacy-behavior merge is implemented, locally verified, and privately deployed owner-only as version 12; the Sites website is the product and the desktop legacy surface is the composition-behavior oracle.
 - Problem: translate a dense packaged church-music desktop editor into a responsive hosted surface without exposing the historical church database or flattening its keyboard-first workflow.
 - Contribution: separated visual and behavioral baselines, preserved the eight-column Letter editor, and implemented two-slot cue ranges, a full Karen keyboard, gated imports, advanced lead navigation, owner-scoped persistence, responsive controls, and reusable guard skills.
-- Evidence: `sites/karen-music-director`, 14 focused Playwright journeys, exact option/endpoint assertions, lint and production build, anonymous API denial, prior parity proof, and sanitized screenshots under `output/playwright/sites-parity-2026-07-28/`.
-- Safe claim: built, locally verified, and privately deployed advanced parity for a S’gaw Karen chord-chart editor using synthetic-only demonstration data.
+- Evidence: `sites/karen-music-director`, exact option/endpoint assertions, lint and production build, anonymous API denial, prior parity proof, and sanitized screenshots including `output/playwright/sites-website-legacy-merge-2026-08-01.png`, its mobile counterpart, and `sites-website-live-v12-2026-08-01.png`.
+- Safe claim: built, browser-verified, and privately deployed a responsive S’gaw Karen music website that preserves a keyboard-first chord-chart workflow while adding hosted navigation and owner-only access, using synthetic-only demonstration data.
 - Privacy risk: high if real church songs, names, charts, or provider payloads are captured or published.
 - Proof gap: verify one synthetic signed-in D1 save/load cycle, then record a sanitized end-to-end demo.
 - Service hypothesis: fixed-scope migration of paper-based or desktop-only music workflows into private, keyboard-accessible hosted tools. Buyer demand and pricing require external research.

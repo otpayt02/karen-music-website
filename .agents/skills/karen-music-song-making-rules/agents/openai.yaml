@@ -1,0 +1,4 @@
+interface:
+  display_name: "Karen Music Song-Making Rules"
+  short_description: "Apply the keyboard-first chart creation workflow"
+  default_prompt: "Use $karen-music-song-making-rules to implement or verify the Karen Music song-building workflow."

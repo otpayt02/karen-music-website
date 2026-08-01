@@ -1,4 +1,5 @@
 const { test, expect } = require("@playwright/test");
+const fs = require("fs");
 const { chooseLanguageAndEnterEditor } = require("./helpers");
 
 test.describe("shared editor logic", () => {
@@ -16,22 +17,154 @@ test.describe("shared editor logic", () => {
     await expect(page.locator("#chart-container")).toBeVisible();
   });
 
-  test("opens the metadata wizard only after New Song is pressed", async ({ page }) => {
+  test("New Song opens a blank keyboard-ready 4/4 editor", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
     await page.locator("#sidebar-toggle").click();
 
     await expect(page.locator("#wizard-overlay")).toBeHidden();
+    await page.evaluate(() => {
+      state.sections = [createEmptySection("Verse")];
+      document.getElementById("songTitle").value = "Previous song";
+      document.getElementById("songKey").value = "G";
+      setTempoValue("songTempo", 120, { render: false });
+      renderChart();
+    });
     await page.locator("#btn-new").click();
-    await expect(page.locator("#wizard-overlay")).toBeVisible();
-    await expect(page.locator("#wizard-quick")).toBeVisible();
+    await expect(page.locator("#wizard-overlay")).toBeHidden();
+    await expect(page.locator("#songTitle")).toHaveValue("");
+    await expect(page.locator("#songKey")).toHaveValue("");
+    await expect(page.locator("#songTempo")).toHaveValue("");
+    await expect(page.locator("#sections-container .section")).toHaveCount(0);
+    await expect(page.locator("#sections-container .measure")).toHaveCount(0);
+    await expect(page.locator("#focus-trap")).toBeFocused();
+    await expect.poll(() => page.evaluate(() => state.beatsPerMeasure)).toBe(4);
+
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#modal-overlay")).toHaveClass(/open/);
+    await page.keyboard.press("i");
+    await expect(page.locator("#sections-container .section")).toHaveCount(1);
+    await expect.poll(() => page.evaluate(() => state.sections[0].measures.length)).toBe(1);
+    await expect(page.locator("#sections-container .beat")).toHaveCount(4);
+  });
+
+  test("paper header aligns Karen, Style, and Key while English stays below Karen", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+
+    const metrics = await page.evaluate(() => {
+      const karen = document.getElementById("ph-title-karen");
+      const english = document.getElementById("ph-title-english");
+      const style = document.getElementById("ph-style-value");
+      const key = document.getElementById("ph-key-value");
+      const box = (element) => element.getBoundingClientRect();
+      return {
+        englishBelowKaren: box(english).top >= box(karen).bottom - 1,
+        topDeltaStyle: Math.abs(box(style).top - box(karen).top),
+        topDeltaKey: Math.abs(box(key).top - box(karen).top),
+        sizeKaren: getComputedStyle(karen).fontSize,
+        sizeStyle: getComputedStyle(style).fontSize,
+        sizeKey: getComputedStyle(key).fontSize,
+        keyRightOfStyle: box(key).left > box(style).left,
+        styleList: style.getAttribute("list"),
+        keyTag: key.tagName
+      };
+    });
+
+    expect(metrics).toMatchObject({
+      englishBelowKaren: true,
+      keyRightOfStyle: true,
+      styleList: "paper-style-options",
+      keyTag: "SELECT"
+    });
+    expect(metrics.topDeltaStyle).toBeLessThan(3);
+    expect(metrics.topDeltaKey).toBeLessThan(3);
+    expect(metrics.sizeStyle).toBe(metrics.sizeKaren);
+    expect(metrics.sizeKey).toBe(metrics.sizeKaren);
+
+    await page.locator("#ph-style-value").fill("Custom Worship");
+    await expect(page.locator("#songStyle")).toHaveValue("Custom Worship");
+    await page.locator("#ph-key-value").selectOption("Eb");
+    await expect(page.locator("#songKey")).toHaveValue("Eb");
+  });
+
+  test("wheel scrolling follows the hovered region instead of the previously used region", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+    await page.evaluate(() => {
+      for (const id of ["hover-scroll-a", "hover-scroll-b"]) {
+        const region = document.createElement("div");
+        region.id = id;
+        region.style.cssText = "position:fixed;top:120px;width:120px;height:80px;overflow:auto;z-index:9999;background:white;";
+        region.style.left = id.endsWith("a") ? "20px" : "170px";
+        const content = document.createElement("div");
+        content.style.height = "500px";
+        region.appendChild(content);
+        document.body.appendChild(region);
+      }
+    });
+
+    await page.locator("#hover-scroll-a").hover();
+    await page.mouse.wheel(0, 180);
+    const afterA = await page.evaluate(() => ({
+      a: document.getElementById("hover-scroll-a").scrollTop,
+      b: document.getElementById("hover-scroll-b").scrollTop
+    }));
+    expect(afterA.a).toBeGreaterThan(0);
+    expect(afterA.b).toBe(0);
+
+    await page.locator("#hover-scroll-b").hover();
+    await page.mouse.wheel(0, 180);
+    const afterB = await page.evaluate(() => ({
+      a: document.getElementById("hover-scroll-a").scrollTop,
+      b: document.getElementById("hover-scroll-b").scrollTop
+    }));
+    expect(afterB.a).toBe(afterA.a);
+    expect(afterB.b).toBeGreaterThan(0);
+  });
+
+  test("autosave creates once and Export downloads a PDF", async ({ page }) => {
+    await chooseLanguageAndEnterEditor(page, "english");
+    await page.locator("#sidebar-toggle").click();
+    await page.locator("#btn-new").click();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("i");
+    await page.keyboard.press("c");
+
+    await page.evaluate(() => {
+      window.html2canvas = async () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 612;
+        canvas.height = 792;
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "#111111";
+        context.fillText("Synthetic chart", 30, 40);
+        return canvas;
+      };
+    });
+
+    await page.evaluate(() => autosaveSongIfNeeded());
+    const firstId = await page.evaluate(() => state.id);
+    expect(Number.isInteger(firstId)).toBeTruthy();
+    await expect.poll(() => page.evaluate(() => AUTOSAVE_INTERVAL_MS)).toBe(60_000);
+
+    await page.keyboard.press(" ");
+    await page.keyboard.press("g");
+    await page.evaluate(() => autosaveSongIfNeeded());
+    await expect.poll(() => page.evaluate(() => state.id)).toBe(firstId);
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.locator("#btn-export").click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/\.pdf$/i);
+    const downloadedPath = await download.path();
+    expect(fs.readFileSync(downloadedPath).subarray(0, 5).toString("ascii")).toBe("%PDF-");
   });
 
   test("transpose dropdown applies target keys and Original immediately", async ({ page }) => {
     await chooseLanguageAndEnterEditor(page, "english");
     await page.locator("#sidebar-toggle").click();
 
-    await page.locator("#songKey").fill("C");
-    await page.locator("#songKey").blur();
+    await page.locator("#songKey").selectOption("C");
 
     await page.evaluate(() => {
       const measure = createMeasure();
@@ -254,10 +387,10 @@ test.describe("shared editor logic", () => {
 
     await page.locator("#editor-zoom-in").click();
     await page.locator("#editor-zoom-in").click();
-    await expect(page.locator("#editor-zoom-label")).toHaveText("120%");
+    await expect(page.locator("#editor-zoom-label")).toHaveText("125%");
 
     const zoomedWidth = await page.locator("#chart-container").evaluate(el => el.getBoundingClientRect().width);
-    expect(zoomedWidth).toBeGreaterThan(restoredWidth * 1.15);
+    expect(zoomedWidth).toBeGreaterThan(restoredWidth * 1.2);
   });
 
   test("ctrl shortcuts add sus and aug as chord exponents", async ({ page }) => {

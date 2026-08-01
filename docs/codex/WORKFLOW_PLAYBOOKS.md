@@ -111,3 +111,32 @@
 - **Privacy boundary:** use synthetic or explicitly approved songs and images only.
 - **Cost:** no model or package cost is assumed; external dependency installation and paid providers require approval.
 - **Approval gates:** access changes, real-song hosting, attachment upload, dependency installation, and public proof publication.
+
+## Compose a new chart from the blank editor
+
+- **Trigger:** The music director presses New Song to start composing.
+- **Outcome:** A blank 4/4 chart becomes a saved, exportable song without modal setup or file-picker interruption.
+- **Inputs:** Empty metadata placeholders, keyboard focus, section type, chords/marks, and optional lyrics/metadata.
+- **Owner:** The music director authors and reviews the song; Codex may maintain the local behavior and tests.
+- **Steps:** Press New Song; press Enter then a section letter; enter a chord; use Space by beat and Tab by measure; allow the one-minute autosave or press Save; press Export for a PDF or Print for instrument packets.
+- **Tools:** `index.html` editor state and keyboard handlers; `/api/songs`; `chart_images/song_<id>.png` and `.json`; in-browser PDF builder.
+- **Current bottleneck:** PDF export captures the active chart page only; full multi-instrument packets remain under Print.
+- **Optimized version:** Keep New Song reset, song composition, persistence, export, and print as separate testable contracts documented by the two project-local skills.
+- **Verification:** Blank-state DOM counts; Enter/I one-section/four-beat path; Tab/Space creation; backend overwrite test; one-minute autosave; downloaded `%PDF-` artifact; desktop/mobile chrome and focus.
+- **Rollback:** Existing saved songs remain untouched until explicitly loaded or saved; revert the focused source changes if blank-state or keyboard regressions appear.
+- **Privacy boundary:** Local database and chart files only. Use synthetic content for screenshots/tests and never publish private music.
+- **Cost:** No provider or new dependency cost.
+- **Approval gates:** Publishing, uploading, deploying, deleting songs, or changing credentials requires explicit approval.
+
+## Pointer-owned chart editing
+
+- **Trigger:** The operator clicks a beat, measure, paper field, sidebar field, dropdown, or another scrollable editor region.
+- **Outcome:** The chart selection changes without relocating the visible paper, and the wheel affects only the region currently beneath the pointer.
+- **Inputs:** Pointer target, current scroll ancestors, wheel delta, and the active native control type.
+- **Steps:** Snapshot chart scroll ancestors on pointer down; apply the edit; restore the viewport after rendering; route wheel events to the hovered select/stepper/scroll surface; contain the event at that region's boundary.
+- **Tools:** Legacy `setupHoverOnlyScrolling`/`setupEditorViewportStability`; Sites capture-phase wheel and pointer effects; focused Chromium geometry/scroll checks.
+- **Verification:** Move between two independent scroll regions; confirm only the hovered one changes; click a chart beat after scrolling and confirm the scroll offset remains stable; verify Style/Key interactions.
+- **Rollback:** Remove the delegated handlers and restore native scroll chaining; do not alter song data or keyboard notation logic.
+- **Privacy boundary:** Interaction state only; no song content leaves its existing local or owner-only store.
+- **Cost:** No new package or service cost.
+- **Approval gates:** Public access, real-song hosting, or changes to the review-gated hosted Save path remain separate approvals.

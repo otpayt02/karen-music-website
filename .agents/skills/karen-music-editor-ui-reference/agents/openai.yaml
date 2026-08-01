@@ -1,0 +1,4 @@
+interface:
+  display_name: "Karen Music Editor UI Reference"
+  short_description: "Preserve every editor control and navigation rule"
+  default_prompt: "Use $karen-music-editor-ui-reference to inspect or change the Karen Music editor UI without losing behavior."

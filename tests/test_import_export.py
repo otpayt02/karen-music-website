@@ -150,7 +150,7 @@ def test_parse_chart_text_supports_inline_chordpro_chords():
 def test_json_import_recovery_mirroring(monkeypatch, tmp_path):
     _, chart_code_path, _, chart_images_path = configure_temp_storage(monkeypatch, tmp_path)
     payload = sample_song()
-    chart_images_path.mkdir(parents=True)
+    chart_images_path.mkdir(parents=True, exist_ok=True)
     (chart_images_path / "song_20.json").write_text(json.dumps({"id": 20, **payload}), encoding="utf-8")
 
     first_recovery = app_module.recover_song_json_library()

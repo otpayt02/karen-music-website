@@ -97,6 +97,13 @@
 - Why: the existing Sites project is working, the user did not authorize dependency installation, and the first slice does not need a framework-level migration.
 - Next gate: consider the package only during the shell phase after a component-by-component behavior inventory and a reversible smoke check.
 
+## 2026-08-01 - The Sites website is the product; legacy is the behavior oracle
+
+- Decision: stop presenting a separate Worship Music Editor product. The private Sites project is now the Karen Music Director Website, and legacy editing rules/modals take precedence when Sites behavior differs.
+- Shell merge: retain the village background and modern responsive shell; use the legacy-style Settings model; make Database a sidebar reached by its paper tab.
+- Interaction lock: section-insert hover may change color/visibility but never geometry; fit-to-width is a real paper measurement control, not a `100%` label.
+- Privacy and publishing: update only the existing owner-only Sites project after local build and browser verification; do not push local private song data or unrelated dirty-root changes to public GitHub.
+
 ## 2026-07-25 - Isolate the hosted replica from the desktop runtime
 
 - Decision: build the Sites version under `sites/karen-music-director` rather than modifying or packaging the desktop runtime.
@@ -138,3 +145,22 @@
 - Settings rule: the sidebar is now Song Library only; Karen keyboard and metadata vocabularies live in the header Settings menu, while theme and the full `?` guide stay on the paper rail.
 - Data boundary: no `songs.db`, chart image, or real song content is used by the hosted candidate.
 - Verification: direct browser interaction, production build, source-contract test, 13/14 full Chromium journeys plus the corrected focused journey.
+
+## 2026-07-30 - Make New Song a direct blank-editor action
+
+- Decision: New Song bypasses the metadata wizard, clears every content/notation structure, retains 4/4 as the only explicit song-building default, and returns focus to the chart.
+- Why: the operator is composing immediately; Enter then a section letter is the established fastest path.
+- Placeholder rule: Key, title, Karen title, category, style, and Tempo display muted non-content prompts; placeholder text is never saved as song content.
+- Save rule: the first content-bearing autosave creates the database identity and local PNG/JSON pair; each later minute overwrites that pair without a dialog.
+- Export rule: Export is distinct from Save and produces a browser-downloaded Letter PDF; Print retains the multi-instrument packet workflow.
+- UI rule: the top help button and a connected minus/percentage/plus zoom oval share the chrome scale. Zoom steps multiply by 1.12 and recalculate annotations.
+- Framework boundary: Astryx ButtonGroup guidance informed grouping and labeling, but no React or package migration was introduced.
+
+## 2026-07-30 - Make the pointer own scrolling and keep the paper viewport fixed
+
+- Decision: wheel input belongs to the currently hovered select, stepper, textarea, sidebar, popup, or nested scroll region; prior click/focus state never redirects it.
+- Why: the music director must be able to move the pointer between metadata, chart, and sidebar regions without a previous click continuing to scroll the wrong surface.
+- Viewport rule: pointer edits inside the chord body snapshot and restore scroll ancestors; all programmatic editor focus uses `preventScroll`.
+- Header rule: Karen, editable Style, and Key share the primary type size and top line; English sits immediately below Karen; Key remains right-anchored.
+- Sites boundary: the hosted replica receives the same blank-song/header/interaction behavior but retains owner-only, review-gated persistence.
+- Astryx boundary: native input+datalist is used as the reversible non-Astryx equivalent of a typed single-value Typeahead.

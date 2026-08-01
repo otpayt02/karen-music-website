@@ -3,7 +3,7 @@
   <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karen Worship Music Editor</title>
+  <title>Karen Music Director Website</title>
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <style>
     html { background: #121212; }
@@ -9673,47 +9673,88 @@
       }
 
       .editor-zoom-toolbar {
-        position: sticky;
-        top: 8px;
-        z-index: 10;
+        position: fixed;
+        top: 12px;
+        left: 222px;
+        z-index: 200;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 5px;
-        align-self: center;
-        margin: 0 auto 10px;
-        padding: 5px;
+        gap: 0;
+        height: 34px;
+        margin: 0;
+        padding: 0 3px;
         border-radius: 999px;
-        background: rgba(255,255,255,0.10);
-        border: 1px solid rgba(255,255,255,0.14);
-        box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+        background:
+          linear-gradient(145deg, color-mix(in srgb, var(--panel-bg-strong) 92%, white 8%), color-mix(in srgb, var(--surface-2) 72%, transparent)),
+          var(--panel-bg-strong);
+        border: 1px solid var(--glass-line);
+        box-shadow: 0 14px 34px color-mix(in srgb, var(--accent) 16%, transparent);
+        backdrop-filter: blur(18px) saturate(1.15);
       }
 
       .editor-zoom-btn,
       .editor-zoom-fit {
-        min-width: 30px;
-        height: 30px;
+        min-width: 28px;
+        height: 28px;
         margin: 0;
-        padding: 0 9px;
+        padding: 0;
         border-radius: 999px;
-        font-size: 0.78em;
+        background: transparent !important;
+        color: var(--text) !important;
+        border: 0 !important;
+        font-size: 1rem;
         line-height: 1;
         box-shadow: none;
       }
 
       .editor-zoom-btn {
-        width: 30px;
+        width: 28px;
         padding: 0;
         font-size: 1.05em;
       }
 
       .editor-zoom-label {
-        min-width: 44px;
-        color: rgba(255,255,255,0.88);
+        min-width: 46px;
+        color: var(--text);
         font-size: 0.74em;
         font-weight: 900;
         text-align: center;
         font-variant-numeric: tabular-nums;
+      }
+
+      #editor-zoom-fit,
+      #editor-zoom-reset {
+        display: none;
+      }
+
+      #songKey:has(option:checked[value=""]),
+      #songCategory:has(option:checked[value=""]) {
+        color: var(--text-muted) !important;
+      }
+
+      #songKey option,
+      #songCategory option {
+        color: var(--text);
+        background: var(--field-bg);
+      }
+
+      #shortcut-toggle {
+        left: 180px;
+        right: auto;
+      }
+
+      @media (max-width: 700px) {
+        .editor-zoom-toolbar {
+          top: 54px;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+
+        #shortcut-toggle {
+          left: auto;
+          right: 48px;
+        }
       }
 
       .paper-stack {
@@ -9978,10 +10019,50 @@
       #paper-header .paper-title-karen,
       #paper-header .paper-style-value,
       #paper-header .paper-key-value {
+        font-size: var(--paper-header-primary-size, 1.22em) !important;
         font-weight: 800 !important;
+        line-height: 1 !important;
       }
       #paper-header .paper-title-english {
         font-weight: 400 !important;
+      }
+      #paper-header {
+        align-items: start;
+      }
+      #paper-header .paper-head-left,
+      #paper-header .paper-head-center,
+      #paper-header .paper-head-right {
+        justify-content: flex-start;
+      }
+      #paper-header .paper-title-karen {
+        order: 1;
+        text-align: left;
+      }
+      #paper-header .paper-title-english {
+        order: 2;
+        text-align: left;
+      }
+      #paper-header .paper-style-value {
+        text-align: center;
+        cursor: text;
+      }
+      #paper-header .paper-key-value {
+        justify-self: end;
+        text-align: right;
+        text-align-last: right;
+      }
+      #sidebar,
+      #main-editor,
+      #songList,
+      #settings-panel,
+      #shortcut-panel .shortcut-panel-body,
+      .wizard-card,
+      .lang-picker-overlay,
+      .instr-checklist,
+      .paper-instrument-wheel,
+      textarea,
+      select {
+        overscroll-behavior: contain;
       }
       @media print {
         #paper-header { position: static !important; }
@@ -10083,6 +10164,118 @@
         .paper-stack {
           transform: none !important;
           margin-bottom: 0 !important;
+        }
+      }
+
+      /* Paper tabs keep one physical size; selection changes stacking only. */
+      .paper-flaps {
+        isolation: isolate;
+      }
+
+      .paper-flap,
+      .paper-flap.is-active {
+        box-sizing: border-box;
+        z-index: 1;
+      }
+
+      .paper-flap.is-active {
+        z-index: 4;
+      }
+
+      html[data-design="design-2"] .paper-flap,
+      html[data-design="design-2"] .paper-flap.is-active {
+        height: 92px;
+        min-height: 92px;
+        max-height: 92px;
+      }
+
+      html[data-design="design-2"] .paper-flap:not(.is-active) {
+        transform: translateX(4px);
+      }
+
+      html[data-design="design-2"] .paper-flap.is-active {
+        transform: translateX(0);
+        color: #18231f !important;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 247, 241, 0.99)),
+          #f8f7f1 !important;
+        border-right-color: var(--paper-bg, #fffaf2) !important;
+        box-shadow:
+          -8px 0 22px rgba(0, 0, 0, 0.22),
+          inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+      }
+
+      .paper-key-editor-cluster {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+        align-self: start;
+        margin-top: -4px;
+      }
+
+      #paper-header .paper-key-editor-cluster .paper-key-value {
+        width: 100% !important;
+      }
+
+      #paper-header .paper-transpose-control {
+        width: auto;
+        max-width: 92px;
+        min-height: 28px;
+        margin: 0;
+        padding: 4px 22px 4px 8px !important;
+        border: 1px solid rgba(15, 23, 42, 0.14) !important;
+        border-radius: 999px !important;
+        background: rgba(255, 255, 255, 0.72) !important;
+        color: #46514d !important;
+        box-shadow: none !important;
+        font: 800 0.62rem/1 var(--font-ui) !important;
+        text-align: left;
+      }
+
+      @media (max-width: 1180px) {
+        html[data-design="design-2"] .paper-flap,
+        html[data-design="design-2"] .paper-flap.is-active {
+          height: 36px;
+          min-height: 36px;
+          max-height: 36px;
+          transform: none;
+        }
+      }
+
+      @media (max-width: 680px) {
+        #paper-header {
+          grid-template-columns: minmax(110px, 1.2fr) minmax(54px, 0.55fr) minmax(96px, 0.8fr) !important;
+          column-gap: 7px !important;
+        }
+
+        .paper-flap,
+        .paper-flap.is-active,
+        html[data-design="design-2"] .paper-flap,
+        html[data-design="design-2"] .paper-flap.is-active {
+          height: 30px;
+          min-height: 30px;
+          max-height: 30px;
+        }
+
+        .paper-key-editor-cluster {
+          grid-template-columns: minmax(24px, 0.35fr) minmax(62px, 0.65fr);
+          gap: 2px;
+        }
+
+        #paper-header .paper-transpose-control {
+          max-width: 70px;
+          min-height: 24px;
+          padding-inline: 5px 16px !important;
+          font-size: 0.48rem !important;
+        }
+      }
+
+      @media print {
+        .paper-transpose-control,
+        .paper-key-editor-cluster > .paper-transpose-control {
+          display: none !important;
         }
       }
     </style>
@@ -10463,7 +10656,7 @@
     <div id="sidebar" class="collapsed">
 
       <h2 class="sidebar-title">
-        <img class="sidebar-brand-logo" src="/static/startup-language-image.png" alt="" aria-hidden="true">
+        <img class="sidebar-brand-logo" src="./karen_logo.png" alt="Karen Music emblem">
         <span class="sidebar-title-text">KAREN MUSIC</span>
       </h2>
 
@@ -10489,28 +10682,21 @@
       </div>
       <div class="form-group">
         <label for="songKey">Key</label>
-        <input type="text" id="songKey" placeholder="e.g. G">
-      </div>
-      <div class="form-group">
-        <label>Transpose</label>
-        <div class="transpose-row">
-          <select id="songTransposeTarget">
-            <option value="__ORIGINAL__">Original Key</option>
-            <option value="C">C</option>
-            <option value="Db">Db</option>
-            <option value="D">D</option>
-            <option value="Eb">Eb</option>
-            <option value="E">E</option>
-            <option value="F">F</option>
-            <option value="Gb">Gb</option>
-            <option value="G">G</option>
-            <option value="Ab">Ab</option>
-            <option value="A">A</option>
-            <option value="Bb">Bb</option>
-            <option value="B">B</option>
-          </select>
-          <button type="button" id="btn-transpose">Apply</button>
-        </div>
+        <select id="songKey" aria-label="Song key">
+          <option value="">Key</option>
+          <option value="C">C</option>
+          <option value="Db">Db</option>
+          <option value="D">D</option>
+          <option value="Eb">Eb</option>
+          <option value="E">E</option>
+          <option value="F">F</option>
+          <option value="Gb">Gb</option>
+          <option value="G">G</option>
+          <option value="Ab">Ab</option>
+          <option value="A">A</option>
+          <option value="Bb">Bb</option>
+          <option value="B">B</option>
+        </select>
       </div>
       <div class="form-group">
         <label for="songStyle">Style</label>
@@ -10521,7 +10707,7 @@
         <div class="tempo-control" data-target="songTempo">
           <button type="button" class="tempo-btn" onclick="changeTempo('songTempo', -1)">&#9660;</button>
           <input class="tempo-slider" data-target="songTempo" type="range" min="20" max="300" value="120" aria-label="Sidebar tempo slider">
-          <input type="number" id="songTempo" class="tempo-input-small" min="20" max="300" placeholder="120" oninput="renderChart()">
+          <input type="number" id="songTempo" class="tempo-input-small" min="20" max="300" placeholder="Tempo" oninput="renderChart()">
           <button type="button" class="tempo-btn" onclick="changeTempo('songTempo', 1)">&#9650;</button>
         </div>
       </div>
@@ -10600,10 +10786,10 @@
         tabindex="0"
       >
 
-      <div class="editor-zoom-toolbar" aria-label="Chart zoom controls">
-        <button type="button" id="editor-zoom-out" class="editor-zoom-btn" title="Zoom out" onclick="changeEditorZoom(-0.01)">−</button>
+      <div class="editor-zoom-toolbar" role="group" aria-label="Chart zoom controls">
+        <button type="button" id="editor-zoom-out" class="editor-zoom-btn" title="Zoom out" aria-label="Zoom out" onclick="changeEditorZoom(-1)">−</button>
         <span id="editor-zoom-label" class="editor-zoom-label">100%</span>
-        <button type="button" id="editor-zoom-in" class="editor-zoom-btn" title="Zoom in" onclick="changeEditorZoom(0.01)">+</button>
+        <button type="button" id="editor-zoom-in" class="editor-zoom-btn" title="Zoom in" aria-label="Zoom in" onclick="changeEditorZoom(1)">+</button>
         <button type="button" id="editor-zoom-fit" class="editor-zoom-fit" title="Fit chart to editor width" onclick="fitEditorZoomToWidth()">Fit</button>
         <button type="button" id="editor-zoom-reset" class="editor-zoom-fit" title="Reset chart zoom" onclick="setEditorZoom(1)">100</button>
       </div>
@@ -10628,9 +10814,16 @@
                 <datalist id="paper-style-options"><option value="Worship"><option value="Worship Ballad"><option value="Go Go"><option value="Gospel"><option value="Rock"><option value="Acoustic"></datalist>
               </div>
               <div class="paper-head-cell paper-head-right">
-                <select class="paper-meta-control paper-key-value" id="ph-key-value" aria-label="Song key" onchange="syncPaperMetadata('songKey', this.value)">
-                  <option value="">Key</option><option>C</option><option value="Db">Dᵇ</option><option>D</option><option value="Eb">Eᵇ</option><option>E</option><option>F</option><option value="Gb">Gᵇ</option><option>G</option><option value="Ab">Aᵇ</option><option>A</option><option value="Bb">Bᵇ</option><option>B</option>
-                </select>
+                <div class="paper-key-editor-cluster">
+                  <select class="paper-meta-control paper-key-value" id="ph-key-value" aria-label="Song key" onchange="syncPaperMetadata('songKey', this.value)">
+                    <option value="">Key</option><option>C</option><option value="Db">Dᵇ</option><option>D</option><option value="Eb">Eᵇ</option><option>E</option><option>F</option><option value="Gb">Gᵇ</option><option>G</option><option value="Ab">Aᵇ</option><option>A</option><option value="Bb">Bᵇ</option><option>B</option>
+                  </select>
+                  <select id="songTransposeTarget" class="paper-transpose-control" aria-label="Transpose song" title="Transpose song">
+                    <option value="">Transpose</option>
+                    <option value="__ORIGINAL__">Original</option>
+                    <option value="C">C</option><option value="Db">Dᵇ</option><option value="D">D</option><option value="Eb">Eᵇ</option><option value="E">E</option><option value="F">F</option><option value="Gb">Gᵇ</option><option value="G">G</option><option value="Ab">Aᵇ</option><option value="A">A</option><option value="Bb">Bᵇ</option><option value="B">B</option>
+                  </select>
+                </div>
               </div>
             </div>
             <div id="sections-container"></div>
@@ -10868,10 +11061,10 @@
           <summary data-i18n="guideSidebarWorkflows">Sidebar Workflows</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
-              <dt>New</dt><dd>Clear the current form and open the new-song wizard.</dd>
+              <dt>New</dt><dd>Open a completely blank chart with empty metadata, no sections, 4/4 time, and keyboard focus ready for Enter.</dd>
               <dt>Save</dt><dd>Save the song metadata, chart JSON, lead rows, dates, notes, and reference media.</dd>
               <dt>Print</dt><dd>Create one print packet for each selected instrument plus a Reference copy.</dd>
-              <dt>Export</dt><dd>Download the local song database.</dd>
+              <dt>Export</dt><dd>Save the current chart, then download a Letter-size PDF printout to your browser's Downloads folder.</dd>
               <dt>Instruments</dt><dd>Select instruments in the wheel/list. Selected instruments control print packets and footer labels.</dd>
               <dt>Dates</dt><dd>Date Created, Next Performance, and performed-date log flow into the sheet footer and saved song metadata.</dd>
               <dt>Reference / Media</dt><dd>Store YouTube links, handwritten/photo links, and notes for the song.</dd>
@@ -10883,7 +11076,7 @@
           <summary data-i18n="guideSettingsAppearance">Settings And Appearance</summary>
           <div class="guide-section-body">
             <dl class="guide-grid">
-              <dt>Wizard mode</dt><dd>Choose quick song setup or guided step-by-step setup.</dd>
+              <dt>Blank-song start</dt><dd>New begins directly in the editor. Press Enter, then I for an Intro with one four-beat measure.</dd>
               <dt>Language</dt><dd>Switch between English and Karen UI labels.</dd>
               <dt>Theme</dt><dd>Use Auto, Light, or Dark modes when available.</dd>
               <dt>Palette</dt><dd>Change the interface color set without changing chart data.</dd>
@@ -10894,6 +11087,7 @@
               <dt>Time Signature</dt><dd>Switch between 4/4 and 3/4 for new measures. Existing measures keep their saved beat counts so switching does not delete beat data.</dd>
               <dt>Measures / row</dt><dd>Set the default row density for new/auto sections.</dd>
               <dt>Alternate folder</dt><dd>Choose or save a different song folder path for the backend settings.</dd>
+              <dt>Autosave</dt><dd>After the draft has content, it saves every minute and overwrites its song PNG and JSON in the local chart_images folder.</dd>
             </dl>
           </div>
         </details>
@@ -11150,6 +11344,9 @@
 
       let songsCache = [];
       let databaseSearchTimer = 0;
+      let autosaveTimer = 0;
+      let lastAutosaveFingerprint = "";
+      const AUTOSAVE_INTERVAL_MS = 60_000;
       let karenInputTargetEl = null;
       let karenKeyboardCloseTimer = 0;
       let karenInputUndoStack = [];
@@ -11205,7 +11402,11 @@
         const target = document.getElementById(targetId);
         if (!target) return;
         target.value = value;
-        if (targetId === "songKey") state.currentKey = normalizeKeyToFlat(value);
+        if (targetId === "songKey") {
+          state.currentKey = normalizeKeyToFlat(value);
+          if (!state.originalKey && state.currentKey) state.originalKey = state.currentKey;
+          updateTransposeTargetSelectDefault();
+        }
         renderChart();
       }
 
@@ -11405,8 +11606,9 @@
       }
 
       function changeEditorZoom(delta) {
-        const step = Number(delta || 0) >= 0 ? 0.02 : -0.02;
-        setEditorZoom(editorZoom + step);
+        const direction = Number(delta || 0) >= 0 ? 1 : -1;
+        const sensitivity = 1.12;
+        setEditorZoom(direction > 0 ? editorZoom * sensitivity : editorZoom / sensitivity);
       }
 
       function fitEditorZoomToWidth() {
@@ -11462,30 +11664,112 @@
         if (document.documentElement.dataset.instrumentScrollLockBound === "1") return;
         document.documentElement.dataset.instrumentScrollLockBound = "1";
 
-        document.addEventListener("pointerdown", (event) => {
+        document.addEventListener("pointerover", (event) => {
           const group = event.target?.closest?.(".instr-checklist");
-          if (!group && activeInstrumentScrollGroup) {
-            unlockInstrumentScrollGroup();
-            return;
-          }
           if (group && activeInstrumentScrollGroup !== group) {
             lockInstrumentScrollGroup(group);
           }
         }, true);
 
+        document.addEventListener("pointerout", (event) => {
+          const group = event.target?.closest?.(".instr-checklist");
+          if (!group || group.contains(event.relatedTarget)) return;
+          unlockInstrumentScrollGroup();
+        }, true);
+      }
+
+      function setupHoverOnlyScrolling() {
+        if (document.documentElement.dataset.hoverScrollBound === "1") return;
+        document.documentElement.dataset.hoverScrollBound = "1";
+
         document.addEventListener("wheel", (event) => {
-          const group = activeInstrumentScrollGroup;
-          if (!group || !group.isConnected) {
-            unlockInstrumentScrollGroup();
+          if (event.ctrlKey || event.metaKey) return;
+          const origin = event.target instanceof Element ? event.target : null;
+          if (!origin) return;
+
+          const select = origin.closest("select:not([multiple])");
+          if (select && Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
+            const options = Array.from(select.options);
+            const direction = event.deltaY > 0 ? 1 : -1;
+            let nextIndex = select.selectedIndex;
+            do {
+              nextIndex += direction;
+            } while (options[nextIndex]?.disabled);
+            nextIndex = Math.max(0, Math.min(options.length - 1, nextIndex));
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (nextIndex !== select.selectedIndex) {
+              select.selectedIndex = nextIndex;
+              select.dispatchEvent(new Event("input", { bubbles: true }));
+              select.dispatchEvent(new Event("change", { bubbles: true }));
+            }
             return;
           }
-          if (event.ctrlKey || event.metaKey || event.shiftKey) return;
-          if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+
+          const stepControl = origin.closest('input[type="number"], input[type="range"]');
+          if (stepControl && Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (event.deltaY < 0) stepControl.stepUp();
+            else stepControl.stepDown();
+            stepControl.dispatchEvent(new Event("input", { bubbles: true }));
+            stepControl.dispatchEvent(new Event("change", { bubbles: true }));
+            return;
+          }
+
+          const hoveredPath = event.composedPath().filter(node => node instanceof HTMLElement);
+          const scrollTarget = hoveredPath.find(element => {
+            const styles = getComputedStyle(element);
+            const canScrollY = /(auto|scroll)/.test(styles.overflowY) && element.scrollHeight > element.clientHeight;
+            const canScrollX = /(auto|scroll)/.test(styles.overflowX) && element.scrollWidth > element.clientWidth;
+            return canScrollY || canScrollX;
+          });
+          if (!scrollTarget) return;
 
           event.preventDefault();
-          group.scrollTop += event.deltaY * 0.6;
-          updateInstrumentWheel(group);
+          event.stopImmediatePropagation();
+          if (Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
+            scrollTarget.scrollTop += event.deltaY;
+          } else {
+            scrollTarget.scrollLeft += event.deltaX;
+          }
+          if (scrollTarget.matches(".instr-checklist")) updateInstrumentWheel(scrollTarget);
         }, { passive: false, capture: true });
+      }
+
+      function setupEditorViewportStability() {
+        const chart = document.getElementById("chart-container");
+        if (!chart || chart.dataset.viewportStableBound === "1") return;
+        chart.dataset.viewportStableBound = "1";
+        let scrollSnapshot = [];
+
+        chart.addEventListener("pointerdown", (event) => {
+          const origin = event.target instanceof Element ? event.target : null;
+          if (!origin?.closest("#sections-container")) {
+            scrollSnapshot = [];
+            return;
+          }
+          const candidates = new Set([document.scrollingElement]);
+          let current = origin.parentElement;
+          while (current) {
+            if (current.scrollHeight > current.clientHeight || current.scrollWidth > current.clientWidth) {
+              candidates.add(current);
+            }
+            current = current.parentElement;
+          }
+          scrollSnapshot = Array.from(candidates)
+            .filter(Boolean)
+            .map(element => ({ element, top: element.scrollTop, left: element.scrollLeft }));
+        }, true);
+
+        chart.addEventListener("click", () => {
+          if (!scrollSnapshot.length) return;
+          const restore = () => scrollSnapshot.forEach(({ element, top, left }) => {
+            element.scrollTop = top;
+            element.scrollLeft = left;
+          });
+          requestAnimationFrame(() => requestAnimationFrame(restore));
+        }, true);
       }
 
       function setInstrChecks(groupId, valueStr) {
@@ -11832,13 +12116,7 @@
       function updateTransposeTargetSelectDefault() {
         const sel = document.getElementById("songTransposeTarget");
         if (!sel) return;
-        const original = normalizeKeyToFlat(state.originalKey || document.getElementById("songKey")?.value);
-        const current = normalizeKeyToFlat(state.currentKey || document.getElementById("songKey")?.value);
-        if (!original || !current || original === current) {
-          sel.value = TRANSPOSE_ORIGINAL_VALUE;
-        } else {
-          sel.value = current;
-        }
+        sel.value = "";
       }
 
       function parseLinksTextarea(value) {
@@ -12061,7 +12339,7 @@
 
       function stripEditorOnlyPrintUi(root) {
         if (!root) return;
-        root.querySelectorAll(".section-delete-btn, .section-rowcap-control, .row-rowcap-control, .section-premeasure-control, .section-insert-line, .section-insert-plus")
+        root.querySelectorAll(".paper-transpose-control, .section-delete-btn, .section-rowcap-control, .row-rowcap-control, .section-premeasure-control, .section-insert-line, .section-insert-plus")
           .forEach(node => node.remove());
         root.querySelectorAll(".beat.active, .beat.slur-start-pending, .beat.only-start-pending")
           .forEach(node => node.classList.remove("active", "slur-start-pending", "only-start-pending"));
@@ -12335,10 +12613,12 @@
 
       function applyTransposeSelection(selectEl = document.getElementById("songTransposeTarget")) {
         if (!selectEl) return;
+        if (!selectEl.value) return;
         const target = selectEl.value === TRANSPOSE_ORIGINAL_VALUE
           ? (state.originalKey || document.getElementById("songKey")?.value || "")
           : selectEl.value;
         applyTransposeToSong(target);
+        selectEl.value = "";
       }
 
       function createPreMeasure() {
@@ -17002,20 +17282,16 @@
           container.appendChild(sectionEl);
         });
 
-        container.appendChild(makeInsertLine(state.sections.length));
+        if (state.sections.length > 0) {
+          container.appendChild(makeInsertLine(state.sections.length));
+        }
 
         applyBeatCellLayout();
         fitChartContentToPaper();
         renderOnlySpans();
         renderSlurs();
         renderLeadInstrumentLabels();
-        if (pendingScrollTarget) {
-          const target = pendingScrollTarget;
-          state.pendingSectionScrollIdx = null;
-          requestAnimationFrame(() => {
-            target.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
-          });
-        }
+        if (pendingScrollTarget) state.pendingSectionScrollIdx = null;
       }
 
       function openSlurModal() {
@@ -18307,8 +18583,8 @@
 
         saveState();
         renderChart();
+        lastAutosaveFingerprint = getDraftFingerprint();
         setPaperView("chart", { focus: false });
-        requestAnimationFrame(() => document.getElementById("chart-container")?.scrollIntoView({ block: "start", behavior: "smooth" }));
         if (repairedLegacyChart && state.id) {
           saveSong({ quiet: true, skipCapture: true, skipReload: true })
             .catch(err => console.warn("Could not save repaired song chart", err));
@@ -18316,6 +18592,68 @@
 
         const ft = document.getElementById("focus-trap");
         ft && ft.focus();
+      }
+
+      function getDraftFingerprint() {
+        return JSON.stringify({
+          id: state.id,
+          title: document.getElementById("songTitle")?.value || "",
+          titleKaren: document.getElementById("songTitleKaren")?.value || "",
+          category: document.getElementById("songCategory")?.value || "",
+          key: document.getElementById("songKey")?.value || "",
+          style: document.getElementById("songStyle")?.value || "",
+          tempo: document.getElementById("songTempo")?.value || "",
+          notes: document.getElementById("karenText")?.value || "",
+          instruments: document.getElementById("songInstruments")?.value || "",
+          createdDate: state.createdDate || "",
+          nextPerformanceDate: state.nextPerformanceDate || "",
+          performedDates: state.performedDates || [],
+          referenceMedia: state.referenceMedia || {},
+          sections: state.sections || [],
+          lyricsSections: state.lyricsSections || [],
+          onlySpans: state.onlySpans || [],
+          slurs: state.slurs || [],
+          rowLead: state.rowLead || {},
+          beatsPerMeasure: state.beatsPerMeasure || 4
+        });
+      }
+
+      function draftHasUserContent() {
+        return [
+          "songTitle",
+          "songTitleKaren",
+          "songCategory",
+          "songKey",
+          "songStyle",
+          "songTempo",
+          "karenText",
+          "songInstruments"
+        ].some(id => String(document.getElementById(id)?.value || "").trim())
+          || (state.sections || []).length > 0
+          || (state.lyricsSections || []).length > 0;
+      }
+
+      async function autosaveSongIfNeeded() {
+        if (!draftHasUserContent()) return;
+        const fingerprint = getDraftFingerprint();
+        if (fingerprint === lastAutosaveFingerprint) return;
+        try {
+          await saveSong({ quiet: true, skipReload: true, autosave: true });
+          lastAutosaveFingerprint = getDraftFingerprint();
+          const saveBtn = document.getElementById("btn-save");
+          if (saveBtn) {
+            const stamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            saveBtn.title = `Autosaved ${stamp} to chart_images`;
+          }
+        } catch (error) {
+          console.warn("Autosave failed", error);
+        }
+      }
+
+      function setupSongAutosave() {
+        if (autosaveTimer) clearInterval(autosaveTimer);
+        lastAutosaveFingerprint = getDraftFingerprint();
+        autosaveTimer = window.setInterval(autosaveSongIfNeeded, AUTOSAVE_INTERVAL_MS);
       }
 
       async function saveSong(options = {}) {
@@ -18397,6 +18735,7 @@
           }
           showToast("Song saved", "success");
         }
+        lastAutosaveFingerprint = getDraftFingerprint();
         return result;
       }
 
@@ -18404,12 +18743,30 @@
         state.id = null;
         state.originalKey = "";
         state.currentKey = "";
-        state.createdDate = getTodayIsoDate();
+        state.createdDate = "";
         state.nextPerformanceDate = "";
         state.performedDates = [];
         state.referenceMedia = { videos: [], images: [], info: "" };
         state.fileMetadata = [];
         state.lyricsSections = [];
+        state.sections = [];
+        state.rowLead = {};
+        state.onlyStart = null;
+        state.onlySpans = [];
+        state.slurStart = null;
+        state.slurs = [];
+        state.history = [];
+        state.historyIndex = -1;
+        state.currentSectionIdx = 0;
+        state.currentMeasureIdx = 0;
+        state.currentBeatIdx = 0;
+        state.pendingSectionInsertIndex = null;
+        state.pendingSectionScrollIdx = null;
+        state.pendingBass = false;
+        state.pendingBassFlat = false;
+        state.pendingTriangle = false;
+        state.pendingSup = false;
+        setBeatsPerMeasure(4, { render: false, normalizeExisting: false });
         state.defaultMeasuresPerRow = getAutoDefaultMeasuresPerRow();
         state.rowDefaultExplicit = false;
         syncDefaultMeasuresPerRowInput();
@@ -18418,7 +18775,10 @@
         document.getElementById("songCategory").value = "";
         document.getElementById("songKey").value = "";
         document.getElementById("songStyle").value = "";
-        setTempoValue("songTempo", 120, { render: false });
+        document.getElementById("songTempo").value = "";
+        document.querySelectorAll('.tempo-slider[data-target="songTempo"]').forEach(slider => {
+          slider.value = "120";
+        });
         document.getElementById("karenText").value = "";
         ["instr-sidebar","instr-wq","instr-wg"].forEach(id => setInstrChecks(id, ""));
         syncMetadataInputsFromState();
@@ -18437,7 +18797,22 @@
           if (el) el.value = "";
         });
 
-        openWizard();
+        const wizard = document.getElementById("wizard-overlay");
+        if (wizard) {
+          wizard.classList.remove("dismissing");
+          wizard.style.display = "none";
+        }
+        const sectionModal = document.getElementById("modal-overlay");
+        if (sectionModal) {
+          sectionModal.style.display = "none";
+          sectionModal.classList.remove("open");
+        }
+        setPaperView("chart", { focus: false });
+        saveState();
+        renderChart();
+        lastAutosaveFingerprint = getDraftFingerprint();
+        showToast("Blank song ready — press Enter to add a section", "success");
+        focusEditor();
       }
 
       function openSongImport() {
@@ -18507,6 +18882,111 @@
         return `${karen}_${english}_${new Date().toISOString().slice(0, 10)}.json`;
       }
 
+      function suggestedSongPdfFilename() {
+        const title = safeExportPart(
+          document.getElementById("songTitle")?.value || document.getElementById("songTitleKaren")?.value,
+          "New_Song"
+        );
+        return `${title}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      }
+
+      function joinByteArrays(parts) {
+        const size = parts.reduce((total, part) => total + part.length, 0);
+        const output = new Uint8Array(size);
+        let cursor = 0;
+        parts.forEach(part => {
+          output.set(part, cursor);
+          cursor += part.length;
+        });
+        return output;
+      }
+
+      function buildLetterPdfFromJpeg(jpegBytes, imageWidth, imageHeight) {
+        const encoder = new TextEncoder();
+        const pageWidth = 612;
+        const pageHeight = 792;
+        const margin = 18;
+        const scale = Math.min(
+          (pageWidth - margin * 2) / Math.max(1, imageWidth),
+          (pageHeight - margin * 2) / Math.max(1, imageHeight)
+        );
+        const drawWidth = imageWidth * scale;
+        const drawHeight = imageHeight * scale;
+        const drawX = (pageWidth - drawWidth) / 2;
+        const drawY = (pageHeight - drawHeight) / 2;
+        const content = `q\n${drawWidth.toFixed(2)} 0 0 ${drawHeight.toFixed(2)} ${drawX.toFixed(2)} ${drawY.toFixed(2)} cm\n/Chart Do\nQ\n`;
+        const contentBytes = encoder.encode(content);
+        const header = encoder.encode("%PDF-1.4\n%KarenMusic\n");
+        const objects = [
+          encoder.encode("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"),
+          encoder.encode("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n"),
+          encoder.encode("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /XObject << /Chart 4 0 R >> >> /Contents 5 0 R >>\nendobj\n"),
+          joinByteArrays([
+            encoder.encode(`4 0 obj\n<< /Type /XObject /Subtype /Image /Width ${imageWidth} /Height ${imageHeight} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpegBytes.length} >>\nstream\n`),
+            jpegBytes,
+            encoder.encode("\nendstream\nendobj\n")
+          ]),
+          joinByteArrays([
+            encoder.encode(`5 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`),
+            contentBytes,
+            encoder.encode("endstream\nendobj\n")
+          ])
+        ];
+
+        const offsets = [0];
+        let cursor = header.length;
+        objects.forEach(object => {
+          offsets.push(cursor);
+          cursor += object.length;
+        });
+        const xrefOffset = cursor;
+        const xref = [
+          "xref",
+          "0 6",
+          "0000000000 65535 f ",
+          ...offsets.slice(1).map(offset => `${String(offset).padStart(10, "0")} 00000 n `),
+          "trailer",
+          "<< /Size 6 /Root 1 0 R >>",
+          "startxref",
+          String(xrefOffset),
+          "%%EOF",
+          ""
+        ].join("\n");
+        return joinByteArrays([header, ...objects, encoder.encode(xref)]);
+      }
+
+      function downloadBlob(blob, filename) {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1500);
+      }
+
+      async function exportCurrentChartPdf() {
+        const chart = document.getElementById("chart-container");
+        if (!chart || typeof html2canvas !== "function") {
+          throw new Error("PDF capture is unavailable. Check the app connection and try again.");
+        }
+        renderChart();
+        const canvas = await html2canvas(chart, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff"
+        });
+        const jpegBlob = await new Promise((resolve, reject) => {
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Could not create PDF image.")), "image/jpeg", 0.94);
+        });
+        const pdfBytes = buildLetterPdfFromJpeg(
+          new Uint8Array(await jpegBlob.arrayBuffer()),
+          canvas.width,
+          canvas.height
+        );
+        downloadBlob(new Blob([pdfBytes], { type: "application/pdf" }), suggestedSongPdfFilename());
+      }
+
       async function saveResponseFile(response, suggestedName) {
         if (!response.ok) throw new Error(`Export failed (${response.status})`);
         const blob = await response.blob();
@@ -18544,10 +19024,9 @@
           btn.textContent = uiText("exportStarted", { fallback: "Export started" });
         }
         try {
-          await saveSong({ quiet: true, skipCapture: true });
-          if (!state.id) throw new Error("Save the song before exporting it.");
-          await saveResponseFile(await fetch(`/api/export-song/${state.id}`), suggestedSongFilename());
-          showToast("Song JSON exported", "success");
+          await saveSong({ quiet: true, skipReload: true });
+          await exportCurrentChartPdf();
+          showToast("PDF exported — check Downloads", "success");
         } catch (error) {
           showToast(error.message || "Export failed", "error");
         }
@@ -19499,10 +19978,10 @@
           guideKeyboardBackspaceDesc: "Undo the latest Karen keyboard insertion or delete the previous character when there is no keyboard insertion history.",
           guideKeyboardUndoDesc: "Undo the latest Karen keyboard insertion while the modal is open, or use normal field undo when no keyboard insertion is pending.",
           guideKeyboardRedoDesc: "Redo the latest Karen keyboard insertion while the modal is open.",
-          guideNewDesc: "Clear the current form and open the new-song wizard.",
+          guideNewDesc: "Open a blank chart with empty metadata, no sections, and 4/4 time.",
           guideSaveDesc: "Save song metadata, chart JSON, lead rows, dates, notes, and reference media.",
           guidePrintDesc: "Create one print packet for each selected instrument plus a Reference copy.",
-          guideExportDesc: "Download the local song database. The export button now shows confirmation when the download starts.",
+          guideExportDesc: "Save the song and download a Letter-size PDF chart to Downloads.",
           guideInstrumentsDesc: "Selected instruments control print packet count and footer labels.",
           guideDatesDesc: "Date Created, Next Performance, and performed-date history flow into the sheet footer and saved song metadata.",
           guideReferenceDesc: "Store YouTube links, handwritten/photo links, and notes for the song.",
@@ -20836,6 +21315,8 @@
         setupEventListeners();
         initializeInstrumentChoiceButtons();
         setupInstrumentScrollLock();
+        setupHoverOnlyScrolling();
+        setupEditorViewportStability();
         setupEditorZoomControls();
         setupShortcutPanel();
         setupSidebarToggle();
@@ -20865,6 +21346,7 @@
         updateTransposeTargetSelectDefault();
         saveState();
         renderChart();
+        setupSongAutosave();
         loadSongs();
         appInitialized = true;
 

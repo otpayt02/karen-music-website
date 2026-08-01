@@ -1,6 +1,6 @@
 # Request adherence
 
-Last updated: 2026-07-28
+Last updated: 2026-07-30
 
 ## Current redesign request
 
@@ -14,7 +14,7 @@ Last updated: 2026-07-28
 | UI-06 | Do not show the song wizard on startup. | 1 | verified | Startup browser check sees no dialog; New song still opens it. |
 | UI-07 | Use smoother multiplicative zoom. | 1 | implemented | Zoom steps use a 1.12 multiplier with 55%-175% bounds and reduced-motion fallback. |
 | UI-08 | Redesign sidebar, top controls, sticky tool banner, symbols, docs, shortcuts, Karen keyboard, modals, navigation, and mobile shell. | 2 | deferred | Begin with a behavior inventory and move all non-help circle actions into the sidebar. |
-| UI-09 | Add cursor-hover-routed scrolling, first-click reliability, editor focus recovery, and viewport anchoring during edits and zoom. | 3 | deferred | Add pointer-region routing and scroll-anchor browser tests before implementation. |
+| UI-09 | Add cursor-hover-routed scrolling, first-click reliability, editor focus recovery, and viewport anchoring during edits and zoom. | 20 | verified | Legacy and Sites route wheel input to the region under the pointer, contain scroll chaining, use `preventScroll` for programmatic focus, and preserve the chart viewport across pointer edits. |
 | UI-10 | Add a contextual right-click toolbar with the relevant tools. | 3 | deferred | Use the Astryx ContextMenu contract; keep every action available by keyboard and visible UI. |
 | UI-11 | Group metadata logically and move advanced details into the database rather than the sidebar. | 4 | deferred | Define basic sidebar fields versus advanced database fields before schema/UI changes. |
 | UI-12 | Store prior images and visible documents, classify good/bad sources, and pair approved handwritten/typed counterparts for ground truth. | 5 | deferred | Inventory local attachments and provenance first; keep unmatched sides valid and require human approval before ground-truth promotion. |
@@ -49,3 +49,40 @@ Last updated: 2026-07-28
 | DATA-04 | “Make the database from the different …” | 18 | blocked | The request ended mid-sentence. No database mutation or hosted upload was inferred; exact next action is for the user to finish the database requirement. |
 
 Completion claims apply to verified rows only; UI-18 and OPS-01 remain partial until their recorded blockers are cleared.
+
+## Phase 19 - desktop blank-song creation and reference skills
+
+| ID | Requirement | Phase | Status | Evidence |
+| --- | --- | --- | --- | --- |
+| UI-35 | Make New Song open a truly blank editor with empty content fields and no section, measure, or beat. | 19 | verified | Focused Chromium path passed with zero section/measure/beat state before creation. |
+| UI-36 | Keep only explicit defaults/placeholders: 4/4, muted field placeholders, Key dropdown placeholder, and empty Tempo. | 19 | verified | Focused Chromium asserted empty values and 4/4; rendered paper showed muted metadata placeholders. |
+| UI-37 | Preserve Enter then I as one Intro with one four-beat measure; keep Tab and Space creation/navigation. | 19 | verified | Focused New Song path and the existing Tab/Space measure suite passed. |
+| DATA-05 | Autosave content-bearing drafts each minute, silently create first save, and overwrite PNG/JSON in `chart_images`. | 19 | verified | Browser create/update identity test plus backend overwrite test; Python suite 25/25. |
+| UI-38 | Make Export save and download a Letter-size PDF to Downloads. | 19 | verified | Chromium download had a `.pdf` name and `%PDF-` header. |
+| UI-39 | Put `?` help next to theme/language controls and make zoom one equal-height oval with minus, percent, plus and multiplicative scaling. | 19 | verified | Rendered desktop state reviewed; focused zoom test reached 125% after two multiplicative clicks. |
+| SKILL-01 | Create a reusable reference for every editor UI surface and navigation contract. | 19 | verified | `.agents/skills/karen-music-editor-ui-reference`; official validator passed. |
+| SKILL-02 | Create a reusable skill for the keyboard-first song-making process. | 19 | verified | `.agents/skills/karen-music-song-making-rules`; official validator passed. |
+
+## Phase 20 - matched legacy and Sites header/interaction contract
+
+| ID | Requirement | Phase | Status | Evidence |
+| --- | --- | --- | --- | --- |
+| UI-40 | Put English directly below Karen; align Karen, editable Style, and Key at one primary size with Key anchored right. | 20 | verified | Legacy geometry test passed; Sites live preview measured 21px for all three primary controls with zero top offset and English below Karen. |
+| UI-41 | Keep Style typable with suggestions and Key as a real dropdown. | 20 | verified | Legacy input/datalist and select synchronized to sidebar fields; Sites input/datalist accepted `Custom Worship` and Key selected E-flat. |
+| UI-42 | Make scroll routing depend on the currently hovered region, including dropdowns, steppers, sidebar/text areas, and nested scroll surfaces. | 20 | verified | Focused Chromium hovered-region test passed; both implementations use capture-phase pointer routing and contained overscroll. |
+| UI-43 | Never let chord-editor clicks relocate the current visual viewport. | 20 | verified | Legacy viewport-preservation regression passed; both implementations snapshot/restore scroll ancestors and use `focus({ preventScroll: true })`. |
+| UI-44 | Carry the direct blank New Song workflow into the private Sites version. | 20 | verified | Live Sites preview: zero sections after New Song; Enter then I produced one Intro, one measure, four beats, and zero console errors. |
+| OPS-04 | Publish the matched behavior to the existing owner-only Sites project. | 20 | verified | Owner-only Sites version 11 deployed successfully and the production New Song blank state passed with zero console errors. |
+
+## Phase 21 - website-first legacy behavior merge
+
+| ID | Requirement | Phase | Status | Evidence or next action |
+| --- | --- | --- | --- | --- |
+| UI-45 | Treat the Sites website as the primary product and the legacy editor as its behavior reference. | 21 | verified | Production title and brand both read `Karen Music Director Website`; the legacy page title no longer says Worship Music Editor. |
+| UI-46 | Preserve the village background and combine the legacy editor behavior with the newer Sites shell. | 21 | verified | Production New Song → Enter → I produced one Intro, one measure, and four beats with the village shell intact. |
+| UI-47 | Make Settings use the legacy editor model. | 21 | verified | Local browser proof showed Appearance, legacy composition defaults, Karen keyboard, Database choices, theme, reduced motion, and default row-cap controls. |
+| UI-48 | Make Database the new sidebar rather than a replacement paper page. | 21 | verified | Production Database tab selected the visible `Song Database` sidebar while the chart remained visible; `.database-paper` is absent. |
+| UI-49 | Do not shift later rows when the section-insert bar is hovered. | 21 | verified | Local and production geometry both measured exactly 0 px movement after hover. |
+| UI-50 | Replace the 100% reset with a working fit-to-width paper measurement icon. | 21 | verified | Local and production checks changed zoom from 89% to a geometry-derived 126%; the 18×22 px paper/width icon is present. |
+| UI-51 | Keep Key aligned with Karen and Style in the legacy website shell. | 21 | verified | Focused Chromium header geometry test passed after the top-alignment correction. |
+| OPS-05 | Verify and publish Phase 21 to the existing owner-only Sites project. | 21 | verified | Lint, build/contract, desktop/mobile and production paths passed; Sites version 12 is owner-only and live with zero routed-console errors. |

@@ -54,6 +54,10 @@ STATIC_CANDIDATES = (
     RESOURCE_DIR / "static",
     BASE_DIR / "static",
 )
+SRC_CANDIDATES = (
+    RESOURCE_DIR / "src",
+    BASE_DIR / "src",
+)
 DIST_ASSETS_CANDIDATES = (
     RESOURCE_DIR / "dist" / "assets",
     BASE_DIR / "dist" / "assets",
@@ -72,7 +76,7 @@ def utc_now() -> str:
 
 
 def ensure_dirs() -> None:
-    for path in (DATA_DIR, CHART_CODE_DIR, EXPORT_DIR, ATTACHMENT_DIR, IMPORT_DIR):
+    for path in (DATA_DIR, CHART_CODE_DIR, EXPORT_DIR, ATTACHMENT_DIR, IMPORT_DIR, LOCAL_IMAGE_DIR):
         Path(path).mkdir(parents=True, exist_ok=True)
     if IS_FROZEN:
         bundled_db = RESOURCE_DIR / "songs.db"
@@ -279,7 +283,7 @@ def legacy_song_from_row(row: sqlite3.Row) -> dict[str, Any]:
 
 
 def normalize_legacy_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    chart = payload.get("chart_json") or {}
+    chart = payload.get("chart_json") or payload.get("chartjson") or {}
     if not isinstance(chart, dict):
         chart = {}
     row_lead = payload.get("rowleadjson")
@@ -317,6 +321,26 @@ def snapshot_song(song: dict[str, Any]) -> str:
     return json.dumps(song, ensure_ascii=False, indent=2)
 
 
+def persist_chart_image_snapshot(song_id: int, payload: dict[str, Any], song: dict[str, Any]) -> None:
+    """Silently overwrite the local working PNG/JSON pair for one song."""
+    LOCAL_IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+    (LOCAL_IMAGE_DIR / f"song_{song_id}.json").write_text(
+        snapshot_song(song),
+        encoding="utf-8",
+    )
+
+    raw_data_url = str(payload.get("chartpngdataurl") or payload.get("chart_png_data_url") or "")
+    match = re.fullmatch(r"data:image/png;base64,([A-Za-z0-9+/=\s]+)", raw_data_url)
+    if not match:
+        return
+    try:
+        image_bytes = base64.b64decode(re.sub(r"\s+", "", match.group(1)), validate=True)
+    except (ValueError, TypeError):
+        return
+    if image_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        (LOCAL_IMAGE_DIR / f"song_{song_id}.png").write_bytes(image_bytes)
+
+
 def upsert_search_index(conn: sqlite3.Connection, song: dict[str, Any]) -> None:
     # FTS5 external-content tables can report a malformed index when a row is
     # deleted before it has ever been indexed. Rebuild from the authoritative
@@ -325,6 +349,7 @@ def upsert_search_index(conn: sqlite3.Connection, song: dict[str, Any]) -> None:
 
 
 def save_song(song_id: int | None, payload: dict[str, Any]) -> dict[str, Any]:
+    raw_payload = dict(payload)
     payload = normalize_legacy_payload(payload)
     conn = db()
     now = utc_now()
@@ -376,6 +401,7 @@ def save_song(song_id: int | None, payload: dict[str, Any]) -> dict[str, Any]:
     upsert_search_index(conn, song_dict)
     conn.commit()
     conn.close()
+    persist_chart_image_snapshot(song_id, raw_payload, song_dict)
     return song_dict
 
 
@@ -673,6 +699,19 @@ def index() -> HTMLResponse:
     return HTMLResponse("<!doctype html><html><body><div id='root'></div></body></html>")
 
 
+@app.get("/karen_logo.png")
+def brand_logo() -> FileResponse:
+    logo_path = resolve_first_existing_path((
+        RESOURCE_DIR / "karen_logo.png",
+        BASE_DIR / "karen_logo.png",
+        RESOURCE_DIR / "static" / "karen-music-logo.svg",
+        BASE_DIR / "static" / "karen-music-logo.svg",
+    ))
+    if not logo_path:
+        raise HTTPException(status_code=404, detail="Karen Music logo not found")
+    return FileResponse(logo_path)
+
+
 @app.get("/redesign")
 def redesign() -> HTMLResponse:
     index_path = resolve_first_existing_path(REDESIGN_INDEX_CANDIDATES)
@@ -692,6 +731,10 @@ def print_song(song_id: int) -> HTMLResponse:
 STATIC_PATH = resolve_first_existing_path(STATIC_CANDIDATES)
 if STATIC_PATH:
     app.mount("/static", StaticFiles(directory=str(STATIC_PATH)), name="static")
+
+SRC_PATH = resolve_first_existing_path(SRC_CANDIDATES)
+if SRC_PATH:
+    app.mount("/src", StaticFiles(directory=str(SRC_PATH)), name="src")
 
 DIST_ASSETS_PATH = resolve_first_existing_path(DIST_ASSETS_CANDIDATES)
 if DIST_ASSETS_PATH:

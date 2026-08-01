@@ -61,13 +61,14 @@ Authority:
 - Beat rendering includes root, flat, minor, seventh, triangle-seven, sus, aug, slash bass, circle, dot/push, x marks, manual underline, and roll.
 - Arrangement rendering includes Only / All In spans, slurs, lead rows, base octave, subdivisions, note cells, and instrument cues.
 - Lead modal retains octave, per-beat spacing, note entry, clearing, navigation, and undo/redo behavior.
-- New Song, Add Section, lead, instrument, shortcuts, Karen keyboard, import review, print, and lyrics-section dialogs remain explicit triggers rather than startup blockers.
+- New Song resets directly to a blank keyboard-ready editor. Add Section, lead, instrument, shortcuts, Karen keyboard, import review, print, and lyrics-section dialogs remain explicit triggers rather than startup blockers.
 - Editing retains undo/redo, JSON import/export, unsaved-import review, Karen input, and saved chart compatibility.
 
 ## Paper and print contract
 
 - The white editor surface and every printed copy use exact Letter proportions: 8.5 x 11 inches.
 - Header fields remain editable and fixed at the top.
+- Karen title, typed/suggestion-backed Style, and Key share the primary header line and type size; English sits directly below Karen; Key is right-aligned and remains a select.
 - Footer fields remain fixed to the page bottom.
 - Header/footer geometry does not move when measures are edited.
 - Print opens page 1.
@@ -75,6 +76,8 @@ Authority:
 - Exactly one centered instrument belongs to each physical page.
 - Editor and print views use the same section, row-capacity, measure-width, beat, annotation, lead, and ending-bar rendering rules.
 - No horizontal or vertical page overflow is allowed.
+- Wheel input belongs to the scrollable control or region currently under the pointer; nested scroll never continues in a previously clicked region.
+- Pointer edits inside the chord body preserve the current visible viewport; programmatic focus uses `preventScroll`.
 
 ## Current proof
 

@@ -20,6 +20,9 @@
 16. Seven-option instrument dropdown - verified and privately deployed as Sites version 7
 17. Paper-owned metadata and Settings/Library sidebar - verified and privately deployed as Sites version 8
 18. Annotation-driven Library/settings/help and ghost-measure refinement - verified and privately deployed as Sites version 10
+19. Desktop blank-song workflow and editor reference skills - verified
+20. Matched legacy/Sites paper header and pointer-routed scrolling - verified and privately deployed as Sites version 11
+21. Website-first legacy behavior merge - verified and privately deployed as Sites version 12
 
 ## Completed milestone
 
@@ -36,3 +39,29 @@ The Sites editor remains owner-only and contains synthetic data only. The separa
 ## Next milestone
 
 Finish the incomplete database sentence, then verify one synthetic signed-in save/load cycle against the private production URL. Never upload `songs.db` or real charts.
+
+## Phase 19 - desktop New Song vertical slice
+
+- Current focus: blank New Song, one-minute local autosave, PDF Export, compact help/zoom chrome, and reusable editor-reference skills in the authoritative desktop `index.html` runtime.
+- Implemented: direct blank reset; empty metadata placeholders; Key dropdown; 4/4 default; Enter/I section start; silent `chart_images` PNG/JSON overwrite; Letter PDF download; connected exponential zoom control; two project-local skills.
+- Verification complete for this slice: 25/25 Python tests; 4/4 affected desktop browser checks; Key transpose check; downloaded PDF header; skill validation.
+- Full-suite disclosure: 38/66 browser tests passed before Node exhausted memory. Requested New Song/autosave/PDF/zoom, measure navigation, print, lyrics, and slur paths passed. Separate Sites/stale UI/import expectations and the pre-existing `renderOnlySpans` `endRect` reference error remain outside this slice.
+- Privacy: local only; no database, chart, or proof media is uploaded or deployed.
+- Next milestone: compose the real song in the repaired blank editor; treat the legacy `endRect` annotation defect as a separate regression task.
+
+## Phase 20 - matched legacy and Sites interaction contract
+
+- Current focus: one paper-header geometry and one pointer-owned scroll/focus rule across the desktop source and private Sites replica.
+- Implemented: English under Karen; equal-size Karen/Style/Key primary row; typed Style suggestions; Key dropdown; hover-owned dropdown/stepper/nested scrolling; viewport-preserving chart clicks; direct blank Sites New Song.
+- Verification: 4/4 focused legacy Chromium checks; Sites production build and source-contract test; live Sites blank New Song → Enter → I with one section, one measure, four beats, and zero console errors.
+- Full-suite disclosure: the required full legacy browser run was attempted with one worker against the source server but did not finish within the four-minute bound; it reached unrelated database/Karen-input cases. The four touched-path checks remain green.
+- Privacy: Sites remains owner-only and synthetic; local `songs.db`, chart images, attachments, and provider data were not published.
+- Next milestone: confirm private production version 11, then use the editor for the active song.
+
+## Phase 21 - Sites website becomes the product
+
+- Current focus: make the private Sites website the primary Karen Music surface while using the legacy editor as the typing and modal behavior oracle.
+- Implemented: Database-as-sidebar; legacy-style Settings groups; stable-height section insert hover; working fit-to-width paper icon; website naming; retained village shell and editor keyboard/modal logic.
+- Verification: lint and production build passed; local desktop/mobile checks measured zero hover shift and zero page overflow; focused legacy Key alignment passed; production Database/sidebar, fit-to-width, and New Song → Enter → I passed with zero routed-console errors.
+- Privacy: keep the deployment owner-only and synthetic; do not upload `songs.db`, chart images, or real song content.
+- Next milestone: compose the active song in the website and verify one synthetic signed-in save/load cycle before any real-song hosting decision.

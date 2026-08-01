@@ -1,6 +1,6 @@
 # Request adherence ledger
 
-Last updated: 2026-07-28
+Last updated: 2026-07-30
 
 ## Active request: reconcile the local song database with chart_images
 
@@ -192,6 +192,18 @@ Verification:
 | ID | Requirement | Delivery state | Communication state | Evidence |
 |---|---|---|---|---|
 | S8 | Replace the sidebar Settings/Library switcher with a Library-only `Song Library` surface. | verified | reported with evidence | Browser snapshot contains no `.sidebar-tabs`; Library empty state remains functional. |
+
+### 2026-08-01 website-first legacy behavior merge
+
+| ID | Requirement | Delivery state | Communication state | Evidence |
+|---|---|---|---|---|
+| WEB-01 | Make the music editor the main inspiration and restore its typing/modal behavior in Sites. | verified | reported with evidence | Production New Song → Enter → I produced one Intro, one measure, and four beats while the Sites shell stayed intact. |
+| WEB-02 | Preserve the village background. | verified | reported with evidence | `/karen-village-aerial.png` remains the paper-area background. |
+| WEB-03 | Use legacy-style Settings and the new sidebar for Database. | verified | reported with evidence | Local Settings controls and production Database/sidebar-plus-chart state passed. |
+| WEB-04 | Never move rows on section-insert hover. | verified | reported with evidence | Local and production movement measured 0 px. |
+| WEB-05 | Use a paper-and-width-measurement icon for functional fit-to-width. | verified | reported with evidence | Local and production changed 89% to a computed 126%; icon geometry measured 18×22 px. |
+| WEB-06 | Rename the product from Worship Music Editor to a website. | verified | reported with evidence | Production title and brand plus the root title use `Karen Music Director Website`. |
+| WEB-07 | Verify and privately update the existing Sites project. | verified | reported with evidence | Sites version 12 deployed owner-only; production route ready, Database/sidebar, chart, fit, blank-song typing, and clean console passed. |
 | S9 | Move Karen keyboard plus style/category/group vocabulary controls to header Settings; place moon and `?` Docs controls below Lyrics. | verified | reported with evidence | Header popover and rail controls were clicked in-browser; theme changed dark→light and the full shortcut guide opened. |
 | S10 | Use clickable muted ghost measures instead of `+ Measure`, creating every full measure through the clicked slot. | verified | reported with evidence | INTRO ghost 7 created measures 5–7, selected measure 7, retained ghost 8, and rendered zero bottom Add Measure controls. |
 | S11 | Make style selectable/configurable, English title content-sized inside tight parentheses, and row steppers external to the row. | verified | reported with evidence | Browser geometry and interaction checks passed; focused updated Chromium journey passed. |
@@ -223,3 +235,32 @@ Verification:
 | R7 | Repackage the Desktop shortcut executable. | verified | reported with evidence | PyInstaller build succeeded at the shortcut target; packaged source and database hashes match the repo. |
 
 Full-suite disclosure: 37/55 tests passed. The requested print and measure paths are green. Eighteen failures remain in functionality associated with newer post-package UI/import/settings/Sites expectations or legacy regressions and are deferred rather than silently reintroduced into the restored shell.
+
+## Active request: blank New Song and keyboard-first composition
+
+| ID | Atomic request | Delivery | Communication | Evidence |
+| --- | --- | --- | --- | --- |
+| NS1 | New Song must show a whole blank editor with no sections, measures, or beats. | verified | reported with evidence | Focused Chromium blank-state assertions passed. |
+| NS2 | Clear content fields and use muted non-content placeholders; Key is a dropdown placeholder plus note choices. | verified | reported with evidence | Empty values, Key select, and rendered muted paper placeholders verified. |
+| NS3 | Keep 4/4 as the default and Tempo empty until entered. | verified | reported with evidence | Focused Chromium asserted both values. |
+| NS4 | Enter then I creates one Intro with one four-beat measure; preserve Tab and Space flow. | verified | reported with evidence | New Song flow plus existing measure-navigation browser tests passed. |
+| NS5 | Autosave each minute, silently create the first save, and overwrite the same `chart_images` files. | verified | reported with evidence | Browser identity test, backend overwrite test, and 25/25 Python suite. |
+| NS6 | Give Export a distinct PDF-to-Downloads job. | verified | reported with evidence | Download name and `%PDF-` header verified in Chromium. |
+| NS7 | Place `?` docs with the top controls and make zoom a connected exponential minus/percent/plus oval. | verified | reported with evidence | Rendered desktop review plus focused 125% zoom assertion. |
+| NS8 | Create reusable UI/navigation and song-making skills. | verified | reported with evidence | Both project-local skills passed official validation. |
+
+Full-suite disclosure: 38/66 browser tests passed before Node exhausted memory. The requested slice is green; separate Sites/stale desktop/import assertions and the existing `renderOnlySpans` `endRect` error remain deferred to dedicated regression work.
+
+## Active request: matched legacy and Sites header, focus, and scrolling
+
+| ID | Atomic request | Delivery | Communication | Evidence |
+| --- | --- | --- | --- | --- |
+| HS1 | Apply the requested interaction model to both the legacy editor and the Sites version. | verified | reported with evidence | Both source surfaces changed; legacy focused browser checks and Sites live preview passed. |
+| HS2 | Put English below Karen and align Karen, Style, and Key at one primary size, with Key right-aligned. | verified | reported with evidence | Legacy geometry test and Sites 21px/zero-top-offset browser measurements. |
+| HS3 | Keep Style both typable and suggestion-backed; keep Key a dropdown. | verified | reported with evidence | Native input+datalist and select controls verified on both surfaces. |
+| HS4 | Do not move the visual viewport when clicking within the chord editor. | verified | reported with evidence | Click viewport snapshots plus `preventScroll`; focused legacy regression passed. |
+| HS5 | Route wheel scrolling only to the region under the pointer, including sidebar, dropdowns, text fields, and nested regions. | verified | reported with evidence | Hover-region Chromium test passed; pointer-routed wheel handlers and contained overscroll exist in both sources. |
+| HS6 | Make Sites New Song use the same direct blank 4/4 start. | verified | reported with evidence | Live Sites New Song → Enter → I produced one four-beat Intro with zero console errors. |
+| HS7 | Publish the updated Sites implementation without exposing private local data. | verified | reported with evidence | Owner-only Sites version 11 deployed successfully; production New Song showed zero sections, empty metadata, 4/4, and zero console errors. |
+
+Full-suite disclosure: the one-worker legacy browser suite was attempted against the authoritative source runtime and exceeded the four-minute bound after reaching unrelated database and Karen-input cases. The four focused header, blank-song, hover-scroll, and viewport-preservation checks passed 4/4.
