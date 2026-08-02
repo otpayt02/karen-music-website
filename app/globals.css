@@ -335,6 +335,7 @@ button.primary:hover { background: #66845a; }
   display: block;
   position: relative;
   border: 1.5px solid currentColor;
+  border-top: 0;
   border-radius: 1px;
   background: color-mix(in srgb, var(--paper) 78%, transparent);
 }
@@ -343,7 +344,7 @@ button.primary:hover { background: #66845a; }
   position: absolute;
   left: -4px;
   right: -4px;
-  top: 4px;
+  top: -4px;
   height: 1.5px;
   background: currentColor;
 }
@@ -351,7 +352,7 @@ button.primary:hover { background: #66845a; }
   content: "↔";
   position: absolute;
   left: 50%;
-  top: -4px;
+  top: -9px;
   transform: translateX(-50%);
   padding: 0 1px;
   background: var(--case-raised);
@@ -386,7 +387,7 @@ button.primary:hover { background: #66845a; }
 .chart-paper {
   transform-origin: top center;
   transform: scale(var(--paper-scale, 1));
-  transition: transform 180ms cubic-bezier(.2, .8, .2, 1);
+  transition: transform 45ms linear;
   font-family: var(--font-ui);
 }
 .paper-header {
@@ -471,9 +472,10 @@ button.primary:hover { background: #66845a; }
 .paper-key-editor-cluster {
   width: 100%;
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px !important;
+  grid-template-columns: 1fr;
+  align-items: start;
+  justify-items: end;
+  gap: 4px !important;
   justify-self: end;
 }
 .paper-key-editor-cluster .paper-key-select {
@@ -765,9 +767,33 @@ html[data-reduced-motion="true"] *::after {
   border: 1.5px solid currentColor;
   border-radius: 50%;
 }
-.rhythm-marks { display: grid; min-width: 14px; font: 8px/1 ui-monospace, monospace; }
-.rhythm-marks .underline { display: block; width: 100%; border-bottom: 1px solid currentColor; }
-.push-dot { font-size: 10px; }
+.rhythm-marks,
+.print-rhythm-marks {
+  display: grid;
+  min-width: 14px;
+  justify-items: center;
+  grid-template-rows: 2px 9px;
+  color: currentColor;
+}
+.rhythm-marks .underline,
+.print-rhythm-marks .underline {
+  display: block;
+  grid-row: 1;
+  width: 100%;
+  min-width: 14px;
+  border-bottom: 1px solid currentColor;
+}
+.rhythm-symbols {
+  display: inline-flex;
+  grid-row: 2;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  white-space: nowrap;
+  font: 9px/1 ui-monospace, monospace;
+}
+.rhythm-dot,
+.rhythm-x { font: inherit; }
 .bass-note { font-size: 9px; font-weight: 800; }
 .lead-row {
   min-height: 13px;
@@ -1379,7 +1405,8 @@ html[data-reduced-motion="true"] *::after {
   border: 1.5px solid currentColor;
   border-radius: 50%;
 }
-.print-beat-row small { min-height: 8px; font: 7px/1 ui-monospace, monospace; text-decoration: underline; }
+.print-beat-row small { min-height: 11px; font: 7px/1 ui-monospace, monospace; }
+.print-beat-row .rhythm-symbols { font-size: 7px; }
 .print-beat-row em { font: 800 8px/1 inherit; }
 .print-lead-row { min-height: 12px; display: grid; border-bottom: 1px solid #bbb; font-size: 7px; }
 .print-lead-row span { display: grid; place-items: center; border-left: 1px solid #ddd; }
@@ -1479,7 +1506,7 @@ html[data-reduced-motion="true"] *::after {
   .paper-header > input,
   .paper-header > select,
   .paper-key-editor-cluster .paper-key-select { font-size: 16px; }
-  .paper-key-editor-cluster { grid-template-columns: minmax(24px, .35fr) minmax(62px, .65fr); gap: 2px !important; }
+  .paper-key-editor-cluster { grid-template-columns: 1fr; gap: 2px !important; }
   .paper-key-editor-cluster .paper-transpose-control { max-width: 70px; min-height: 24px; padding-inline: 5px 16px; font-size: 7.5px; }
   .paper-header .paper-english-title { font-size: 11px; }
   .chart-body { padding: 8px 10px 12px; }

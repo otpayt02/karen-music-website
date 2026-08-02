@@ -118,9 +118,10 @@ const DEFAULT_MEASURES_PER_ROW = 8;
 const MIN_MEASURES_PER_ROW = 4;
 const MAX_MEASURES_PER_ROW = 16;
 const createMeasure = (count = 4): Measure => ({ beats: Array.from({ length: count }, () => ({ chord: null })) });
-const clampZoom = (value: number) => Math.min(175, Math.max(55, value));
+const ZOOM_STEP = 0.5;
+const clampZoom = (value: number) => Number(Math.min(175, Math.max(55, value)).toFixed(1));
 const nextZoom = (current: number, direction: -1 | 1) =>
-  clampZoom(Math.round(current * (direction > 0 ? 1.12 : 1 / 1.12)));
+  clampZoom(current + direction * ZOOM_STEP);
 
 function clampBpm(value: number) {
   return Math.min(MAX_BPM, Math.max(MIN_BPM, Math.round(Number(value) || 76)));
@@ -413,7 +414,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [styleDraft, setStyleDraft] = useState(defaultStyleOptions.join(", "));
   const [categoryDraft, setCategoryDraft] = useState(defaultCategoryOptions.join(", "));
   const [groupDraft, setGroupDraft] = useState(songGroupOptions.join(", "));
-  const [status, setStatus] = useState("Blank 4/4 song ready — press Enter to add a section");
+  const [status, setStatus] = useState("");
   const [songs, setSongs] = useState<Song[]>([]);
   const [search, setSearch] = useState("");
   const [zoom, setZoom] = useState(100);
@@ -506,9 +507,17 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
 
   useEffect(() => {
     const routeWheelToHoveredRegion = (event: globalThis.WheelEvent) => {
-      if (event.ctrlKey || event.metaKey) return;
       const origin = event.target instanceof Element ? event.target : null;
       if (!origin) return;
+
+      const chartPaper = origin.closest<HTMLElement>(".chart-paper");
+      if ((event.ctrlKey || event.metaKey) && chartPaper && paperAreaTarget.current?.contains(chartPaper)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        setZoom((current) => nextZoom(current, event.deltaY > 0 ? -1 : 1));
+        return;
+      }
+      if (event.ctrlKey || event.metaKey) return;
 
       const select = origin.closest<HTMLSelectElement>("select:not([multiple])");
       if (select && Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
@@ -979,7 +988,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       - (Number.parseFloat(styles.paddingRight) || 0);
     const naturalWidth = paper.offsetWidth;
     if (!availableWidth || !naturalWidth) return;
-    const fittedZoom = clampZoom(Math.floor((availableWidth / naturalWidth) * 100));
+    const fittedZoom = clampZoom(Math.floor((availableWidth / naturalWidth) * 200) / 2);
     setZoom(fittedZoom);
     setStatus(`Paper fitted to width at ${fittedZoom}%`);
   }
@@ -1422,7 +1431,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     undoHistory.current = [];
     redoHistory.current = [];
     setTab("chart");
-    setStatus("Blank 4/4 song ready — press Enter to add a section");
+    setStatus("");
     window.requestAnimationFrame(() => editorTarget.current?.focus({ preventScroll: true }));
   }
 
@@ -1480,7 +1489,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="brand-logo" src="/karen-music-logo.png" alt="Karen Music emblem" />
           <div>
-            <strong>Karen Music Director Website</strong>
+            <strong>(Karen Music)</strong>
             <span>ကညီတၢ်သးဝံၣ်</span>
           </div>
         </div>
@@ -1574,17 +1583,17 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <div className="command-bar">
             <div className="song-position">
               <span className="eyebrow">Active chart</span>
-              <strong>{song.key || "Key"} / {song.style || "Style"}</strong>
+              <strong lang={song.titleKaren ? "kar" : "en"}>{song.titleKaren || "Untitled chart"}</strong>
             </div>
             <div className="view-controls" aria-label="View controls">
               <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
-              <output>{zoom}%</output>
+              <output>{zoom.toFixed(1)}%</output>
               <button onClick={() => setZoom((value) => nextZoom(value, 1))} aria-label="Zoom in">+</button>
               <button className="fit-width-button" onClick={fitPaperToWidth} aria-label="Fit paper to width" title="Fit paper to width">
                 <span className="fit-paper-icon" aria-hidden="true"><i /></span>
               </button>
             </div>
-            <span className="status" aria-live="polite">{status}</span>
+            {status && <span className="status" aria-live="polite">{status}</span>}
           </div>
 
           <div className="paper-area" ref={paperAreaTarget}>
@@ -1973,6 +1982,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <dt>Enter</dt><dd>Open Add Section; use I, V, P, C, B, S, or E.</dd>
           <dt>Ctrl+Z / Ctrl+Y</dt><dd>Undo or redo chart edits.</dd>
           <dt>Ctrl+P / ?</dt><dd>Open print room or this guide.</dd>
+          <dt>Ctrl+wheel over paper</dt><dd>Zoom the paper in responsive 0.5% steps without changing ordinary scrolling.</dd>
         </dl>
       </aside>}
 
@@ -2079,16 +2089,22 @@ function MeasureView({
         data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
         <span className={`chord ${beat.circle ? "circled" : ""}`}><ChordNotation chord={beat.chord} /></span>
-        {(beat.dot || beat.xMarks || beat.manualUnderline || beat.bass) && <span className="rhythm-marks">
-          {beat.dot && <span className="push-dot">•</span>}
-          {Boolean(beat.xMarks) && <span>{"x".repeat(beat.xMarks || 0)}</span>}
+        {(beat.dot || beat.xMarks || beat.manualUnderline) && <span className="rhythm-marks">
           <span className="underline" />
+          {(beat.dot || beat.xMarks) && <RhythmSymbols beat={beat} />}
         </span>}
         {beat.bass && <span className="bass-note">{beat.bass}</span>}
       </button>)}
     </div>
     {measure.roll && <span className="roll-label">Roll</span>}
   </div>;
+}
+
+function RhythmSymbols({ beat }: { beat: Beat }) {
+  return <span className="rhythm-symbols" aria-hidden="true">
+    {beat.dot && <><span className="rhythm-dot">•</span><span className="rhythm-x">x</span></>}
+    {Boolean(beat.xMarks) && <span className="rhythm-x">{"x".repeat(beat.xMarks || 0)}</span>}
+  </span>;
 }
 
 function PrintSheet({
@@ -2178,7 +2194,10 @@ function PrintMeasure({
         data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
         <strong className={beat.circle ? "circled" : ""}><ChordNotation chord={beat.chord} /></strong>
-        {(beat.dot || beat.xMarks || beat.manualUnderline || beat.bass) && <small>{beat.dot ? "•" : ""}{"x".repeat(beat.xMarks || 0)}</small>}
+        {(beat.dot || beat.xMarks || beat.manualUnderline) && <small className="print-rhythm-marks">
+          <span className="underline" />
+          {(beat.dot || beat.xMarks) && <RhythmSymbols beat={beat} />}
+        </small>}
         {beat.bass && <em>{beat.bass}</em>}
       </span>)}
     </div>

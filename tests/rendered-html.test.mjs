@@ -18,7 +18,7 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /const blankSong = \(\): Song =>/);
   assert.match(editor, /sections:\s*\[\]/);
   assert.match(editor, /<button onClick=\{startNewSong\}>New song<\/button>/);
-  assert.match(editor, /Blank 4\/4 song ready/);
+  assert.doesNotMatch(editor, /Blank 4\/4 song ready/);
   assert.match(editor, /song\.sections\.length > 0 && <button/);
   assert.match(editor, /useState<Song>\(\(\) => blankSong\(\)\)/);
   assert.match(editor, /aria-label="Music workspace sidebar"/);
@@ -65,6 +65,17 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /className="fit-width-button"/);
   assert.match(editor, /function fitPaperToWidth/);
   assert.match(editor, /function transposeSong/);
+  assert.match(editor, /const ZOOM_STEP = 0\.5/);
+  assert.match(editor, /current \+ direction \* ZOOM_STEP/);
+  assert.match(editor, /closest<HTMLElement>\("\.chart-paper"\)/);
+  assert.match(editor, /zoom\.toFixed\(1\)/);
+  assert.match(editor, /function RhythmSymbols/);
+  assert.match(editor, /className="rhythm-dot">•/);
+  assert.match(editor, /className="rhythm-x">x/);
+  assert.match(editor, /className="underline" \/>[\s\S]*?<RhythmSymbols beat=\{beat\}/);
+  assert.match(editor, /song\.titleKaren \|\| "Untitled chart"/);
+  assert.match(editor, /<strong>\(Karen Music\)<\/strong>/);
+  assert.match(editor, /\{status && <span className="status"/);
   const removeSectionBody = editor.match(/function removeSection\(sectionIndex: number\) \{([\s\S]*?)\n  \}\n\n  function changeRowCap/)?.[1] || "";
   assert.match(removeSectionBody, /sections\.splice\(sectionIndex, 1\)/);
   assert.doesNotMatch(removeSectionBody, /sections\.length <= 1/);
@@ -90,6 +101,10 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(styles, /\.paper-english-title-wrap/);
   assert.match(styles, /\.paper-header \.paper-karen-title/);
   assert.match(styles, /\.paper-transpose-control/);
+  assert.match(styles, /\.paper-key-editor-cluster \{[\s\S]*?grid-template-columns:\s*1fr/);
+  assert.match(styles, /\.fit-paper-icon \{[\s\S]*?border-top:\s*0/);
+  assert.match(styles, /\.rhythm-symbols/);
+  assert.match(styles, /transition:\s*transform 45ms linear/);
   assert.match(styles, /\.fit-paper-icon::before/);
   assert.match(styles, /--font-mono:\s*"IBM Plex Mono"/);
   assert.match(styles, /\.section-tone-chorus/);
