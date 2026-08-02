@@ -3,13 +3,14 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("ships the Karen Music Director application shell without starter artifacts", async () => {
-  const [page, layout, editor, styles, hosting, songsRoute] = await Promise.all([
+  const [page, layout, editor, styles, hosting, songsRoute, referenceLibrary] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/music-director.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
     readFile(new URL("../app/api/songs/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/reference-library.ts", import.meta.url), "utf8"),
   ]);
 
   assert.match(page, /<MusicDirector viewer=/);
@@ -69,10 +70,17 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /current \+ direction \* ZOOM_STEP/);
   assert.match(editor, /closest<HTMLElement>\("\.chart-paper"\)/);
   assert.match(editor, /zoom\.toFixed\(1\)/);
+  assert.match(editor, /approvedReferenceSongs/);
+  assert.match(editor, /referencePdfNames/);
+  assert.match(editor, /id="lang-toggle"/);
+  assert.match(editor, /interfaceLanguage/);
+  assert.match(editor, /id="theme-toggle"/);
+  assert.match(editor, /className="paper-theme-toggle"/);
   assert.match(editor, /function RhythmSymbols/);
-  assert.match(editor, /className="rhythm-dot">•/);
-  assert.match(editor, /className="rhythm-x">x/);
-  assert.match(editor, /className="underline" \/>[\s\S]*?<RhythmSymbols beat=\{beat\}/);
+  assert.match(editor, /underline \$\{beat\.dot \? "with-dot" : ""\}/);
+  assert.match(editor, /className="rhythm-dot"/);
+  assert.match(editor, /className="rhythm-x">\{"x"\.repeat\(xCount\)\}/);
+  assert.match(editor, /const xCount = \(beat\.dot \? 1 : 0\) \+ \(beat\.xMarks \|\| 0\)/);
   assert.match(editor, /song\.titleKaren \|\| "Untitled chart"/);
   assert.match(editor, /<strong>\(Karen Music\)<\/strong>/);
   assert.match(editor, /\{status && <span className="status"/);
@@ -101,9 +109,14 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(styles, /\.paper-english-title-wrap/);
   assert.match(styles, /\.paper-header \.paper-karen-title/);
   assert.match(styles, /\.paper-transpose-control/);
+  assert.match(styles, /\.language-toggle/);
+  assert.match(styles, /\.paper-theme-toggle/);
   assert.match(styles, /\.paper-key-editor-cluster \{[\s\S]*?grid-template-columns:\s*1fr/);
   assert.match(styles, /\.fit-paper-icon \{[\s\S]*?border-top:\s*0/);
   assert.match(styles, /\.rhythm-symbols/);
+  assert.match(styles, /\.rhythm-marks \.underline\.with-dot/);
+  assert.match(styles, /grid-template-columns:\s*3px minmax\(0, 1fr\)/);
+  assert.match(styles, /\.reference-library-note/);
   assert.match(styles, /transition:\s*transform 45ms linear/);
   assert.match(styles, /\.fit-paper-icon::before/);
   assert.match(styles, /--font-mono:\s*"IBM Plex Mono"/);
@@ -121,6 +134,9 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(songsRoute, /MIN_BPM = 55/);
   assert.match(songsRoute, /MAX_BPM = 155/);
   assert.match(songsRoute, /bpm: safePayload\.bpm/);
+  assert.match(referenceLibrary, /convertLegacyExport/);
+  assert.match(referenceLibrary, /song_21\.json/);
+  assert.match(referenceLibrary, /count_your_blessings_print\.pdf/);
 
   const combined = `${page}\n${layout}\n${editor}\n${styles}`;
   assert.doesNotMatch(combined, /codex-preview|Your site is taking shape|react-loading-skeleton/i);

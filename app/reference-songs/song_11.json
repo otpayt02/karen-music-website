@@ -1,0 +1,5897 @@
+{
+  "id": 11,
+  "title": "Karen Gospel Song",
+  "category": "Youth",
+  "key": "C",
+  "style": "Slow",
+  "tempo": 120,
+  "date_performed": "",
+  "instruments": "Piano 1",
+  "chart_json": {
+    "sections": [
+      {
+        "measures": [
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "root",
+                  "minor",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "D",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "root",
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": true,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "flat",
+                  "minor",
+                  "seven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 1,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "xMarks",
+                  "root",
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": true,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": true
+          }
+        ],
+        "measuresPerRow": null,
+        "preMeasure": null,
+        "rowMeasureCounts": [],
+        "type": "Intro"
+      },
+      {
+        "measures": [
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "root",
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "root",
+                  "root"
+                ]
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": true
+          }
+        ],
+        "measuresPerRow": null,
+        "preMeasure": null,
+        "rowMeasureCounts": [],
+        "type": "Verse"
+      },
+      {
+        "measures": [
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "D",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "seven",
+                  "seven",
+                  "seven",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "D",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "D",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "seven",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "D",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor",
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": true
+          }
+        ],
+        "measuresPerRow": null,
+        "preMeasure": null,
+        "rowMeasureCounts": [],
+        "type": "Chorus"
+      },
+      {
+        "measures": [
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": true,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "flat",
+                  "minor",
+                  "seven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 1,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "xMarks"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": true,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": true
+          }
+        ],
+        "measuresPerRow": null,
+        "preMeasure": null,
+        "rowMeasureCounts": [],
+        "type": "Solo"
+      },
+      {
+        "measures": [
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "root"
+                ]
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": true
+          }
+        ],
+        "measuresPerRow": null,
+        "preMeasure": null,
+        "rowMeasureCounts": [],
+        "type": "Verse"
+      },
+      {
+        "measures": [
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "D",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "seven",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "E",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "D",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "flat",
+                  "minor",
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "B",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "F",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "B",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "A",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "D",
+                  "flat": false,
+                  "minor": true,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "minor"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "G",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "xMarks",
+                  "xMarks",
+                  "xMarks",
+                  "xMarks",
+                  "xMarks"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": false
+          },
+          {
+            "beats": [
+              {
+                "chordState": {
+                  "root": "C",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": true,
+                  "seven": true,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 1,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": false,
+                "roll": false,
+                "lead": [],
+                "editStack": [
+                  "root",
+                  "xMarks",
+                  "triangleSeven"
+                ]
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": true,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": true,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              },
+              {
+                "chordState": {
+                  "root": "",
+                  "flat": false,
+                  "minor": false,
+                  "triangle": false,
+                  "seven": false,
+                  "quality": ""
+                },
+                "bass": "",
+                "xMarks": 0,
+                "dot": false,
+                "manualUnderline": false,
+                "circle": true,
+                "roll": false,
+                "lead": [],
+                "editStack": []
+              }
+            ],
+            "roll": false,
+            "forceUnderline": false,
+            "isPreMeasure": false,
+            "leadEnabled": false,
+            "leadBaseOctave": 0,
+            "leadInstrumentAbbr": "",
+            "leadInstrumentRanges": [],
+            "leadSlotsPerBeat": 4,
+            "leadSlotsByBeat": [
+              4,
+              4,
+              4,
+              4
+            ],
+            "leadSlots": 16,
+            "isEndingBar": true
+          }
+        ],
+        "measuresPerRow": null,
+        "preMeasure": null,
+        "rowMeasureCounts": [],
+        "type": "Chorus"
+      }
+    ],
+    "onlySpans": [],
+    "slurs": [
+      {
+        "endBeatIndex": 27,
+        "startBeatIndex": 26
+      },
+      {
+        "endBeatIndex": 223,
+        "startBeatIndex": 220
+      },
+      {
+        "endBeatIndex": 139,
+        "startBeatIndex": 138
+      }
+    ],
+    "lyricsSections": [],
+    "beatsPerMeasure": 4,
+    "defaultMeasuresPerRow": 8,
+    "rowDefaultExplicit": false
+  },
+  "raw_editor_text": "",
+  "chart_image_path": null,
+  "created_at": null,
+  "updated_at": "2026-06-21 05:24:19",
+  "notes": "",
+  "row_lead_json": {
+    "0:0": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "6",
+        "base:12": "6",
+        "base:14": "7"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":0,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":5,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":5,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":5,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"6\",\"base:14\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":5,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"6\",\"base:14\":\"6\",\"base:12\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":5,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"6\",\"base:12\":\"6\",\"base:14\":\"7\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 7,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "0:10": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "4",
+        "base:12": "3",
+        "base:14": "2"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"4\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"4\",\"base:8\":\"3\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"4\",\"base:8\":\"3\",\"base:12\":\"3\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"4\",\"base:8\":\"3\",\"base:12\":\"3\",\"base:14\":\"2\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"4\",\"base:12\":\"3\",\"base:14\":\"2\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 6,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "0:11": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "5",
+        "base:12": "3",
+        "base:14": "2",
+        "base:4": "6"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:2\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:2\":\"6\",\"base:12\":\"3\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:2\":\"6\",\"base:12\":\"3\",\"base:14\":\"2\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:12\":\"3\",\"base:14\":\"2\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:12\":\"3\",\"base:14\":\"2\",\"base:4\":\"6\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 7,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "0:12": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "1"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"1\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 4,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "0:13": {
+      "baseOctave": 6,
+      "cells": {},
+      "enabled": false,
+      "history": [],
+      "historyIndex": -1,
+      "instrumentAbbr": "",
+      "lastTab": 1,
+      "slots": null
+    },
+    "0:7": {
+      "baseOctave": 6,
+      "cells": {
+        "base:12": "6",
+        "base:8": "7",
+        "up:0": "1"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":5,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\",\"base:8\":\"7\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\",\"base:8\":\"7\",\"base:12\":\"6\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 5,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "0:8": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "5",
+        "base:14": "4",
+        "base:4": "6"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:4\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:4\":\"6\",\"base:14\":\"4\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 5,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "0:9": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "3"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"3\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 2,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "3:0": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "6",
+        "base:12": "6",
+        "base:14": "7"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":0,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"6\",\"base:12\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"6\",\"base:12\":\"6\",\"base:14\":\"7\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 5,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "3:12": {
+      "baseOctave": 6,
+      "cells": {
+        "base:12": "6",
+        "base:9": "7",
+        "up:0": "1"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\",\"base:12\":\"7\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\",\"base:12\":\"7\",\"base:9\":\"7\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\",\"base:9\":\"7\",\"base:12\":\"6\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 5,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "3:13": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "5",
+        "base:14": "4",
+        "base:4": "6"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:4\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:4\":\"6\",\"base:14\":\"4\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 4,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "3:14": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "3"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"3\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 2,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "3:15": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "4",
+        "base:12": "3",
+        "base:14": "2"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"4\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"4\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"4\",\"base:12\":\"3\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"4\",\"base:12\":\"3\",\"base:14\":\"2\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 6,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "3:16": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "5",
+        "base:12": "3",
+        "base:14": "2",
+        "base:4": "6"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"5\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:4\":\"6\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:4\":\"6\",\"base:12\":\"3\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"5\",\"base:4\":\"6\",\"base:12\":\"3\",\"base:14\":\"2\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 7,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "3:17": {
+      "baseOctave": 6,
+      "cells": {
+        "base:0": "1"
+      },
+      "enabled": true,
+      "history": [
+        "{\"enabled\":false,\"baseOctave\":6,\"slots\":null,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":1}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"up:0\":\"1\"},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{},\"lastTab\":3}",
+        "{\"enabled\":true,\"baseOctave\":6,\"slots\":4,\"instrumentAbbr\":\"\",\"cells\":{\"base:0\":\"1\"},\"lastTab\":3}"
+      ],
+      "historyIndex": 4,
+      "instrumentAbbr": "",
+      "lastTab": 3,
+      "slots": 4
+    },
+    "3:18": {
+      "baseOctave": 6,
+      "cells": {},
+      "enabled": false,
+      "history": [],
+      "historyIndex": -1,
+      "instrumentAbbr": "",
+      "lastTab": 1,
+      "slots": null
+    }
+  },
+  "current_key": "C",
+  "original_key": "C",
+  "created_date": "2026-06-14",
+  "next_performance_date": "",
+  "performed_dates_json": "[]",
+  "reference_media_json": "{\"videos\": [], \"images\": [], \"info\": \"\"}",
+  "title_karen": "Karen Gospel Song",
+  "file_metadata_json": "[]",
+  "performed_dates": [],
+  "reference_media": {
+    "videos": [],
+    "images": [],
+    "info": ""
+  },
+  "file_metadata": []
+}

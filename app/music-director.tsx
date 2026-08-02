@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { approvedReferenceSongs, referencePdfNames } from "./reference-library";
 
 type Chord = {
   root: string;
@@ -45,7 +46,7 @@ type Section = {
   measuresPerRow?: number | null;
   rowMeasureCounts?: number[];
 };
-type Song = {
+export type Song = {
   id?: number;
   titleKaren: string;
   titleEnglish: string;
@@ -63,7 +64,7 @@ type Song = {
   slurs?: Array<{ start: string; end: string }>;
   instrumentCueRanges?: InstrumentCueRange[];
   sourceKind?: "synthetic" | "approved-sanitized" | "imported-json";
-  reviewState?: "draft" | "reviewed";
+  reviewState?: "unreviewed" | "draft" | "reviewed";
   updatedAt?: string;
 };
 
@@ -405,6 +406,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [printRoomOpen, setPrintRoomOpen] = useState(false);
   const [printPage, setPrintPage] = useState(1);
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [interfaceLanguage, setInterfaceLanguage] = useState<"english" | "karen">("english");
   const [reducedMotion, setReducedMotion] = useState(false);
   const [defaultMeasuresPerRow, setDefaultMeasuresPerRow] = useState(DEFAULT_MEASURES_PER_ROW);
   const [karenTitleKeyboardEnabled, setKarenTitleKeyboardEnabled] = useState(true);
@@ -415,7 +417,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [categoryDraft, setCategoryDraft] = useState(defaultCategoryOptions.join(", "));
   const [groupDraft, setGroupDraft] = useState(songGroupOptions.join(", "));
   const [status, setStatus] = useState("");
-  const [songs, setSongs] = useState<Song[]>([]);
+  const [songs, setSongs] = useState<Song[]>(() => approvedReferenceSongs.map((item) => normalizeSongMetadata(item)));
   const [search, setSearch] = useState("");
   const [zoom, setZoom] = useState(100);
   const [pendingBass, setPendingBass] = useState(false);
@@ -476,6 +478,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.dataset.interfaceLanguage = interfaceLanguage;
+  }, [interfaceLanguage]);
 
   useEffect(() => {
     document.documentElement.dataset.reducedMotion = reducedMotion ? "true" : "false";
@@ -636,7 +642,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     fetch("/api/songs")
       .then((response) => response.ok ? response.json() : Promise.reject())
       .then((data) => {
-        setSongs((data.songs ?? []).map((item: Song) => normalizeSongMetadata(item)));
+        const hostedSongs = (data.songs ?? []).map((item: Song) => normalizeSongMetadata(item));
+        const hostedTitles = new Set(hostedSongs.map((item: Song) => `${item.titleKaren}::${item.titleEnglish}`.toLowerCase()));
+        const referenceSongs = approvedReferenceSongs
+          .map((item) => normalizeSongMetadata(item))
+          .filter((item) => !hostedTitles.has(`${item.titleKaren}::${item.titleEnglish}`.toLowerCase()));
+        setSongs([...hostedSongs, ...referenceSongs]);
         if (data.warning) setStatus(data.warning);
       })
       .catch(() => setStatus("Hosted library is unavailable; this draft remains local"));
@@ -1334,7 +1345,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       if (!response.ok) throw new Error(data.error || "Save failed");
       const saved = normalizeSongMetadata(data.song as Song);
       setSong(saved);
-      setSongs((current) => [saved, ...current.filter((item) => item.id !== saved.id)]);
+      setSongs((current) => [saved, ...current.filter((item) => item.id !== saved.id && `${item.titleKaren}::${item.titleEnglish}` !== `${saved.titleKaren}::${saved.titleEnglish}`)]);
       setStatus("Saved to hosted library");
       setSaveReviewOpen(false);
       setSaveReviewConfirmed(false);
@@ -1499,6 +1510,16 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <button onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }}>Import</button>
           <button onClick={exportSong}>Export</button>
           <button ref={printButton} onClick={openPrintRoom}>Print</button>
+          <button
+            id="lang-toggle"
+            className="language-toggle"
+            onClick={() => setInterfaceLanguage((value) => value === "english" ? "karen" : "english")}
+            aria-label="Toggle interface language between Karen and English"
+            aria-pressed={interfaceLanguage === "karen"}
+          >
+            <span lang="kar">ကညီ</span>
+            <span>English</span>
+          </button>
           <details className="settings-menu">
             <summary>Settings</summary>
             <div className="settings-popover">
@@ -1564,18 +1585,18 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <button role="tab" aria-selected={tab === "database"} onClick={openDatabaseSidebar}>database</button>
           </div>
           <div className="sidebar-utilities" aria-label="Appearance and help">
-            <button onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")} aria-label="Toggle dark mode" aria-pressed={theme === "dark"} title="Toggle dark mode"><span aria-hidden="true">{theme === "dark" ? "☾" : "☼"}</span><span>Theme</span></button>
             <button onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Docs and keyboard shortcuts"><span aria-hidden="true">?</span><span>Guide</span></button>
           </div>
           <section className="sidebar-panel library-panel" aria-label="Database sidebar">
             <div className="database-sidebar-heading"><strong>Song Database</strong><small>Private hosted library</small></div>
             <input className="library-search" type="search" aria-label="Search song database" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
             <div className="song-list">
-              {filteredSongs.length === 0 ? <div className="empty-state"><strong>No hosted songs yet</strong><span>Save a reviewed, sanitized chart to add it to this private library.</span></div> :
+              {filteredSongs.length === 0 ? <div className="empty-state"><strong>No approved songs yet</strong><span>Import or save a reviewed chart to add it to this private library.</span></div> :
                 filteredSongs.map((item) => <button key={item.id} onClick={() => { setSong(normalizeSongMetadata(item)); setTab("chart"); setStatus("Loaded from hosted library"); }}>
                   <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key}, {item.style}, {item.meter}</small>
                 </button>)}
             </div>
+            <p className="reference-library-note">{approvedReferenceSongs.length} approved chart exports loaded. {referencePdfNames.length} PDF print references tracked for notation review.</p>
           </section>
         </aside>
 
@@ -1586,6 +1607,14 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <strong lang={song.titleKaren ? "kar" : "en"}>{song.titleKaren || "Untitled chart"}</strong>
             </div>
             <div className="view-controls" aria-label="View controls">
+              <button
+                id="theme-toggle"
+                className="paper-theme-toggle"
+                onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")}
+                aria-label="Toggle light mode"
+                aria-pressed={theme === "light"}
+                title="Toggle light mode"
+              />
               <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
               <output>{zoom.toFixed(1)}%</output>
               <button onClick={() => setZoom((value) => nextZoom(value, 1))} aria-label="Zoom in">+</button>
@@ -2089,8 +2118,8 @@ function MeasureView({
         data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
         <span className={`chord ${beat.circle ? "circled" : ""}`}><ChordNotation chord={beat.chord} /></span>
-        {(beat.dot || beat.xMarks || beat.manualUnderline) && <span className="rhythm-marks">
-          <span className="underline" />
+        {(beat.dot || beat.xMarks || beat.manualUnderline) && <span className={`rhythm-marks ${beat.dot ? "has-dot" : ""}`}>
+          <span className={`underline ${beat.dot ? "with-dot" : ""}`}>{beat.dot && <span className="rhythm-dot" />}</span>
           {(beat.dot || beat.xMarks) && <RhythmSymbols beat={beat} />}
         </span>}
         {beat.bass && <span className="bass-note">{beat.bass}</span>}
@@ -2101,9 +2130,9 @@ function MeasureView({
 }
 
 function RhythmSymbols({ beat }: { beat: Beat }) {
+  const xCount = (beat.dot ? 1 : 0) + (beat.xMarks || 0);
   return <span className="rhythm-symbols" aria-hidden="true">
-    {beat.dot && <><span className="rhythm-dot">•</span><span className="rhythm-x">x</span></>}
-    {Boolean(beat.xMarks) && <span className="rhythm-x">{"x".repeat(beat.xMarks || 0)}</span>}
+    {Boolean(xCount) && <span className="rhythm-x">{"x".repeat(xCount)}</span>}
   </span>;
 }
 
@@ -2194,8 +2223,8 @@ function PrintMeasure({
         data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
         <strong className={beat.circle ? "circled" : ""}><ChordNotation chord={beat.chord} /></strong>
-        {(beat.dot || beat.xMarks || beat.manualUnderline) && <small className="print-rhythm-marks">
-          <span className="underline" />
+        {(beat.dot || beat.xMarks || beat.manualUnderline) && <small className={`print-rhythm-marks ${beat.dot ? "has-dot" : ""}`}>
+          <span className={`underline ${beat.dot ? "with-dot" : ""}`}>{beat.dot && <span className="rhythm-dot" />}</span>
           {(beat.dot || beat.xMarks) && <RhythmSymbols beat={beat} />}
         </small>}
         {beat.bass && <em>{beat.bass}</em>}
