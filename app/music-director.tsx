@@ -985,11 +985,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   }
 
   function removeSection(sectionIndex: number) {
-    if (song.sections.length <= 1) return;
+    if (sectionIndex < 0 || sectionIndex >= song.sections.length) return;
     commitSong((next) => {
       next.sections.splice(sectionIndex, 1);
     }, "Section removed");
     setSelected({ section: Math.max(0, sectionIndex - 1), measure: 0, beat: 0, pre: false });
+    window.requestAnimationFrame(() => editorTarget.current?.focus({ preventScroll: true }));
   }
 
   function changeRowCap(sectionIndex: number, rowIndex: number, delta: number) {

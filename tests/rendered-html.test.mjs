@@ -65,6 +65,9 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /className="fit-width-button"/);
   assert.match(editor, /function fitPaperToWidth/);
   assert.match(editor, /function transposeSong/);
+  const removeSectionBody = editor.match(/function removeSection\(sectionIndex: number\) \{([\s\S]*?)\n  \}\n\n  function changeRowCap/)?.[1] || "";
+  assert.match(removeSectionBody, /sections\.splice\(sectionIndex, 1\)/);
+  assert.doesNotMatch(removeSectionBody, /sections\.length <= 1/);
   assert.match(editor, /src="\/karen-music-logo\.png"/);
   assert.match(editor, /routeWheelToHoveredRegion/);
   assert.match(editor, /focus\(\{ preventScroll: true \}\)/);
