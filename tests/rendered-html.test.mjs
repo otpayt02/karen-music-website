@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("ships the Karen Music Director application shell without starter artifacts", async () => {
-  const [page, layout, editor, styles, hosting, songsRoute, referenceLibrary] = await Promise.all([
+  const [page, layout, editor, styles, hosting, songsRoute, referenceLibrary, referencePdfs] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/music-director.tsx", import.meta.url), "utf8"),
@@ -11,6 +11,7 @@ test("ships the Karen Music Director application shell without starter artifacts
     readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
     readFile(new URL("../app/api/songs/route.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/reference-library.ts", import.meta.url), "utf8"),
+    readdir(new URL("../public/reference-pdfs", import.meta.url)),
   ]);
 
   assert.match(page, /<MusicDirector viewer=/);
@@ -137,6 +138,7 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(referenceLibrary, /convertLegacyExport/);
   assert.match(referenceLibrary, /song_21\.json/);
   assert.match(referenceLibrary, /count_your_blessings_print\.pdf/);
+  assert.equal(referencePdfs.filter((name) => name.endsWith(".pdf")).length, 32);
 
   const combined = `${page}\n${layout}\n${editor}\n${styles}`;
   assert.doesNotMatch(combined, /codex-preview|Your site is taking shape|react-loading-skeleton/i);

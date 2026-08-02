@@ -1596,7 +1596,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                   <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key}, {item.style}, {item.meter}</small>
                 </button>)}
             </div>
-            <p className="reference-library-note">{approvedReferenceSongs.length} approved chart exports loaded. {referencePdfNames.length} PDF print references tracked for notation review.</p>
+            <p className="reference-library-note">{approvedReferenceSongs.length} approved chart exports loaded. {referencePdfNames.length} PDF print references copied for notation review.</p>
           </section>
         </aside>
 
