@@ -9,6 +9,11 @@ This is Karen's music website and music director database. The main app is serve
 - Start the local app with `python -m flask --app app run --host 127.0.0.1 --port 5000`.
 - Local URL: `http://127.0.0.1:5000`.
 
+## Feature Contract & Stack Migrations
+- `docs/CURRENT_FEATURE_MAP.md` is the source of truth for the application's required feature set across stack changes or migrations.
+- When changing architecture, framework, or database stack, preserve all Implemented features in `docs/CURRENT_FEATURE_MAP.md`.
+- Verify features with `npm run test:e2e` and pytest backend tests (`pytest tests/`).
+
 ## Verify
 - After frontend changes, open the site in the browser and check desktop and mobile layouts.
 - Run `npm run test:e2e` before finishing meaningful UI or app changes.
