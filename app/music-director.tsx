@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { approvedReferenceSongs, referencePdfNames } from "./reference-library";
+import { approvedReferenceSongs } from "./reference-library";
 
 type Chord = {
   root: string;
@@ -119,7 +119,7 @@ const DEFAULT_MEASURES_PER_ROW = 8;
 const MIN_MEASURES_PER_ROW = 4;
 const MAX_MEASURES_PER_ROW = 16;
 const createMeasure = (count = 4): Measure => ({ beats: Array.from({ length: count }, () => ({ chord: null })) });
-const ZOOM_STEP = 0.5;
+const ZOOM_STEP = 2.5;
 const clampZoom = (value: number) => Number(Math.min(175, Math.max(55, value)).toFixed(1));
 const nextZoom = (current: number, direction: -1 | 1) =>
   clampZoom(current + direction * ZOOM_STEP);
@@ -396,7 +396,7 @@ function ChordNotation({ chord }: { chord: Chord | null }) {
 
 export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: Viewer }) {
   const [song, setSong] = useState<Song>(() => blankSong());
-  const [tab, setTab] = useState<"chart" | "lyrics" | "database">("chart");
+  const [tab, setTab] = useState<"chart" | "lyrics">("chart");
   const [selected, setSelected] = useState({ section: 0, measure: 0, beat: 0, pre: false });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sectionModalOpen, setSectionModalOpen] = useState(false);
@@ -981,12 +981,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
 
   function closeWorkspaceSidebar() {
     setSidebarOpen(false);
-    setTab((current) => current === "database" ? "chart" : current);
   }
 
   function openDatabaseSidebar() {
     setSidebarOpen(true);
-    setTab("database");
   }
 
   function fitPaperToWidth() {
@@ -1498,21 +1496,20 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     <main className="app-shell" onKeyDownCapture={handleEditorKey} onFocusCapture={handleTextFocus} onClickCapture={(event) => handleKarenTextTarget(event.target)}>
       <header className="app-header">
         <div className="brand">
-          <button className="icon-button" onClick={() => sidebarOpen ? closeWorkspaceSidebar() : setSidebarOpen(true)} aria-label="Toggle music workspace sidebar">☰</button>
+          <button className={`icon-button sidebar-toggle ${sidebarOpen ? "is-open" : ""}`} onClick={() => sidebarOpen ? closeWorkspaceSidebar() : setSidebarOpen(true)} aria-label={sidebarOpen ? "Close music database sidebar" : "Open music database sidebar"} aria-expanded={sidebarOpen}>
+            <span aria-hidden="true"><i /><i /><i /></span>
+          </button>
           {/* The approved project logo is a raster asset, so it stays an ordinary image. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="brand-logo" src="/karen-music-logo.png" alt="Karen Music emblem" />
-          <div>
-            <strong>(Karen Music)</strong>
-            <span>ကညီတၢ်သးဝံၣ်</span>
-          </div>
+          <strong className="brand-name"><span>Karen Music</span><span lang="kar">ကညီတၢ်သးဝံၣ်</span></strong>
         </div>
         <nav className="global-actions" aria-label="Song actions">
-          <button onClick={startNewSong}>New song</button>
-          <button onClick={requestSaveSong} className="primary">Save</button>
-          <button onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }}>Import</button>
-          <button onClick={exportSong}>Export</button>
-          <button ref={printButton} onClick={openPrintRoom}>Print</button>
+          <button className="header-symbol-button" onClick={startNewSong} aria-label="New song" title="New song"><span aria-hidden="true">＋</span></button>
+          <button className="header-symbol-button" onClick={requestSaveSong} aria-label="Save song" title="Save"><span className="save-symbol" aria-hidden="true">↓</span></button>
+          <button className="header-symbol-button" onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }} aria-label="Import song" title="Import"><span aria-hidden="true">↥</span></button>
+          <button className="header-symbol-button" onClick={exportSong} aria-label="Export song" title="Export"><span aria-hidden="true">↧</span></button>
+          <button className="header-symbol-button" ref={printButton} onClick={openPrintRoom} aria-label="Print song" title="Print"><span aria-hidden="true">⎙</span></button>
           <button
             id="lang-toggle"
             className="language-toggle"
@@ -1520,11 +1517,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             aria-label="Toggle interface language between Karen and English"
             aria-pressed={interfaceLanguage === "karen"}
           >
-            <span lang="kar">ကညီ</span>
-            <span>English</span>
+            <span lang="kar">က</span>
+            <span>EN</span>
           </button>
+          <button className="header-symbol-button guide-button" onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Guide and keyboard shortcuts"><span aria-hidden="true">?</span></button>
           <details className="settings-menu">
-            <summary>Settings</summary>
+            <summary aria-label="Settings" title="Settings"><span aria-hidden="true">•••</span></summary>
             <div className="settings-popover">
               <div className="settings-group-heading"><strong>Appearance</strong><small>Website shell and motion</small></div>
               <label>Theme
@@ -1578,49 +1576,43 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       <div className={`workspace ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <aside className="sidebar" aria-label="Music workspace sidebar">
           <div className="sidebar-heading">
-            <span>Music Workspace</span>
-            <button className="icon-button" onClick={closeWorkspaceSidebar} aria-label="Close music workspace sidebar">×</button>
-          </div>
-          <div className="sidebar-work-surfaces" role="tablist" aria-label="Song work surfaces">
-            {(["chart", "lyrics"] as const).map((name) => (
-              <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>
-            ))}
-            <button role="tab" aria-selected={tab === "database"} onClick={openDatabaseSidebar}>database</button>
-          </div>
-          <div className="sidebar-utilities" aria-label="Appearance and help">
-            <button onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Docs and keyboard shortcuts"><span aria-hidden="true">?</span><span>Guide</span></button>
+            <span>Database</span>
           </div>
           <section className="sidebar-panel library-panel" aria-label="Database sidebar">
-            <div className="database-sidebar-heading"><strong>Song Database</strong><small>Private hosted library</small></div>
             <input className="library-search" type="search" aria-label="Search song database" placeholder="Search titles, key, or style" value={search} onChange={(event) => setSearch(event.target.value)} />
             <div className="song-list">
               {filteredSongs.length === 0 ? <div className="empty-state"><strong>No approved songs yet</strong><span>Import or save a reviewed chart to add it to this private library.</span></div> :
-                filteredSongs.map((item) => <button key={item.id} onClick={() => { setSong(normalizeSongMetadata(item)); setTab("chart"); setStatus("Loaded from hosted library"); }}>
-                  <span lang="kar">{item.titleKaren}</span><strong>{item.titleEnglish}</strong><small>{item.key}, {item.style}, {item.meter}</small>
-                </button>)}
+                filteredSongs.map((item) => {
+                  const active = item.id === song.id;
+                  const visibleTitle = interfaceLanguage === "karen" ? item.titleKaren || item.titleEnglish : item.titleEnglish || item.titleKaren;
+                  return <button className={active ? "is-active" : ""} key={item.id} aria-expanded={active} onClick={() => { setSong(normalizeSongMetadata(item)); setTab("chart"); setStatus("Loaded from hosted library"); }}>
+                    <strong lang={interfaceLanguage === "karen" ? "kar" : "en"}>{visibleTitle || "Untitled song"}</strong>
+                    {active && <small>{item.key || "Key"} · {item.style || "Style"} · {item.meter}</small>}
+                  </button>;
+                })}
             </div>
-            <p className="reference-library-note">{approvedReferenceSongs.length} approved chart exports loaded. {referencePdfNames.length} PDF print references copied for notation review.</p>
           </section>
         </aside>
 
         <section className="editor-stage" aria-label="Music editor">
           <div className="command-bar">
             <div className="song-position">
-              <span className="eyebrow">Active chart</span>
-              <strong lang={song.titleKaren ? "kar" : "en"}>{song.titleKaren || "Untitled chart"}</strong>
+              <strong lang={interfaceLanguage === "karen" ? "kar" : "en"}>{interfaceLanguage === "karen" ? song.titleKaren || song.titleEnglish || "Untitled chart" : song.titleEnglish || song.titleKaren || "Untitled chart"}</strong>
             </div>
             <div className="view-controls" aria-label="View controls">
               <button
                 id="theme-toggle"
                 className="paper-theme-toggle"
                 onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")}
-                aria-label="Toggle light mode"
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
                 aria-pressed={theme === "light"}
-                title="Toggle light mode"
-              />
-              <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
-              <output>{zoom.toFixed(1)}%</output>
-              <button onClick={() => setZoom((value) => nextZoom(value, 1))} aria-label="Zoom in">+</button>
+                title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              ><span aria-hidden="true">☾</span></button>
+              <div className="zoom-control">
+                <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
+                <output>{Math.round(zoom)}%</output>
+                <button onClick={() => setZoom((value) => nextZoom(value, 1))} aria-label="Zoom in">+</button>
+              </div>
               <button className="fit-width-button" onClick={fitPaperToWidth} aria-label="Fit paper to width" title="Fit paper to width">
                 <span className="fit-paper-icon" aria-hidden="true"><i /></span>
               </button>
@@ -1629,7 +1621,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           </div>
 
           <div className="paper-area" ref={paperAreaTarget}>
-            {tab !== "lyrics" && <article
+            <div className="paper-tabs" role="tablist" aria-label="Song work surfaces">
+              {(["chart", "lyrics"] as const).map((name) => <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>)}
+            </div>
+            {tab === "chart" && <article
               className="paper chart-paper"
               tabIndex={0}
               ref={editorTarget}
@@ -1644,7 +1639,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 <input className="paper-content-input paper-style-input" size={Math.max(4, (song.style || "Style").length)} aria-label="Song style on paper" list="paper-style-options" placeholder="Style" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
                 <datalist id="paper-style-options">{styleOptions.map((style) => <option key={style} value={style} />)}</datalist>
                 <div className="paper-key-editor-cluster">
-                  <select className="paper-key-select" aria-label="Song key on paper" value={song.key} onChange={(event) => updateSongKey(event.target.value)}><option value="">Key</option>{keyOptions.map((key) => <option key={key.value} value={key.value}>{key.label}</option>)}</select>
+                  <select className="paper-key-select" data-placeholder={song.key ? undefined : "true"} aria-label="Song key on paper" value={song.key} onChange={(event) => updateSongKey(event.target.value)}><option value="">Key</option>{keyOptions.map((key) => <option key={key.value} value={key.value}>{key.label}</option>)}</select>
                   <select className="paper-transpose-control" aria-label="Transpose song" defaultValue="" onChange={(event) => { transposeSong(event.target.value); event.currentTarget.value = ""; }}>
                     <option value="">Transpose</option>
                     <option value="__ORIGINAL__">Original</option>
@@ -1753,7 +1748,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                   </select>
                 </div>
                 <details className="paper-instrument-picker">
-                  <summary aria-label="Choose centered footer instruments">{song.instruments.length ? song.instruments.join(" / ") : "Reference"}</summary>
+                  <summary aria-label="Choose print-copy instruments">Reference</summary>
                   <div className="paper-instrument-menu">
                     {instrumentOptions.map((instrument) => <label key={instrument}>
                       <input
@@ -2014,7 +2009,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <dt>Enter</dt><dd>Open Add Section; use I, V, P, C, B, S, or E.</dd>
           <dt>Ctrl+Z / Ctrl+Y</dt><dd>Undo or redo chart edits.</dd>
           <dt>Ctrl+P / ?</dt><dd>Open print room or this guide.</dd>
-          <dt>Ctrl+wheel over paper</dt><dd>Zoom the paper in responsive 0.5% steps without changing ordinary scrolling.</dd>
+          <dt>Ctrl+wheel over paper</dt><dd>Zoom the paper in responsive 2.5% steps without changing ordinary scrolling.</dd>
         </dl>
       </aside>}
 
