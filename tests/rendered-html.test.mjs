@@ -85,7 +85,7 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /song\.titleKaren \|\| "Untitled chart"/);
   assert.match(editor, /<strong>\(Karen Music\)<\/strong>/);
   assert.match(editor, /\{status && <span className="status"/);
-  const removeSectionBody = editor.match(/function removeSection\(sectionIndex: number\) \{([\s\S]*?)\n  \}\n\n  function changeRowCap/)?.[1] || "";
+  const removeSectionBody = editor.match(/function removeSection\(sectionIndex: number\) \{([\s\S]*?)\r?\n  \}\r?\n\r?\n  function changeRowCap/)?.[1] || "";
   assert.match(removeSectionBody, /sections\.splice\(sectionIndex, 1\)/);
   assert.doesNotMatch(removeSectionBody, /sections\.length <= 1/);
   assert.match(editor, /src="\/karen-music-logo\.png"/);
@@ -104,6 +104,11 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(styles, /\.measure:hover/);
   assert.match(styles, /\.ghost-measure/);
   assert.match(styles, /overscroll-behavior:\s*contain/);
+  assert.match(styles, /\.app-shell \{[\s\S]*?height:\s*100dvh;[\s\S]*?overflow:\s*hidden;/);
+  assert.match(styles, /\.workspace \{[\s\S]*?height:\s*calc\(100dvh - 62px\);[\s\S]*?min-height:\s*0;[\s\S]*?overflow:\s*hidden;/);
+  assert.match(styles, /\.editor-stage \{[\s\S]*?grid-template-rows:\s*auto minmax\(0, 1fr\);[\s\S]*?overflow:\s*hidden;/);
+  assert.match(styles, /\.paper-area \{[\s\S]*?min-height:\s*0;[\s\S]*?overflow:\s*auto;[\s\S]*?-webkit-overflow-scrolling:\s*touch;/);
+  assert.match(editor, /const canMoveY = canScrollY/);
   assert.match(styles, /\.paper-header \.paper-english-title/);
   assert.match(styles, /\.sidebar-work-surfaces button\[aria-selected="true"\]/);
   assert.match(styles, /field-sizing:\s*content/);

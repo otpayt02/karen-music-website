@@ -54,7 +54,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   outline-offset: 2px;
 }
 
-.app-shell { min-height: 100dvh; background: var(--case); }
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--case);
+}
 .app-header {
   min-height: 62px;
   display: flex;
@@ -167,7 +173,9 @@ button.primary:hover { background: #66845a; }
 .workspace {
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-  min-height: calc(100dvh - 62px);
+  height: calc(100dvh - 62px);
+  min-height: 0;
+  overflow: hidden;
   transition: grid-template-columns .2s ease;
 }
 .workspace.sidebar-collapsed { grid-template-columns: 0 minmax(0, 1fr); }
@@ -344,7 +352,14 @@ button.primary:hover { background: #66845a; }
 }
 .shortcut-note strong { color: var(--shell-text); }
 
-.editor-stage { min-width: 0; position: relative; }
+.editor-stage {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  position: relative;
+}
 .command-bar {
   min-height: 58px;
   display: grid;
@@ -427,13 +442,14 @@ html[data-theme="light"] .paper-theme-toggle {
 .status { grid-column: 2; justify-self: end; color: var(--shell-muted); font-size: 12px; text-align: right; }
 
 .paper-area {
-  min-height: calc(100dvh - 120px);
+  min-height: 0;
   padding: 22px 34px 80px;
   background:
     linear-gradient(rgb(10 17 13 / .72), rgb(10 17 13 / .88)),
     url("/karen-village-aerial.png") center / cover fixed;
   position: relative;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   isolation: isolate;
 }
 .paper {

@@ -561,7 +561,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           const styles = window.getComputedStyle(element);
           const canScrollY = /(auto|scroll)/.test(styles.overflowY) && element.scrollHeight > element.clientHeight;
           const canScrollX = /(auto|scroll)/.test(styles.overflowX) && element.scrollWidth > element.clientWidth;
-          return canScrollY || canScrollX;
+          const wantsY = Math.abs(event.deltaY) >= Math.abs(event.deltaX);
+          const canMoveY = canScrollY && (event.deltaY < 0 ? element.scrollTop > 0 : element.scrollTop < element.scrollHeight - element.clientHeight);
+          const canMoveX = canScrollX && (event.deltaX < 0 ? element.scrollLeft > 0 : element.scrollLeft < element.scrollWidth - element.clientWidth);
+          return wantsY ? canMoveY : canMoveX;
         });
       if (!scrollTarget) return;
 
