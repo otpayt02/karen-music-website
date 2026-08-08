@@ -1,6 +1,7 @@
 "use client";
 
-import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { CircleHelp, Download, Ellipsis, FilePlus2, Moon, Printer, Save, ScanLine, Upload } from "lucide-react";
 import { approvedReferenceSongs } from "./reference-library";
 
 type Chord = {
@@ -416,10 +417,11 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const [styleDraft, setStyleDraft] = useState(defaultStyleOptions.join(", "));
   const [categoryDraft, setCategoryDraft] = useState(defaultCategoryOptions.join(", "));
   const [groupDraft, setGroupDraft] = useState(songGroupOptions.join(", "));
-  const [status, setStatus] = useState("");
+  const [, setStatus] = useState("");
   const [songs, setSongs] = useState<Song[]>(() => approvedReferenceSongs.map((item) => normalizeSongMetadata(item)));
   const [search, setSearch] = useState("");
   const [zoom, setZoom] = useState(100);
+  const [chartBodyFit, setChartBodyFit] = useState(1);
   const [pendingBass, setPendingBass] = useState(false);
   const [pendingSuperscript, setPendingSuperscript] = useState(false);
   const [pendingSlur, setPendingSlur] = useState<string | null>(null);
@@ -436,6 +438,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const printButton = useRef<HTMLButtonElement>(null);
   const editorTarget = useRef<HTMLElement>(null);
   const paperAreaTarget = useRef<HTMLDivElement>(null);
+  const chartBodyTarget = useRef<HTMLDivElement>(null);
+  const chartBodyContentTarget = useRef<HTMLDivElement>(null);
   const undoHistory = useRef<Song[]>([]);
   const redoHistory = useRef<Song[]>([]);
   const leadInputs = useRef<Array<HTMLInputElement | null>>([]);
@@ -453,6 +457,34 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     () => [...song.instruments, "Reference"],
     [song.instruments],
   );
+
+  useLayoutEffect(() => {
+    if (tab !== "chart") return;
+    const body = chartBodyTarget.current;
+    const content = chartBodyContentTarget.current;
+    if (!body || !content) return;
+
+    const fit = () => {
+      const naturalHeight = content.scrollHeight;
+      const bodyStyle = window.getComputedStyle(body);
+      const availableHeight = body.clientHeight
+        - Number.parseFloat(bodyStyle.paddingTop)
+        - Number.parseFloat(bodyStyle.paddingBottom);
+      const next = naturalHeight > availableHeight && availableHeight > 0
+        ? Math.max(.58, Math.min(1, availableHeight / naturalHeight))
+        : 1;
+      setChartBodyFit((current) => Math.abs(current - next) > .004 ? next : current);
+    };
+
+    const frame = window.requestAnimationFrame(fit);
+    const observer = new ResizeObserver(fit);
+    observer.observe(body);
+    observer.observe(content);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [song, tab]);
 
   const commitSong = useCallback((mutator: (draft: Song) => void, message = "Unsaved changes") => {
     setSong((current) => {
@@ -1505,11 +1537,11 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <strong className="brand-name"><span>Karen Music</span><span lang="kar">ကညီတၢ်သးဝံၣ်</span></strong>
         </div>
         <nav className="global-actions" aria-label="Song actions">
-          <button className="header-symbol-button" onClick={startNewSong} aria-label="New song" title="New song"><span aria-hidden="true">＋</span></button>
-          <button className="header-symbol-button" onClick={requestSaveSong} aria-label="Save song" title="Save"><span className="save-symbol" aria-hidden="true">↓</span></button>
-          <button className="header-symbol-button" onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }} aria-label="Import song" title="Import"><span aria-hidden="true">↥</span></button>
-          <button className="header-symbol-button" onClick={exportSong} aria-label="Export song" title="Export"><span aria-hidden="true">↧</span></button>
-          <button className="header-symbol-button" ref={printButton} onClick={openPrintRoom} aria-label="Print song" title="Print"><span aria-hidden="true">⎙</span></button>
+          <button className="header-symbol-button" onClick={startNewSong} aria-label="New song" title="New song"><FilePlus2 aria-hidden="true" /></button>
+          <button className="header-symbol-button" onClick={requestSaveSong} aria-label="Save song" title="Save"><Save aria-hidden="true" /></button>
+          <button className="header-symbol-button" onClick={() => { setKarenKeyboardOpen(false); fileInput.current?.click(); }} aria-label="Import song" title="Import"><Upload aria-hidden="true" /></button>
+          <button className="header-symbol-button" onClick={exportSong} aria-label="Export song" title="Export"><Download aria-hidden="true" /></button>
+          <button className="header-symbol-button" ref={printButton} onClick={openPrintRoom} aria-label="Print song" title="Print"><Printer aria-hidden="true" /></button>
           <button
             id="lang-toggle"
             className="language-toggle"
@@ -1520,9 +1552,9 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <span lang="kar">က</span>
             <span>EN</span>
           </button>
-          <button className="header-symbol-button guide-button" onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Guide and keyboard shortcuts"><span aria-hidden="true">?</span></button>
+          <button className="header-symbol-button guide-button" onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Guide and keyboard shortcuts"><CircleHelp aria-hidden="true" /></button>
           <details className="settings-menu">
-            <summary aria-label="Settings" title="Settings"><span aria-hidden="true">•••</span></summary>
+            <summary aria-label="Settings" title="Settings"><Ellipsis aria-hidden="true" /></summary>
             <div className="settings-popover">
               <div className="settings-group-heading"><strong>Appearance</strong><small>Website shell and motion</small></div>
               <label>Theme
@@ -1607,17 +1639,16 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
                 aria-pressed={theme === "light"}
                 title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              ><span aria-hidden="true">☾</span></button>
+              ><Moon aria-hidden="true" /></button>
               <div className="zoom-control">
                 <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
                 <output>{Math.round(zoom)}%</output>
                 <button onClick={() => setZoom((value) => nextZoom(value, 1))} aria-label="Zoom in">+</button>
               </div>
               <button className="fit-width-button" onClick={fitPaperToWidth} aria-label="Fit paper to width" title="Fit paper to width">
-                <span className="fit-paper-icon" aria-hidden="true"><i /></span>
+                <ScanLine aria-hidden="true" />
               </button>
             </div>
-            {status && <span className="status" aria-live="polite">{status}</span>}
           </div>
 
           <div className="paper-area" ref={paperAreaTarget}>
@@ -1647,7 +1678,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                   </select>
                 </div>
               </header>
-              <div className="chart-body">
+              <div className="chart-body" ref={chartBodyTarget}>
+                <div className="chart-body-content" ref={chartBodyContentTarget} style={{ "--chart-body-fit": chartBodyFit } as React.CSSProperties}>
                 {song.sections.map((section, sectionIndex) => <div className="section-block" key={section.id}>
                   <button
                     className="section-insert"
@@ -1667,7 +1699,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                       <h3>{section.name}</h3>
                       <button className="section-delete" onClick={() => removeSection(sectionIndex)} aria-label={`Remove ${section.name}`}>×</button>
                     </header>
-                    {editorRowsForSection(section).map((row) => <div className="chart-row-wrap" key={`${section.id}-row-${row.rowIndex}`}>
+                    {editorRowsForSection(section).map((row) => <div className={`chart-row-wrap ${row.rowIndex === 0 && section.preMeasure ? "has-pre-measure" : ""}`} key={`${section.id}-row-${row.rowIndex}`}>
                       {row.rowIndex === 0 && section.preMeasure && <MeasureView
                         measure={section.preMeasure}
                         active={selected.section === sectionIndex && selected.pre}
@@ -1725,6 +1757,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 >
                   +
                 </button>}
+                </div>
               </div>
               <footer className="paper-footer">
                 <div className="paper-tempo-controls">
