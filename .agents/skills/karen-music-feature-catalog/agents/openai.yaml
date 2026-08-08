@@ -1,0 +1,4 @@
+interface:
+  display_name: "Karen Music Feature Catalog"
+  short_description: "Preserve and locate every Karen Music feature"
+  default_prompt: "Use the Karen Music feature catalog to identify and preserve the features affected by this request."

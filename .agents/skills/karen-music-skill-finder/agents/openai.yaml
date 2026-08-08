@@ -1,0 +1,4 @@
+interface:
+  display_name: "Karen Music Skill Finder"
+  short_description: "Select relevant skills for every project prompt"
+  default_prompt: "Find and apply the relevant available skills for this Karen Music request or annotation."
