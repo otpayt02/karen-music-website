@@ -107,7 +107,15 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /chartBodyFit/);
   assert.match(styles, /\.chart-body-content \{[\s\S]*?transform:\s*scale\(var\(--chart-body-fit, 1\)\)/);
   assert.doesNotMatch(editor, /<span className="status"/);
-  assert.match(styles, /\.rhythm-dot \{[\s\S]*?width:\s*\.78em;[\s\S]*?height:\s*\.78em/);
+  assert.match(styles, /\.rhythm-dot \{[\s\S]*?width:\s*3px;[\s\S]*?height:\s*3px/);
+  assert.match(styles, /\.rhythm-marks \.underline\.with-dot,[\s\S]*?grid-template-columns:\s*3px minmax\(0, 1fr\);[\s\S]*?column-gap:\s*2px/);
+  assert.match(editor, /function measureHasVisibleLead/);
+  assert.match(editor, /measureHasVisibleLead\(measure\) && <div className="lead-row"/);
+  assert.match(editor, /if \(rows\.length === 0\) \{\s*return \[\];/);
+  assert.doesNotMatch(editor, /return \[\.\.\.rows, \{ start: section\.measures\.length/);
+  assert.match(editor, /const collisionPressure = labelOverflowRisk \+ beatOverflowRisk/);
+  assert.doesNotMatch(editor, /chordDensity/);
+  assert.match(styles, /\.chord\.circled \{[\s\S]*?width:\s*9px;[\s\S]*?height:\s*9px;[\s\S]*?border:\s*2px solid currentColor/);
   assert.match(styles, /overscroll-behavior:\s*contain/);
   assert.match(styles, /\.app-shell \{[\s\S]*?height:\s*100dvh;[\s\S]*?overflow:\s*hidden;/);
   assert.match(styles, /\.workspace \{[\s\S]*?height:\s*calc\(100dvh - 60px\);[\s\S]*?min-height:\s*0;[\s\S]*?overflow:\s*hidden;/);

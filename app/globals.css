@@ -841,11 +841,12 @@ html[data-reduced-motion="true"] *::after {
 }
 .pre-measure button { min-height: 100%; padding-inline: 0; font-size: 12px; }
 .chord.circled {
-  min-width: 23px;
-  height: 23px;
+  min-width: 9px;
+  width: 9px;
+  height: 9px;
   display: grid;
   place-items: center;
-  border: 1.5px solid currentColor;
+  border: 2px solid currentColor;
   border-radius: 50%;
 }
 .rhythm-marks,
@@ -867,6 +868,8 @@ html[data-reduced-motion="true"] *::after {
 .rhythm-marks .underline.with-dot,
 .print-rhythm-marks .underline.with-dot {
   display: grid;
+  width: 16px;
+  min-width: 16px;
   grid-template-columns: 3px minmax(0, 1fr);
   align-items: end;
   column-gap: 2px;
@@ -888,10 +891,11 @@ html[data-reduced-motion="true"] *::after {
   font: 9px/1 ui-monospace, monospace;
 }
 .rhythm-dot {
-  width: .78em;
-  height: .78em;
+  width: 3px;
+  height: 3px;
   display: block;
-  margin-bottom: -.08em;
+  align-self: end;
+  margin-bottom: 0;
   border-radius: 50%;
   background: currentColor;
 }
@@ -1500,11 +1504,12 @@ html[data-reduced-motion="true"] *::after {
 }
 .print-beat-row strong { display: inline-flex; align-items: baseline; justify-content: center; font-family: var(--font-mono); font-weight: 700; }
 .print-beat-row strong.circled {
-  min-width: 21px;
-  height: 21px;
+  min-width: 8px;
+  width: 8px;
+  height: 8px;
   display: grid;
   place-items: center;
-  border: 1.5px solid currentColor;
+  border: 1.75px solid currentColor;
   border-radius: 50%;
 }
 .print-beat-row small { min-height: 11px; font: 7px/1 ui-monospace, monospace; }

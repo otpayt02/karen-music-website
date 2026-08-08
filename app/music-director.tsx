@@ -219,14 +219,7 @@ function rowsForSection(section: Section) {
 function editorRowsForSection(section: Section) {
   const rows = rowsForSection(section);
   if (rows.length === 0) {
-    const cap = clampMeasuresPerRow(section.rowMeasureCounts?.[0] ?? section.measuresPerRow ?? DEFAULT_MEASURES_PER_ROW);
-    return [{ start: 0, measures: [], cap, rowIndex: 0 }];
-  }
-  const last = rows[rows.length - 1];
-  if (last.measures.length === last.cap) {
-    const rowIndex = last.rowIndex + 1;
-    const cap = clampMeasuresPerRow(section.rowMeasureCounts?.[rowIndex] ?? section.measuresPerRow ?? DEFAULT_MEASURES_PER_ROW);
-    return [...rows, { start: section.measures.length, measures: [], cap, rowIndex }];
+    return [];
   }
   return rows;
 }
@@ -240,11 +233,10 @@ function measureWidthWeight(measure: Measure) {
     const value = `${chordLabel(beat.chord)}${beat.bass ? `/${beat.bass}` : ""}`;
     return Math.max(longest, Array.from(value).length);
   }, 0);
-  const chordDensity = measure.beats.reduce((total, beat) => total + (beat.chord ? 1 : 0), 0);
-  const complexity = Math.max(0, longestChord - 2) * 0.16
-    + Math.max(0, measure.beats.length - 4) * 0.08
-    + Math.max(0, chordDensity - 2) * 0.035;
-  return Math.min(1.72, 1 + complexity);
+  const labelOverflowRisk = Math.max(0, longestChord - 4) * 0.18;
+  const beatOverflowRisk = Math.max(0, measure.beats.length - 4) * 0.1;
+  const collisionPressure = labelOverflowRisk + beatOverflowRisk;
+  return collisionPressure > 0 ? Math.min(1.72, 1 + collisionPressure) : 1;
 }
 
 function rowGridTemplate(measures: Measure[], capacity: number) {
@@ -255,6 +247,10 @@ function rowGridTemplate(measures: Measure[], capacity: number) {
 
 function totalLeadSlots(measure: Measure) {
   return measure.beats.reduce((total, _beat, index) => total + (measure.leadSlotsByBeat?.[index] ?? 4), 0);
+}
+
+function measureHasVisibleLead(measure: Measure) {
+  return Boolean(measure.leadEnabled && measure.rowLeadView?.some((note) => String(note || "").trim()));
 }
 
 function normalizeLeadSlots(measure: Measure) {
@@ -2136,7 +2132,7 @@ function MeasureView({
   cueEnds?: string[][];
 }) {
   return <div className={`measure ${active ? "active-measure" : ""} ${pre ? "pre-measure" : ""} ${ending ? "ending-bar" : ""} ${measure.roll ? "has-roll" : ""}`}>
-    {measure.leadEnabled && <div className="lead-row" style={{ gridTemplateColumns: `repeat(${totalLeadSlots(measure)}, minmax(0, 1fr))` }}>
+    {measureHasVisibleLead(measure) && <div className="lead-row" style={{ gridTemplateColumns: `repeat(${totalLeadSlots(measure)}, minmax(0, 1fr))` }}>
       {Array.from({ length: totalLeadSlots(measure) }, (_, index) => <span key={index}>{measure.rowLeadView?.[index] || ""}</span>)}
     </div>}
     <div className="beat-row" style={{ gridTemplateColumns: `repeat(${measure.beats.length}, minmax(0, 1fr))` }}>
@@ -2243,7 +2239,7 @@ function PrintMeasure({
   cueEnds?: string[][];
 }) {
   return <div className={`print-measure ${pre ? "is-pre-measure" : ""} ${ending ? "ending-bar" : ""}`}>
-    {measure.leadEnabled && <div className="print-lead-row" style={{ gridTemplateColumns: `repeat(${measure.rowLeadView?.length || 1}, minmax(0, 1fr))` }}>
+      {measureHasVisibleLead(measure) && <div className="print-lead-row" style={{ gridTemplateColumns: `repeat(${measure.rowLeadView?.length || 1}, minmax(0, 1fr))` }}>
       {(measure.rowLeadView || []).map((note, index) => <span key={index}>{note}</span>)}
     </div>}
     <div className="print-beat-row" style={{ gridTemplateColumns: `repeat(${measure.beats.length}, minmax(0, 1fr))` }}>
