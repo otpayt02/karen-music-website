@@ -116,6 +116,16 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /const collisionPressure = labelOverflowRisk \+ beatOverflowRisk/);
   assert.doesNotMatch(editor, /chordDensity/);
   assert.match(styles, /\.chord\.circled \{[\s\S]*?width:\s*9px;[\s\S]*?height:\s*9px;[\s\S]*?border:\s*2px solid currentColor/);
+  assert.match(editor, /bassEnabled\?: boolean/);
+  assert.match(editor, /bassFlat\?: boolean/);
+  assert.match(editor, /onKeyUpCapture=\{handleEditorKeyUp\}/);
+  assert.match(editor, /lower === "u"[\s\S]*?manualUnderline = !beat\.manualUnderline/);
+  assert.match(editor, /if \(bassIsEnabled\(target\) && bassIsFlat\(target\)\)/);
+  assert.match(editor, /className="slur-arc"/);
+  assert.match(editor, /className="slur-pending-anchor"/);
+  assert.match(styles, /@keyframes slur-reveal/);
+  assert.match(styles, /@keyframes slur-anchor-pulse/);
+  assert.match(editor, /event\.ctrlKey && !event\.altKey && !event\.metaKey && \/\^\[1-6\]\$\//);
   assert.match(styles, /overscroll-behavior:\s*contain/);
   assert.match(styles, /\.app-shell \{[\s\S]*?height:\s*100dvh;[\s\S]*?overflow:\s*hidden;/);
   assert.match(styles, /\.workspace \{[\s\S]*?height:\s*calc\(100dvh - 60px\);[\s\S]*?min-height:\s*0;[\s\S]*?overflow:\s*hidden;/);

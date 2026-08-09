@@ -14,6 +14,8 @@ type Chord = {
 type Beat = {
   chord: Chord | null;
   bass?: string;
+  bassFlat?: boolean;
+  bassEnabled?: boolean;
   circle?: boolean;
   dot?: boolean;
   xMarks?: number;
@@ -249,6 +251,52 @@ function totalLeadSlots(measure: Measure) {
   return measure.beats.reduce((total, _beat, index) => total + (measure.leadSlotsByBeat?.[index] ?? 4), 0);
 }
 
+function beatCenterPercent(row: { start: number; measures: Measure[]; cap: number }, measureIndex: number, beatIndex: number) {
+  const weights = [
+    ...row.measures.map(measureWidthWeight),
+    ...Array.from({ length: Math.max(0, row.cap - row.measures.length) }, () => 1),
+  ];
+  const offset = measureIndex - row.start;
+  if (offset < 0 || offset >= row.measures.length) return null;
+  const measure = row.measures[offset];
+  const before = weights.slice(0, offset).reduce((sum, weight) => sum + weight, 0);
+  const total = weights.reduce((sum, weight) => sum + weight, 0) || 1;
+  const within = weights[offset] * ((beatIndex + .5) / Math.max(1, measure.beats.length));
+  return ((before + within) / total) * 100;
+}
+
+function beatWidthPercent(row: { start: number; measures: Measure[]; cap: number }, measureIndex: number) {
+  const weights = [
+    ...row.measures.map(measureWidthWeight),
+    ...Array.from({ length: Math.max(0, row.cap - row.measures.length) }, () => 1),
+  ];
+  const offset = measureIndex - row.start;
+  if (offset < 0 || offset >= row.measures.length) return null;
+  const total = weights.reduce((sum, weight) => sum + weight, 0) || 1;
+  return (weights[offset] / Math.max(1, row.measures[offset].beats.length) / total) * 100;
+}
+
+function rowSlurGeometry(song: Song, sectionIndex: number, row: { start: number; measures: Measure[]; cap: number }) {
+  const rowEnd = row.start + row.measures.length - 1;
+  return (song.slurs || []).flatMap((slur, index) => {
+    const start = parseBeatKey(slur.start);
+    const end = parseBeatKey(slur.end);
+    if (start.pre || end.pre || start.section !== sectionIndex || end.section !== sectionIndex) return [];
+    const first = start.measure < end.measure || (start.measure === end.measure && start.beat <= end.beat) ? start : end;
+    const last = first === start ? end : start;
+    if (last.measure < row.start || first.measure > rowEnd) return [];
+    const left = first.measure < row.start ? 0 : beatCenterPercent(row, first.measure, first.beat);
+    const right = last.measure > rowEnd ? 100 : beatCenterPercent(row, last.measure, last.beat);
+    if (left === null || right === null) return [];
+    if (right === left) {
+      const beatWidth = beatWidthPercent(row, first.measure) || 2;
+      return [{ id: `${index}-${row.start}`, left: Math.max(0, left - beatWidth / 2), width: beatWidth }];
+    }
+    if (right < left) return [];
+    return [{ id: `${index}-${row.start}`, left, width: right - left }];
+  });
+}
+
 function measureHasVisibleLead(measure: Measure) {
   return Boolean(measure.leadEnabled && measure.rowLeadView?.some((note) => String(note || "").trim()));
 }
@@ -314,8 +362,30 @@ function beatKey(section: number, measure: number, beat: number, pre = false) {
   return `${section}:${pre ? "pre" : measure}:${beat}`;
 }
 
+function parseBeatKey(value: string) {
+  const [sectionValue, measureValue, beatValue] = value.split(":");
+  return {
+    section: Number(sectionValue),
+    measure: measureValue === "pre" ? -1 : Number(measureValue),
+    beat: Number(beatValue),
+    pre: measureValue === "pre",
+  };
+}
+
+function bassIsEnabled(beat: Beat | undefined) {
+  return Boolean(beat?.bassEnabled || beat?.bass);
+}
+
+function bassRoot(beat: Beat) {
+  return String(beat.bass || "").replace(/[♭b]/g, "").slice(0, 1).toUpperCase();
+}
+
+function bassIsFlat(beat: Beat) {
+  return Boolean(beat.bassFlat || /[♭b]/.test(String(beat.bass || "").slice(1)));
+}
+
 function beatIsEmpty(beat: Beat | undefined) {
-  return !beat?.chord && !beat?.bass && !beat?.circle && !beat?.dot && !(beat?.xMarks) && !beat?.manualUnderline;
+  return !beat?.chord && !bassIsEnabled(beat) && !beat?.circle && !beat?.dot && !(beat?.xMarks) && !beat?.manualUnderline;
 }
 
 const demoSong = (): Song => ({
@@ -441,6 +511,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const leadInputs = useRef<Array<HTMLInputElement | null>>([]);
   const karenTarget = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const karenSuppressOpen = useRef(false);
+  const slashGesture = useRef({ held: false, hadKeydown: false, beat: "" });
   const karenUndoHistory = useRef<Array<{ element: HTMLInputElement | HTMLTextAreaElement; value: string; caret: number }>>([]);
   const karenRedoHistory = useRef<Array<{ element: HTMLInputElement | HTMLTextAreaElement; value: string; caret: number }>>([]);
 
@@ -653,20 +724,6 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, [printRoomOpen]);
-
-  useEffect(() => {
-    const handleVariableMeasure = (event: globalThis.KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (target?.matches("input, textarea, select, [contenteditable='true']")) return;
-      if (event.ctrlKey && !event.altKey && !event.metaKey && /^[1-6]$/.test(event.key)) {
-        event.preventDefault();
-        event.stopPropagation();
-        insertMeasure(Number(event.key));
-      }
-    };
-    document.addEventListener("keydown", handleVariableMeasure, true);
-    return () => document.removeEventListener("keydown", handleVariableMeasure, true);
-  }, [insertMeasure]);
 
   useEffect(() => {
     if (!viewer.authenticated) return;
@@ -1167,7 +1224,12 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     }
     if (beat && !beatIsEmpty(beat)) {
       mutateActiveBeat((target) => {
-        if (target.bass) target.bass = "";
+        if (bassIsEnabled(target) && bassIsFlat(target)) {
+          target.bassFlat = false;
+          target.bass = bassRoot(target);
+        }
+        else if (bassIsEnabled(target) && bassRoot(target)) target.bass = "";
+        else if (bassIsEnabled(target)) target.bassEnabled = false;
         else if (target.xMarks) target.xMarks = Math.max(0, target.xMarks - 1);
         else if (target.dot) target.dot = false;
         else if (target.circle) target.circle = false;
@@ -1206,6 +1268,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     if (leadModalOpen || importReview || saveReviewOpen || printRoomOpen) return;
     if (target.matches("input, textarea, select, [contenteditable='true']")) return;
 
+    if (slashGesture.current.held && key !== "/") slashGesture.current.hadKeydown = true;
+
     if (key === "?" || (event.shiftKey && key === "/")) {
       event.preventDefault();
       setShortcutsOpen((open) => !open);
@@ -1221,6 +1285,11 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     if (event.ctrlKey && !event.altKey && !event.metaKey && /^[1-6]$/.test(key)) {
       event.preventDefault();
       insertMeasure(Number(key));
+      return;
+    }
+    if (event.ctrlKey && !event.altKey && !event.metaKey && lower === "u") {
+      event.preventDefault();
+      mutateActiveBeat((beat) => { beat.manualUnderline = !beat.manualUnderline; }, "Underline toggled");
       return;
     }
     if (event.ctrlKey && !event.altKey && !event.metaKey && (lower === "s" || lower === "a")) {
@@ -1242,6 +1311,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       setPendingSuperscript(false);
       setPendingOnly(null);
       setPendingSlur(null);
+      slashGesture.current = { held: false, hadKeydown: false, beat: "" };
       return;
     }
     if (key === "Delete") { event.preventDefault(); deleteCurrentMeasure(); return; }
@@ -1260,6 +1330,34 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       event.preventDefault();
       if (event.ctrlKey) splitMeasure();
       else insertMeasure(Number(song.meter.split("/")[0]) || 4);
+      return;
+    }
+    if (key === "/" && !event.shiftKey) {
+      event.preventDefault();
+      if (!event.repeat) {
+        slashGesture.current = {
+          held: true,
+          hadKeydown: false,
+          beat: beatKey(selected.section, selected.measure, selected.beat, selected.pre),
+        };
+        setPendingBass(true);
+      }
+      return;
+    }
+    if ((pendingBass || slashGesture.current.held) && /^[a-gA-G]$/.test(key)) {
+      event.preventDefault();
+      if (event.repeat) return;
+      mutateActiveBeat((beat) => {
+        const root = bassRoot(beat);
+        if (lower === "b" && slashGesture.current.held && root) {
+          beat.bassFlat = !bassIsFlat(beat);
+          beat.bass = root;
+        } else {
+          beat.bass = key.toUpperCase();
+          beat.bassEnabled = true;
+        }
+      }, lower === "b" && slashGesture.current.held ? "Bass flat toggled" : "Bass note added");
+      if (!slashGesture.current.held) setPendingBass(false);
       return;
     }
     if (lower === "l") { event.preventDefault(); setKarenKeyboardOpen(false); setLeadModalOpen(true); return; }
@@ -1306,20 +1404,6 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       }
       return;
     }
-    if (key === "/") {
-      event.preventDefault();
-      const beat = activeBeatFrom(song);
-      if (!beat?.chord) return;
-      if (beat.bass) mutateActiveBeat((targetBeat) => { targetBeat.bass = ""; });
-      else setPendingBass(true);
-      return;
-    }
-    if (pendingBass && /^[a-gA-G]$/.test(key)) {
-      event.preventDefault();
-      mutateActiveBeat((beat) => { beat.bass = key.toUpperCase(); }, "Bass note added");
-      setPendingBass(false);
-      return;
-    }
     if (lower === "t") { event.preventDefault(); setPendingSuperscript(true); return; }
     if (key === "7") {
       event.preventDefault();
@@ -1354,6 +1438,29 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       event.preventDefault();
       mutateActiveBeat((beat) => { beat.chord = { root: key.toUpperCase() }; });
     }
+  }
+
+  function handleEditorKeyUp(event: KeyboardEvent<HTMLElement>) {
+    if (event.key !== "/" || event.shiftKey || !slashGesture.current.held) return;
+    event.preventDefault();
+    const gesture = slashGesture.current;
+    const current = beatKey(selected.section, selected.measure, selected.beat, selected.pre);
+    if (!gesture.hadKeydown && gesture.beat === current) {
+      const enabled = bassIsEnabled(activeBeatFrom(song));
+      mutateActiveBeat((beat) => {
+        if (enabled) {
+          beat.bass = "";
+          beat.bassFlat = false;
+          beat.bassEnabled = false;
+        } else {
+          beat.bassEnabled = true;
+        }
+      }, enabled ? "Bass note removed" : "Bass note enabled");
+      setPendingBass(!enabled);
+    } else {
+      setPendingBass(false);
+    }
+    slashGesture.current = { held: false, hadKeydown: false, beat: "" };
   }
 
   async function saveSong() {
@@ -1521,7 +1628,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const activeCueRange = activeCueRanges[activeCueSlot];
 
   return (
-    <main className="app-shell" onKeyDownCapture={handleEditorKey} onFocusCapture={handleTextFocus} onClickCapture={(event) => handleKarenTextTarget(event.target)}>
+    <main className="app-shell" onKeyDownCapture={handleEditorKey} onKeyUpCapture={handleEditorKeyUp} onFocusCapture={handleTextFocus} onClickCapture={(event) => handleKarenTextTarget(event.target)}>
       <header className="app-header">
         <div className="brand">
           <button className={`icon-button sidebar-toggle ${sidebarOpen ? "is-open" : ""}`} onClick={() => sidebarOpen ? closeWorkspaceSidebar() : setSidebarOpen(true)} aria-label={sidebarOpen ? "Close music database sidebar" : "Open music database sidebar"} aria-expanded={sidebarOpen}>
@@ -1695,7 +1802,27 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                       <h3>{section.name}</h3>
                       <button className="section-delete" onClick={() => removeSection(sectionIndex)} aria-label={`Remove ${section.name}`}>×</button>
                     </header>
-                    {editorRowsForSection(section).map((row) => <div className={`chart-row-wrap ${row.rowIndex === 0 && section.preMeasure ? "has-pre-measure" : ""}`} key={`${section.id}-row-${row.rowIndex}`}>
+                    {editorRowsForSection(section).map((row) => {
+                      const slurGeometry = rowSlurGeometry(song, sectionIndex, row);
+                      const pending = pendingSlur ? parseBeatKey(pendingSlur) : null;
+                      const pendingCenter = pending && !pending.pre && pending.section === sectionIndex
+                        ? beatCenterPercent(row, pending.measure, pending.beat)
+                        : null;
+                      const pendingWidth = pending && pendingCenter !== null
+                        ? beatWidthPercent(row, pending.measure)
+                        : null;
+                      return <div className={`chart-row-wrap ${row.rowIndex === 0 && section.preMeasure ? "has-pre-measure" : ""} ${slurGeometry.length ? "has-slur" : ""}`} key={`${section.id}-row-${row.rowIndex}`}>
+                      {(slurGeometry.length > 0 || pendingCenter !== null) && <div className="slur-layer" aria-hidden="true">
+                        {slurGeometry.map((slur) => <span
+                          className="slur-arc"
+                          key={slur.id}
+                          style={{ left: `${slur.left}%`, width: `${slur.width}%` }}
+                        />)}
+                        {pendingCenter !== null && pendingWidth !== null && <span
+                          className="slur-pending-anchor"
+                          style={{ left: `${pendingCenter - pendingWidth / 2}%`, width: `${pendingWidth}%` }}
+                        />}
+                      </div>}
                       {row.rowIndex === 0 && section.preMeasure && <MeasureView
                         measure={section.preMeasure}
                         active={selected.section === sectionIndex && selected.pre}
@@ -1743,7 +1870,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                         <output>{row.cap}</output>
                         <button onClick={() => changeRowCap(sectionIndex, row.rowIndex, -1)} aria-label="Fewer measures in this row">▼</button>
                       </div>
-                    </div>)}
+                    </div>;
+                    })}
                   </section>
                 </div>)}
                 {song.sections.length > 0 && <button
@@ -2026,12 +2154,13 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <dt>Ctrl+Space</dt><dd>Insert a measure using the current beat number.</dd>
           <dt>Ctrl+Tab</dt><dd>Split after the active beat.</dd>
           <dt>Ctrl+1-6</dt><dd>Insert an exact 1-6 beat measure.</dd>
-          <dt>Backspace / Delete</dt><dd>Smart-delete the latest mark, or remove the measure.</dd>
+          <dt>Backspace / Delete</dt><dd>Smart-delete bass flat, bass letter, bass underline, then the latest remaining mark; or remove the measure.</dd>
           <dt>A-G / B / M</dt><dd>Root chord; B toggles flat after a root; M toggles minor.</dd>
           <dt>7 / T+7/8/9</dt><dd>Seventh, triangle seventh, sus, or aug.</dd>
-          <dt>/ then A-G</dt><dd>Add a slash-bass note.</dd>
+          <dt>/ then A-G</dt><dd>Tap slash to toggle the bass underline, then type A-G. Hold slash and press B after a bass letter to toggle its flat.</dd>
+          <dt>Ctrl+U</dt><dd>Toggle a manual underline on the active beat.</dd>
           <dt>. / X / O / R</dt><dd>Push, x marks, circle, or measure roll.</dd>
-          <dt>S / comma</dt><dd>Start or finish a slur or Only / All In span.</dd>
+          <dt>S / comma</dt><dd>Press S at the first and last beat to draw a centered slur; comma starts or finishes an Only / All In span.</dd>
           <dt>L</dt><dd>Open lead melody editing.</dd>
           <dt>Lead arrows</dt><dd>Left/Right moves slots; Ctrl+Left/Right changes measure; Up/Down changes note octave; Ctrl+Up/Down changes base octave.</dd>
           <dt>Karen A-Z</dt><dd>While the Karen keyboard is open, type A-Z or Shift+A-Z; Escape closes, Backspace deletes, and Ctrl+Z/Y undo or redo.</dd>
@@ -2145,11 +2274,11 @@ function MeasureView({
         data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
         <span className={`chord ${beat.circle ? "circled" : ""}`}><ChordNotation chord={beat.chord} /></span>
-        {(beat.dot || beat.xMarks || beat.manualUnderline) && <span className={`rhythm-marks ${beat.dot ? "has-dot" : ""}`}>
+        {(beat.dot || beat.xMarks || beat.manualUnderline || bassIsEnabled(beat)) && <span className={`rhythm-marks ${beat.dot ? "has-dot" : ""}`}>
           <span className={`underline ${beat.dot ? "with-dot" : ""}`}>{beat.dot && <span className="rhythm-dot" />}</span>
           {(beat.dot || beat.xMarks) && <RhythmSymbols beat={beat} />}
         </span>}
-        {beat.bass && <span className="bass-note">{beat.bass}</span>}
+        {bassIsEnabled(beat) && <span className="bass-note">{bassRoot(beat)}{bassIsFlat(beat) && <sup>♭</sup>}</span>}
       </button>)}
     </div>
     {measure.roll && <span className="roll-label">Roll</span>}
@@ -2193,7 +2322,12 @@ function PrintSheet({
     <div className="print-sheet-body">
       {song.sections.map((section, sectionIndex) => <section className={`print-section ${sectionTone(section.name)}`} data-section-type={section.name} key={section.id}>
         <h3>{section.name}</h3>
-        {rowsForSection(section).map((row) => <div className="print-row-wrap" key={`${section.id}-print-row-${row.rowIndex}`}>
+        {rowsForSection(section).map((row) => {
+          const slurGeometry = rowSlurGeometry(song, sectionIndex, row);
+          return <div className={`print-row-wrap ${slurGeometry.length ? "has-slur" : ""}`} key={`${section.id}-print-row-${row.rowIndex}`}>
+          {slurGeometry.length > 0 && <div className="print-slur-layer" aria-hidden="true">
+            {slurGeometry.map((slur) => <span className="print-slur-arc" key={slur.id} style={{ left: `${slur.left}%`, width: `${slur.width}%` }} />)}
+          </div>}
           {row.rowIndex === 0 && section.preMeasure && <PrintMeasure measure={section.preMeasure} pre />}
           <div className="print-measure-row" style={{ gridTemplateColumns: rowGridTemplate(row.measures, row.cap) }}>
             {row.measures.map((measure, rowOffset) => {
@@ -2211,7 +2345,8 @@ function PrintSheet({
               />;
             })}
           </div>
-        </div>)}
+        </div>;
+        })}
       </section>)}
     </div>
 
@@ -2250,11 +2385,11 @@ function PrintMeasure({
         data-cue-end={cueEnds[index]?.join(",") || undefined}
       >
         <strong className={beat.circle ? "circled" : ""}><ChordNotation chord={beat.chord} /></strong>
-        {(beat.dot || beat.xMarks || beat.manualUnderline) && <small className={`print-rhythm-marks ${beat.dot ? "has-dot" : ""}`}>
+          {(beat.dot || beat.xMarks || beat.manualUnderline || bassIsEnabled(beat)) && <small className={`print-rhythm-marks ${beat.dot ? "has-dot" : ""}`}>
           <span className={`underline ${beat.dot ? "with-dot" : ""}`}>{beat.dot && <span className="rhythm-dot" />}</span>
           {(beat.dot || beat.xMarks) && <RhythmSymbols beat={beat} />}
         </small>}
-        {beat.bass && <em>{beat.bass}</em>}
+          {bassIsEnabled(beat) && <em>{bassRoot(beat)}{bassIsFlat(beat) && <sup>♭</sup>}</em>}
       </span>)}
     </div>
     {measure.roll && <span className="print-roll-label">Roll</span>}

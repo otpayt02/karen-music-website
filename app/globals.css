@@ -839,6 +839,48 @@ html[data-reduced-motion="true"] *::after {
   background: rgb(248 247 241 / .96);
   box-shadow: 0 0 0 1px rgb(23 26 24 / .05);
 }
+.chart-row-wrap.has-slur { padding-top: 24px; }
+.slur-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  overflow: visible;
+  pointer-events: none;
+}
+.slur-arc {
+  position: absolute;
+  top: 3px;
+  height: 17px;
+  border: 2px solid transparent;
+  border-top-color: #55764d;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  filter: drop-shadow(0 0 2px rgb(168 206 112 / .75));
+  transform-origin: left center;
+  animation: slur-reveal 720ms cubic-bezier(.2, .8, .2, 1) both, slur-breathe 1.8s ease-in-out 720ms 2;
+}
+.slur-pending-anchor {
+  position: absolute;
+  top: 4px;
+  bottom: 2px;
+  border: 1.5px dotted #8aa85f;
+  border-radius: 5px;
+  background: rgb(168 206 112 / .08);
+  box-shadow: 0 0 0 2px rgb(168 206 112 / .1), 0 0 10px rgb(168 206 112 / .28);
+  animation: slur-anchor-pulse 1.05s ease-in-out infinite;
+}
+.chart-row-wrap.has-slur .slur-pending-anchor { top: 24px; }
+@keyframes slur-reveal {
+  from { opacity: 0; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+@keyframes slur-breathe {
+  0%, 100% { opacity: .78; filter: drop-shadow(0 0 1px rgb(168 206 112 / .45)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 5px rgb(168 206 112 / .9)); }
+}
+@keyframes slur-anchor-pulse {
+  0%, 100% { opacity: .52; transform: scale(.98); }
+  50% { opacity: 1; transform: scale(1.035); }
+}
 .pre-measure button { min-height: 100%; padding-inline: 0; font-size: 12px; }
 .chord.circled {
   min-width: 9px;
@@ -1471,7 +1513,17 @@ html[data-reduced-motion="true"] *::after {
   font-weight: 850;
   letter-spacing: .04em;
 }
-.print-row-wrap { display: flex; align-items: stretch; padding-top: 4px; }
+.print-row-wrap { position: relative; display: flex; align-items: stretch; padding-top: 4px; }
+.print-row-wrap.has-slur { padding-top: 16px; }
+.print-slur-layer { position: absolute; inset: 0 0 auto; height: 15px; pointer-events: none; }
+.print-slur-arc {
+  position: absolute;
+  top: 2px;
+  height: 12px;
+  border: 1.25px solid transparent;
+  border-top-color: #202520;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
 .print-measure-row {
   min-width: 0;
   flex: 1;
