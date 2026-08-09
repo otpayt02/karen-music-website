@@ -34,9 +34,10 @@
 
 - A-G: root; B on a rooted beat toggles flat.
 - M: minor. 7: seventh. T then 7/8/9: triangle-seven, sus, or aug.
-- Slash then A-G: bass; slash again clears bass.
+- Tap Slash to toggle the bass underline; the next A-G fills its letter. Hold Slash while entering the bass and press B again to toggle its flat. Backspace removes bass flat, letter, then underline.
+- Ctrl+U toggles a normal-height manual underline on the active beat.
 - Period: push/dot. X: rhythm hits. O: circle. R: measure roll.
-- S: slur. Comma: Only/All In span. L: lead melody editor.
+- S starts a slur at the active beat center; the second S ends it at the new beat center. Comma starts/ends an Only/All In span. L opens the lead melody editor.
 - Ctrl+Z/Ctrl+Y: undo/redo.
 
 ## Save and finish

@@ -20,7 +20,7 @@ Authority:
 | Ctrl+Space | Insert a measure whose length equals the current one-based beat position. |
 | Ctrl+Tab | Split the current measure after the active beat. |
 | Ctrl+1 through Ctrl+6 | Insert an exact 1-6 beat measure after the current measure. |
-| Backspace | Remove the latest visible beat change, move backward through empty beats, remove an empty trailing measure, or remove an empty pre-measure. |
+| Backspace | Remove bass flat, bass letter, and bass underline in that order before other visible beat changes; then move backward through empty beats, remove an empty trailing measure, or remove an empty pre-measure. |
 | Delete | Remove the current measure; when appropriate, remove the last empty section. |
 | Escape | Clear pending bass, superscript, slur, and Only/All In states or close the active editor modal. |
 | A-G | Enter a root chord. An empty beat plus B creates B. |
@@ -29,12 +29,13 @@ Authority:
 | 7 | Toggle a plain seventh. |
 | T then 7 / 8 / 9 | Enter triangle-seven, sus, or aug. |
 | Ctrl+S / Ctrl+A | Direct sus / aug quality shortcuts. |
-| / then A-G | Add slash bass; slash again clears an existing bass. |
+| / tap / hold | Tap slash with no intervening keydown to toggle the bass underline. The next A-G fills the bass even without a primary chord. While slash is held, A-G fills the bass and a subsequent B toggles its flat. Tapping slash on an existing bass clears its flat, letter, and underline together. |
+| Ctrl+U | Toggle the normal-height manual underline on the active beat. |
 | . | Toggle a push/dot with underline on a rooted beat. |
 | X | Cycle zero through four x marks. |
 | O | Toggle a circle and clear dot/x marks when enabled. |
 | R | Toggle a measure-level roll. |
-| S | Start or finish a slur. |
+| S | Start a slur at the horizontal center of the active beat; press S again to finish at the second beat center. The pending start pulses with a dotted outline and the completed slur reveals left-to-right. |
 | comma | Start or finish an Only / All In span. |
 | L | Open lead melody editing for the current measure. |
 | Enter | Open Add Section. |
