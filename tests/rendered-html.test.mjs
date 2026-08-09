@@ -121,6 +121,11 @@ test("ships the Karen Music Director application shell without starter artifacts
   assert.match(editor, /onKeyUpCapture=\{handleEditorKeyUp\}/);
   assert.match(editor, /lower === "u"[\s\S]*?manualUnderline = !beat\.manualUnderline/);
   assert.match(editor, /if \(bassIsEnabled\(target\) && bassIsFlat\(target\)\)/);
+  assert.match(editor, /function deleteCurrentMeasure\(destination: "first" \| "last" = "first"\)/);
+  assert.match(editor, /destination === "last" && selected\.measure > 0/);
+  assert.match(editor, /selected\.beat === 0 && selected\.measure > 0 && activeMeasure\?\.beats\.every\(beatIsEmpty\)/);
+  assert.match(editor, /deleteCurrentMeasure\("last"\)/);
+  assert.match(editor, /key === "Delete"[\s\S]*?deleteCurrentMeasure\(\)/);
   assert.match(editor, /className="slur-arc"/);
   assert.match(editor, /className="slur-pending-anchor"/);
   assert.match(styles, /@keyframes slur-reveal/);

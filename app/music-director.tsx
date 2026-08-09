@@ -1198,7 +1198,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
     setSelected({ ...selected, measure: selected.measure + 1, beat: 0 });
   }
 
-  function deleteCurrentMeasure() {
+  function deleteCurrentMeasure(destination: "first" | "last" = "first") {
     if (selected.pre) {
       commitSong((next) => { next.sections[selected.section].preMeasure = null; }, "Pre-measure removed");
       setSelected({ ...selected, pre: false, measure: 0, beat: 0 });
@@ -1209,15 +1209,18 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       removeSection(selected.section);
       return;
     }
+    const previousMeasure = Math.max(0, selected.measure - 1);
+    const previousBeat = destination === "last" && selected.measure > 0
+      ? Math.max(0, section.measures[previousMeasure].beats.length - 1)
+      : 0;
     commitSong((next) => {
       next.sections[selected.section].measures.splice(selected.measure, 1);
     }, "Measure removed");
-    setSelected({ ...selected, measure: Math.max(0, selected.measure - 1), beat: 0 });
+    setSelected({ ...selected, measure: previousMeasure, beat: previousBeat });
   }
 
   function smartBackspace() {
     const beat = activeBeatFrom(song);
-    const section = song.sections[selected.section];
     if (selected.pre && beatIsEmpty(beat)) {
       deleteCurrentMeasure();
       return;
@@ -1242,8 +1245,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       });
       return;
     }
-    if (!selected.pre && selected.beat === 0 && selected.measure === section.measures.length - 1 && section.measures.length > 1 && activeMeasure?.beats.every(beatIsEmpty)) {
-      deleteCurrentMeasure();
+    if (!selected.pre && selected.beat === 0 && selected.measure > 0 && activeMeasure?.beats.every(beatIsEmpty)) {
+      deleteCurrentMeasure("last");
       return;
     }
     moveLeft();
@@ -2154,7 +2157,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           <dt>Ctrl+Space</dt><dd>Insert a measure using the current beat number.</dd>
           <dt>Ctrl+Tab</dt><dd>Split after the active beat.</dd>
           <dt>Ctrl+1-6</dt><dd>Insert an exact 1-6 beat measure.</dd>
-          <dt>Backspace / Delete</dt><dd>Smart-delete bass flat, bass letter, bass underline, then the latest remaining mark; or remove the measure.</dd>
+          <dt>Backspace</dt><dd>Smart-delete the latest mark. At the first beat of an empty measure, remove it and land on the previous measure&apos;s last beat.</dd>
+          <dt>Delete</dt><dd>Remove the whole active measure and land on the previous measure&apos;s first beat.</dd>
           <dt>A-G / B / M</dt><dd>Root chord; B toggles flat after a root; M toggles minor.</dd>
           <dt>7 / T+7/8/9</dt><dd>Seventh, triangle seventh, sus, or aug.</dd>
           <dt>/ then A-G</dt><dd>Tap slash to toggle the bass underline, then type A-G. Hold slash and press B after a bass letter to toggle its flat.</dd>
