@@ -20,8 +20,8 @@ Authority:
 | Ctrl+Space | Insert a measure whose length equals the current one-based beat position. |
 | Ctrl+Tab | Split the current measure after the active beat. |
 | Ctrl+1 through Ctrl+6 | Insert an exact 1-6 beat measure after the current measure. |
-| Backspace | Remove bass flat, bass letter, and bass underline in that order before other visible beat changes; then move backward through empty beats, remove an empty trailing measure, or remove an empty pre-measure. |
-| Delete | Remove the current measure; when appropriate, remove the last empty section. |
+| Backspace | Remove bass flat, bass letter, and bass underline in that order before other visible beat changes. From beat 1 of an otherwise empty measure, remove that measure and index the previous measure's last beat. |
+| Delete | Remove the entire current measure and all its contents, then index beat 1 of the previous measure; when appropriate, remove the last empty section. |
 | Escape | Clear pending bass, superscript, slur, and Only/All In states or close the active editor modal. |
 | A-G | Enter a root chord. An empty beat plus B creates B. |
 | B after a root | Toggle flat. |

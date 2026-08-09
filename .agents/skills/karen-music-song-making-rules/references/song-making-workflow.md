@@ -26,8 +26,8 @@
 - Ctrl+Tab splits after the active beat.
 - Ctrl+Space inserts a measure whose length matches the current one-based beat position.
 - Ctrl+1 through Ctrl+6 inserts an exact-length measure.
-- Backspace removes the latest visible beat change, then empty trailing structure.
-- Delete removes the current measure or the last empty section when appropriate.
+- Backspace removes the latest visible beat change. From beat 1 of an otherwise empty measure, it removes that measure and lands on the previous measure's last beat.
+- Delete removes the entire current measure and all its contents, then lands on beat 1 of the previous measure (or removes the last empty section when appropriate).
 - Enter opens Add Section; I/V/P/C/B/S/E selects the type.
 
 ## Chords and marks
