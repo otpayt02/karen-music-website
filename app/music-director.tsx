@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, FocusEvent, KeyboardEvent, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { CircleHelp, Download, Ellipsis, FilePlus2, Moon, Printer, Save, ScanLine, Upload } from "lucide-react";
+import { CircleHelp, Download, EllipsisVertical, FilePlus2, Moon, Printer, Save, ScanLine, Upload } from "lucide-react";
 import { approvedReferenceSongs } from "./reference-library";
 
 type Chord = {
@@ -459,6 +459,37 @@ function ChordNotation({ chord }: { chord: Chord | null }) {
     {chord.seven && <span className="chord-seven">₇</span>}
     {chord.quality && <span className="chord-quality">{chord.quality === "triangle7" ? "Δ7" : chord.quality}</span>}
   </>;
+}
+
+function PaperDropdown({
+  ariaLabel,
+  display,
+  options,
+  onSelect,
+  compact = false,
+  opensUp = false,
+}: {
+  ariaLabel: string;
+  display: string;
+  options: Array<{ value: string; label: string }>;
+  onSelect: (value: string) => void;
+  compact?: boolean;
+  opensUp?: boolean;
+}) {
+  return <details className={`paper-dropdown ${compact ? "is-compact" : ""} ${opensUp ? "opens-up" : ""}`}>
+    <summary aria-label={ariaLabel}>{display}</summary>
+    <div className="paper-dropdown-menu" role="menu">
+      {options.map((option) => <button
+        type="button"
+        role="menuitem"
+        key={`${option.value}-${option.label}`}
+        onClick={(event) => {
+          onSelect(option.value);
+          event.currentTarget.closest("details")?.removeAttribute("open");
+        }}
+      >{option.label}</button>)}
+    </div>
+  </details>;
 }
 
 export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: Viewer }) {
@@ -1629,6 +1660,54 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
   const activeCueRowKey = selected.pre || !song.sections[selected.section] ? "" : cueRowKey(song, selected);
   const activeCueRanges = (song.instrumentCueRanges ?? []).filter((range) => range.rowKey === activeCueRowKey).slice(0, 2);
   const activeCueRange = activeCueRanges[activeCueSlot];
+  const settingsControl = <details className="settings-menu command-settings-menu">
+    <summary aria-label="Settings" title="Settings"><EllipsisVertical aria-hidden="true" /></summary>
+    <div className="settings-popover">
+      <div className="settings-group-heading"><strong>Appearance</strong><small>Website shell and motion</small></div>
+      <label>Theme
+        <select value={theme} onChange={(event) => setTheme(event.target.value as "light" | "dark")}>
+          <option value="dark">Dark village</option>
+          <option value="light">Light village</option>
+        </select>
+      </label>
+      <label className="setting-row">
+        <input type="checkbox" checked={reducedMotion} onChange={(event) => setReducedMotion(event.target.checked)} />
+        <span><strong>Reduce motion</strong><small>Turn off zoom and panel animation.</small></span>
+      </label>
+      <div className="settings-group-heading"><strong>Music editor</strong><small>Legacy composition defaults</small></div>
+      <label>Default measures per row
+        <input type="number" min={MIN_MEASURES_PER_ROW} max={MAX_MEASURES_PER_ROW} value={defaultMeasuresPerRow} onChange={(event) => setDefaultMeasuresPerRow(Math.max(MIN_MEASURES_PER_ROW, Math.min(MAX_MEASURES_PER_ROW, Number(event.target.value) || DEFAULT_MEASURES_PER_ROW)))} />
+      </label>
+      <label className="setting-row">
+        <input
+          type="checkbox"
+          checked={karenTitleKeyboardEnabled}
+          onChange={(event) => {
+            setKarenTitleKeyboardEnabled(event.target.checked);
+            if (!event.target.checked) setKarenKeyboardOpen(false);
+          }}
+        />
+        <span><strong>Karen title keyboard</strong><small>Open the Karen keyboard from Karen title fields.</small></span>
+      </label>
+      <div className="settings-group-heading"><strong>Database choices</strong><small>Styles, categories, and groups</small></div>
+      <label>Song styles
+        <input value={styleDraft} onChange={(event) => setStyleDraft(event.target.value)} onBlur={(event) => applyOptionDraft("styles", event.target.value)} />
+        <small>Comma-separated choices. Loaded styles remain available.</small>
+      </label>
+      <label>Categories
+        <input value={categoryDraft} onChange={(event) => setCategoryDraft(event.target.value)} onBlur={(event) => applyOptionDraft("categories", event.target.value)} />
+      </label>
+      <label>Current song category
+        <select value={song.category} onChange={(event) => updateSong({ category: event.target.value })}>
+          <option value="">Category</option>
+          {categoryOptions.map((category) => <option key={category}>{category}</option>)}
+        </select>
+      </label>
+      <label>Groups
+        <input value={groupDraft} onChange={(event) => setGroupDraft(event.target.value)} onBlur={(event) => applyOptionDraft("groups", event.target.value)} />
+      </label>
+    </div>
+  </details>;
 
   return (
     <main className="app-shell" onKeyDownCapture={handleEditorKey} onKeyUpCapture={handleEditorKeyUp} onFocusCapture={handleTextFocus} onClickCapture={(event) => handleKarenTextTarget(event.target)}>
@@ -1639,7 +1718,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
           </button>
           {/* The approved project logo is a raster asset, so it stays an ordinary image. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="brand-logo" src="/karen-music-logo.png" alt="Karen Music emblem" />
+          <img className="brand-logo" src="/karen-music-logo-v2.png" alt="Karen Music emblem with chord chart" />
           <strong className="brand-name"><span>Karen Music</span><span lang="kar">ကညီတၢ်သးဝံၣ်</span></strong>
         </div>
         <nav className="global-actions" aria-label="Song actions">
@@ -1658,55 +1737,15 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <span lang="kar">က</span>
             <span>EN</span>
           </button>
+          <button
+            id="theme-toggle"
+            className="header-symbol-button header-theme-toggle"
+            onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            aria-pressed={theme === "light"}
+            title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          ><Moon aria-hidden="true" /></button>
           <button className="header-symbol-button guide-button" onClick={() => setShortcutsOpen(true)} aria-label="Open app guide and keyboard shortcuts" title="Guide and keyboard shortcuts"><CircleHelp aria-hidden="true" /></button>
-          <details className="settings-menu">
-            <summary aria-label="Settings" title="Settings"><Ellipsis aria-hidden="true" /></summary>
-            <div className="settings-popover">
-              <div className="settings-group-heading"><strong>Appearance</strong><small>Website shell and motion</small></div>
-              <label>Theme
-                <select value={theme} onChange={(event) => setTheme(event.target.value as "light" | "dark")}>
-                  <option value="dark">Dark village</option>
-                  <option value="light">Light village</option>
-                </select>
-              </label>
-              <label className="setting-row">
-                <input type="checkbox" checked={reducedMotion} onChange={(event) => setReducedMotion(event.target.checked)} />
-                <span><strong>Reduce motion</strong><small>Turn off zoom and panel animation.</small></span>
-              </label>
-              <div className="settings-group-heading"><strong>Music editor</strong><small>Legacy composition defaults</small></div>
-              <label>Default measures per row
-                <input type="number" min={MIN_MEASURES_PER_ROW} max={MAX_MEASURES_PER_ROW} value={defaultMeasuresPerRow} onChange={(event) => setDefaultMeasuresPerRow(Math.max(MIN_MEASURES_PER_ROW, Math.min(MAX_MEASURES_PER_ROW, Number(event.target.value) || DEFAULT_MEASURES_PER_ROW)))} />
-              </label>
-              <label className="setting-row">
-                <input
-                  type="checkbox"
-                  checked={karenTitleKeyboardEnabled}
-                  onChange={(event) => {
-                    setKarenTitleKeyboardEnabled(event.target.checked);
-                    if (!event.target.checked) setKarenKeyboardOpen(false);
-                  }}
-                />
-                <span><strong>Karen title keyboard</strong><small>Open the Karen keyboard from Karen title fields.</small></span>
-              </label>
-              <div className="settings-group-heading"><strong>Database choices</strong><small>Styles, categories, and groups</small></div>
-              <label>Song styles
-                <input value={styleDraft} onChange={(event) => setStyleDraft(event.target.value)} onBlur={(event) => applyOptionDraft("styles", event.target.value)} />
-                <small>Comma-separated choices. Loaded styles remain available.</small>
-              </label>
-              <label>Categories
-                <input value={categoryDraft} onChange={(event) => setCategoryDraft(event.target.value)} onBlur={(event) => applyOptionDraft("categories", event.target.value)} />
-              </label>
-              <label>Current song category
-                <select value={song.category} onChange={(event) => updateSong({ category: event.target.value })}>
-                  <option value="">Category</option>
-                  {categoryOptions.map((category) => <option key={category}>{category}</option>)}
-                </select>
-              </label>
-              <label>Groups
-                <input value={groupDraft} onChange={(event) => setGroupDraft(event.target.value)} onBlur={(event) => applyOptionDraft("groups", event.target.value)} />
-              </label>
-            </div>
-          </details>
           <input ref={fileInput} type="file" accept=".json,application/json" onChange={importSong} hidden />
         </nav>
       </header>
@@ -1714,6 +1753,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
       <div className={`workspace ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <aside className="sidebar" aria-label="Music workspace sidebar">
           <div className="sidebar-heading">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="sidebar-logo" src="/karen-music-logo-v2.png" alt="" aria-hidden="true" />
             <span>Database</span>
           </div>
           <section className="sidebar-panel library-panel" aria-label="Database sidebar">
@@ -1737,15 +1778,10 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
             <div className="song-position">
               <strong lang={interfaceLanguage === "karen" ? "kar" : "en"}>{interfaceLanguage === "karen" ? song.titleKaren || song.titleEnglish || "Untitled chart" : song.titleEnglish || song.titleKaren || "Untitled chart"}</strong>
             </div>
+            <div className="work-surface-tabs" role="tablist" aria-label="Song work surfaces">
+              {(["chart", "lyrics"] as const).map((name) => <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>)}
+            </div>
             <div className="view-controls" aria-label="View controls">
-              <button
-                id="theme-toggle"
-                className="paper-theme-toggle"
-                onClick={() => setTheme((value) => value === "dark" ? "light" : "dark")}
-                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-                aria-pressed={theme === "light"}
-                title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              ><Moon aria-hidden="true" /></button>
               <div className="zoom-control">
                 <button onClick={() => setZoom((value) => nextZoom(value, -1))} aria-label="Zoom out">−</button>
                 <output>{Math.round(zoom)}%</output>
@@ -1754,13 +1790,11 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
               <button className="fit-width-button" onClick={fitPaperToWidth} aria-label="Fit paper to width" title="Fit paper to width">
                 <ScanLine aria-hidden="true" />
               </button>
+              {settingsControl}
             </div>
           </div>
 
           <div className="paper-area" ref={paperAreaTarget}>
-            <div className="paper-tabs" role="tablist" aria-label="Song work surfaces">
-              {(["chart", "lyrics"] as const).map((name) => <button key={name} role="tab" aria-selected={tab === name} onClick={() => setTab(name)}>{name}</button>)}
-            </div>
             {tab === "chart" && <article
               className="paper chart-paper"
               tabIndex={0}
@@ -1776,12 +1810,8 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                 <input className="paper-content-input paper-style-input" size={Math.max(4, (song.style || "Style").length)} aria-label="Song style on paper" list="paper-style-options" placeholder="Style" value={song.style} onChange={(event) => updateSong({ style: event.target.value })} />
                 <datalist id="paper-style-options">{styleOptions.map((style) => <option key={style} value={style} />)}</datalist>
                 <div className="paper-key-editor-cluster">
-                  <select className="paper-key-select" data-placeholder={song.key ? undefined : "true"} aria-label="Song key on paper" value={song.key} onChange={(event) => updateSongKey(event.target.value)}><option value="">Key</option>{keyOptions.map((key) => <option key={key.value} value={key.value}>{key.label}</option>)}</select>
-                  <select className="paper-transpose-control" aria-label="Transpose song" defaultValue="" onChange={(event) => { transposeSong(event.target.value); event.currentTarget.value = ""; }}>
-                    <option value="">Transpose</option>
-                    <option value="__ORIGINAL__">Original</option>
-                    {keyOptions.map((key) => <option key={key.value} value={key.value}>{key.label}</option>)}
-                  </select>
+                  <PaperDropdown ariaLabel="Song key on paper" display={keyOptions.find((key) => key.value === song.key)?.label || "Key"} options={[{ value: "", label: "Key" }, ...keyOptions]} onSelect={updateSongKey} />
+                  <PaperDropdown ariaLabel="Transpose song" display="Transpose" compact options={[{ value: "__ORIGINAL__", label: "Original" }, ...keyOptions]} onSelect={transposeSong} />
                 </div>
               </header>
               <div className="chart-body" ref={chartBodyTarget}>
@@ -1903,9 +1933,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                     <small>{MAX_BPM}</small>
                     <output>{song.bpm} BPM</output>
                   </label>
-                  <select aria-label="Time signature on paper" value={song.meter} onChange={(event) => updateSong({ meter: normalizeTimeSignature(event.target.value) })}>
-                    {timeSignatureOptions.map((signature) => <option key={signature}>{signature}</option>)}
-                  </select>
+                  <PaperDropdown ariaLabel="Time signature on paper" display={song.meter} opensUp options={timeSignatureOptions.map((signature) => ({ value: signature, label: signature }))} onSelect={(meter) => updateSong({ meter: normalizeTimeSignature(meter) })} />
                 </div>
                 <details className="paper-instrument-picker">
                   <summary aria-label="Choose print-copy instruments">Reference</summary>
@@ -1924,7 +1952,7 @@ export function MusicDirector({ viewer = { authenticated: false } }: { viewer?: 
                     </label>)}
                   </div>
                 </details>
-                <select aria-label="Group on paper" value={song.group} onChange={(event) => updateSong({ group: event.target.value })}><option value="">Group</option>{groupOptions.map((group) => <option key={group}>{group}</option>)}</select>
+                <PaperDropdown ariaLabel="Group on paper" display={song.group || "Group"} opensUp options={[{ value: "", label: "Group" }, ...groupOptions.map((group) => ({ value: group, label: group }))]} onSelect={(group) => updateSong({ group })} />
               </footer>
             </article>}
 
