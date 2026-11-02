@@ -13,9 +13,28 @@ export type Song = {
   lyrics_json: any[];
   metadata_json: Record<string, any>;
   tags_json: string[];
+  // Reference media (optional, backwards-compatible). Persisted through the
+  // API inside metadata_json.reference_media.videos — see services.ts.
+  youtubeUrl?: string;
+  facebookUrl?: string;
+  performanceUrl?: string;
   updated_at?: string;
   version?: number;
 };
+
+export type SetlistItem = {
+  songId?: number;
+  title: string;
+  group: string;
+};
+
+export type Setlist = {
+  date: string; // ISO date of the Sunday
+  items: SetlistItem[];
+  copiesPerGroup: Record<string, number>;
+};
+
+export const SETLIST_GROUPS = ["Praise & Worship", "Kids", "Youth", "Choir", "Solo"] as const;
 
 export type ImportReview = {
   title: string;
