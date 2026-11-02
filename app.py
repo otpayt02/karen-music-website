@@ -292,6 +292,21 @@ def normalize_legacy_payload(payload: dict[str, Any]) -> dict[str, Any]:
     file_metadata = payload.get("file_metadata")
     if file_metadata is None:
         file_metadata = payload.get("fileMetadata") or []
+    reference_media = payload.get("reference_media")
+    if not isinstance(reference_media, dict):
+        metadata_in = payload.get("metadata_json")
+        reference_media = metadata_in.get("reference_media") if isinstance(metadata_in, dict) else {}
+        if not isinstance(reference_media, dict):
+            reference_media = {}
+    # Fold the editor's top-level reference URL fields into reference_media
+    # videos so they persist in the existing metadata column.
+    videos = [v for v in (reference_media.get("videos") or []) if isinstance(v, dict) and v.get("url")]
+    known_kinds = {str(v.get("kind") or v.get("type") or "") for v in videos}
+    for field, kind in (("youtubeUrl", "youtube"), ("facebookUrl", "facebook"), ("performanceUrl", "performance")):
+        url = str(payload.get(field) or "").strip()
+        if url and kind not in known_kinds:
+            videos.append({"url": url, "kind": kind})
+    reference_media = {**reference_media, "videos": videos}
     return {
         "title": payload.get("title", ""),
         "title_karen": payload.get("title_karen", ""),
@@ -308,7 +323,7 @@ def normalize_legacy_payload(payload: dict[str, Any]) -> dict[str, Any]:
             "created_date": payload.get("created_date", ""),
             "next_performance_date": payload.get("next_performance_date", ""),
             "performed_dates": payload.get("performed_dates", []),
-            "reference_media": payload.get("reference_media", {}),
+            "reference_media": reference_media,
             "fileMetadata": file_metadata,
             "instruments": payload.get("instruments", ""),
             "rowLead": row_lead,
@@ -441,19 +456,30 @@ def put_settings(payload: dict[str, Any]) -> dict[str, Any]:
 @app.get("/api/songs")
 def api_songs(q: str | None = None, tag: str | None = None) -> list[dict[str, Any]]:
     if q:
-        conn = db()
-        rows = conn.execute(
-            """
-            SELECT songs.*
-            FROM songs_fts
-            JOIN songs ON songs_fts.rowid = songs.id
-            WHERE songs_fts MATCH ?
-            ORDER BY songs.updated_at DESC
-            """,
-            (q,),
-        ).fetchall()
-        conn.close()
-        songs = [legacy_song_from_row(row) for row in rows]
+        # Quote each token as an FTS5 phrase. Passing raw user text to MATCH
+        # lets characters like "-" or ":" act as FTS syntax (a hyphenated
+        # search raised "no such column" and 500'd the whole library list).
+        tokens = [token.replace('"', '""') for token in q.split() if token.strip()]
+        if tokens:
+            fts_query = " ".join(f'"{token}"' for token in tokens)
+            conn = db()
+            try:
+                rows = conn.execute(
+                    """
+                    SELECT songs.*
+                    FROM songs_fts
+                    JOIN songs ON songs_fts.rowid = songs.id
+                    WHERE songs_fts MATCH ?
+                    ORDER BY songs.updated_at DESC
+                    """,
+                    (fts_query,),
+                ).fetchall()
+            except sqlite3.OperationalError:
+                rows = []
+            conn.close()
+            songs = [legacy_song_from_row(row) for row in rows]
+        else:
+            songs = fetch_song_rows()
     else:
         songs = fetch_song_rows()
     if tag:
