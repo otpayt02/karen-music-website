@@ -1,5 +1,5 @@
-import { Component, useEffect, useMemo, useState } from "react";
-import { api } from "./services";
+import { Component, useEffect, useMemo, useRef, useState } from "react";
+import { api, buildSongById, mergeSongsById } from "./services";
 import type { ImportReview, Setlist, SetlistItem, Song } from "./types";
 import { SETLIST_GROUPS } from "./types";
 import { ALL_KEYS, normalizeChart, semitonesBetween, transposeChart, chordStateName } from "./music";
@@ -477,7 +477,7 @@ function SetlistPanel({
   onNotice: (message: string) => void;
 }) {
   const [addId, setAddId] = useState("");
-  const songById = useMemo(() => new Map(songs.filter((s) => s.id).map((s) => [s.id!, s])), [songs]);
+  const songById = useMemo(() => buildSongById(songs), [songs]);
 
   const setItems = (items: SetlistItem[]) => onChange({ ...setlist, items });
   const move = (index: number, delta: number) => {
@@ -610,7 +610,7 @@ function SetlistPanel({
 }
 
 function PrintPacket({ setlist, songs }: { setlist: Setlist; songs: Song[] }) {
-  const songById = useMemo(() => new Map(songs.filter((s) => s.id).map((s) => [s.id!, s])), [songs]);
+  const songById = useMemo(() => buildSongById(songs), [songs]);
   const dateLabel = new Date(`${setlist.date}T12:00:00`).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
   return (
     <div className="print-packet" aria-hidden="true">
@@ -719,6 +719,11 @@ function ReviewDrawer({
 
 export default function App() {
   const [songs, setSongs] = useState<Song[]>([]);
+  // Complete-library cache for setlist resolution. `songs` above is the
+  // search-filtered list; resolving a setlist from it silently dropped
+  // every non-matching song from the print packet and team summary.
+  const [librarySongs, setLibrarySongs] = useState<Song[]>([]);
+  const librarySongsRef = useRef<Song[]>([]);
   const [song, setSong] = useState<Song>(blankSong());
   const [query, setQuery] = useState("");
   const [styleFilter, setStyleFilter] = useState("");
@@ -732,11 +737,29 @@ export default function App() {
   const [printingPacket, setPrintingPacket] = useState(false);
   const [libraryTotal, setLibraryTotal] = useState(0);
 
+  const replaceLibrarySongs = (rows: Song[]) => {
+    librarySongsRef.current = rows;
+    setLibrarySongs(rows);
+  };
+
+  const upsertLibrarySongs = (updates: Song[]) => {
+    const next = mergeSongsById(librarySongsRef.current, updates);
+    librarySongsRef.current = next;
+    setLibrarySongs(next);
+  };
+
   const refresh = async (nextQuery = query) => {
     try {
       const rows = await api.listSongs(nextQuery);
       setSongs(rows);
-      if (!nextQuery) setLibraryTotal(rows.length);
+      if (!nextQuery) {
+        replaceLibrarySongs(rows);
+        setLibraryTotal(rows.length);
+      } else {
+        // A filtered result is a subset, never a replacement: merge it so
+        // fresher copies update the cache without evicting other songs.
+        upsertLibrarySongs(rows);
+      }
     } catch {
       setNotice("Could not load songs from the database — keeping the last list shown.");
     }
@@ -772,6 +795,7 @@ export default function App() {
       api.saveSong(song)
         .then((saved) => {
           setSong(saved);
+          upsertLibrarySongs([saved]);
           setDirty(false);
           refresh();
         })
@@ -805,6 +829,13 @@ export default function App() {
       ),
     [songs, styleFilter, groupFilter],
   );
+  // The setlist always resolves against the complete cache, with the song
+  // currently being edited merged in so its latest key/references are used
+  // even before the next library refresh lands.
+  const setlistSongs = useMemo(
+    () => (song.id ? mergeSongsById(librarySongs, [song]) : librarySongs),
+    [librarySongs, song],
+  );
 
   const selectedStats = useMemo(() => {
     const collections = new Set(songs.map((item) => item.category).filter(Boolean));
@@ -823,12 +854,14 @@ export default function App() {
   const save = async () => {
     const saved = await api.saveSong(song);
     setSong(saved);
+    upsertLibrarySongs([saved]);
     setDirty(false);
     await refresh();
   };
 
   const deleteSong = async (id: number) => {
     await api.deleteSong(id);
+    replaceLibrarySongs(librarySongsRef.current.filter((item) => item.id !== id));
     if (song.id === id) setSong(blankSong());
     await refresh();
   };
@@ -951,7 +984,7 @@ export default function App() {
               <ErrorBoundary resetKey={song.id || song.title} fallbackTitle={song.title || "This song"}>
                 <Workspace song={song} activeTab={activeTab} setActiveTab={setActiveTab} onChange={updateSong} onNotice={setNotice} />
               </ErrorBoundary>
-              <SetlistPanel songs={songs} setlist={setlist} onChange={setSetlist} onPrintPacket={() => setPrintingPacket(true)} onNotice={setNotice} />
+              <SetlistPanel songs={setlistSongs} setlist={setlist} onChange={setSetlist} onPrintPacket={() => setPrintingPacket(true)} onNotice={setNotice} />
               <SettingsPanel settings={settings} onChange={setSettings} onSave={() => api.saveSettings(settings)} />
             </div>
             <div className="right-stack">
@@ -966,7 +999,7 @@ export default function App() {
 
         {review ? <ReviewDrawer review={review} onApply={applyReview} onDismiss={() => setReview(null)} /> : null}
       </div>
-      {printingPacket ? <PrintPacket setlist={setlist} songs={songs} /> : null}
+      {printingPacket ? <PrintPacket setlist={setlist} songs={setlistSongs} /> : null}
     </div>
   );
 }

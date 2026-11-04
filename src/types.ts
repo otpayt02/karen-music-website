@@ -1,3 +1,10 @@
+export type ReferenceMedia = {
+  videos?: Array<string | Record<string, any>>;
+  images?: any[];
+  info?: string;
+  [key: string]: any;
+};
+
 export type Song = {
   id?: number;
   title: string;
@@ -15,9 +22,21 @@ export type Song = {
   tags_json: string[];
   // Reference media (optional, backwards-compatible). Persisted through the
   // API inside metadata_json.reference_media.videos — see services.ts.
+  reference_media?: ReferenceMedia;
   youtubeUrl?: string;
   facebookUrl?: string;
   performanceUrl?: string;
+  // Legacy fields returned at the top level by the API and consumed by
+  // app.py::normalize_legacy_payload on save. Dropping any of these in the
+  // editor silently erases the corresponding metadata_json values.
+  rowleadjson?: Record<string, any>;
+  file_metadata?: any[];
+  instruments?: string;
+  created_date?: string;
+  performed_dates?: string[];
+  next_performance_date?: string;
+  date_performed?: string;
+  created_at?: string;
   updated_at?: string;
   version?: number;
 };

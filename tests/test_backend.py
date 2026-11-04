@@ -76,3 +76,74 @@ def test_save_song_accepts_editor_payload_and_overwrites_chart_images(monkeypatc
     payload["chartpngdataurl"] = "data:image/png;base64," + base64.b64encode(updated_png).decode("ascii")
     app_module.save_song(song_id, payload)
     assert image_path.read_bytes() == updated_png
+
+
+def test_save_song_preserves_reference_media_and_legacy_fields(monkeypatch):
+    tmp_path = Path(tempfile.mkdtemp(dir=str(Path.cwd()), prefix="pytest-local-"))
+    monkeypatch.setattr(app_module, "DATA_DIR", tmp_path)
+    monkeypatch.setattr(app_module, "DB_PATH", tmp_path / "songs.db")
+    monkeypatch.setattr(app_module, "CHART_CODE_DIR", tmp_path / "chart_code")
+    monkeypatch.setattr(app_module, "EXPORT_DIR", tmp_path / "exports")
+    monkeypatch.setattr(app_module, "ATTACHMENT_DIR", tmp_path / "attachments")
+    monkeypatch.setattr(app_module, "IMPORT_DIR", tmp_path / "imports")
+    monkeypatch.setattr(app_module, "LOCAL_IMAGE_DIR", tmp_path / "chart_images")
+    app_module.init_db()
+
+    row_lead = {"0:0": {"baseOctave": 5, "cells": {"base:0": "3"}, "enabled": True}}
+    file_metadata = [{"id": "file-1", "name": "song.json", "kind": "Editor JSON"}]
+    reference_media = {
+        "videos": [
+            {"url": "https://www.youtube.com/watch?v=new-video", "kind": "youtube"},
+            {
+                "url": "https://www.facebook.com/watch/?v=old-facebook",
+                "kind": "facebook",
+                "label": "Original Facebook reference",
+            },
+            {"url": "https://example.org/rehearsal.mp4", "kind": "rehearsal"},
+        ],
+        "images": [{"id": "image-1", "url": "https://example.org/reference.jpg"}],
+        "info": "Reference notes survive",
+        "customMediaNote": "Keep arbitrary reference_media keys",
+    }
+    payload = {
+        "title": "Fully Populated",
+        "title_karen": "Karen Title",
+        "category": "Choir",
+        "key": "G",
+        "current_key": "G",
+        "original_key": "G",
+        "style": "Praise",
+        "tempo": "96",
+        "notes": "Director notes",
+        "chart_json": {"sections": [], "raw": "G | C | D"},
+        "lyrics_json": [{"title": "Verse", "karenText": "Lyrics"}],
+        "tags_json": ["legacy", "choir"],
+        "reference_media": reference_media,
+        "youtubeUrl": "https://www.youtube.com/watch?v=new-video",
+        "facebookUrl": "https://www.facebook.com/watch/?v=old-facebook",
+        "performanceUrl": "",
+        "rowleadjson": row_lead,
+        "file_metadata": file_metadata,
+        "instruments": "Piano, Guitar",
+        "created_date": "2024-01-02",
+        "performed_dates": ["2026-10-04", "2026-10-11"],
+        "next_performance_date": "2026-11-08",
+        "date_performed": "2026-10-11",
+    }
+
+    created = app_module.save_song(None, payload)
+
+    assert created["reference_media"] == reference_media
+    assert created["rowleadjson"] == row_lead
+    assert created["file_metadata"] == file_metadata
+    assert created["instruments"] == "Piano, Guitar"
+    assert created["created_date"] == "2024-01-02"
+    assert created["performed_dates"] == ["2026-10-04", "2026-10-11"]
+    assert created["next_performance_date"] == "2026-11-08"
+    assert created["date_performed"] == "2026-10-11"
+
+    loaded = app_module.fetch_song_rows("WHERE id = ?", (created["id"],))[0]
+    assert loaded["metadata_json"]["reference_media"] == reference_media
+    assert loaded["metadata_json"]["rowLead"] == row_lead
+    assert loaded["metadata_json"]["fileMetadata"] == file_metadata
+    assert loaded["metadata_json"]["instruments"] == "Piano, Guitar"
