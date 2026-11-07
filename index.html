@@ -902,7 +902,7 @@
       }
 
       html[data-design="design-3"] {
-        --design-concept: "Studio";
+        --design-concept: "Stage";
         --sidebar-width: 360px;
         --panel-radius: 28px;
         --control-radius: 18px;
@@ -4003,6 +4003,11 @@
         display: block;
       }
 
+      /* Settings must stay clickable above the Karen keyboard flap (z up to 980). */
+      #settings-panel {
+        z-index: 1000;
+      }
+
       .translation-queue-panel {
         margin-top: 12px;
         padding-top: 10px;
@@ -4108,14 +4113,19 @@
       }
 
       .toggle-switch input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
         opacity: 0;
-        width: 0;
-        height: 0;
+        cursor: pointer;
       }
 
       .toggle-track {
         position: absolute;
         inset: 0;
+        pointer-events: none;
         background: #444;
         border-radius: 999px;
         cursor: pointer;
@@ -6464,7 +6474,7 @@
         --lead-row-bg: color-mix(in srgb, var(--accent-2) 16%, transparent);
       }
 
-      html[data-palette="moss-party"] {
+      html[data-palette="kawthoolei"] {
         --palette-accent: #1f6f4a;
         --palette-accent-2: #bfe36d;
         --palette-accent-3: #244b33;
@@ -7092,7 +7102,7 @@
           inset 0 1px 0 rgba(255,255,255,0.4);
       }
 
-      .swatch-moss-party { background: linear-gradient(120deg, #1f6f4a, #c7d96b, #f6f0d8); }
+      .swatch-kawthoolei { background: linear-gradient(120deg, #1f6f4a, #c7d96b, #f6f0d8); }
       .swatch-neon-jam { background: linear-gradient(120deg, #8f6cff, #25d0b5, #ff7188); }
       .swatch-sunburst-soda { background: linear-gradient(120deg, #f59e0b, #d45d45, #fff3bf); }
       .swatch-ink-honey { background: linear-gradient(120deg, #2f6f88, #d8a657, #2b315e); }
@@ -7317,12 +7327,12 @@
       .toggle-switch input {
         position: absolute;
         opacity: 0;
-        pointer-events: none;
       }
 
       .toggle-track {
         position: absolute;
         inset: 0;
+        pointer-events: none;
         border-radius: 999px;
         background: color-mix(in srgb, var(--text) 16%, transparent);
         box-shadow: inset 0 1px 2px color-mix(in srgb, #000 22%, transparent);
@@ -10760,7 +10770,37 @@
         <button id="btn-new" onclick="newSong()">New</button>
         <button id="btn-save" onclick="saveSong()">Save</button>
         <button id="btn-import" type="button" onclick="openSongImport()">Import</button>
-        <input id="song-import-file" type="file" accept=".json,.png,.jpg,.jpeg,.webp,.pdf,application/json,image/png,image/jpeg,image/webp,application/pdf" hidden>
+        <input id="song-import-file" type="file" accept=".json,.png,.jpg,.jpeg,.webp,.pdf,.cho,.chordpro,.crd,.pro,.txt,application/json,image/png,image/jpeg,image/webp,application/pdf,text/plain" hidden>
+        <div id="song-import-overlay" class="modal-overlay" style="display:none;">
+          <div class="modal song-import-modal" role="dialog" aria-label="Import a song">
+            <h2>Import a song</h2>
+            <p class="only-instrument-help">Imports are reviewed before anything is loaded — the editor is only replaced when you apply.</p>
+            <div class="song-import-criteria">
+              <h3>Metadata the importer reads</h3>
+              <p id="song-import-metadata-criteria">Loading criteria…</p>
+              <h3>Chart details the importer reads</h3>
+              <p id="song-import-chart-criteria">Loading criteria…</p>
+            </div>
+            <div class="song-import-actions">
+              <button type="button" id="song-import-choose" class="wizard-btn-primary">Choose a file…</button>
+              <button type="button" id="song-import-cancel" class="wizard-btn-secondary">Cancel</button>
+            </div>
+            <div id="song-import-review" style="display:none;">
+              <h3>Review import</h3>
+              <dl class="song-import-review-grid">
+                <dt>Source</dt><dd id="song-import-review-source"></dd>
+                <dt>Sections</dt><dd id="song-import-review-sections"></dd>
+                <dt>Measures</dt><dd id="song-import-review-measures"></dd>
+                <dt>Confidence</dt><dd id="song-import-review-confidence"></dd>
+              </dl>
+              <p id="song-import-warnings"></p>
+              <div class="song-import-actions">
+                <button type="button" id="song-import-apply" class="wizard-btn-primary">Apply to editor</button>
+                <button type="button" id="song-import-discard" class="wizard-btn-secondary">Discard</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <button id="btn-print" onclick="printInstrumentPackets()">Print</button>
         <button id="btn-export" onclick="exportDb()">Export</button>
       </div>
@@ -11664,18 +11704,37 @@
         if (document.documentElement.dataset.instrumentScrollLockBound === "1") return;
         document.documentElement.dataset.instrumentScrollLockBound = "1";
 
-        document.addEventListener("pointerover", (event) => {
+        // Click-to-lock: hovering alone must not capture the wheel (the
+        // sidebar keeps scrolling); only a click into the picker locks
+        // wheel scrolling to it, and clicking anywhere else releases it.
+        document.addEventListener("pointerdown", (event) => {
           const group = event.target?.closest?.(".instr-checklist");
-          if (group && activeInstrumentScrollGroup !== group) {
-            lockInstrumentScrollGroup(group);
+          if (group) {
+            if (activeInstrumentScrollGroup !== group) lockInstrumentScrollGroup(group);
+          } else {
+            unlockInstrumentScrollGroup();
           }
         }, true);
 
-        document.addEventListener("pointerout", (event) => {
-          const group = event.target?.closest?.(".instr-checklist");
-          if (!group || group.contains(event.relatedTarget)) return;
-          unlockInstrumentScrollGroup();
-        }, true);
+        // While a picker is locked, wheel gestures over the editor area
+        // route to the locked picker instead of scrolling the page.
+        document.addEventListener("wheel", (event) => {
+          if (!activeInstrumentScrollGroup) return;
+          if (event.ctrlKey || event.metaKey) return;
+          const origin = event.target instanceof Element ? event.target : null;
+          if (!origin) return;
+          if (activeInstrumentScrollGroup.contains(origin)) return;
+          if (!origin.closest("#main-editor")) return;
+          event.preventDefault();
+          // The checklist inherits scroll-behavior:smooth, which would
+          // animate this jump and leave scrollTop mid-flight for readers;
+          // a wheel tick must land immediately.
+          const group = activeInstrumentScrollGroup;
+          const previousBehavior = group.style.scrollBehavior;
+          group.style.scrollBehavior = "auto";
+          group.scrollTop += event.deltaY;
+          group.style.scrollBehavior = previousBehavior;
+        }, { capture: true, passive: false });
       }
 
       function setupHoverOnlyScrolling() {
@@ -13861,9 +13920,6 @@
         const measureKey = getRowKey(state.currentSectionIdx, state.currentMeasureIdx);
         const cfg = ensureRowLead(measureKey);
         if (state.currentMeasureIdx === PRE_MEASURE_INDEX) {
-          if ((!cfg.baseOctave || Number(cfg.baseOctave) < 1)) {
-            cfg.baseOctave = 4;
-          }
           openLeadModal(measureKey, cfg.baseOctave ? 3 : 1);
           return;
         }
@@ -14273,6 +14329,18 @@
 
         if (e.key === "Enter") {
           e.preventDefault();
+          // Enter advances the wizard step by step; it only saves and
+          // closes from the grid/instrument steps. Handling this here —
+          // not only in the focused button's own keydown — keeps the flow
+          // correct even when focus has not landed on a button yet.
+          if (lm.tab === 1) {
+            if (lm.working?.baseOctave) leadModalGoTab(2);
+            return;
+          }
+          if (lm.tab === 2) {
+            commitLeadSlotChoice(true);
+            return;
+          }
           closeLeadModal(true);
           return;
         }
@@ -15297,12 +15365,12 @@
         const map = {
           "Piano 1": "KB1",
           "Piano 2": "KB2",
-          "Electric Guitar": "GT",
+          "Electric Guitar": "EGT",
           "Acoustic Guitar": "AGT",
           "Rhythm": "RT",
           "Rhythm Guitar": "RT",
           "Electric Bass": "BS",
-          "Drums": "DRM",
+          "Drums": "DR",
           "Keytar": "KT"
         };
         if (map[name]) return map[name];
@@ -15317,13 +15385,17 @@
       }
 
       function getCueAbbreviationChoices() {
+        const songInstruments = getPrintInstrumentList();
+        if (songInstruments.length) {
+          return songInstruments.map(name => ({ name, label: getInstrumentAbbreviation(name) }));
+        }
         return [
           { name: "Keyboard", label: "KB" },
-          { name: "Electric Guitar", label: "GT" },
+          { name: "Electric Guitar", label: "EGT" },
           { name: "Rhythm", label: "RT" },
           { name: "Acoustic Guitar", label: "AGT" },
           { name: "Bass", label: "BS" },
-          { name: "Drums", label: "DRM" },
+          { name: "Drums", label: "DR" },
           { name: "Keytar", label: "KT" }
         ];
       }
@@ -15498,13 +15570,13 @@
         const cueAbbreviations = {
           "keyboard": "KB",
           "piano 1": "KB1", "piano 2": "KB2",
-          "electric guitar": "GT",
+          "electric guitar": "EGT",
           "acoustic guitar": "AGT",
           "rhythm": "RT",
           "rhythm guitar": "RT",
           "electric bass": "BS",
           "bass": "BS",
-          "drums": "DRM",
+          "drums": "DR",
           "keytar": "KT"
         };
         const prefix = cueAbbreviations[prefixRaw.toLowerCase()] || prefixRaw;
@@ -15626,7 +15698,8 @@
           container.appendChild(label1);
           container.appendChild(label2);
           if (rows.length <= 1) {
-            appendCueLine(startCueLeft, Math.max(startCueWidth, (eRect.left - sRect.left) + endRect.width), cueTop);
+            appendCueLine(startCueLeft, startCueWidth, cueTop);
+            appendCueLine(endCueLeft, endCueWidth, cueTop);
           } else {
             rows.forEach((row, idx) => {
               const firstBeat = row.beats[0];
@@ -16396,6 +16469,7 @@
           grid.innerHTML = "";
           [
             ["Karen Title", meta.titleKaren || "—"],
+            ["Key", meta.key || "—"],
             ["Created", meta.created || "—"],
             ["Next", meta.nextPerformance || "—"],
             ["Performed", meta.performed || "—"],
@@ -18378,10 +18452,18 @@
           }
         });
 
+        // Backdrop close must require the press to START on the backdrop:
+        // tab panels re-render on state changes, which can retarget a
+        // click that began on a control to the overlay's common ancestor.
+        let leadBackdropPressStarted = false;
+        document.getElementById("lead-modal-overlay").addEventListener("pointerdown", e => {
+          leadBackdropPressStarted = e.target.id === "lead-modal-overlay";
+        });
         document.getElementById("lead-modal-overlay").addEventListener("click", e => {
-          if (e.target.id === "lead-modal-overlay") {
+          if (e.target.id === "lead-modal-overlay" && leadBackdropPressStarted) {
             closeLeadModal();
           }
+          leadBackdropPressStarted = false;
         });
 
         document.getElementById("lyrics-section-modal-overlay").addEventListener("click", e => {
@@ -18545,10 +18627,10 @@
         state.lyricsSections    = normalizeLyricsSections(chartBundle.lyricsSections || chartBundle.lyrics || []);
         const inferredBpm = (() => {
           const savedBpm = Number(chartBundle.beatsPerMeasure);
-          if (savedBpm === 3 || savedBpm === 4) return savedBpm;
+          if (savedBpm === 3 || savedBpm === 4 || savedBpm === 6) return savedBpm;
           const first = state.sections?.[0]?.measures?.[0];
           const len = Array.isArray(first?.beats) ? first.beats.length : 4;
-          return len === 3 ? 3 : 4;
+          return len === 3 ? 3 : len === 6 ? 6 : 4;
         })();
         setBeatsPerMeasure(inferredBpm, { render: false, normalizeExisting: false });
         const savedDefaultMpr = Number(chartBundle.defaultMeasuresPerRow);
@@ -18561,6 +18643,7 @@
         }
         syncDefaultMeasuresPerRowInput();
         state.rowLead          = rowLeadPayload || {};
+        state.songGroup        = String(chartBundle.songGroup || s.group || s.song_group || "");
         state.currentSectionIdx = 0;
         state.currentMeasureIdx = 0;
         state.currentBeatIdx    = 0;
@@ -18815,11 +18898,78 @@
         focusEditor();
       }
 
-      function openSongImport() {
+      let pendingImportResult = null;
+      let songImportCriteriaLoaded = false;
+
+      async function openSongImport() {
+        const overlay = document.getElementById("song-import-overlay");
         const input = document.getElementById("song-import-file");
-        if (!input) return;
-        input.value = "";
-        input.click();
+        if (!overlay) {
+          if (input) { input.value = ""; input.click(); }
+          return;
+        }
+        overlay.style.display = "flex";
+        overlay.classList.add("open");
+        if (!songImportCriteriaLoaded) {
+          songImportCriteriaLoaded = true;
+          try {
+            const response = await fetch("/api/import/criteria");
+            const criteria = await response.json();
+            const metaEl = document.getElementById("song-import-metadata-criteria");
+            const chartEl = document.getElementById("song-import-chart-criteria");
+            if (metaEl) metaEl.textContent = (criteria.metadata_fields || []).join(" · ");
+            if (chartEl) chartEl.textContent = (criteria.chart_fields || []).join(" · ");
+          } catch (error) {
+            songImportCriteriaLoaded = false;
+          }
+        }
+      }
+
+      function closeSongImport() {
+        const overlay = document.getElementById("song-import-overlay");
+        if (overlay) {
+          overlay.style.display = "none";
+          overlay.classList.remove("open");
+        }
+        const review = document.getElementById("song-import-review");
+        if (review) review.style.display = "none";
+        pendingImportResult = null;
+      }
+
+      function showSongImportReview(result) {
+        pendingImportResult = result;
+        const review = result?.import_review || {};
+        const chart = result?.chart_json || result?.chartjson || {};
+        const sections = Array.isArray(chart.sections) ? chart.sections : [];
+        const measureCount = sections.reduce((total, section) => total + (Array.isArray(section.measures) ? section.measures.length : 0), 0);
+        const sourceEl = document.getElementById("song-import-review-source");
+        const sectionsEl = document.getElementById("song-import-review-sections");
+        const measuresEl = document.getElementById("song-import-review-measures");
+        const confidenceEl = document.getElementById("song-import-review-confidence");
+        const warningsEl = document.getElementById("song-import-warnings");
+        const sourceKind = review.source_kind || result?.kind || "";
+        if (sourceEl) sourceEl.textContent = review.provider ? `${sourceKind} / ${review.provider}` : sourceKind;
+        if (sectionsEl) sectionsEl.textContent = String(review.section_count ?? sections.length);
+        if (measuresEl) measuresEl.textContent = String(review.measure_count ?? measureCount);
+        if (confidenceEl) confidenceEl.textContent = Number.isFinite(Number(result?.confidence)) ? `${Math.round(Number(result.confidence) * 100)}%` : "—";
+        if (warningsEl) warningsEl.textContent = Array.isArray(result?.warnings) ? result.warnings.join("\n") : "";
+        const reviewEl = document.getElementById("song-import-review");
+        if (reviewEl) reviewEl.style.display = "block";
+        const overlay = document.getElementById("song-import-overlay");
+        if (overlay && overlay.style.display === "none") {
+          overlay.style.display = "flex";
+          overlay.classList.add("open");
+        }
+      }
+
+      async function applySongImport() {
+        if (!pendingImportResult) return;
+        const result = pendingImportResult;
+        await loadSong({ ...result, id: null });
+        state.id = null;
+        closeSongImport();
+        renderChart();
+        showToast(uiText("importLoaded"), "success");
       }
 
       async function importSongFile(file) {
@@ -18833,35 +18983,15 @@
         try {
           const form = new FormData();
           form.append("file", file);
-          const isJson = file.name.toLowerCase().endsWith(".json") || file.type === "application/json";
-          const endpoint = isJson ? "/api/import/json" : "/api/import/vision";
+          const lowerName = file.name.toLowerCase();
+          const isJson = lowerName.endsWith(".json") || file.type === "application/json";
+          const isCode = /\.(cho|chordpro|crd|pro|txt)$/.test(lowerName) || file.type === "text/plain";
+          const endpoint = isJson ? "/api/import/json" : isCode ? "/api/import/code" : "/api/import/vision";
           const response = await fetch(endpoint, { method: "POST", body: form });
           const result = await response.json();
           if (!response.ok) throw new Error(result.error || "Import failed");
 
-          const chart = result.chart_json || result.chartjson || {};
-          const sectionCount = Array.isArray(chart.sections) ? chart.sections.length : 0;
-          const measureCount = Array.isArray(chart.sections)
-            ? chart.sections.reduce((total, section) => total + (Array.isArray(section.measures) ? section.measures.length : 0), 0)
-            : 0;
-          const confidence = Number.isFinite(Number(result.confidence))
-            ? `\nOCR confidence: ${Math.round(Number(result.confidence) * 100)}%`
-            : "";
-          const warnings = Array.isArray(result.warnings) && result.warnings.length
-            ? `\nWarnings:\n- ${result.warnings.join("\n- ")}`
-            : "";
-          const approved = window.confirm(
-            `Import ${file.name}?\n\nDetected ${sectionCount} section(s) and ${measureCount} measure(s).${confidence}${warnings}\n\nThe editor will be replaced with this draft. Review it before pressing Save.`
-          );
-          if (!approved) {
-            showToast(uiText("importCanceled"), "success");
-            return;
-          }
-
-          await loadSong({ ...result, id: null });
-          state.id = null;
-          renderChart();
-          showToast(uiText("importLoaded"), "success");
+          showSongImportReview(result);
         } catch (error) {
           showToast(error.message || uiText("importFailed"), "error");
         } finally {
@@ -19240,6 +19370,9 @@
       function isKarenTextField(el) {
         if (!el) return false;
         const tag = String(el.tagName || "").toLowerCase();
+        if (currentLang === "karen" && el.id === "songKey") {
+          return true;
+        }
         if (currentLang === "karen" && (tag === "input" || tag === "textarea") && !isKarenDisallowedFieldId(el.id || "")) {
           return true;
         }
@@ -19300,12 +19433,33 @@
         return typeof el.selectionStart === "number" && typeof el.selectionEnd === "number";
       }
 
+      function isKarenKeyboardField(el) {
+        if (isKarenInsertTarget(el)) return true;
+        // The key selector is a <select>, so it can never receive typed
+        // inserts, but in Karen mode the keyboard flap still opens for it
+        // (with inputmode="none") like every other non-English-title field.
+        return currentLang === "karen" && !!el && el.id === "songKey";
+      }
+
+      let karenTargetSelection = null;
+
       function rememberKarenTarget(el) {
         if (!isKarenInsertTarget(el)) return;
         forceKarenTextDirection(el);
         karenInputTargetEl = el;
         if (el.id) {
           state.karenInputTargetId = el.id;
+        }
+        // Browsers collapse a text field's caret to 0 when it loses and
+        // regains focus; for the Karen keyboard's target field that would
+        // send the next characters to the start of the text. Remember the
+        // caret while the field is in use and restore it on refocus.
+        if (karenTargetSelection && karenTargetSelection.id === el.id
+            && el.selectionStart === 0 && el.selectionEnd === 0
+            && karenTargetSelection.start > 0) {
+          try {
+            el.setSelectionRange(karenTargetSelection.start, karenTargetSelection.end);
+          } catch (error) { /* field may not support selection */ }
         }
       }
 
@@ -19428,8 +19582,9 @@
       }
 
       function openKarenKeyboardForTarget(el = getKarenInsertTarget()) {
-        if (!isKarenInsertTarget(el)) return;
-        rememberKarenTarget(el);
+        if (!isKarenKeyboardField(el)) return;
+        if (isKarenInsertTarget(el)) rememberKarenTarget(el);
+        else forceKarenTextDirection(el);
         const flap = document.getElementById("karen-flap");
         const label = document.getElementById("karen-target-label");
         if (label) label.textContent = `${t("typingInto")} ${getKarenTargetName(el)}`;
@@ -19456,6 +19611,18 @@
       }
 
       function handleKarenKeyboardShortcut(e) {
+        // The browser resets a blurred field's caret to 0 as part of
+        // refocusing, after focusin has already run — restore the saved
+        // caret here, in the capture phase, before the key can insert.
+        const activeTarget = document.activeElement;
+        if (activeTarget && karenTargetSelection && karenTargetSelection.id === (activeTarget.id || "")
+            && isKarenInsertTarget(activeTarget)
+            && activeTarget.selectionStart === 0 && activeTarget.selectionEnd === 0
+            && karenTargetSelection.start > 0) {
+          try {
+            activeTarget.setSelectionRange(karenTargetSelection.start, karenTargetSelection.end);
+          } catch (error) { /* field may not support selection */ }
+        }
         const karenFlapOpen = document.getElementById("karen-flap")?.classList.contains("open");
         if (!karenFlapOpen) return false;
 
@@ -19587,11 +19754,11 @@
         // update target label when focus changes
         document.addEventListener("focusin", (e) => {
           const tag = e.target.tagName.toLowerCase();
-          if ((tag === "input" || tag === "textarea") && e.target.id !== "focus-trap") {
+          if ((tag === "input" || tag === "textarea" || (tag === "select" && isKarenKeyboardField(e.target))) && e.target.id !== "focus-trap") {
             if (label) {
               const targetName = getKarenTargetName(e.target);
               const typingPrefix = t("typingInto");
-              if (!isKarenInsertTarget(e.target)) {
+              if (!isKarenKeyboardField(e.target)) {
                 label.textContent = typingPrefix + " " + targetName + " (English only)";
                 closeKarenKeyboard();
               } else {
@@ -19599,7 +19766,7 @@
               }
             }
             rememberKarenTarget(e.target);
-            if (isKarenInsertTarget(e.target)) {
+            if (isKarenKeyboardField(e.target)) {
               openKarenKeyboardForTarget(e.target);
             }
           }
@@ -19612,10 +19779,34 @@
         });
 
         document.addEventListener("selectionchange", () => {
+          const target = getKarenInsertTarget();
+          if (target && document.activeElement === target && typeof target.selectionStart === "number") {
+            // A collapsed 0 caret right after refocus is the browser's
+            // focus reset, not a user choice — never let it clobber the
+            // caret saved when the field last had focus.
+            const collapsedReset = target.selectionStart === 0 && target.selectionEnd === 0
+              && karenTargetSelection && karenTargetSelection.id === (target.id || "")
+              && karenTargetSelection.start > 0 && String(target.value || "").length > 0;
+            if (!collapsedReset) {
+              karenTargetSelection = {
+                id: target.id || "",
+                start: target.selectionStart,
+                end: target.selectionEnd ?? target.selectionStart
+              };
+            }
+          }
           if (document.activeElement === getKarenInsertTarget()) {
             updateKarenFocusPreview(document.activeElement);
           }
         });
+
+        // A pointer press is the user choosing a new caret — drop the
+        // saved one so refocus restoration does not override the click.
+        document.addEventListener("pointerdown", (e) => {
+          if (karenTargetSelection && e.target && e.target.id === karenTargetSelection.id) {
+            karenTargetSelection = null;
+          }
+        }, true);
       }
 
       // ============================================================
@@ -20048,10 +20239,10 @@
           apply: "Apply",
           instrumentPiano1Abbr: "KB1",
           instrumentPiano2Abbr: "KB2",
-          instrumentElectricGuitarAbbr: "GT",
+          instrumentElectricGuitarAbbr: "EGT",
           instrumentAcousticGuitarAbbr: "AGT",
           instrumentElectricBassAbbr: "BS",
-          instrumentDrumsAbbr: "DRM",
+          instrumentDrumsAbbr: "DR",
           instrumentKeytarAbbr: "KT",
           newSongTitle: "New Song"
         },
@@ -20226,10 +20417,10 @@
           apply: "",
           instrumentPiano1Abbr: "KB1",
           instrumentPiano2Abbr: "KB2",
-          instrumentElectricGuitarAbbr: "GT",
+          instrumentElectricGuitarAbbr: "EGT",
           instrumentAcousticGuitarAbbr: "AGT",
           instrumentElectricBassAbbr: "BS",
-          instrumentDrumsAbbr: "DRM",
+          instrumentDrumsAbbr: "DR",
           instrumentKeytarAbbr: "KT",
           newSongTitle: "သဝ်အသီ"
         }
@@ -20397,13 +20588,13 @@
       };
 
       const THEME_MODES = ["light", "dark"];
-      const THEME_PALETTES = ["moss-party", "neon-jam", "sunburst-soda", "ink-honey", "cherry-moss"];
+      const THEME_PALETTES = ["kawthoolei", "neon-jam", "sunburst-soda", "ink-honey", "cherry-moss"];
       const THEME_MOTIONS = ["silky", "calm"];
       const THEME_DENSITIES = ["compact", "comfy"];
       const UI_DESIGNS = ["design-1", "design-2", "design-3"];
 
       let themeMode = localStorage.getItem(THEME_STORAGE_KEYS.mode) || "light";
-      let themePalette = localStorage.getItem(THEME_STORAGE_KEYS.palette) || "moss-party";
+      let themePalette = localStorage.getItem(THEME_STORAGE_KEYS.palette) || "kawthoolei";
       let themeMotion = localStorage.getItem(THEME_STORAGE_KEYS.motion) || "silky";
       let themeDensity = localStorage.getItem(THEME_STORAGE_KEYS.density) || "compact";
       let uiDesign = localStorage.getItem(THEME_STORAGE_KEYS.design) || "design-2";
@@ -20423,7 +20614,7 @@
 
       function applyThemePreferences() {
         themeMode = clampThemeChoice(themeMode, THEME_MODES, "light");
-        themePalette = clampThemeChoice(themePalette, THEME_PALETTES, "moss-party");
+        themePalette = clampThemeChoice(themePalette, THEME_PALETTES, "kawthoolei");
         themeMotion = clampThemeChoice(themeMotion, THEME_MOTIONS, "silky");
         themeDensity = clampThemeChoice(themeDensity, THEME_DENSITIES, "compact");
         uiDesign = clampThemeChoice(uiDesign, UI_DESIGNS, "design-1");
@@ -20490,7 +20681,7 @@
       }
 
       function setThemePalette(palette) {
-        themePalette = clampThemeChoice(palette, THEME_PALETTES, "moss-party");
+        themePalette = clampThemeChoice(palette, THEME_PALETTES, "kawthoolei");
         localStorage.setItem(THEME_STORAGE_KEYS.palette, themePalette);
         applyThemePreferences();
       }
@@ -21794,6 +21985,28 @@
         if (importInput && !importInput.dataset.importBound) {
           importInput.addEventListener("change", () => importSongFile(importInput.files?.[0]));
           importInput.dataset.importBound = "1";
+        }
+        const importChoose = document.getElementById("song-import-choose");
+        if (importChoose && !importChoose.dataset.bound) {
+          importChoose.addEventListener("click", () => {
+            if (importInput) { importInput.value = ""; importInput.click(); }
+          });
+          importChoose.dataset.bound = "1";
+        }
+        const importCancel = document.getElementById("song-import-cancel");
+        if (importCancel && !importCancel.dataset.bound) {
+          importCancel.addEventListener("click", closeSongImport);
+          importCancel.dataset.bound = "1";
+        }
+        const importDiscard = document.getElementById("song-import-discard");
+        if (importDiscard && !importDiscard.dataset.bound) {
+          importDiscard.addEventListener("click", closeSongImport);
+          importDiscard.dataset.bound = "1";
+        }
+        const importApply = document.getElementById("song-import-apply");
+        if (importApply && !importApply.dataset.bound) {
+          importApply.addEventListener("click", applySongImport);
+          importApply.dataset.bound = "1";
         }
         await loadLatestTranslationOverrides();
         if (!appInitialized) {
